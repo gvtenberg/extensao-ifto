@@ -1,0 +1,51 @@
+/* Páginas da própria extensão (janela do ícone e configurações): cores do padrão do sistema. */
+:root {
+  --fundo: #F5F6F4;
+  --cartao: #FFFFFF;
+  --borda: #E2E6E3;
+  --borda-forte: #D5DBD7;
+  --texto: #1B2420;
+  --texto-2: #5B6660;
+  --marca: #1E5E33;
+  --marca-fundo: #E7F2EA;
+  --pendencia: #7A4B00;
+  --pendencia-fundo: #FFF1D6;
+}
+
+* { box-sizing: border-box; }
+
+body {
+  margin: 0;
+  background: var(--fundo);
+  color: var(--texto);
+  font: 14px/1.5 "IBM Plex Sans", system-ui, sans-serif;
+}
+
+h1 { font-size: 17px; font-weight: 600; margin: 0 0 4px; }
+.apoio { color: var(--texto-2); font-size: 13px; margin: 0; }
+
+.cartao {
+  background: var(--cartao);
+  border: 1px solid var(--borda);
+  border-radius: 12px;
+  padding: 20px;
+}
+
+.botao {
+  min-height: 44px;
+  padding: 0 16px;
+  border-radius: 8px;
+  border: 1px solid var(--borda-forte);
+  background: var(--cartao);
+  color: var(--texto);
+  font: inherit;
+  cursor: pointer;
+}
+.botao.principal { background: var(--marca); border-color: var(--marca); color: #fff; }
+
+.opcao { display: flex; gap: 12px; align-items: flex-start; min-height: 44px; padding: 8px 0; cursor: pointer; }
+.opcao input { width: 18px; height: 18px; margin-top: 2px; accent-color: var(--marca); }
+
+.aviso { border-radius: 8px; padding: 10px 12px; font-size: 13px; }
+.aviso.sucesso { background: var(--marca-fundo); color: var(--marca); }
+.aviso.pendencia { background: var(--pendencia-fundo); color: var(--pendencia); }

@@ -51,8 +51,12 @@ O sistema principal fica em `../sistema-orcamento-ifto` (outro repositório). L�
 
 ## Comandos
 
-- A definir na primeira etapa (ferramenta `web-ext` da Mozilla: rodar, conferir e empacotar a extensão). Ao definir, liste aqui o texto exato de cada comando.
-- Instalação temporária no Firefox: `about:debugging#/runtime/this-firefox` > **Carregar extensão temporária…** > escolher o `manifest.json` (ou o `.xpi`). Some quando o Firefox fecha.
+- `npm test` – testes automáticos das regras (`testes/*.test.js`, com o executor de testes do próprio Node; crie testes para cada regra nova em `comum/`).
+- `npm run conferir` – conferência da Mozilla (`web-ext lint`): manifest, permissões e código (no fim de cada etapa).
+- `npm run empacotar` – gera o pacote em `web-ext-artifacts/` (fora do git).
+- `npm run rodar` – abre um Firefox de teste com a extensão (perfil limpo, sem as senhas do usuário; para testar no SEI, prefira a instalação temporária).
+- Instalação temporária no Firefox: `about:debugging#/runtime/this-firefox` > **Carregar extensão temporária…** > escolher o `manifest.json` da pasta `extensao-ifto` (ou um `.xpi`). Some quando o Firefox fecha; depois de mudar o código, clique em **Recarregar** ali.
+- Regras puras (sem página) ficam em `comum/` e funcionam no navegador e no Node (`module.exports` ou `globalThis.ExtensaoIFTO`); o que mexe na página fica em `sites/<site>/`.
 - `ferramentas-de-teste/` está no `.gitignore`: **nunca vai para o git**; todo arquivo de teste ou de referência local (ex.: pacotes do SEI++) fica lá dentro. Nunca retire linhas do `.gitignore` sem permissão (acrescentar pode, avisando).
 - Chaves e senhas (Google, Mozilla) nunca vão para o git: ficam em `.env.local` ou nas configurações do navegador.
 

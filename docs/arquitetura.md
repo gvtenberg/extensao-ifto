@@ -2,13 +2,19 @@
 
 Leia só quando precisar localizar código. Ao criar um arquivo importante, acrescente uma linha aqui.
 
-Ainda não há código. A estrutura será decidida na primeira etapa (ver `specs/base-e-sei.md`). Provável, no padrão das extensões do Firefox:
+JavaScript simples, sem compilação, Manifest V3 (D4 de `specs/base-e-sei.md`). As regras puras ficam em `comum/` e são testadas no Node (`testes/`); o que mexe nas páginas fica em `sites/<site>/`.
 
 | Arquivo ou pasta | Função |
 | --- | --- |
-| `manifest.json` | Nome, versão, permissões e em quais sites a extensão age |
-| `background/` | Parte que roda o tempo todo (login Google, leitura da planilha) |
-| `sites/sei/` | O que a extensão acrescenta nas páginas do SEI (uma pasta por site: `sites/suap/`, `sites/siafi/`…) |
-| `janela/` | Janela que abre ao clicar no ícone da extensão |
-| `configuracoes/` | Página de configurações (login, funções ligadas e desligadas) |
-| `comum/` | Código usado por mais de uma parte (formatação de valores, leitura da planilha) |
+| `manifest.json` | Nome, versão, permissões, sites em que a extensão age (`*.ifto.edu.br/…controlador.php?acao=…`) e scripts de cada página |
+| `comum/sei.js` | Regras de leitura do SEI: versão (`versaoDoSei`), link do botão Novo documento (`extrairLinkNovoDocumento`) |
+| `comum/configuracoes.js` | Configurações no navegador: padrões (`PADROES`), `comPadroes`, ler e gravar |
+| `comum/estilo.css` | Cores e componentes das páginas da extensão (padrão do sistema) |
+| `sites/sei/todas-as-paginas.js` | Em toda página do SEI: guarda a versão e o endereço do SEI (`seiVisto`) |
+| `sites/sei/botao-novo-documento.js` | Botão "Novo documento" sempre visível (`acao=arvore_visualizar`) |
+| `janela/` | Janela do ícone: versão da extensão, SEI reconhecido, botão Configurações |
+| `configuracoes/` | Página de configurações (cada opção grava na hora) |
+| `icones/icone.svg` | Ícone (SVG: o Chrome vai pedir PNG) |
+| `testes/` | Testes automáticos (`npm test`) |
+
+Dados no navegador (`storage.local`): `configuracoes` (opções) e `seiVisto` (versão, endereço e data do último SEI aberto).

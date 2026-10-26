@@ -1,6 +1,6 @@
 # Base da extensão e melhorias do SEI
 
-- **Situação:** aguardando decisões (conversa de 25/10/2026)
+- **Situação:** em andamento (etapa 1 feita na v0.1.0); próxima: etapa 2, que depende de D1 e D7
 - **Pedido em:** 25/10/2026 · **Prazo ou prioridade:** primeira melhoria da extensão; começar já
 - **Versão prevista:** 0.1.0 (uma versão por etapa: 0.1, 0.2…)
 
@@ -68,7 +68,7 @@ Decidido na conversa de 25/10/2026:
 
 Cada etapa cabe numa conversa curta (`/etapa base-e-sei <n>`) e termina com testes, versão e commit.
 
-- [ ] Etapa 1 – **Esqueleto e botão Novo documento.** Extensão instalável (manifest, ícone, janela do ícone, página de configurações vazia), comandos do `web-ext` no CLAUDE.md, reconhecimento do SEI e da sua versão, botão "Novo documento" sempre visível. Depende de D3, D4, D5. Teste: instalação temporária; abrir um processo no SEI e ver o botão.
+- [x] Etapa 1 – **Esqueleto e botão Novo documento.** (feita na v0.1.0, 26/10/2026; a extensão age só em endereços `*.ifto.edu.br`; o botão é acrescentado em qualquer versão do SEI quando falta na barra, não só antes do SEI 4 como no SEI++) Extensão instalável (manifest, ícone, janela do ícone, página de configurações vazia), comandos do `web-ext` no CLAUDE.md, reconhecimento do SEI e da sua versão, botão "Novo documento" sempre visível. Depende de D3, D4, D5. Teste: instalação temporária; abrir um processo no SEI e ver o botão.
 - [ ] Etapa 2 – **Documento externo preenchido.** Configurações com os valores padrão (nível de acesso, hipótese legal, formato, tipo de conferência, tipo de documento e os campos de D7); preenchimento e aviso na tela. Depende de D1, D7. Teste: abrir "Incluir documento › Externo" e ver os campos preenchidos, sem salvar.
 - [ ] Etapa 3 – **Arrastar arquivos.** Área para soltar arquivos na árvore; tipo pelo nome do arquivo, pelas regras do usuário e pelo padrão; pergunta quando não reconhece; lista de conferência antes de enviar; nomes com acento e travessão corretos. Depende de D1, D6. Teste (crítico, grava no SEI): arrastar três arquivos para um processo de teste.
 - [ ] Etapa 4 – **Tipos de processo e roteiros.** Cadastro dos tipos e dos passos; escolher o tipo do processo aberto; lista de conferência dos passos; o arrastar sugere o tipo do próximo passo pendente. Depende de D8. Teste: cadastrar o roteiro de pagamento, marcar um processo e ver o que falta.
