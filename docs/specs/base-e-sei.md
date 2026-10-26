@@ -23,12 +23,12 @@ O Claude não programa enquanto houver `[ ]` que afete a etapa. O usuário marca
   - Resposta:
 - [ ] D2 – Além das funções desta spec, que outras funções do SEI++ eram úteis (T01 e T02)? Entram numa etapa extra no fim.
   - Resposta:
-- [ ] D3 – Licença: aproveitar o código do SEI++ (GPL-3.0) e do SEI Pro (AGPL-3.0) faz a extensão ser GPL-3.0 (o código fica aberto se um dia for distribuída). Pode ser assim? Afeta a etapa 1.
-  - Resposta:
-- [ ] D4 – Como o código é escrito. Sugestão do Claude: JavaScript simples, sem compilação (como o SEI++; dá para aproveitar o código quase como está), no formato novo de extensão (Manifest V3, o mesmo que o Chrome exige), para Firefox 128 ou mais novo. Afeta a etapa 1.
-  - Resposta:
-- [ ] D5 – Onde ficam as configurações, os tipos de processo, os roteiros e a marcação de cada processo. Sugestão do Claude: no próprio navegador (funciona sem login), com "Exportar" e "Importar" num arquivo, para cópia de segurança e para passar a colegas; na planilha só depois do login (outra spec). Afeta a etapa 1.
-  - Resposta:
+- [x] D3 – Licença: aproveitar o código do SEI++ (GPL-3.0) e do SEI Pro (AGPL-3.0) faz a extensão ser GPL-3.0 (o código fica aberto se um dia for distribuída). Pode ser assim? Afeta a etapa 1.
+  - Resposta: sim, GPL-3.0 (25/10/2026).
+- [x] D4 – Como o código é escrito. Sugestão do Claude: JavaScript simples, sem compilação (como o SEI++; dá para aproveitar o código quase como está), no formato novo de extensão (Manifest V3, o mesmo que o Chrome exige), para Firefox 128 ou mais novo. Afeta a etapa 1.
+  - Resposta: JavaScript simples, Manifest V3, Firefox 128 ou mais novo (25/10/2026).
+- [x] D5 – Onde ficam as configurações, os tipos de processo, os roteiros e a marcação de cada processo. Sugestão do Claude: no próprio navegador (funciona sem login), com "Exportar" e "Importar" num arquivo, para cópia de segurança e para passar a colegas; na planilha só depois do login (outra spec). Afeta a etapa 1.
+  - Resposta: no navegador, com Exportar e Importar num arquivo (25/10/2026).
 - [ ] D6 – Data do documento externo ao arrastar: a de hoje (SEI++) ou a data em que o arquivo foi modificado (SEI Pro)? Sugestão do Claude: a de hoje como padrão, com opção nas configurações. Afeta a etapa 3.
   - Resposta:
 - [ ] D7 – Que "outros campos" do documento externo vêm preenchidos? Opções no SEI: número/nome na árvore, remetente, interessados, descrição, observações. Afeta a etapa 2.
@@ -39,6 +39,8 @@ O Claude não programa enquanto houver `[ ]` que afete a etapa. O usuário marca
 ## 4. Regras decididas
 
 Decidido na conversa de 25/10/2026:
+
+- **Licença GPL-3.0** (D3); código em **JavaScript simples**, sem compilação, Manifest V3, Firefox 128 ou mais novo (D4); configurações, tipos de processo, roteiros e marcação dos processos **no navegador**, com exportar/importar num arquivo (D5).
 
 - **Base:** o código do SEI++ (commit c53f1367 e versão 5.1.1, ver `docs/referencias/seipp.md`); o SEI Pro (https://github.com/SEI-Pro/sei-pro) como referência de melhorias e de outro jeito de fazer as mesmas coisas.
 - **Botão "Novo documento" sempre visível** na barra de ações da árvore do processo (como o SEI++).
