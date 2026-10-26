@@ -1,0 +1,20 @@
+# Dependências e pacotes gerados
+node_modules/
+build/
+dist/
+web-ext-artifacts/
+*.xpi
+*.zip
+
+# Variáveis de ambiente e credenciais locais (chaves do Google, da Mozilla etc.)
+.env*
+!.env.example
+
+# Testes e arquivos de referência locais (nunca vão para o git)
+ferramentas-de-teste/
+
+# Editor e sistema operacional
+.vscode/
+.DS_Store
+*~
+*.log
