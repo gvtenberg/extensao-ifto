@@ -53,3 +53,45 @@ Antes destes testes, desative o SEI++ e o SEI Pro, se estiverem instalados (menu
 - O que deve acontecer: com a opção marcada, o ícone "Incluir documento" aparece no começo da barra de ações e abre a tela de escolher o tipo do documento. Com a opção desmarcada, o SEI fica como era. Se o SEI já mostrava o botão, ele não aparece duas vezes.
 - Resultado: \[ \]
 - Observação:
+
+## Levantamento: nome e tamanho dos arquivos no SEI (para as etapas 2 e 3)
+
+Use um **processo de teste** no SEI (ou um processo em que possa excluir os documentos depois). Os arquivos estão em `extensao-ifto/ferramentas-de-teste/arquivos-sei/` (fora do git). Pode anexar pela tela normal do SEI ("Incluir documento" > "Externo"). Se o SEI++ 5.1.1 do T01 estiver funcionando, pode arrastar vários de uma vez.
+
+### T06 – Caracteres que o SEI não aceita no nome do arquivo
+
+- O que fazer: anexe, um de cada vez, os 20 arquivos da pasta `caracteres` (de "teste 01-cerquilha-#.pdf" a "teste 20-virgula-,.pdf").
+- O que deve acontecer: alguns são recusados ou ficam com o nome mudado. Na Observação, anote o **número** de cada arquivo recusado (e a mensagem do SEI) e o de cada um que entrou com o nome mudado (como ficou). Se não anotar nada de um arquivo, entendo que entrou normal.
+- Resultado: \[ \]
+- Observação:
+
+### T07 – Limite de tamanho: 10 MB ou 10 MiB
+
+- O que fazer: anexe os três arquivos da pasta `tamanhos`: A (9.900.000 bytes), B (10.200.000 bytes) e C (10.600.000 bytes). São PDFs de uma página que quase não compactam.
+- O que deve acontecer: o A entra. Se o B for recusado, o limite é 10 MB; se o B entrar e o C for recusado, é 10 MiB. Anote quais entraram e a mensagem do SEI para o recusado (copie o texto, se puder). Se o SEI mostrar o tamanho máximo em algum lugar da tela, anote também.
+- Resultado: \[ \]
+- Observação:
+
+## Perguntas para responder (etapas 2 e 3)
+
+Escreva a resposta na linha **Resposta**. Depois do `/testes`, elas entram na spec (`docs/specs/base-e-sei.md`, D11 a D13).
+
+### P1 – Arquivo que não é PDF acima de 10 MB
+
+- Pergunta: que tipos de arquivo, além de PDF, vocês anexam e às vezes passam do limite (planilha, imagem, vídeo, áudio, .zip…)? O que vocês fazem hoje com eles: compactam em .zip, dividem em partes, convertem para PDF? A extensão mostra essa dica.
+- Resposta:
+
+### P2 – Dica de compactação abaixo do limite
+
+- Pergunta: para economizar espaço no servidor da Reitoria, a extensão deve sugerir compactar também arquivos **abaixo** de 10 MB? A partir de que tamanho (ex.: 2 MB, 5 MB)? Só sugere (pode enviar mesmo assim) ou pergunta antes de enviar?
+- Resposta:
+
+### P3 – Documentos restritos ou sigilosos em sites de compactação
+
+- Pergunta: o pdf24.org e o ilovepdf recebem o arquivo nos servidores deles. A dica de usar esses sites deve aparecer também para documentos **restritos ou sigilosos** (ex.: com dados pessoais), ou, nesses casos, a extensão deve sugerir outra forma (ex.: programa instalado no computador)? Vocês usam Windows ou Linux no setor?
+- Resposta:
+
+### P4 – Dicas do pdf24.org
+
+- Pergunta: no pdf24.org, que opção de compressão vocês usam (nível de qualidade, DPI) para os arquivos que o ilovepdf não consegue compactar? Que tipo de PDF costuma dar problema (digitalizado, com muitas imagens, gerado por algum sistema)? A dica mostra o passo a passo.
+- Resposta:

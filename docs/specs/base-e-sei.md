@@ -12,6 +12,7 @@ Voltar a ter no SEI do IFTO as funções do SEI++ que a CGOC usava (o SEI++ paro
 
 - Login Google e leitura da planilha do sistema (próxima spec).
 - Passos do roteiro preenchidos com dados (folha de encaminhamento com os dados da nota e os números SEI; solicitação de nota de empenho com os dados do sistema): dependem do login; outra spec.
+- Compressão automática de PDF na própria extensão (ver `melhorias-futuras.md`).
 - Outros sites (Comprasnet, Contratos.gov, SIAFI, SUAP, SICAF, Simples Nacional).
 - Chrome e assinatura da Mozilla.
 
@@ -35,6 +36,16 @@ O Claude não programa enquanto houver `[ ]` que afete a etapa. O usuário marca
   - Resposta:
 - [ ] D8 – Como a extensão sabe que um passo do roteiro já foi feito? Sugestão do Claude: há na árvore do processo um documento com o tipo do passo (ex.: um "SICAF" depois da última nota fiscal). Nos processos de pagamento, que recebem várias notas, cada nota nova recomeça o roteiro? Afeta a etapa 4.
   - Resposta:
+- [ ] D9 – Quais caracteres o SEI não aceita no nome do arquivo (pelo menos o "#") e o que fazer com eles: trocar por "_" (como o SEI Pro), por espaço ou tirar? E os acentos ficam? Levantamento no T06. Afeta as etapas 2 e 3.
+  - Resposta:
+- [ ] D10 – O limite do SEI é 10 MB (10.000.000 bytes) ou 10 MiB (10.485.760 bytes)? Levantamento no T07. Afeta as etapas 2 e 3.
+  - Resposta:
+- [ ] D11 – Arquivo que **não é PDF** acima do limite (planilha, imagem, vídeo…): que dica mostrar (compactar em .zip, dividir, converter para PDF)? Pergunta P1 do `TESTES-PENDENTES.md`. Afeta as etapas 2 e 3.
+  - Resposta:
+- [ ] D12 – Dica de compactação também **abaixo** do limite (para economizar espaço no servidor da Reitoria): a partir de que tamanho? Pergunta P2. Afeta as etapas 2 e 3.
+  - Resposta:
+- [ ] D13 – O pdf24.org e o ilovepdf recebem o arquivo nos servidores deles. A dica vale para documento **restrito ou sigiloso**? Pergunta P3. Afeta as etapas 2 e 3.
+  - Resposta:
 
 ## 4. Regras decididas
 
@@ -53,6 +64,8 @@ Decidido na conversa de 25/10/2026:
 - **Conferência antes de enviar:** como o envio grava direto no SEI, a extensão mostra a lista dos arquivos com o tipo e o nome de cada um, para corrigir ou tirar algum, e só envia depois da confirmação.
 - **Tipos de processo e roteiros:** os tipos de processo são **cadastrados na extensão** (não se usa o tipo do SEI, porque muitos processos foram cadastrados com o tipo errado). Cada tipo tem um roteiro: a lista de passos, cada um com o tipo de documento do SEI e se é externo (arquivo) ou feito no SEI. Em cada processo, o usuário escolhe o tipo de processo da extensão; a escolha fica guardada pelo número do processo.
 - **Lista de conferência:** no processo com roteiro, a extensão mostra os passos feitos e os que faltam. Passo que demora (ex.: PDF do empenho, depois das assinaturas) fica pendente até ser anexado.
+- **Nome do arquivo (26/10/2026):** opção nas configurações para **tirar do nome do arquivo os caracteres que o SEI não aceita** (pelo menos "#"; a lista sai do T06, D9), ao arrastar e na tela de documento externo.
+- **Tamanho do arquivo (26/10/2026):** o SEI só aceita arquivos até **10 MB** (vale para **todos os tipos** de arquivo; MB ou MiB: D10). Acima do limite, a extensão **não envia** e avisa que é obrigatório compactar antes, com as dicas: para PDF, o **pdf24.org** comprime bem melhor que o ilovepdf em alguns tipos de arquivo; para outros tipos, D11. As dicas também aparecem na tela de documento externo, ao escolher o arquivo.
 - **Roteiros de exemplo** (o usuário ajusta):
   - **Pagamento (CGOC):** nota fiscal e ateste da nota (chegam ao setor); SICAF; consulta de optante do Simples Nacional; anexo do instrumento de cobrança do Contratos.gov; folha de encaminhamento com os dados da nota e dos documentos SEI.
   - **Reforço de empenho:** crédito disponível do SIAFI (externo); solicitação de nota de empenho (dados do sistema de orçamento, depois do login); PDF do empenho (depois das assinaturas, dias depois).
@@ -69,8 +82,8 @@ Decidido na conversa de 25/10/2026:
 Cada etapa cabe numa conversa curta (`/etapa base-e-sei <n>`) e termina com testes, versão e commit.
 
 - [x] Etapa 1 – **Esqueleto e botão Novo documento.** (feita na v0.1.0, 26/10/2026; a extensão age só em endereços `*.ifto.edu.br`; o botão é acrescentado em qualquer versão do SEI quando falta na barra, não só antes do SEI 4 como no SEI++) Extensão instalável (manifest, ícone, janela do ícone, página de configurações vazia), comandos do `web-ext` no CLAUDE.md, reconhecimento do SEI e da sua versão, botão "Novo documento" sempre visível. Depende de D3, D4, D5. Teste: instalação temporária; abrir um processo no SEI e ver o botão.
-- [ ] Etapa 2 – **Documento externo preenchido.** Configurações com os valores padrão (nível de acesso, hipótese legal, formato, tipo de conferência, tipo de documento e os campos de D7); preenchimento e aviso na tela. Depende de D1, D7. Teste: abrir "Incluir documento › Externo" e ver os campos preenchidos, sem salvar.
-- [ ] Etapa 3 – **Arrastar arquivos.** Área para soltar arquivos na árvore; tipo pelo nome do arquivo, pelas regras do usuário e pelo padrão; pergunta quando não reconhece; lista de conferência antes de enviar; nomes com acento e travessão corretos. Depende de D1, D6. Teste (crítico, grava no SEI): arrastar três arquivos para um processo de teste.
+- [ ] Etapa 2 – **Documento externo preenchido.** Configurações com os valores padrão (nível de acesso, hipótese legal, formato, tipo de conferência, tipo de documento e os campos de D7); preenchimento e aviso na tela; ao escolher o arquivo, nome sem os caracteres que o SEI não aceita e aviso de tamanho com as dicas de compactação. Depende de D1, D7, D9 a D13. Teste: abrir "Incluir documento › Externo" e ver os campos preenchidos, sem salvar.
+- [ ] Etapa 3 – **Arrastar arquivos.** Área para soltar arquivos na árvore; tipo pelo nome do arquivo, pelas regras do usuário e pelo padrão; pergunta quando não reconhece; lista de conferência antes de enviar, com o tamanho de cada arquivo (acima do limite: não envia e mostra as dicas); nomes sem os caracteres que o SEI não aceita, com acento e travessão corretos. Depende de D1, D6, D9 a D13. Teste (crítico, grava no SEI): arrastar três arquivos para um processo de teste.
 - [ ] Etapa 4 – **Tipos de processo e roteiros.** Cadastro dos tipos e dos passos; escolher o tipo do processo aberto; lista de conferência dos passos; o arrastar sugere o tipo do próximo passo pendente. Depende de D8. Teste: cadastrar o roteiro de pagamento, marcar um processo e ver o que falta.
 - [ ] Etapa 5 – **Exportar e importar** configurações e roteiros num arquivo. Teste: exportar, apagar, importar.
 - [ ] Etapa 6 – (se D2) outras funções do SEI++.
