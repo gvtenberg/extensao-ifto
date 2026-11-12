@@ -1,4 +1,6 @@
 // Lê o TESTES-PENDENTES.md e monta o cartão (issue) do GitHub de cada teste (T..) e pergunta (P..).
+// Formato compacto (só para os cartões): "## seção", "> antes" (opcional), "### T08 – título",
+// "F:" (o que fazer), "E:" (o que deve acontecer), "?:" (pergunta).
 // Usado pelo GitHub (testes-para-cartoes.js) e pelo /testes (ler-resultados.js). Sem dependências.
 const MARCA = /<!-- teste:([TP]\d+) -->/
 
@@ -18,15 +20,19 @@ function lerTestes (texto) {
     if (/^---\s*$/.test(linha)) { secao = ''; introducao = [] }
     if (t) atual = { numero: t[1], titulo: t[2].trim(), secao, antes: introducao.join('\n').trim(), linhas: [] }
     else if (atual) atual.linhas.push(linha)
-    else if (secao && !s) introducao.push(linha)
+    else if (secao && !s) introducao.push(linha.replace(/^>\s?/, ''))
   }
   if (atual) itens.push(atual)
   return itens.map(({ linhas, ...item }) => ({ ...item, texto: linhas.join('\n').trim() }))
 }
 
-// Corpo do cartão: o texto do teste (sem as linhas Resultado/Observação do arquivo) e as caixinhas.
+const ROTULOS = { 'F:': '**O que fazer:**', 'E:': '**O que deve acontecer:**', '?:': '**Pergunta:**' }
+
+// Corpo do cartão: o texto do teste, com os rótulos por extenso, e as caixinhas.
 function corpoDoCartao (item) {
-  const texto = item.texto.split('\n').filter(l => !/^- (Resultado|Observação):/.test(l)).join('\n').trim()
+  const texto = item.texto.split('\n')
+    .map(l => ROTULOS[l.slice(0, 2)] ? ROTULOS[l.slice(0, 2)] + ' ' + l.slice(2).trim() + '\n' : l)
+    .join('\n').trim()
   const pergunta = item.numero.startsWith('P')
   return [
     `**Seção:** ${item.secao}`,
@@ -36,8 +42,15 @@ function corpoDoCartao (item) {
     '',
     '---',
     pergunta
-      ? '**Resposta:** escreva num comentário abaixo.'
-      : '**Resultado** (clique numa caixinha):\n\n- [ ] ✅ Passou\n- [ ] ❌ Falhou\n\nO que aconteceu, observações e sugestões: escreva num comentário abaixo.',
+      ? '**Como responder:** escreva a resposta num comentário abaixo.'
+      : [
+          '**Como responder:** faça o teste e clique numa caixinha. Se falhou ou tiver sugestão, escreva num comentário abaixo o que fez e o que apareceu.',
+          '',
+          '- [ ] ✅ Passou',
+          '- [ ] ❌ Falhou',
+          '',
+          '_Sem permissão para clicar? Escreva "passou" ou "falhou" no comentário._'
+        ].join('\n'),
     '',
     `<!-- teste:${item.numero} -->`
   ].join('\n')
@@ -60,4 +73,21 @@ function numeroDoCartao (cartao) {
   return titulo ? titulo[1] : null
 }
 
-module.exports = { lerTestes, corpoDoCartao, resultadoDoCartao, numeroDoCartao }
+// Apaga do arquivo os blocos dos números indicados (para o /testes, sem ler o arquivo inteiro).
+// Seção que fica sem testes sai também.
+function apagarTestes (texto, numeros) {
+  const apagar = new Set(numeros)
+  const saida = []
+  let pulando = false
+  for (const linha of texto.split('\n')) {
+    const t = /^### ([TP]\d+) /.exec(linha)
+    if (t) pulando = apagar.has(t[1])
+    else if (/^## /.test(linha)) pulando = false
+    if (!pulando) saida.push(linha)
+  }
+  return saida.join('\n')
+    .replace(/^## [^\n]*\n(?:>[^\n]*\n)?\n*(?=## |$)/gm, '') // seção vazia
+    .replace(/\n{3,}/g, '\n\n')
+}
+
+module.exports = { apagarTestes, lerTestes, corpoDoCartao, resultadoDoCartao, numeroDoCartao }

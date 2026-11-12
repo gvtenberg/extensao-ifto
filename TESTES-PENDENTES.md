@@ -1,141 +1,60 @@
-# Testes pendentes
-
-**Seções** (busque `### T..` ou o título): Levantamento: SEI++ antigo no SEI do IFTO · Base da extensão e botão Novo documento (v0.1.0) · Levantamento: nome e tamanho dos arquivos no SEI · Perguntas para responder (etapas 2 e 3) · Senha reconhecida pelo navegador no SEI 5 (v0.1.1) · Instalação e atualização pelo GitHub (v0.1.2 e v0.1.3)
-
-Como usar este arquivo:
-
-- Cada teste tem um número fixo (T01, T02…). Ao testar, troque a marca da linha **Resultado**:
-    - `[ ]` ainda não testado;
-    - `[x]` deu certo;
-    - `[!]` falhou ou precisa de ajuste. Escreva na linha **Observação** o que aconteceu ou o que quer mudar.
-- **No GitHub (mais prático, também no computador do trabalho):** cada teste vira um cartão em https://github.com/gvtenberg/extensao-ifto/issues. Abra o cartão, clique em "✅ Passou" ou "❌ Falhou" e, se quiser, escreva o que aconteceu ou sugestões num comentário (botão **Comment**). Não precisa mexer neste arquivo.
-- Depois, no Claude Code, digite `/testes` (ou diga "atualizei os testes"): o Claude lê este arquivo, corrige o que falhou e apaga os testes que deram certo.
-- Instalação temporária no Firefox: digite `about:debugging#/runtime/this-firefox` na barra de endereço, clique em **Carregar extensão temporária…** e escolha o arquivo. A extensão some quando o Firefox fecha.
-
----
+# Testes pendentes: só a fonte dos cartões do GitHub (formato no CLAUDE.md, seção Testes)
 
 ## Levantamento: SEI++ antigo no SEI do IFTO
-
-Antes de cada teste, desative o SEI Pro ou outro SEI++ que estiver instalado (menu ☰ > Extensões e temas). Teste uma versão de cada vez: remova a primeira (botão **Remover** em `about:debugging`) antes de carregar a segunda.
-
-### T01 – SEI++ versão 5.1.1 (2022)
-
-- O que fazer: carregue o arquivo `ferramentas-de-teste/seipp/seipp-v5.1.1.xpi` (dentro da pasta `extensao-ifto`). Entre no SEI do IFTO, abra o "Controle de Processos", um processo e um documento. Clique no ícone do SEI++ na barra do Firefox e veja as opções.
-- O que deve acontecer: as funções do SEI++ aparecem no SEI. Anote na Observação: a versão do SEI do IFTO (rodapé ou tela de login), quais funções eram úteis para vocês e quais funcionam ou não.
-- Resultado: \[ \]
-- Observação:
-
-### T02 – SEI++ do commit c53f1367 (6.0 beta, 2025)
-
-- O que fazer: o mesmo do T01, com o arquivo `ferramentas-de-teste/seipp/seipp-c53f136.xpi`.
-- O que deve acontecer: esta versão pede SEI 4.1 ou mais novo; se o SEI do IFTO for mais antigo, parte das funções pode não aparecer. Anote o que funciona e o que não funciona, comparando com o T01.
-- Resultado: \[ \]
-- Observação:
+> No computador de desenvolvimento (os pacotes ficam em ferramentas-de-teste/seipp/, fora do git). Desative o SEI Pro e outros SEI++; teste uma versão por vez.
+### T01 – SEI++ 5.1.1 (2022)
+F: Carregue seipp-v5.1.1.xpi em about:debugging (Carregar extensão temporária). No SEI, abra Controle de Processos, um processo e um documento; veja as opções no ícone do SEI++.
+E: Comente quais funções aparecem, quais funcionam e quais eram úteis.
+### T02 – SEI++ 6.0 beta (commit c53f1367, 2025)
+F: Igual ao T01, com seipp-c53f136.xpi.
+E: Comente o que funciona e o que não, comparando com o T01.
 
 ## Base da extensão e botão Novo documento (v0.1.0)
-
-Antes destes testes, desative o SEI++ e o SEI Pro, se estiverem instalados (menu ☰ > Extensões e temas), para não aparecerem dois botões.
-
-### T03 – Instalar a extensão (v0.1.0)
-
-- O que fazer: no Firefox, digite `about:debugging#/runtime/this-firefox` na barra de endereço, clique em **Carregar extensão temporária…**, entre na pasta `extensao-ifto` e escolha o arquivo `manifest.json`. Clique no ícone verde da extensão na barra do Firefox (se não aparecer, clique na peça de quebra-cabeça e fixe "Extensão IFTO Palmas").
-- O que deve acontecer: a janela mostra "Extensão IFTO Palmas", "Versão 0.1.0" e, em amarelo, "Abra o SEI do IFTO para a extensão reconhecê-lo". O botão **Configurações** abre uma aba com a opção "Botão 'Novo documento' sempre visível" já marcada.
-- Resultado: \[ \]
-- Observação:
-
+> Desative o SEI++ e o SEI Pro, para não aparecerem dois botões.
+### T03 – Janela da extensão e Configurações (v0.1.0)
+F: Com a extensão instalada (T11), clique no ícone dela > Configurações.
+E: A janela mostra o nome e a versão; Configurações abre uma aba com "Botão Novo documento sempre visível" marcado.
 ### T04 – SEI reconhecido (v0.1.0)
-
-- O que fazer: entre no SEI do IFTO e abra o Controle de Processos. Depois clique no ícone da extensão.
-- O que deve acontecer: a janela mostra, em verde, "SEI <versão> em https://sei.ifto.edu.br (visto em …)". **Anote a versão na Observação** (é a decisão D1 da spec). Se continuar a mensagem amarela, anote o endereço que aparece na barra quando o SEI está aberto (a extensão só age em endereços terminados em ifto.edu.br).
-- Resultado: \[ \]
-- Observação:
-
+F: Abra o Controle de Processos do SEI e clique no ícone da extensão.
+E: Aparece em verde "SEI 5.0.4 em https://sei.ifto.edu.br". Se ficar a mensagem amarela, comente o endereço do SEI na barra.
 ### T05 – Botão "Novo documento" sempre visível (v0.1.0)
+F: Abra um processo e clique num documento da árvore onde o botão Incluir documento não aparecia; clique no botão. Desmarque a opção nas Configurações, aperte F5 e repita.
+E: Marcada: o botão aparece no começo da barra e abre a escolha do tipo, sem repetir se o SEI já o mostra. Desmarcada: o SEI fica como era.
 
-- O que fazer: no SEI, abra um processo e clique num **documento** da árvore (à esquerda), onde antes o botão "Incluir documento" não aparecia. Clique no botão. Depois, em Configurações da extensão, desmarque a opção, volte ao SEI, aperte F5 e clique de novo no documento.
-- O que deve acontecer: com a opção marcada, o ícone "Incluir documento" aparece no começo da barra de ações e abre a tela de escolher o tipo do documento. Com a opção desmarcada, o SEI fica como era. Se o SEI já mostrava o botão, ele não aparece duas vezes.
-- Resultado: \[ \]
-- Observação:
-
-## Levantamento: nome e tamanho dos arquivos no SEI (para as etapas 2 e 3)
-
-Use um **processo de teste** no SEI (ou um processo em que possa excluir os documentos depois). Os arquivos estão em `extensao-ifto/ferramentas-de-teste/arquivos-sei/` (fora do git). Pode anexar pela tela normal do SEI ("Incluir documento" > "Externo"). Se o SEI++ 5.1.1 do T01 estiver funcionando, pode arrastar vários de uma vez.
-
+## Levantamento: nome e tamanho dos arquivos no SEI (etapas 2 e 3)
+> No computador de desenvolvimento (arquivos em ferramentas-de-teste/arquivos-sei/, fora do git). Use um processo de teste; anexe por Incluir documento > Externo.
 ### T06 – Caracteres que o SEI não aceita no nome do arquivo
+F: Anexe um a um os 20 arquivos da pasta caracteres.
+E: Comente o número de cada arquivo recusado (com a mensagem) e de cada um com nome mudado (como ficou).
+### T07 – Limite: 10 MB ou 10 MiB
+F: Anexe A (9.900.000 bytes), B (10.200.000) e C (10.600.000) da pasta tamanhos.
+E: Comente quais entraram e a mensagem do recusado. B recusado = 10 MB; B aceito e C recusado = 10 MiB.
 
-- O que fazer: anexe, um de cada vez, os 20 arquivos da pasta `caracteres` (de "teste 01-cerquilha-#.pdf" a "teste 20-virgula-,.pdf").
-- O que deve acontecer: alguns são recusados ou ficam com o nome mudado. Na Observação, anote o **número** de cada arquivo recusado (e a mensagem do SEI) e o de cada um que entrou com o nome mudado (como ficou). Se não anotar nada de um arquivo, entendo que entrou normal.
-- Resultado: \[ \]
-- Observação:
-
-### T07 – Limite de tamanho: 10 MB ou 10 MiB
-
-- O que fazer: anexe os três arquivos da pasta `tamanhos`: A (9.900.000 bytes), B (10.200.000 bytes) e C (10.600.000 bytes). São PDFs de uma página que quase não compactam.
-- O que deve acontecer: o A entra. Se o B for recusado, o limite é 10 MB; se o B entrar e o C for recusado, é 10 MiB. Anote quais entraram e a mensagem do SEI para o recusado (copie o texto, se puder). Se o SEI mostrar o tamanho máximo em algum lugar da tela, anote também.
-- Resultado: \[ \]
-- Observação:
-
-## Perguntas para responder (etapas 2 e 3)
-
-Escreva a resposta na linha **Resposta**. Depois do `/testes`, elas entram na spec (`docs/specs/base-e-sei.md`, D11 a D13).
-
+## Perguntas (etapas 2 e 3; respostas vão para a spec base-e-sei, D11 a D13)
 ### P1 – Arquivo que não é PDF acima de 10 MB
-
-- Pergunta: que tipos de arquivo, além de PDF, vocês anexam e às vezes passam do limite (planilha, imagem, vídeo, áudio, .zip…)? O que vocês fazem hoje com eles: compactam em .zip, dividem em partes, convertem para PDF? A extensão mostra essa dica.
-- Resposta:
-
+?: Que tipos de arquivo além de PDF passam do limite (planilha, imagem, vídeo, .zip…)? O que fazem hoje: .zip, dividir, converter para PDF?
 ### P2 – Dica de compactação abaixo do limite
-
-- Pergunta: para economizar espaço no servidor da Reitoria, a extensão deve sugerir compactar também arquivos **abaixo** de 10 MB? A partir de que tamanho (ex.: 2 MB, 5 MB)? Só sugere (pode enviar mesmo assim) ou pergunta antes de enviar?
-- Resposta:
-
-### P3 – Documentos restritos ou sigilosos em sites de compactação
-
-- Pergunta: o pdf24.org e o ilovepdf recebem o arquivo nos servidores deles. A dica de usar esses sites deve aparecer também para documentos **restritos ou sigilosos** (ex.: com dados pessoais), ou, nesses casos, a extensão deve sugerir outra forma (ex.: programa instalado no computador)? Vocês usam Windows ou Linux no setor?
-- Resposta:
-
+?: Sugerir compactar também abaixo de 10 MB? A partir de que tamanho? Só sugere ou pergunta antes de enviar?
+### P3 – Restritos ou sigilosos em sites de compactação
+?: Mostrar a dica do pdf24.org e do ilovepdf (que recebem o arquivo) também para documentos restritos ou sigilosos, ou sugerir um programa no computador? O setor usa Windows ou Linux?
 ### P4 – Dicas do pdf24.org
-
-- Pergunta: no pdf24.org, que opção de compressão vocês usam (nível de qualidade, DPI) para os arquivos que o ilovepdf não consegue compactar? Que tipo de PDF costuma dar problema (digitalizado, com muitas imagens, gerado por algum sistema)? A dica mostra o passo a passo.
-- Resposta:
+?: Que opção de compressão usam no pdf24.org quando o ilovepdf não resolve? Que tipo de PDF dá problema (digitalizado, muitas imagens, gerado por sistema)?
 
 ## Senha reconhecida pelo navegador no SEI 5 (v0.1.1)
-
-Antes: instale a extensão temporária (como no T03, escolhendo o `manifest.json`) ou, depois da assinatura no GitHub, o arquivo `.xpi` (ver `docs/publicacao.md`). Se a extensão já estava carregada, clique em **Recarregar** em `about:debugging#/runtime/this-firefox`.
-
 ### T08 – Senha na tela de entrada do SEI (v0.1.1)
-
-- O que fazer: no Firefox, saia do SEI (ou abra uma janela anônima com a extensão permitida) e abra a tela de entrada do SEI do IFTO. Digite o usuário e a senha e clique em **Acessar**. Se o Firefox perguntar se quer salvar (ou atualizar) a senha, clique em **Salvar**. Saia do SEI e abra a tela de entrada de novo.
-- O que deve acontecer: ao digitar, a senha aparece como pontos (●), sem mostrar a última letra. A entrada no SEI funciona normalmente. Na segunda vez, o Firefox preenche a senha sozinho (ou mostra a senha guardada ao clicar no campo Usuário ou Senha).
-- Resultado: \[ \]
-- Observação:
-
+F: Saia do SEI, entre de novo com usuário e senha e salve a senha quando o Firefox perguntar. Saia e abra a tela de entrada outra vez.
+E: A senha aparece como ●. Na segunda vez o Firefox preenche ou oferece a senha guardada.
 ### T09 – Senha na assinatura de documento (v0.1.1) (Crítico)
-
-- O que fazer: no SEI, abra um documento que você precisa assinar e clique em **Assinar documento**. Na janela de assinatura, clique no campo **Senha**. Se o Firefox mostrar a senha guardada, escolha-a; senão, digite-a, aperte **Enter** e, se o Firefox perguntar, salve a senha. Assine um segundo documento.
-- O que deve acontecer: o campo Senha aceita a senha guardada do Firefox (preenchida sozinha ou escolhida na lista ao clicar no campo). Enter e o botão **Assinar** assinam o documento como antes. No segundo documento, não é preciso digitar a senha. Se o Firefox oferecer salvar com o seu nome completo como usuário, anote na Observação.
-- Resultado: \[ \]
-- Observação:
-
+F: Abra um documento seu > Assinar documento > clique em Senha; escolha a senha guardada ou digite, aperte Enter e salve se o Firefox perguntar. Assine um segundo documento.
+E: Enter e Assinar funcionam como antes; no segundo documento não é preciso digitar. Comente se o Firefox oferecer salvar com o seu nome completo.
 ### T10 – Desligar a correção da senha (v0.1.1)
-
-- O que fazer: clique no ícone da extensão > **Configurações** e desmarque "Navegador reconhece o campo de senha". Recarregue a tela de entrada do SEI e clique no campo Senha. Depois marque a opção de novo.
-- O que deve acontecer: desmarcada, a tela volta ao comportamento do SEI novo (o Firefox não oferece a senha). Marcada, volta a oferecer.
-- Resultado: \[ \]
-- Observação:
+F: Configurações > desmarque "Navegador reconhece o campo de senha", recarregue a entrada do SEI e clique em Senha. Marque de novo.
+E: Desmarcada, o Firefox não oferece a senha; marcada, oferece.
 
 ## Instalação e atualização pelo GitHub (v0.1.2 e v0.1.3)
-
-### T11 – Instalar pelo GitHub e atualização automática (v0.1.2)
-
-- O que fazer: depois de criar as chaves da Mozilla (`docs/publicacao.md`, "Preparar uma vez") e digitar `git push` no computador de desenvolvimento, abra no GitHub a aba **Actions** e espere "Assinar extensão" ficar verde. No Firefox do trabalho, abra a página **Releases** do repositório, clique em `extensao-ifto-0.1.2.xpi` e em **Adicionar**. Feche e abra o Firefox. Na próxima versão (depois do próximo `git push`), abra o menu ☰ > **Extensões e temas** > engrenagem ⚙ > **Verificar se há atualizações**.
-- O que deve acontecer: a extensão fica instalada mesmo depois de fechar o Firefox. Na versão seguinte, o Firefox instala a versão nova sozinho (o número aparece na janela do ícone da extensão).
-- Resultado: \[ \]
-- Observação:
-
+### T11 – Instalar pelo GitHub (v0.1.2)
+F: Depois de "Assinar extensão" ficar verde (aba Actions), no Firefox do trabalho abra Releases > extensao-ifto-X.Y.Z.xpi > Adicionar. Feche e abra o Firefox.
+E: A extensão continua instalada; a janela do ícone mostra a versão.
 ### T12 – Botão "Procurar atualização" (v0.1.3)
-
-- O que fazer: no Firefox do trabalho, com a extensão instalada pelo GitHub (T11), faça uma mudança qualquer no computador de desenvolvimento (ou peça ao Claude), digite `git push` e espere "Assinar extensão" ficar verde na aba **Actions** do GitHub. Clique no ícone da extensão > **Procurar atualização**. Clique em **Instalar a versão …**, depois em **Permitir** e **Adicionar**. Clique de novo em **Procurar atualização**.
-- O que deve acontecer: aparece "Versão X disponível (instalada: Y)" e o botão verde de instalar. Depois de instalar, a janela mostra a versão nova e, ao procurar de novo, "Você já tem a versão mais nova". Antes de a assinatura terminar, a janela diz que você já tem a versão mais nova e sugere esperar o GitHub.
-- Resultado: \[ \]
-- Observação:
+F: Depois de uma versão nova ficar pronta no GitHub, clique no ícone da extensão > Procurar atualização > Instalar a versão… > Permitir > Adicionar. Procure de novo.
+E: Aparece "Versão X disponível"; depois de instalar, "Você já tem a versão mais nova".

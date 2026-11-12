@@ -36,10 +36,10 @@ Atualizado em 12/11/2026. Modelo: `/home/berg/Desktop/Sistema Gestão Orçament�
 
 ## Testes
 
-- `TESTES-PENDENTES.md`: "### Tnn – título (vX.Y.Z)", "- O que fazer:", "- O que deve acontecer:" (detalhados), "- Resultado: \[ \]", "- Observação:". O usuário marca `[x]` ou `[!]`; `/testes` acha as marcas com `grep`, apaga os `[x]` por script (conferindo a quantidade), corrige os `[!]`.
-- Teste não comentado = deu certo. Nunca apague teste sem `[x]`; só acrescente no fim; número novo, nunca reaproveitado.
+- Testes manuais pelo GitHub: o usuário responde nos **cartões** (issues) com as caixinhas "✅ Passou" / "❌ Falhou" e comentários; uma Action cria um cartão por teste novo e fecha os que saem do arquivo; o `/testes` lê os cartões por um script de resumo e apaga os resolvidos por script. Modelo: `extensao-ifto` (`.github/workflows/testes.yml`, `.github/scripts/`). Em projeto existente, monte só quando o usuário pedir.
+- O `TESTES-PENDENTES.md` serve **só** de fonte para os cartões (o usuário não o lê): compacto, sem instruções nem linhas de resultado. Formato: "## seção", "> antes de testar" (opcional), "### Tnn – título (vX.Y.Z)", "F: o que fazer", "E: o que deve acontecer" (uma linha cada; resumido, só o necessário para o usuário e colegas que não são de TI fazerem o teste: onde clicar e o que deve aparecer). O cartão leva um rodapé curto "Como responder" (comentário vale como resposta para quem não pode clicar); pergunta: "### Pn – título" e "?: pergunta". Projeto ainda sem cartões: formato antigo, detalhado.
+- Teste não comentado = deu certo. Nunca apague teste sem "Passou" no cartão (ou `[x]` no formato antigo); só acrescente no fim; número novo, nunca reaproveitado.
 - Várias etapas: o usuário testa tudo junto no fim; só pare antes por teste **crítico** (grava em sistema oficial ou decide o rumo), marcado "(Crítico)". Testes automáticos em toda etapa.
-- **Cartões no GitHub:** os testes manuais também viram cartões (issues): uma Action cria um cartão por teste novo do `TESTES-PENDENTES.md`, com as caixinhas "✅ Passou" e "❌ Falhou" (comentário para observações), e fecha os cartões dos testes que saem do arquivo; o `/testes` lê os cartões por um script de resumo. Modelo: `extensao-ifto` (`.github/workflows/testes.yml` e `.github/scripts/`). Em projeto existente, monte só quando o usuário pedir.
 - **Nunca faça testes com captura de tela** sem pedido expresso.
 
 ## Versão e git

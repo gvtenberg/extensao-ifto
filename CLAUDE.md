@@ -24,7 +24,7 @@ Extensão para o **Firefox** (depois também para o Chrome) que acompanha o Sist
 3. **Executar** (`/etapa <spec> <n>`): leia só a spec e o que ela indicar. Ao terminar: testes, versão, histórico, Situação, commit e etapa marcada.
 4. **Fim da melhoria:** regras para `docs/regras/`, linha sai de `melhorias-futuras.md`, spec para `docs/specs/feitas/`.
 - Ajustes pequenos e correções de testes não precisam de spec.
-- **Testes manuais** (`/testes`): o usuário marca `[x]` (certo) ou `[!]` (falhou, com observação). Corrija os `[!]`, apague os `[x]` e acrescente os novos (número novo, nunca reaproveitado).
+- **Testes manuais** (`/testes`): o usuário responde nos cartões do GitHub ("✅ Passou" / "❌ Falhou" e comentários). Corrija os que falharam, apague do arquivo os que passaram e acrescente os novos (número novo, nunca reaproveitado).
 
 ## Quem é o usuário
 
@@ -44,9 +44,9 @@ Extensão para o **Firefox** (depois também para o Chrome) que acompanha o Sist
 
 ## Testes
 
-- No `TESTES-PENDENTES.md`, cada teste: "### Tnn – título (vX.Y.Z)", "- O que fazer:" e "- O que deve acontecer:" detalhados (navegador, site e página, conta logada, o que clicar, o que deve aparecer), "- Resultado: \[ \]" e "- Observação:".
-- **Cartões no GitHub** (`.github/workflows/testes.yml`): a cada envio, cada teste ou pergunta nova vira um cartão (issue, marca "teste") com as caixinhas "✅ Passou" e "❌ Falhou"; o usuário clica e comenta no computador do trabalho. Os cartões dos testes que saem do arquivo fecham sozinhos. O `/testes` lê os cartões com `node .github/scripts/ler-resultados.js` (resumo curto; não abra os cartões um a um). O arquivo continua sendo a base.
-- Teste não comentado pelo usuário = deu certo. Nunca apague teste sem `[x]` (no arquivo) ou "Passou" (no cartão). Só acrescente no fim e confira que a quantidade não diminuiu. Atualize o índice "**Seções**" ao criar seção.
+- O `TESTES-PENDENTES.md` serve **só** de fonte para os cartões do GitHub (o usuário não o lê): compacto, sem instruções nem linhas de resultado. Formato: "## seção", "> antes de testar" (opcional, uma linha), "### Tnn – título (vX.Y.Z)" (+ " (Crítico)"), "F: o que fazer" e "E: o que deve acontecer" (uma linha cada; resumido, só o necessário para o usuário e colegas que não são de TI: onde clicar e o que deve aparecer); pergunta: "### Pn – título" e "?: pergunta". Teste que depende de arquivo fora do git: diga no "> antes" que é no computador de desenvolvimento.
+- **Cartões no GitHub** (`.github/workflows/testes.yml`): a cada envio, cada teste ou pergunta nova vira um cartão (issue, marca "teste") com o texto por extenso e as caixinhas "✅ Passou" e "❌ Falhou"; os cartões dos testes que saem do arquivo fecham sozinhos. O `/testes` lê os cartões com `node .github/scripts/ler-resultados.js` e apaga os resolvidos com `node .github/scripts/apagar-testes.js T03 T05` (não leia o arquivo nem os cartões inteiros).
+- Teste não comentado = deu certo. Nunca apague teste sem "Passou" no cartão (ou pedido do usuário). Só acrescente no fim e confira que a quantidade não diminuiu.
 - Melhoria com várias etapas: os testes de cada etapa entram no arquivo, mas o usuário testa tudo junto no fim. Só pare antes por teste **crítico** (grava em sistema oficial – SEI, planilha – ou decide o rumo da etapa seguinte), marcado "(Crítico)". Os testes automáticos rodam em toda etapa.
 - Verificação mínima: `npm test` e `npm run conferir`. **Nunca faça testes com captura de tela** (nem abra o navegador para ver a tela) sem pedido expresso do usuário.
 

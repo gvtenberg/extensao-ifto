@@ -2,24 +2,19 @@ const { test } = require('node:test')
 const assert = require('node:assert/strict')
 const fs = require('node:fs')
 const path = require('node:path')
-const { lerTestes, corpoDoCartao, resultadoDoCartao, numeroDoCartao } = require('../.github/scripts/testes-pendentes.js')
+const { apagarTestes, lerTestes, corpoDoCartao, resultadoDoCartao, numeroDoCartao } = require('../.github/scripts/testes-pendentes.js')
 
 const exemplo = `# Testes pendentes
 
 ## Senha (v0.1.1)
-
+> Instale antes.
 ### T08 – Senha na tela de entrada (v0.1.1)
-
-- O que fazer: abrir.
-- O que deve acontecer: preencher.
-- Resultado: \\[ \\]
-- Observação:
+F: abrir.
+E: preencher.
 
 ## Perguntas
-
 ### P1 – Arquivo grande
-
-Que dica mostrar?
+?: Que dica mostrar?
 `
 
 test('lerTestes acha testes e perguntas, com a seção', () => {
@@ -30,11 +25,13 @@ test('lerTestes acha testes e perguntas, com a seção', () => {
   ])
 })
 
-test('corpoDoCartao tira Resultado/Observação e põe as caixinhas (pergunta: só comentário)', () => {
+test('corpoDoCartao põe os rótulos por extenso, o "antes" e as caixinhas (pergunta: só comentário)', () => {
   const [teste, pergunta] = lerTestes(exemplo)
   const corpo = corpoDoCartao(teste)
+  assert.ok(corpo.includes('**O que fazer:** abrir.') && corpo.includes('**O que deve acontecer:** preencher.'))
+  assert.ok(corpo.includes('> Instale antes.'))
+  assert.ok(corpoDoCartao(pergunta).includes('**Pergunta:** Que dica mostrar?'))
   assert.ok(corpo.includes('- [ ] ✅ Passou') && corpo.includes('- [ ] ❌ Falhou'))
-  assert.ok(!corpo.includes('Resultado: \\['))
   assert.ok(corpo.endsWith('<!-- teste:T08 -->'))
   assert.ok(!corpoDoCartao(pergunta).includes('Passou'))
 })
@@ -53,4 +50,11 @@ test('o TESTES-PENDENTES.md real tem números únicos', () => {
   const numeros = lerTestes(texto).map(i => i.numero)
   assert.equal(new Set(numeros).size, numeros.length)
   assert.ok(numeros.includes('T12'))
+})
+
+test('apagarTestes tira o bloco e a seção que ficou vazia', () => {
+  const depois = apagarTestes(exemplo, ['T08'])
+  assert.deepEqual(lerTestes(depois).map(i => i.numero), ['P1'])
+  assert.ok(!depois.includes('## Senha'))
+  assert.ok(depois.includes('## Perguntas'))
 })

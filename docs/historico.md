@@ -2,7 +2,7 @@
 
 Uma ou duas linhas por versão, com a data (dd/mm/aaaa). Número 0.ETAPA.AJUSTE.
 
-- (12/11/2026, sem mudar a versão) Testes como cartões (issues) no GitHub, com "Passou"/"Falhou" e comentários; regras gerais do Claude copiadas em `docs/claude-regras-gerais.md` e conferidas no início de cada sessão.
+- (12/11/2026, sem mudar a versão) `TESTES-PENDENTES.md` compacto, só como fonte dos cartões (scripts de leitura e de apagar). Testes como cartões (issues) no GitHub, com "Passou"/"Falhou" e comentários; regras gerais do Claude copiadas em `docs/claude-regras-gerais.md` e conferidas no início de cada sessão.
 - v0.1.3 (12/11/2026): botão "Procurar atualização" na janela do ícone (consulta a última Release do GitHub e instala com um clique); GitHub confere a extensão a cada envio; organização igual à do sistema principal (CLAUDE.md, comandos, permissões).
 - v0.1.2 (12/11/2026): atualização automática no Firefox pelo GitHub (`update_url` + `updates.json` em cada Release; repositório público).
 - v0.1.1 (12/11/2026): SEI 5 – senha reconhecida pelo Firefox na tela de entrada e na assinatura de documentos (o SEI passou a esconder a senha num campo de texto); assinatura na Mozilla pelo GitHub (`.github/workflows/assinar.yml`).
