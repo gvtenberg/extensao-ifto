@@ -29,6 +29,25 @@
         </span>
       </label>
     </section>
+    <section class="cartao">
+      <h1>Lista de assinaturas no SEI</h1>
+      <p class="apoio">Painel no SEI para colar uma lista de processos e documentos e abrir um por vez, para assinar ou dar ciência.</p>
+      <label class="opcao">
+        <input type="radio" name="listaAssinaturas" value="automatica">
+        <span>
+          Automática
+          <span class="apoio" style="display:block">Aparece só quando a unidade aberta no SEI é a Direção-geral (PAL/REI/IFTO).</span>
+        </span>
+      </label>
+      <label class="opcao">
+        <input type="radio" name="listaAssinaturas" value="sempre">
+        <span>Sempre ligada, em qualquer unidade</span>
+      </label>
+      <label class="opcao">
+        <input type="radio" name="listaAssinaturas" value="desligada">
+        <span>Desligada</span>
+      </label>
+    </section>
     <div class="aviso sucesso" id="gravado" hidden>Configuração gravada.</div>
   </main>
   <script src="../comum/configuracoes.js"></script>

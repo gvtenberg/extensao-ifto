@@ -14,6 +14,7 @@ JavaScript simples, sem compilação, Manifest V3 (D4 de `specs/base-e-sei.md`).
 | `comum/estilo.css` | Cores e componentes das páginas da extensão (padrão do sistema) |
 | `sites/sei/todas-as-paginas.js` | Em toda página do SEI: guarda a versão e o endereço do SEI (`seiVisto`) |
 | `sites/sei/lista-assinaturas.js` | Painel flutuante da lista de assinaturas (página principal do SEI): colar, navegar, abrir pela pesquisa rápida |
+| `sites/sei/lista-assinaturas-teclas.js` | Atalhos Alt+→ e Alt+← da lista com o foco dentro dos quadros do SEI (avisa a página principal) |
 | `sites/sei/botao-novo-documento.js` | Botão "Novo documento" sempre visível (`acao=arvore_visualizar`) |
 | `sites/sei/campo-senha.js` | Campo de senha reconhecido pelo navegador (`login.php` e `acao=documento_assinar`, também dentro da janela de assinatura) |
 | `janela/` | Janela do ícone: versão da extensão, SEI reconhecido, botões Configurações e Procurar atualização |

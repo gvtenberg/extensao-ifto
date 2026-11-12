@@ -2,6 +2,7 @@
 
 Uma ou duas linhas por versão, com a data (dd/mm/aaaa). Número 0.ETAPA.AJUSTE.
 
+- v0.3.0 (12/11/2026): lista de assinaturas, etapa 2: "Feito e próximo" e contador de feitos, lista completa clicável, itens de ciência em azul, minimizar, atalhos Alt+→ e Alt+←, opção nas configurações (Automática / Sempre ligada / Desligada).
 - v0.2.0 (12/11/2026): lista de assinaturas no SEI, etapa 1: colar a lista (processo, documento, comentário; vários formatos), linhas não reconhecidas em vermelho, painel móvel à direita da barra de botões com Anterior/Próximo e contador, abre cada item pela pesquisa rápida; só na Direção-geral (PAL/REI/IFTO). A extensão passa a agir só em `sei.ifto.edu.br`.
 - (12/11/2026, sem mudar a versão) `TESTES-PENDENTES.md` compacto, só como fonte dos cartões (scripts de leitura e de apagar). Testes como cartões (issues) no GitHub, com "Passou"/"Falhou" e comentários; regras gerais do Claude copiadas em `docs/claude-regras-gerais.md` e conferidas no início de cada sessão.
 - v0.1.3 (12/11/2026): botão "Procurar atualização" na janela do ícone (consulta a última Release do GitHub e instala com um clique); GitHub confere a extensão a cada envio; organização igual à do sistema principal (CLAUDE.md, comandos, permissões).

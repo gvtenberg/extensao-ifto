@@ -73,3 +73,12 @@ E: O painel volta no lugar em que você o deixou e no item 3; "Lugar padrão" o 
 ### T16 – Outra unidade (v0.2.0)
 F: Com a lista colada, troque para outra unidade no SEI e depois volte para PAL/REI/IFTO.
 E: Na outra unidade o painel some; ao voltar, reaparece no mesmo item.
+### T17 – Feito e lista completa (v0.3.0)
+F: Com a lista colada, clique em "✓ Feito e próximo" em dois itens, depois em "Lista completa" e num item qualquer da lista.
+E: O contador mostra "3/28 · 2 feitos"; na lista, os feitos têm ✓ e o clique abre o item escolhido.
+### T18 – Ciência, minimizar e atalhos (v0.3.0)
+F: Vá a um item com "dar ciência", clique em "–" (minimizar) e depois em "▢"; com o documento aberto, aperte Alt+→ e Alt+←.
+E: O item de ciência aparece em azul com "Só dar ciência"; minimizado, sobra uma barrinha com o contador; os atalhos passam para o próximo e voltam.
+### T19 – Opção nas configurações (v0.3.0)
+F: Configurações > Lista de assinaturas no SEI: escolha "Desligada", recarregue o SEI; depois "Sempre ligada" e troque para outra unidade; feche e abra o Firefox e veja a escolha.
+E: Desligada, o painel some; "Sempre ligada", aparece em qualquer unidade; a escolha continua marcada depois de reabrir o Firefox.

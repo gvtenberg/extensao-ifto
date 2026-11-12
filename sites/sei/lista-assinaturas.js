@@ -19,6 +19,7 @@
   let rascunho = ''
   let erros = []
   let aviso = ''
+  let verLista = false
 
   async function lerEstado () {
     const { [CHAVE]: gravado } = await navegador.storage.local.get(CHAVE)
@@ -183,13 +184,25 @@
     await irPara(0)
   }
 
+  // v0.3.0: "Feito e próximo", lista completa, ciência em destaque, minimizar.
   function desenharNavegar () {
-    painel.className = 'painel'
     const item = estado.itens[estado.posicao]
     const total = estado.itens.length
-    const contador = el('span', { class: 'contador' }, `${estado.posicao + 1}/${total}`)
+    const contador = el('span', { class: 'contador' }, regras.textoDoContador(estado))
+    const minimizar = el('button', { type: 'button', class: 'icone', title: 'Minimizar', onclick: () => minimizarPainel(true) }, '–')
+    if (estado.minimizado) {
+      painel.className = 'painel minimizado'
+      painel.replaceChildren(cabecalho('Assinaturas', contador,
+        el('button', { type: 'button', class: 'icone', title: 'Próximo (Alt+→)', disabled: estado.posicao === total - 1, onclick: () => irPara(estado.posicao + 1) }, '▶'),
+        el('button', { type: 'button', class: 'icone', title: 'Abrir o painel', onclick: () => minimizarPainel(false) }, '▢')))
+      return
+    }
+    painel.className = 'painel'
     const corpo = [
-      el('div', { class: 'item' },
+      el('div', { class: 'item' + (item.ciencia ? ' ciencia' : '') },
+        el('div', { class: 'etiquetas' },
+          item.ciencia ? el('span', { class: 'etiqueta ciencia' }, 'Só dar ciência') : el('span', { class: 'etiqueta' }, 'Assinar'),
+          item.feito ? el('span', { class: 'etiqueta feito' }, '✓ Feito') : null),
         item.processo ? el('div', {}, el('span', { class: 'rotulo' }, 'Processo '), el('strong', {}, item.processo)) : null,
         item.documento
           ? el('div', {}, el('span', { class: 'rotulo' }, 'Documento '), el('strong', {}, item.documento))
@@ -197,15 +210,74 @@
         item.comentario ? el('div', { class: 'comentario' }, item.comentario) : null),
       aviso ? el('div', { class: 'erros' }, aviso) : null,
       el('div', { class: 'acoes' },
-        el('button', { type: 'button', class: 'botao', disabled: estado.posicao === 0, onclick: () => irPara(estado.posicao - 1) }, '◀ Anterior'),
-        el('button', { type: 'button', class: 'botao principal', disabled: estado.posicao === total - 1, onclick: () => irPara(estado.posicao + 1) }, 'Próximo ▶')),
+        el('button', { type: 'button', class: 'botao', title: 'Alt+←', disabled: estado.posicao === 0, onclick: () => irPara(estado.posicao - 1) }, '◀ Anterior'),
+        el('button', { type: 'button', class: 'botao', title: 'Alt+→', disabled: estado.posicao === total - 1, onclick: () => irPara(estado.posicao + 1) }, 'Próximo ▶')),
+      el('button', { type: 'button', class: 'botao principal', onclick: feitoEProximo }, '✓ Feito e próximo'),
       el('div', { class: 'links' },
+        el('button', { type: 'button', class: 'link', onclick: () => { verLista = !verLista; desenhar() } }, verLista ? 'Esconder a lista' : `Lista completa (${total})`),
         el('button', { type: 'button', class: 'link', onclick: () => irPara(estado.posicao) }, 'Abrir de novo'),
+        item.feito ? el('button', { type: 'button', class: 'link', onclick: desmarcarFeito }, 'Desmarcar feito') : null,
         el('button', { type: 'button', class: 'link', onclick: voltarAoLugarPadrao }, 'Lugar padrão'),
-        el('button', { type: 'button', class: 'link perigo', onclick: limpar }, 'Limpar lista'))
+        el('button', { type: 'button', class: 'link perigo', onclick: limpar }, 'Limpar lista')),
+      verLista ? listaCompleta() : null
     ]
-    painel.replaceChildren(cabecalho('Lista de assinaturas', contador), el('div', { class: 'corpo' }, corpo))
+    painel.replaceChildren(cabecalho('Lista de assinaturas', contador, minimizar), el('div', { class: 'corpo' }, corpo))
   }
+
+  function listaCompleta () {
+    const lista = el('ol', { class: 'lista' }, estado.itens.map((item, indice) =>
+      el('li', { class: [indice === estado.posicao ? 'atual' : '', item.feito ? 'feito' : '', item.ciencia ? 'ciencia' : ''].join(' ').trim() },
+        el('button', { type: 'button', title: 'Abrir este item', onclick: () => irPara(indice) },
+          el('span', { class: 'situacao' }, item.feito ? '✓' : '•'),
+          el('span', {}, [item.processo, item.documento].filter(Boolean).join(' · ')),
+          item.comentario ? el('span', { class: 'apoio' }, ' ' + item.comentario) : null))))
+    // Deixa o item atual à vista.
+    setTimeout(() => { const atual = lista.querySelector('.atual'); if (atual) atual.scrollIntoView({ block: 'nearest' }) }, 0)
+    return lista
+  }
+
+  async function feitoEProximo () {
+    estado.itens[estado.posicao].feito = true
+    const proximo = regras.proximoPendente(estado.itens, estado.posicao)
+    if (proximo === -1) {
+      aviso = ''
+      await gravarEstado()
+      desenhar()
+      window.alert('Todos os itens da lista estão feitos. Clique em "Limpar lista" quando quiser apagá-la.')
+      return
+    }
+    await irPara(proximo)
+  }
+
+  async function desmarcarFeito () {
+    estado.itens[estado.posicao].feito = false
+    await gravarEstado()
+    desenhar()
+  }
+
+  async function minimizarPainel (minimizado) {
+    estado.minimizado = minimizado
+    await gravarEstado()
+    desenhar()
+  }
+
+  // v0.3.0: atalhos Alt+→ (próximo) e Alt+← (anterior), também com o foco dentro do documento
+  // (os quadros internos avisam por mensagem: sites/sei/lista-assinaturas-teclas.js).
+  function atalho (acao) {
+    if (!estado || modo !== 'navegar' || !regras.funcaoLigada(opcoes.listaAssinaturas, unidade)) return false
+    if (acao === 'proximo' && estado.posicao < estado.itens.length - 1) irPara(estado.posicao + 1)
+    else if (acao === 'anterior' && estado.posicao > 0) irPara(estado.posicao - 1)
+    return true
+  }
+  document.addEventListener('keydown', evento => {
+    if (!evento.altKey || evento.ctrlKey || evento.shiftKey || evento.metaKey) return
+    const acao = { ArrowRight: 'proximo', ArrowLeft: 'anterior' }[evento.key]
+    if (acao && atalho(acao)) evento.preventDefault()
+  }, true)
+  window.addEventListener('message', evento => {
+    if (evento.origin !== location.origin || !evento.data || evento.data.extensaoIfto !== 'lista-assinaturas-tecla') return
+    atalho(evento.data.acao)
+  })
 
   async function voltarAoLugarPadrao () {
     estado.painel = null
@@ -265,6 +337,24 @@
       .apoio { color: #5B6660; font-size: 12px; margin: 0; }
       .rotulo { color: #5B6660; }
       .item { display: grid; gap: 2px; }
+      .etiquetas { display: flex; gap: 6px; margin-bottom: 2px; }
+      .etiqueta { font-size: 11px; font-weight: 700; padding: 1px 6px; border-radius: 10px; background: #E7F2EA; color: #1E5E33; }
+      .etiqueta.ciencia { background: #E4E9FB; color: #2A3F9B; }
+      .etiqueta.feito { background: #1E5E33; color: #fff; }
+      .item.ciencia .comentario { background: #E4E9FB; color: #2A3F9B; }
+      .painel.minimizado { width: auto; }
+      .painel.minimizado .cabecalho { border-bottom: 0; border-radius: 8px; }
+      .icone { min-width: 26px; height: 24px; border: 1px solid #C9D1CC; border-radius: 4px; background: #fff;
+        color: #1B2420; font: inherit; cursor: pointer; padding: 0 4px; }
+      .icone:disabled { opacity: .45; cursor: default; }
+      .lista { margin: 0; padding: 0; list-style: none; max-height: 220px; overflow: auto; border-top: 1px solid #E2E6E3; }
+      .lista button { display: flex; gap: 6px; width: 100%; text-align: left; border: 0; background: none;
+        padding: 4px 2px; font: inherit; font-size: 12px; color: inherit; cursor: pointer; }
+      .lista button:hover { background: #F5F6F4; }
+      .lista li.atual button { background: #E7F2EA; font-weight: 600; }
+      .lista li.feito { color: #5B6660; }
+      .lista li.feito .situacao { color: #1E5E33; font-weight: 700; }
+      .lista li.ciencia .situacao { color: #2A3F9B; }
       .comentario { margin-top: 4px; padding: 4px 6px; background: #FFF1D6; color: #7A4B00; border-radius: 4px; font-weight: 600; }
       textarea { width: 100%; box-sizing: border-box; font: 12px/1.4 ui-monospace, monospace; padding: 6px;
         border: 1px solid #C9D1CC; border-radius: 6px; resize: vertical; }

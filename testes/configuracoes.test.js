@@ -18,3 +18,8 @@ test('comPadroes mantém o que o usuário gravou', () => {
 test('comPadroes ignora opções que não existem mais', () => {
   assert.equal('opcaoAntiga' in comPadroes({ opcaoAntiga: 1 }), false)
 })
+
+test('lista de assinaturas começa automática (só na Direção-geral) e guarda a escolha (v0.3.0)', () => {
+  assert.equal(PADROES.listaAssinaturas, 'automatica')
+  assert.equal(comPadroes({ listaAssinaturas: 'sempre' }).listaAssinaturas, 'sempre')
+})
