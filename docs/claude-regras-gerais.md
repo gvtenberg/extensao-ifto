@@ -2,7 +2,7 @@
 
 **Seções**: Leitura econômica (tokens) · Organização do projeto e da documentação · Como trabalhamos (specs pequenas) · Mensagens no chat (curtas) · Testes · Versão e git · Melhorias que servem a vários projetos · Mesmas regras em todos os computadores
 
-Atualizado em 12/11/2026. Modelo: `/home/berg/Desktop/Sistema Gestão Orçamentária/sistema-orcamento-ifto` (CLAUDE.md, docs/, .claude/). Projeto novo ou sem essa organização: proponha aplicá-la. O usuário não é da área de TI: **sempre em português**, linguagem simples, comandos com o texto exato a digitar e o caminho dos cliques.
+Atualizado em 12/11/2026 (2). Modelo: `/home/berg/Desktop/Sistema Gestão Orçamentária/sistema-orcamento-ifto` (CLAUDE.md, docs/, .claude/). Projeto novo ou sem essa organização: proponha aplicá-la. O usuário não é da área de TI: **sempre em português**, linguagem simples, comandos com o texto exato a digitar e o caminho dos cliques.
 
 ## Leitura econômica (tokens)
 
@@ -16,6 +16,7 @@ Atualizado em 12/11/2026. Modelo: `/home/berg/Desktop/Sistema Gestão Orçament�
 - `docs/`: `arquitetura.md` (mapa dos arquivos) · `regras/` (um arquivo por assunto + `LEIA-ME.md`) · `padrao-visual.md` · `melhorias-futuras.md` (seção "Situação" no topo: feito, em andamento, pendente do usuário, planejado **[spec]**, não planejado; depois as ideias, uma linha cada) · `specs/` (`_modelo.md`, uma spec por melhoria; concluídas em `specs/feitas/`) · `historico.md` (uma ou duas linhas por versão, com data) · `referencias/`. Na raiz: `TESTES-PENDENTES.md`.
 - Todos os `.md` no git (fora só os locais ou desnecessários), para outra pessoa ou outra máquina continuar. Ao mudar código ou regra, atualize no mesmo commit o `.md` certo e a "Situação". Não crie arquivo que repita o que já está em outro (aponte para ele).
 - Um assunto por arquivo; títulos `##` que sirvam de busca; índice "**Seções**" na 3ª linha (atualize ao criar ou renomear seção); textos curtos.
+- Textos que aparecem para quem usa o sistema ou a extensão: escritos para esse usuário (não de TI), nunca para o programador (nada de GitHub, Actions, código, nomes de arquivos ou termos técnicos); o que é do programador fica em `docs/`.
 - `ferramentas-de-teste/` no `.gitignore` (arquivos de teste e de referência locais); chaves e senhas nunca no git (`.env.local`, segredos do GitHub). Nunca retire linhas do `.gitignore` sem permissão.
 - `.claude/commands/`: `/planejar`, `/etapa`, `/testes`. `.claude/settings.json`: libera os comandos de verificação e `git status/diff/log`; bloqueia ler `.env.local`.
 - GitHub Actions: confere o projeto a cada envio; versão do sistema operacional fixa (ex.: `ubuntu-24.04`), `timeout-minutes`, passos com nomes em português.
