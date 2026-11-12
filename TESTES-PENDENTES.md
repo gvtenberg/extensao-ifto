@@ -58,3 +58,18 @@ E: A extensão continua instalada; a janela do ícone mostra a versão.
 ### T12 – Botão "Procurar atualização" (v0.1.3)
 F: Depois de uma versão nova ficar pronta no GitHub, clique no ícone da extensão > Procurar atualização > Instalar a versão… > Permitir > Adicionar. Procure de novo.
 E: Aparece "Versão X disponível"; depois de instalar, "Você já tem a versão mais nova".
+
+## Lista de assinaturas no SEI (v0.2.0 a v0.4.0)
+> Instale a versão nova e entre no SEI com a unidade PAL/REI/IFTO (Direção-geral).
+### T13 – Colar a lista e abrir os itens (v0.2.0)
+F: No SEI, clique em "Lista de assinaturas" (canto superior direito), cole a sua lista do dia, clique em "Conferir e começar" e depois em "Próximo ▶" algumas vezes.
+E: O painel fica à direita da barra de botões do processo, mostra "1/28", o processo, o documento e o comentário; cada clique abre o documento certo (ou o processo, quando a linha não tem documento). Comente se a busca do SEI não abrir o documento.
+### T14 – Linhas não reconhecidas (v0.2.0)
+F: Clique em "Limpar lista", cole a lista com uma linha errada (ex.: "23236.0214/2026-95") e clique em "Conferir e começar".
+E: A linha errada aparece em vermelho; dá para corrigir ou "Começar só com as reconhecidas".
+### T15 – Mover o painel e guardar a lista (v0.2.0)
+F: Arraste o painel pela barra de cima, vá até o item 3, feche o Firefox, abra de novo e entre no SEI. Depois clique em "Lugar padrão".
+E: O painel volta no lugar em que você o deixou e no item 3; "Lugar padrão" o devolve ao canto direito.
+### T16 – Outra unidade (v0.2.0)
+F: Com a lista colada, troque para outra unidade no SEI e depois volte para PAL/REI/IFTO.
+E: Na outra unidade o painel some; ao voltar, reaparece no mesmo item.

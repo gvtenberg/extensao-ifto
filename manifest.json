@@ -2,11 +2,11 @@
   "manifest_version": 3,
   "name": "Extensão IFTO Palmas",
   "short_name": "IFTO Palmas",
-  "version": "0.1.3",
+  "version": "0.2.0",
   "description": "Melhorias no SEI e apoio ao Sistema de Gestão Orçamentária do IFTO Campus Palmas.",
   "icons": { "48": "icones/icone.svg", "96": "icones/icone.svg" },
   "permissions": ["storage"],
-  "host_permissions": ["*://*.ifto.edu.br/*controlador.php?acao=*", "*://*.ifto.edu.br/*login.php*"],
+  "host_permissions": ["*://sei.ifto.edu.br/*controlador.php?acao=*", "*://sei.ifto.edu.br/*login.php*"],
   "action": {
     "default_icon": "icones/icone.svg",
     "default_title": "Extensão IFTO Palmas",
@@ -18,20 +18,26 @@
   },
   "content_scripts": [
     {
-      "matches": ["*://*.ifto.edu.br/*controlador.php?acao=*"],
+      "matches": ["*://sei.ifto.edu.br/*controlador.php?acao=*"],
       "run_at": "document_idle",
-      "js": ["comum/sei.js", "sites/sei/todas-as-paginas.js"]
+      "js": [
+        "comum/sei.js",
+        "comum/configuracoes.js",
+        "comum/lista-assinaturas.js",
+        "sites/sei/todas-as-paginas.js",
+        "sites/sei/lista-assinaturas.js"
+      ]
     },
     {
-      "matches": ["*://*.ifto.edu.br/*controlador.php?acao=arvore_visualizar*"],
+      "matches": ["*://sei.ifto.edu.br/*controlador.php?acao=arvore_visualizar*"],
       "run_at": "document_idle",
       "all_frames": true,
       "js": ["comum/sei.js", "comum/configuracoes.js", "sites/sei/botao-novo-documento.js"]
     },
     {
       "matches": [
-        "*://*.ifto.edu.br/*login.php*",
-        "*://*.ifto.edu.br/*controlador.php?acao=documento_assinar*"
+        "*://sei.ifto.edu.br/*login.php*",
+        "*://sei.ifto.edu.br/*controlador.php?acao=documento_assinar*"
       ],
       "run_at": "document_idle",
       "all_frames": true,

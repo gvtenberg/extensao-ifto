@@ -2,7 +2,9 @@
 (function (raiz) {
   const PADROES = Object.freeze({
     novoDocumentoSempreVisivel: true,
-    senhaReconhecidaPeloNavegador: true
+    senhaReconhecidaPeloNavegador: true,
+    // v0.2.0: "automatica" (só na Direção-geral, PAL/REI/IFTO), "sempre" ou "desligada"
+    listaAssinaturas: 'automatica'
   })
 
   // Junta o que o usuário gravou com os padrões; opções que não existem mais são ignoradas.

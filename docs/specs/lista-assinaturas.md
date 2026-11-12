@@ -2,7 +2,7 @@
 
 **Seções**: 1. Objetivo · 2. Fora do escopo · 3. Decisões a confirmar · 4. Regras decididas · 5. O que muda · 6. Etapas · 7. Testes manuais
 
-- **Situação:** pronta para programar
+- **Situação:** em andamento (etapa 1 feita na v0.2.0)
 - **Pedido em:** 12/11/2026 · **Prazo ou prioridade:** fazer agora, antes da etapa 2 de `base-e-sei.md` (não depende dela)
 - **Versão prevista:** 0.2.0 (próxima funcionalidade nova; uma versão por etapa: 0.2, 0.3, 0.4)
 
@@ -54,7 +54,7 @@ Decididas no chat em 12/11/2026.
 
 Cada etapa cabe numa conversa curta (`/etapa lista-assinaturas <n>`) e termina com testes, versão e commit.
 
-- [ ] Etapa 1 – **Ler a lista e abrir um a um** (v0.2.0). Restringir a extensão a `sei.ifto.edu.br` (`manifest.json`, `regras/sei.md`, `arquitetura.md`). Ler a unidade aberta (regra pura com teste) e mostrar a função só na `PAL/REI/IFTO`. Regra pura que lê as linhas (todos os formatos da seção 4, com testes no Node usando o exemplo `ferramentas-de-teste/paginas-sei/documentos assinar.txt`); botãozinho e painel no SEI: colar a lista, linhas não reconhecidas em vermelho, guardar, contador, Anterior/Próximo, abrir pela pesquisa rápida, arrastar o painel (posição padrão à direita da barra de botões), Limpar lista. Teste: na unidade PAL/REI/IFTO, colar o arquivo de exemplo, passar por três itens (processo com documento, só processo e só documento) e fechar e abrir o Firefox para ver a posição guardada. Conferir que a pesquisa rápida do SEI 5 abre o documento pelo número.
+- [x] Etapa 1 – **Ler a lista e abrir um a um** (v0.2.0, feita em 12/11/2026). Restringir a extensão a `sei.ifto.edu.br` (`manifest.json`, `regras/sei.md`, `arquitetura.md`). Ler a unidade aberta (regra pura com teste) e mostrar a função só na `PAL/REI/IFTO`. Regra pura que lê as linhas (todos os formatos da seção 4, com testes no Node usando o exemplo `ferramentas-de-teste/paginas-sei/documentos assinar.txt`); botãozinho e painel no SEI: colar a lista, linhas não reconhecidas em vermelho, guardar, contador, Anterior/Próximo, abrir pela pesquisa rápida, arrastar o painel (posição padrão à direita da barra de botões), Limpar lista. Teste: na unidade PAL/REI/IFTO, colar o arquivo de exemplo, passar por três itens (processo com documento, só processo e só documento) e fechar e abrir o Firefox para ver a posição guardada. Conferir que a pesquisa rápida do SEI 5 abre o documento pelo número.
 - [ ] Etapa 2 – **Feito, lista completa e conforto** (v0.3.0). "Feito ✓ e próximo", contador de feitos, lista completa clicável, comentário em destaque e cor dos itens de ciência, minimizar, atalhos Alt+→ e Alt+←, opção nas configurações (Automática / Sempre ligada / Desligada). Teste: marcar feitos, pular pela lista completa, minimizar; trocar para outra unidade e ver o painel sumir; escolher "Sempre ligada" e vê-lo voltar; escolher "Desligada".
 - [ ] Etapa 3 – **Botões "Assinar" e "Dar ciência" no painel** (v0.4.0). Localizar os botões do SEI 5 (páginas salvas em `ferramentas-de-teste/paginas-sei/`) e clicar neles a pedido. Teste (crítico, grava no SEI): num documento real da lista, clicar em "Assinar" no painel e ver a janela de assinatura do SEI pedir a senha; num item de ciência, ver o SEI pedir a confirmação.
 - [ ] Fim: regras para `docs/regras/sei.md`, painel em `docs/padrao-visual.md`, linha sai de `melhorias-futuras.md`, spec para `feitas/`.

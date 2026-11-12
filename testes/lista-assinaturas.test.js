@@ -1,0 +1,100 @@
+const { test } = require('node:test')
+const assert = require('node:assert/strict')
+const lista = require('../comum/lista-assinaturas.js')
+
+// Linhas no formato do arquivo de exemplo do usuário (12/11/2026).
+const EXEMPLO = [
+  '23236.021417/2026-95 - 3383423 dar ciência',
+  '23236.022730/2026-41 - 3383754 edital e todos os anexos',
+  '23236.011766/2026-07 - 3383812',
+  '',
+  '23235.022688/2026-78 - 3383283'
+].join('\n')
+
+test('lê o formato "processo - documento comentário"', () => {
+  const { itens, erros } = lista.lerLista(EXEMPLO)
+  assert.equal(erros.length, 0)
+  assert.equal(itens.length, 4)
+  assert.deepEqual(itens[0], {
+    processo: '23236.021417/2026-95', documento: '3383423', comentario: 'dar ciência', ciencia: true, feito: false
+  })
+  assert.equal(itens[1].comentario, 'edital e todos os anexos')
+  assert.equal(itens[1].ciencia, false)
+  assert.equal(itens[2].comentario, '')
+})
+
+test('aceita só o processo, com ou sem comentário', () => {
+  assert.deepEqual(lista.lerLinha('23236.011766/2026-07'),
+    { processo: '23236.011766/2026-07', documento: '', comentario: '', ciencia: false, feito: false })
+  const item = lista.lerLinha('23236.011766/2026-07 verificar 2026')
+  assert.equal(item.documento, '')
+  assert.equal(item.comentario, 'verificar 2026')
+})
+
+test('aceita só o número do documento', () => {
+  const item = lista.lerLinha('3383423 dar ciencia')
+  assert.equal(item.processo, '')
+  assert.equal(item.documento, '3383423')
+  assert.equal(item.ciencia, true)
+})
+
+test('aceita colunas de planilha e separadores variados', () => {
+  for (const linha of [
+    '23236.021417/2026-95\t3383423\tdar ciência',
+    '23236.021417/2026-95;3383423;dar ciência',
+    '23236.021417/2026-95, 3383423, dar ciência',
+    '23236.021417/2026-95 3383423 dar ciência',
+    '23236.021417/2026-95 – 3383423 – dar ciência',
+    '• 23236.021417/2026-95 - 3383423 dar ciência'
+  ]) {
+    const item = lista.lerLinha(linha)
+    assert.equal(item.processo, '23236.021417/2026-95', linha)
+    assert.equal(item.documento, '3383423', linha)
+    assert.equal(item.comentario, 'dar ciência', linha)
+  }
+  const semDocumento = lista.lerLinha('23236.021417/2026-95\t\tverificar')
+  assert.equal(semDocumento.documento, '')
+  assert.equal(semDocumento.comentario, 'verificar')
+})
+
+test('linhas não reconhecidas vão para os erros, com o número da linha', () => {
+  const { itens, erros } = lista.lerLista('23236.0214/2026-95 - 3383423\n23236.021417/2026-95\nassinar tudo')
+  assert.equal(itens.length, 1)
+  assert.deepEqual(erros, [
+    { numero: 1, texto: '23236.0214/2026-95 - 3383423' },
+    { numero: 3, texto: 'assinar tudo' }
+  ])
+})
+
+test('pesquisa pelo documento; sem documento, pelo processo', () => {
+  assert.equal(lista.textoDaPesquisa({ processo: '23236.011766/2026-07', documento: '3383812' }), '3383812')
+  assert.equal(lista.textoDaPesquisa({ processo: '23236.011766/2026-07', documento: '' }), '23236.011766/2026-07')
+})
+
+test('função ligada: automática só na Direção-geral', () => {
+  assert.equal(lista.funcaoLigada('automatica', 'PAL/REI/IFTO'), true)
+  assert.equal(lista.funcaoLigada('automatica', ' pal/rei/ifto \n'), true)
+  assert.equal(lista.funcaoLigada('automatica', 'PAL/CGOC/IFTO'), false)
+  assert.equal(lista.funcaoLigada('automatica', ''), false)
+  assert.equal(lista.funcaoLigada('sempre', 'PAL/CGOC/IFTO'), true)
+  assert.equal(lista.funcaoLigada('desligada', 'PAL/REI/IFTO'), false)
+})
+
+test('contador "8/28 · 7 feitos"', () => {
+  const itens = Array.from({ length: 28 }, (_, i) => ({ feito: i < 7 }))
+  assert.equal(lista.textoDoContador({ itens, posicao: 7 }), '8/28 · 7 feitos')
+  assert.equal(lista.textoDoContador({ itens: [{ feito: true }], posicao: 0 }), '1/1 · 1 feito')
+})
+
+test('limitarPosicao fica dentro da lista', () => {
+  assert.equal(lista.limitarPosicao(-1, 5), 0)
+  assert.equal(lista.limitarPosicao(9, 5), 4)
+  assert.equal(lista.limitarPosicao(2, 0), 0)
+})
+
+test('próximo pendente: depois da posição, senão o primeiro antes; todos feitos: -1', () => {
+  const itens = [{ feito: false }, { feito: true }, { feito: false }, { feito: true }]
+  assert.equal(lista.proximoPendente(itens, 0), 2)
+  assert.equal(lista.proximoPendente(itens, 2), 0)
+  assert.equal(lista.proximoPendente(itens.map(() => ({ feito: true })), 1), -1)
+})

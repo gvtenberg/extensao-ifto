@@ -6,8 +6,8 @@
 
 Resumo para retomar o trabalho (em outra máquina ou por outra pessoa) sem ler tudo. Atualize ao fim de cada etapa ou rodada.
 
-- **Feito:** cada versão em `historico.md` (última: v0.1.3, 12/11/2026); specs concluídas em `specs/feitas/` (nenhuma ainda).
-- **Próximo a programar:** `specs/lista-assinaturas.md` (lista de assinaturas no SEI), etapa 1, sem decisões em aberto (prioridade decidida em 12/11/2026: antes da etapa 2 da base-e-sei).
+- **Feito:** cada versão em `historico.md` (última: v0.2.0, 12/11/2026); specs concluídas em `specs/feitas/` (nenhuma ainda).
+- **Em andamento (1º):** `specs/lista-assinaturas.md` (lista de assinaturas no SEI): etapa 1 feita (v0.2.0); próxima, a etapa 2, sem decisões em aberto (prioridade decidida em 12/11/2026: antes da etapa 2 da base-e-sei).
 - **Em andamento:** `specs/base-e-sei.md`: etapa 1 feita (v0.1.0); próxima, a etapa 2, aguarda as decisões D7 e D9 a D13 (perguntas P1 a P4 e levantamentos T06 e T07 no `TESTES-PENDENTES.md`).
 - **Ajustes fora de spec:** v0.1.1, senha reconhecida pelo navegador no SEI 5; v0.1.2, atualização automática pelo GitHub; v0.1.3, botão "Procurar atualização" e organização igual à do sistema principal.
 - **Pendente do usuário:** testes T01 a T12 e perguntas P1 a P4 (também como cartões no GitHub, depois do primeiro `git push`) (o SEI virou SEI 5 em 11/2026: refazer T03 a T05); chaves da Mozilla para a assinatura no GitHub (`publicacao.md`).
