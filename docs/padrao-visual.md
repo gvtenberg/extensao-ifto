@@ -12,4 +12,5 @@ Segue o padrão do sistema (`../sistema-orcamento-ifto/docs/padrao-visual.md`), 
 
 - **Discreto e no estilo do site**, não no do sistema: o que for acrescentado deve parecer parte da página.
 - Tudo o que a extensão acrescenta fica identificável (ex.: um pequeno ícone da extensão), para o usuário saber o que é do site e o que é da extensão.
-- Nada de mudar o que o site já mostra sem o usuário ligar a função nas configurações.
+- Nada de mudar o que o site já mostra sem o usuário ligar a função nas configurações. Exceção (v0.3.0): funções do perfil da unidade aberta no SEI podem vir ligadas ("Automática"), como a lista de assinaturas na Direção-geral; o usuário pode desligá-las.
+- **Painel flutuante** (v0.2.0, lista de assinaturas): fica por cima da página, pode ser arrastado e minimizado e guarda a posição; isolado do estilo do site (shadow DOM), com a etiqueta verde "IFTO" e as cores do sistema; botões de 32 px por ser compacto. Lugar padrão: canto superior direito, à direita da barra de botões do processo.

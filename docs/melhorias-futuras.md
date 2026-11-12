@@ -6,11 +6,10 @@
 
 Resumo para retomar o trabalho (em outra máquina ou por outra pessoa) sem ler tudo. Atualize ao fim de cada etapa ou rodada.
 
-- **Feito:** cada versão em `historico.md` (última: v0.3.0, 12/11/2026); specs concluídas em `specs/feitas/` (nenhuma ainda).
-- **Em andamento (1º):** `specs/lista-assinaturas.md` (lista de assinaturas no SEI): etapas 1 e 2 feitas (v0.2.0 e v0.3.0); próxima, a etapa 3, sem decisões em aberto (prioridade decidida em 12/11/2026: antes da etapa 2 da base-e-sei).
+- **Feito:** cada versão em `historico.md` (última: v0.4.0, 12/11/2026); specs concluídas em `specs/feitas/` (lista de assinaturas no SEI, v0.2.0 a v0.4.0; regras em `regras/lista-assinaturas.md`).
 - **Em andamento:** `specs/base-e-sei.md`: etapa 1 feita (v0.1.0); próxima, a etapa 2, aguarda as decisões D7 e D9 a D13 (perguntas P1 a P4 e levantamentos T06 e T07 no `TESTES-PENDENTES.md`).
 - **Ajustes fora de spec:** v0.1.1, senha reconhecida pelo navegador no SEI 5; v0.1.2, atualização automática pelo GitHub; v0.1.3, botão "Procurar atualização" e organização igual à do sistema principal.
-- **Pendente do usuário:** testes T01 a T12 e perguntas P1 a P4 (também como cartões no GitHub, depois do primeiro `git push`) (o SEI virou SEI 5 em 11/2026: refazer T03 a T05); chaves da Mozilla para a assinatura no GitHub (`publicacao.md`).
+- **Pendente do usuário:** testes T01 a T20 (T20 crítico: assinar pelo painel) e perguntas P1 a P4 (também como cartões no GitHub, depois do primeiro `git push`) (o SEI virou SEI 5 em 11/2026: refazer T03 a T05); chaves da Mozilla para a assinatura no GitHub (`publicacao.md`).
 - **Planejado (com spec):** linhas com **[spec]** abaixo. **Não planejado:** as demais linhas (ideias).
 
 ## Ideias
@@ -24,7 +23,6 @@ Marcas: **[spec]** já tem spec.
 1. Base da extensão e melhorias do SEI (no lugar do SEI++, que parou no SEI do IFTO): botão Novo documento, documento externo preenchido, arrastar arquivos com o tipo reconhecido, roteiros por tipo de processo **[spec]** → `specs/base-e-sei.md`
    - Adicionar arquivos direto num processo do SEI 5 (12/11/2026): já é a etapa 3 da spec ("Arrastar arquivos"). Um colega do IFTO conseguiu fazer isso na extensão dele, no SEI 5: pedir a ele o nome ou o endereço da extensão e anotar em `referencias/` antes da etapa 3.
    - Depois: **compressão automática de PDF** na própria extensão (26/10/2026): compactar, comparar os tamanhos, informar quanto se economiza no servidor de arquivos da Reitoria e mostrar lado a lado o PDF original e o compactado, para o usuário ver a diferença de qualidade e escolher um deles. Obrigatória acima de 10 MB. De preferência sem mandar o arquivo para sites de fora (D13 da spec).
-   - **Lista de assinaturas no SEI** (12/11/2026): colar a lista de processos e documentos para assinar ou dar ciência e abrir um a um, com painel flutuante (Anterior/Próximo, 8/28) **[spec]** → `specs/lista-assinaturas.md` (fazer antes da etapa 2 acima)
    - **Perfis padronizados por unidade do SEI** (12/11/2026): Direção-geral, Contratos, Licitação etc., cada um com as suas funções ligadas por padrão, reconhecido pela unidade aberta no SEI (`#lnkInfraUnidade`). A primeira função de perfil é a lista de assinaturas (Direção-geral).
 2. Login Google e leitura da planilha do sistema (sem login, só as melhorias do SEI).
 3. Solicitação de nota de empenho no SEI: preencher o documento com o texto que o sistema já monta (v0.43.0 do sistema; regras em `../sistema-orcamento-ifto/docs/regras/solicitacao-empenho.md`). Depende do teste T40 do sistema ("Colar no SEI").

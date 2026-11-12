@@ -8,3 +8,4 @@ As regras de negócio do orçamento (demandas, empenhos, contratos, solicitaçã
 | --- | --- |
 | `geral.md` | Navegadores, login e acesso à planilha, instalação, custos |
 | `sei.md` | SEI do IFTO: versão, o que a extensão faz nele, aproveitamento do SEI++ |
+| `lista-assinaturas.md` | Lista de assinaturas no SEI (Direção-geral): formatos aceitos, painel, unidade, configurações |

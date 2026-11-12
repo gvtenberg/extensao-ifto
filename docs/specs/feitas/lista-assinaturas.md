@@ -23,7 +23,7 @@ Nenhuma em aberto (todas respondidas no chat em 12/11/2026; ver seção 4).
 
 ## 4. Regras decididas
 
-Decididas no chat em 12/11/2026.
+Decididas no chat em 12/11/2026. Passadas para `docs/regras/lista-assinaturas.md`.
 
 - **Onde colar:** no painel do SEI, pelo botão "Colar lista", que abre uma caixa de texto.
 - **Formatos aceitos (uma linha por item):** processo + documento + comentário (`23236.022730/2026-41 - 3383754 edital e todos os anexos`); só o processo (com ou sem comentário); só o número SEI do documento (com ou sem comentário); colunas coladas de planilha (tabulação); separadores ` - `, `;`, `,` ou só espaço. Linhas em branco são ignoradas. O processo segue a máscara `NNNNN.NNNNNN/AAAA-DD`; o documento é o número SEI (só algarismos, hoje com 7).
