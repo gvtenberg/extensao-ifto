@@ -1,80 +1,76 @@
 # Extensão de navegador – IFTO Campus Palmas (UG 158336)
 
-Extensão para o **Firefox** (depois também para o Chrome) que acompanha o Sistema de Gestão Orçamentária do campus. Ela melhora o SEI do IFTO e, com o login, lê os dados do sistema na Planilha Google para preencher documentos e capturar dados em outros sites (SEI, SUAP, SIAFI, SICAF, Simples Nacional, Comprasnet). Versão atual em `manifest.json`.
+Extensão para o **Firefox** (depois também para o Chrome) que acompanha o Sistema de Gestão Orçamentária do campus: melhora o SEI do IFTO e, com o login, lê os dados do sistema na Planilha Google para preencher documentos e capturar dados em outros sites (SEI, SUAP, SIAFI, SICAF, Simples Nacional, Comprasnet). Versão em `manifest.json`. O sistema principal fica em `../sistema-orcamento-ifto` (outro repositório): regras de negócio e planilha ficam lá; **não copie**, leia só o trecho necessário.
 
-O sistema principal fica em `../sistema-orcamento-ifto` (outro repositório). Lá estão as regras de negócio e a estrutura da planilha: **não copie** esses arquivos para cá; leia lá só o trecho necessário.
+## Leitura econômica
 
-## Leitura econômica (importante)
-
-- No início da sessão **não leia** nada de `docs/` nem o `TESTES-PENDENTES.md`. Leia só quando a tarefa pedir, e só a parte necessária (busque pelo título da seção; não abra o arquivo inteiro sem precisar).
-- Onde está cada coisa:
-  - `docs/arquitetura.md`: mapa dos arquivos da extensão.
-  - `docs/regras/`: regras já decididas, **um arquivo por assunto** (lista em `docs/regras/LEIA-ME.md`).
-  - `docs/padrao-visual.md`: padrão visual da extensão (janela da extensão, configurações e o que ela acrescenta nas páginas).
-  - `docs/referencias/`: anotações sobre outras extensões e sites (ex.: SEI++).
-  - `docs/melhorias-futuras.md`: **situação do projeto** no topo (feito, em andamento, pendente: leia só essa seção para retomar o trabalho) e a lista curta de ideias (uma linha cada; **[spec]** = já planejada).
-  - `docs/specs/`: uma spec por melhoria em andamento (ver "Como trabalhamos").
-  - `docs/historico.md`: o que entrou em cada versão.
-  - `docs/publicacao.md`: assinatura na Mozilla pelo GitHub e instalação no computador do trabalho.
-  - `TESTES-PENDENTES.md` (raiz, no git): testes manuais T01, T02…
-  - No sistema principal: `../sistema-orcamento-ifto/docs/planilha.md` (abas e colunas da planilha) e `../sistema-orcamento-ifto/docs/regras/` (regras de negócio, ex.: `solicitacao-empenho.md`).
-- Arquivos de `docs/` com várias seções (e o `TESTES-PENDENTES.md`) têm na 3ª linha o índice "**Seções**": leia as 5 primeiras linhas e busque o título da seção. `docs/historico.md`: busque a versão (`v0.1.1`). `TESTES-PENDENTES.md`: busque `### T12`; nunca o arquivo inteiro.
-- Não releia arquivos que já leu na mesma sessão.
+- No início **não leia** `docs/` nem `TESTES-PENDENTES.md`. Leia só o que a tarefa pedir, só a parte necessária, e não releia o que já leu na sessão.
+- Arquivos com várias seções têm na 3ª linha o índice "**Seções**": leia as 5 primeiras linhas e busque o título da seção. `docs/historico.md`: busque a versão (`v0.1.3`). `TESTES-PENDENTES.md`: `### T12` ou a marca (ver `/testes`); nunca o arquivo inteiro. Para retomar o trabalho: só a seção "Situação" de `docs/melhorias-futuras.md`.
+- Onde está cada coisa: `docs/arquitetura.md` (mapa dos arquivos) · `docs/regras/` (regras decididas, um arquivo por assunto; lista em `LEIA-ME.md`) · `docs/padrao-visual.md` (janela, configurações e o que a extensão põe nas páginas) · `docs/referencias/` (outras extensões e sites, ex.: SEI++) · `docs/melhorias-futuras.md` (Situação: feito, em andamento, pendente; e as ideias, uma linha cada) · `docs/specs/` (uma spec por melhoria em andamento; feitas em `feitas/`) · `docs/historico.md` (o que entrou em cada versão) · `docs/publicacao.md` (assinatura na Mozilla pelo GitHub e instalação) · `TESTES-PENDENTES.md` (raiz: testes manuais T01, T02…). No sistema principal: `docs/planilha.md` (abas e colunas) e `docs/regras/`.
 
 ## Documentação (para outra pessoa ou outra máquina continuar)
 
-- Todos os `.md` vão para o git (menos o que estiver em `ferramentas-de-teste/`). Ao mudar código ou regra, atualize no mesmo commit o `.md` certo (arquitetura, regras, histórico, testes, spec).
-- Feito e pendente: o feito fica em `docs/historico.md` (uma linha por versão) e em `docs/specs/feitas/`; o pendente, na seção "Situação" de `docs/melhorias-futuras.md` (atualize ao fim de cada etapa ou rodada), em `docs/specs/` e no `TESTES-PENDENTES.md`. Não crie outro arquivo que repita isso.
-- Organização para economizar leitura: um assunto por arquivo; títulos `##` que sirvam de busca; índice "**Seções**" na 3ª linha quando o arquivo tiver várias seções (atualize o índice ao criar ou renomear seção); textos curtos, sem repetir o que já está em outro arquivo (aponte para ele).
+- Todos os `.md` vão para o git (menos o que estiver em `ferramentas-de-teste/`). Ao mudar código ou regra, atualize no mesmo commit o `.md` certo (arquitetura, regras, histórico, testes, spec, Situação).
+- Feito: `docs/historico.md` e `docs/specs/feitas/`. Pendente: seção "Situação" de `docs/melhorias-futuras.md` (atualize ao fim de cada etapa ou rodada), `docs/specs/` e `TESTES-PENDENTES.md`. Não crie outro arquivo que repita isso.
+- Um assunto por arquivo; títulos `##` que sirvam de busca; índice "**Seções**" na 3ª linha quando houver várias seções (atualize ao criar ou renomear seção); textos curtos, sem repetir o que está em outro arquivo (aponte para ele).
 
 ## Como trabalhamos (specs pequenas)
 
-1. **Planejar** (comando `/planejar <melhoria>`): entreviste o usuário (perguntas curtas, de preferência com opções), depois crie `docs/specs/<nome>.md` a partir de `docs/specs/_modelo.md`. Divida em etapas pequenas; cada etapa cabe numa conversa.
-2. **Decisões a confirmar:** toda escolha que muda regra, tela, dados lidos ou gravados na planilha, ou que seria difícil de desfazer, vai para a seção "Decisões a confirmar" da spec, com `[ ]`. **Não programe** enquanto houver `[ ]` que afete a etapa. Nunca decida sozinho e anote "decisão do Claude, a confirmar": pergunte.
+1. **Planejar** (`/planejar <melhoria>`): entreviste o usuário e crie `docs/specs/<nome>.md` a partir de `_modelo.md`, com etapas pequenas (cada uma cabe numa conversa).
+2. **Decisões:** escolha que muda regra, tela, dados lidos ou gravados (planilha, SEI) ou difícil de desfazer vai para "Decisões a confirmar" com `[ ]`; **não programe** com `[ ]` que afete a etapa e nunca decida sozinho.
    - Toda dúvida é perguntada **no chat assim que aparece** (nunca fica só na spec nem espera a etapa em que será usada); a resposta vai para a spec.
    - Com alternativas, pergunte pela **janela de escolha** (até 4 perguntas por vez; a sugestão em 1º lugar; cada pergunta se explica sozinha). Texto só quando não houver opções.
-3. **Executar** (comando `/etapa <spec> <n>`): numa conversa nova, leia só a spec e o que ela indicar. Ao terminar: testes, versão, histórico, commit e a etapa marcada como feita na spec.
-4. **Fim da melhoria:** as regras decididas passam para `docs/regras/`, a linha sai de `melhorias-futuras.md` e a spec vai para `docs/specs/feitas/`.
+3. **Executar** (`/etapa <spec> <n>`): leia só a spec e o que ela indicar. Ao terminar: testes, versão, histórico, Situação, commit e etapa marcada.
+4. **Fim da melhoria:** regras para `docs/regras/`, linha sai de `melhorias-futuras.md`, spec para `docs/specs/feitas/`.
 - Ajustes pequenos e correções de testes não precisam de spec.
-- **Testes manuais** (comando `/testes`): o usuário marca `[x]` (certo) ou `[!]` (falhou, com observação) no `TESTES-PENDENTES.md`. Leia, corrija o que falhou, apague os que deram certo e acrescente os novos (número novo, nunca reaproveitado).
+- **Testes manuais** (`/testes`): o usuário marca `[x]` (certo) ou `[!]` (falhou, com observação). Corrija os `[!]`, apague os `[x]` e acrescente os novos (número novo, nunca reaproveitado).
 
 ## Quem é o usuário
 
-- Chefe da CGOC (Coordenação de Gestão Orçamentária e Contratos). **Não é da área de TI**: linguagem simples, sem jargão; comandos sempre com o texto exato a digitar e o caminho dos cliques no navegador.
-- **Sempre em português** (respostas, textos da extensão, comentários).
-- Pergunte quando houver dúvida; informe sugestões. O usuário costuma mandar vários pedidos numa mensagem.
+- Chefe da CGOC (Coordenação de Gestão Orçamentária e Contratos), **não é da área de TI**: linguagem simples, sem jargão; comandos com o texto exato a digitar e o caminho dos cliques no navegador. **Sempre em português** (respostas, textos da extensão, comentários).
+- Pergunte quando houver dúvida e dê sugestões. Costuma mandar vários pedidos numa mensagem.
+- Mudança grande, difícil de desfazer ou que grave em sistema oficial (SEI, planilha): proposta + confirmação antes.
+- Instrução permanente nova: proponha acrescentá-la aqui (no lugar certo), não só na memória automática.
+- Ideias novas: uma linha em `docs/melhorias-futuras.md`. Regras novas: no arquivo certo de `docs/regras/`.
+- README.md: só apresentação e licença; o manual de uso irá para lá quando a extensão for distribuída aos colegas.
 - **Quando o usuário sair** e pedir para continuar: faça o que já está decidido (specs sem `[ ]`), planeje o resto e traga as perguntas em blocos no fim, com sugestão.
-- Mudança grande, difícil de desfazer ou que grave na planilha oficial: proposta + confirmação antes.
-- **Resposta depois de mexer no código** (curta, para economizar): **O que mudou** (curto) · **O que eu testei** (uma linha) · **Testes**: só número e título, um por linha ("T11 – Senha na tela de entrada"); o passo a passo (navegador, site e página, conta logada, o que clicar, o que deve aparecer) fica só no `TESTES-PENDENTES.md`. Teste **crítico** vai completo na resposta. Não liste os arquivos alterados. Diga os commits feitos (e que não foram enviados ao GitHub).
-- Teste não comentado pelo usuário = deu certo.
-- **Conversa longa:** quando a conversa estiver grande (várias rodadas ou etapas, muitos arquivos lidos, ou depois de o contexto ser resumido automaticamente), termine a resposta com o aviso: "⚠️ A conversa está grande: recomendo começar uma nova. Digite `/clear` (tudo já está no git e nos arquivos de docs)." Antes do aviso, deixe tudo commitado e anotado (spec, situação, testes, melhorias).
-- **Testes manuais no fim:** numa melhoria com várias etapas, os testes de cada etapa vão para o `TESTES-PENDENTES.md`, mas o usuário testa tudo junto ao final. Só pare antes para teste **crítico** (grava em sistema oficial – SEI, planilha oficial – ou decide o rumo da etapa seguinte); marque-o "(Crítico)".
-- **Versão:** a cada alteração de código, suba `version` no `manifest.json`. Número 0.ETAPA.AJUSTE (meio = funcionalidade nova; último = rodada de correções). Uma ou duas linhas em `docs/historico.md`, com a data (dd/mm/aaaa).
-- Ideias novas do usuário: uma linha em `docs/melhorias-futuras.md`. Regras novas decididas: no arquivo certo de `docs/regras/`.
-- **Git:** faça os commits sozinho, sem esperar pedido: antes de começar cada etapa ou rodada (se houver alterações pendentes) e ao terminar cada etapa ou rodada, com a mensagem "Versão vX.Y.Z: <resumo curto>" (sem versão ainda: "Docs: <resumo>"). Antes de commitar, confira no `git status` que nada de `ferramentas-de-teste/`, chaves ou pacotes `.xpi` entrou. **Nunca faça `git push`**; diga que o commit foi feito e não foi enviado ao GitHub.
-- Instrução permanente nova do usuário: proponha acrescentá-la a este arquivo (no lugar certo), em vez de guardá-la só na memória automática.
 
-## Funcionamento (decidido)
+## Resposta depois de mexer no código
 
-- **Com login** (conta Google @ifto.edu.br) a extensão lê a Planilha Google do sistema. **Sem login**, funcionam só as melhorias do SEI.
-- **Sem custos:** nada de serviços pagos.
-- **SEI do IFTO:** toda função do SEI deve funcionar na versão em uso no IFTO (hoje o SEI 5.0.4; ver `docs/regras/sei.md`).
-- **Uso por enquanto:** só no navegador do usuário, para testes (instalação temporária). Assinatura da Mozilla "não listada" (grátis, sem aparecer na loja) só quando o usuário pedir.
+- **O que mudou** (curto) · **O que eu testei** (uma linha) · **Testes**: só número e título, um por linha ("T11 – Instalar pelo GitHub"); o passo a passo fica só no `TESTES-PENDENTES.md`. Teste **crítico** vai completo na resposta.
+- Não liste os arquivos alterados. Diga os commits feitos (e que não foram enviados ao GitHub).
+- **Conversa longa:** quando a conversa estiver grande (várias rodadas ou etapas, muitos arquivos lidos, ou depois de o contexto ser resumido automaticamente), termine a resposta com o aviso: "⚠️ A conversa está grande: recomendo começar uma nova. Digite `/clear` (tudo já está no git e nos arquivos de docs)." Antes do aviso, deixe tudo commitado e anotado (spec, Situação, testes, melhorias).
+
+## Testes
+
+- No `TESTES-PENDENTES.md`, cada teste: "### Tnn – título (vX.Y.Z)", "- O que fazer:" e "- O que deve acontecer:" detalhados (navegador, site e página, conta logada, o que clicar, o que deve aparecer), "- Resultado: \[ \]" e "- Observação:".
+- Teste não comentado pelo usuário = deu certo. Nunca apague teste sem `[x]`. Só acrescente no fim e confira que a quantidade não diminuiu. Atualize o índice "**Seções**" ao criar seção.
+- Melhoria com várias etapas: os testes de cada etapa entram no arquivo, mas o usuário testa tudo junto no fim. Só pare antes por teste **crítico** (grava em sistema oficial – SEI, planilha – ou decide o rumo da etapa seguinte), marcado "(Crítico)". Os testes automáticos rodam em toda etapa.
+- Verificação mínima: `npm test` e `npm run conferir`. **Nunca faça testes com captura de tela** (nem abra o navegador para ver a tela) sem pedido expresso do usuário.
+
+## Versão e git
+
+- A cada alteração de código: suba `version` no `manifest.json` (0.ETAPA.AJUSTE: meio = funcionalidade nova; último = correções) e uma ou duas linhas em `docs/historico.md` com a data (dd/mm/aaaa). Cada versão enviada ao GitHub é assinada uma única vez pela Mozilla.
+- Faça os commits sem esperar pedido: antes de cada etapa ou rodada (se houver alterações pendentes) e ao terminar, no formato **"vX.Y.Z: tipo: resumo curto"** (ex.: "v0.1.3: feat: procurar atualização na janela"; sem mudança de versão: "docs: resumo"). Tipos: `feat`, `fix`, `style`, `refactor`, `docs`, `chore`, `test`, `ci`. Confira no `git status` que nada de `ferramentas-de-teste/`, chaves ou `.xpi` entrou.
+- **Nunca faça `git push`** sem pedido: o envio dispara a assinatura na Mozilla (e o GitHub Actions tem limite de uso). Diga que o commit não foi enviado.
 
 ## Comandos
 
-- `npm test` – testes automáticos das regras (`testes/*.test.js`, com o executor de testes do próprio Node; crie testes para cada regra nova em `comum/`).
-- `npm run conferir` – conferência da Mozilla (`web-ext lint`): manifest, permissões e código (no fim de cada etapa).
-- `npm run empacotar` – gera o pacote em `web-ext-artifacts/` (fora do git).
-- Assinatura na Mozilla: feita pelo GitHub (`.github/workflows/assinar.yml`) quando o `manifest.json` muda e o usuário envia ao GitHub; passo a passo em `docs/publicacao.md`.
-- `npm run rodar` – abre um Firefox de teste com a extensão (perfil limpo, sem as senhas do usuário; para testar no SEI, prefira a instalação temporária).
-- Instalação temporária no Firefox: `about:debugging#/runtime/this-firefox` > **Carregar extensão temporária…** > escolher o `manifest.json` da pasta `extensao-ifto` (ou um `.xpi`). Some quando o Firefox fecha; depois de mudar o código, clique em **Recarregar** ali.
-- Regras puras (sem página) ficam em `comum/` e funcionam no navegador e no Node (`module.exports` ou `globalThis.ExtensaoIFTO`); o que mexe na página fica em `sites/<site>/`.
-- `ferramentas-de-teste/` está no `.gitignore`: **nunca vai para o git**; todo arquivo de teste ou de referência local (ex.: pacotes do SEI++) fica lá dentro. Nunca retire linhas do `.gitignore` sem permissão (acrescentar pode, avisando).
-- Chaves e senhas (Google, Mozilla) nunca vão para o git: ficam em `.env.local` ou nas configurações do navegador.
+- `npm test` (regras em `testes/*.test.js`, executor do Node; crie teste para cada regra nova em `comum/`) · `npm run conferir` (conferência da Mozilla, `web-ext lint --self-hosted`; no fim de cada etapa) · `npm run empacotar` (pacote em `web-ext-artifacts/`, fora do git) · `npm run rodar` (Firefox de teste, perfil limpo sem as senhas; para o SEI, prefira a instalação temporária).
+- Instalação temporária: `about:debugging#/runtime/this-firefox` > **Carregar extensão temporária…** > `manifest.json` da pasta `extensao-ifto`. Some quando o Firefox fecha; depois de mudar o código, **Recarregar** ali.
+- GitHub (`.github/workflows/assinar.yml`): a cada envio confere (`npm test`, `npm run conferir`); se a versão do `manifest.json` é nova, assina na Mozilla (não listada) e publica o `.xpi` e o `updates.json` em Releases. Passo a passo em `docs/publicacao.md`.
+- `ferramentas-de-teste/` está no `.gitignore`: **nunca vai para o git**; todo arquivo de teste ou de referência local (páginas salvas do SEI, pacotes do SEI++) fica lá. Nunca retire linhas do `.gitignore` sem permissão (acrescentar pode, avisando).
+- Chaves e senhas (Google, Mozilla) nunca vão para o git: ficam em `.env.local`, nos segredos do GitHub ou nas configurações do navegador.
+
+## Funcionamento (decidido)
+
+- **Com login** (conta Google @ifto.edu.br) a extensão lê a Planilha Google do sistema. **Sem login**, só as melhorias do SEI. **Sem custos:** nada de serviços pagos.
+- **SEI do IFTO:** toda função tem que funcionar na versão em uso no IFTO (hoje o SEI 5.0.4; ver `docs/regras/sei.md`).
+- **Instalação:** assinada pela Mozilla como "não listada" (grátis, fora da loja), pelo GitHub; repositório público, atualização automática e botão "Procurar atualização" na janela do ícone.
 
 ## Convenções
 
+- JavaScript simples, sem compilação, Manifest V3. Regras puras (sem página) em `comum/`, funcionando no navegador e no Node (`module.exports` ou `globalThis.ExtensaoIFTO`); o que mexe na página em `sites/<site>/`.
 - Comentários curtos em português explicando o **porquê**, com a versão quando for regra nova (`// v0.2.0: ...`).
 - Textos da extensão em linguagem simples, sem siglas não explicadas.
 - Valores com o mesmo formato do sistema ("R$ 1.234,56"); tipos de orçamento **nunca** somados entre si.

@@ -6,7 +6,7 @@ Não programe nada nesta conversa.
 2. Me entreviste para descobrir o objetivo real e os detalhes: no máximo 4 perguntas por vez, de preferência com opções e com a sua sugestão. Pergunte o que for preciso para não deixar decisão importante em aberto (sites e páginas, o que a extensão lê e grava, login, permissões, telas, prazos, o que fica de fora).
 3. Quando tiver o suficiente, crie ou atualize `docs/specs/<nome>.md` a partir de `docs/specs/_modelo.md`:
    - objetivo, fora do escopo, regras decididas e o que muda;
-   - em "Decisões a confirmar", tudo o que eu ainda não respondi com clareza, com `[ ]`;
+   - em "Decisões a confirmar", tudo o que eu ainda não respondi com clareza, com `[ ]`; **pergunte essas dúvidas no chat antes de terminar** (janela de escolha; não me mande ao arquivo) e grave as respostas como decisões;
    - etapas pequenas, cada uma cabendo numa conversa e com um jeito de testar.
 4. Na linha da melhoria em `docs/melhorias-futuras.md`, ponha a marca **[spec]** e o caminho da spec.
-5. No fim, me diga em poucas linhas quais decisões ainda estão em aberto e faça o commit ("Docs: spec <nome>", sem push).
+5. Atualize a seção "Situação" de `docs/melhorias-futuras.md`. No fim, me diga em poucas linhas quais decisões ainda estão em aberto e faça o commit ("docs: spec <nome>", sem push).

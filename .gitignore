@@ -18,3 +18,7 @@ ferramentas-de-teste/
 .DS_Store
 *~
 *.log
+
+# Resultados de testes e caches
+coverage/
+.eslintcache

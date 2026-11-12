@@ -1,7 +1,7 @@
-# Assina a extensão na Mozilla ("não listada": grátis, não aparece na loja) e publica o arquivo .xpi
-# na página "Releases" do GitHub, para instalar no computador do trabalho.
-# Roda sozinho quando um commit que muda o manifest.json chega ao GitHub, e também pelo botão
-# "Run workflow" (aba Actions). Se a versão já foi assinada, não faz nada (a Mozilla não aceita repetir versão).
+# Verificação e assinatura (GitHub Actions). A cada envio (push) ao GitHub: confere a extensão (testes e
+# conferência da Mozilla). Se a versão do manifest.json ainda não tem Release, assina na Mozilla ("não listada":
+# grátis, não aparece na loja) e publica o .xpi e o updates.json em Releases (instalação e atualização automática).
+# Também roda pelo botão "Run workflow" (aba Actions). A Mozilla não aceita assinar a mesma versão duas vezes.
 # Precisa de duas chaves da Mozilla guardadas em Settings > Secrets and variables > Actions:
 # AMO_JWT_ISSUER e AMO_JWT_SECRET.
 name: Assinar extensão
@@ -9,28 +9,40 @@ name: Assinar extensão
 on:
   push:
     branches: [master]
-    paths: [manifest.json]
-  workflow_dispatch:
+  pull_request:
+    branches: [master]
+  workflow_dispatch: # permite rodar à mão na aba Actions
 
 permissions:
   contents: write
 
 jobs:
   assinar:
-    runs-on: ubuntu-latest
+    # Versão fixa do Ubuntu: a troca do ubuntu-latest não muda nada sem aviso
+    runs-on: ubuntu-24.04
+    timeout-minutes: 45
     steps:
-      - uses: actions/checkout@v4
+      - name: Baixar o código
+        uses: actions/checkout@v5
 
-      - uses: actions/setup-node@v4
+      - name: Instalar o Node.js
+        uses: actions/setup-node@v5
         with:
           node-version: 22
           cache: npm
 
-      - run: npm ci
-      - run: npm test
-      - run: npm run conferir
+      - name: Instalar as dependências
+        run: npm ci
 
+      - name: Testes automáticos
+        run: npm test
+
+      - name: Conferência da Mozilla
+        run: npm run conferir
+
+      # Pull request só confere; assinar só em envio (push) ou pelo botão.
       - name: Ver se esta versão já foi assinada
+        if: github.event_name != 'pull_request'
         id: versao
         env:
           GH_TOKEN: ${{ github.token }}
@@ -43,7 +55,7 @@ jobs:
           fi
 
       - name: Assinar na Mozilla (não listada)
-        if: steps.versao.outputs.ja_existe != 'sim'
+        if: github.event_name != 'pull_request' && steps.versao.outputs.ja_existe != 'sim'
         env:
           WEB_EXT_API_KEY: ${{ secrets.AMO_JWT_ISSUER }}
           WEB_EXT_API_SECRET: ${{ secrets.AMO_JWT_SECRET }}
@@ -53,7 +65,7 @@ jobs:
           package.json package-lock.json CLAUDE.md TESTES-PENDENTES.md
 
       - name: Publicar o .xpi em Releases
-        if: steps.versao.outputs.ja_existe != 'sim'
+        if: github.event_name != 'pull_request' && steps.versao.outputs.ja_existe != 'sim'
         env:
           GH_TOKEN: ${{ github.token }}
         run: |

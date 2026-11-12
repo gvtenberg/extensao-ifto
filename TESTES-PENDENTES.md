@@ -1,6 +1,6 @@
 # Testes pendentes
 
-**Seções** (busque `### T..` ou o título): Levantamento: SEI++ antigo no SEI do IFTO · Base da extensão e botão Novo documento (v0.1.0) · Levantamento: nome e tamanho dos arquivos no SEI · Perguntas para responder (etapas 2 e 3) · Senha reconhecida pelo navegador no SEI 5 (v0.1.1) · T11 instalação pelo GitHub (v0.1.2)
+**Seções** (busque `### T..` ou o título): Levantamento: SEI++ antigo no SEI do IFTO · Base da extensão e botão Novo documento (v0.1.0) · Levantamento: nome e tamanho dos arquivos no SEI · Perguntas para responder (etapas 2 e 3) · Senha reconhecida pelo navegador no SEI 5 (v0.1.1) · Instalação e atualização pelo GitHub (v0.1.2 e v0.1.3)
 
 Como usar este arquivo:
 
@@ -123,9 +123,18 @@ Antes: instale a extensão temporária (como no T03, escolhendo o `manifest.json
 - Resultado: \[ \]
 - Observação:
 
+## Instalação e atualização pelo GitHub (v0.1.2 e v0.1.3)
+
 ### T11 – Instalar pelo GitHub e atualização automática (v0.1.2)
 
 - O que fazer: depois de criar as chaves da Mozilla (`docs/publicacao.md`, "Preparar uma vez") e digitar `git push` no computador de desenvolvimento, abra no GitHub a aba **Actions** e espere "Assinar extensão" ficar verde. No Firefox do trabalho, abra a página **Releases** do repositório, clique em `extensao-ifto-0.1.2.xpi` e em **Adicionar**. Feche e abra o Firefox. Na próxima versão (depois do próximo `git push`), abra o menu ☰ > **Extensões e temas** > engrenagem ⚙ > **Verificar se há atualizações**.
 - O que deve acontecer: a extensão fica instalada mesmo depois de fechar o Firefox. Na versão seguinte, o Firefox instala a versão nova sozinho (o número aparece na janela do ícone da extensão).
+- Resultado: \[ \]
+- Observação:
+
+### T12 – Botão "Procurar atualização" (v0.1.3)
+
+- O que fazer: no Firefox do trabalho, com a extensão instalada pelo GitHub (T11), faça uma mudança qualquer no computador de desenvolvimento (ou peça ao Claude), digite `git push` e espere "Assinar extensão" ficar verde na aba **Actions** do GitHub. Clique no ícone da extensão > **Procurar atualização**. Clique em **Instalar a versão …**, depois em **Permitir** e **Adicionar**. Clique de novo em **Procurar atualização**.
+- O que deve acontecer: aparece "Versão X disponível (instalada: Y)" e o botão verde de instalar. Depois de instalar, a janela mostra a versão nova e, ao procurar de novo, "Você já tem a versão mais nova". Antes de a assinatura terminar, a janela diz que você já tem a versão mais nova e sugere esperar o GitHub.
 - Resultado: \[ \]
 - Observação:
