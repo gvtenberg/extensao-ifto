@@ -42,14 +42,15 @@
       if (!release) {
         avisar('pendencia', 'Ainda não há versão para instalar. Tente de novo mais tarde.')
       } else if (atualizacao.compararVersoes(release.versao, versaoInstalada) > 0) {
-        avisar('sucesso', `Versão ${release.versao} disponível (instalada: ${versaoInstalada}).`)
         botaoInstalar.textContent = `Instalar a versão ${release.versao}`
         botaoInstalar.hidden = false
+        // v0.4.2: abre a página da versão; o clique da pessoa no arquivo faz o Firefox mostrar a instalação.
+        // As configurações e a lista de assinaturas são mantidas.
         botaoInstalar.onclick = () => {
-          // O Firefox pede para permitir o GitHub e depois "Adicionar"; as configurações são mantidas.
-          navegador.tabs.create({ url: release.link })
+          navegador.tabs.create({ url: release.pagina })
           window.close()
         }
+        avisar('sucesso', `Versão ${release.versao} disponível (instalada: ${versaoInstalada}). Clique em "Instalar", depois, na página que abrir, clique em "${release.arquivo}" e em "Adicionar". Outro jeito: menu do Firefox ☰ > Extensões e temas > engrenagem ⚙ > Procurar atualizações.`)
       } else {
         avisar('sucesso', `Você já tem a versão mais nova (${versaoInstalada}).`)
       }

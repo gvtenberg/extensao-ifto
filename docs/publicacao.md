@@ -30,7 +30,7 @@ O Firefox só instala de vez uma extensão assinada pela Mozilla. Usamos a assin
 
 1. No Firefox do trabalho, abra a página **Releases** do repositório e clique no arquivo `extensao-ifto-X.Y.Z.xpi`.
 2. O Firefox pergunta se quer adicionar a extensão: clique em **Adicionar**.
-3. Só na primeira vez. Depois o Firefox atualiza sozinho (confere uma vez por dia). Para atualizar na hora (ex.: logo depois de "Assinar extensão" terminar): clique no ícone da extensão > **Procurar atualização** > **Instalar a versão …** > **Permitir** (para o GitHub) > **Adicionar**. As configurações são mantidas.
+3. Só na primeira vez. Depois o Firefox atualiza sozinho (confere uma vez por dia). Para atualizar na hora (ex.: logo depois de "Assinar extensão" terminar): clique no ícone da extensão > **Procurar atualização** > **Instalar a versão …**; na página da versão que abrir, clique no arquivo `extensao-ifto-X.Y.Z.xpi` > **Permitir** (para o GitHub) > **Adicionar** (v0.4.2: abrir o arquivo direto não mostrava a instalação). Outro jeito, sem a janela da extensão: menu ☰ do Firefox > **Extensões e temas** > engrenagem ⚙ > **Procurar atualizações**. As configurações são mantidas.
 - O botão "Procurar atualização" serve enquanto a extensão está em desenvolvimento; quando ela estiver pronta, o usuário decide se ele sai da janela.
 
 ## Problemas comuns

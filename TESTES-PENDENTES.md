@@ -88,3 +88,6 @@ E: "Assinar" abre a janela de assinatura do SEI pedindo a senha (nada é assinad
 ### T21 – Textos da janela do ícone (v0.4.1)
 F: Clique no ícone da extensão e em "Procurar atualização".
 E: Os textos falam só do que acontece (versão, SEI reconhecido, atualização), sem GitHub, Actions ou código. Comente qualquer texto que ainda pareça de programador.
+### T22 – Instalar a atualização pela página da versão (v0.4.2)
+F: Com uma versão nova pronta, clique no ícone > Procurar atualização > Instalar a versão…; na página que abrir, clique no arquivo que termina em .xpi e em Adicionar. Em outra versão, tente o caminho ☰ > Extensões e temas > ⚙ > Procurar atualizações.
+E: A janela de instalação do Firefox aparece já no primeiro clique, sem recarregar a página; pelo menu, a extensão atualiza sozinha.

@@ -1,5 +1,7 @@
-// v0.1.3: procurar atualização na hora (o Firefox só confere uma vez por dia e não deixa a extensão pedir
-// a conferência). A janela do ícone lê a última Release do GitHub e oferece o .xpi assinado.
+// v0.1.3: procurar atualização na hora (o Firefox só confere uma vez por dia e não tem
+// runtime.requestUpdateCheck). A janela do ícone lê a última Release do GitHub e oferece o .xpi assinado.
+// v0.4.2: abrir o .xpi numa aba criada pela extensão não mostra a instalação (o Firefox exige o clique da
+// pessoa na página); por isso a janela abre a página da Release, onde o clique no arquivo instala.
 (function (raiz) {
   const REPOSITORIO = 'gvtenberg/extensao-ifto'
   const ENDERECO_ULTIMA_RELEASE = `https://api.github.com/repos/${REPOSITORIO}/releases/latest`
@@ -16,12 +18,18 @@
     return 0
   }
 
-  // Da resposta do GitHub: versão (tag "v0.1.3") e o link do .xpi; null se a Release não tiver .xpi.
+  // Da resposta do GitHub: versão (tag "v0.1.3"), link do .xpi, nome do arquivo e página da Release;
+  // null se a Release não tiver .xpi.
   function lerRelease (release) {
     if (!release || !release.tag_name) return null
     const xpi = (release.assets || []).find(a => /\.xpi$/i.test(a.name))
     if (!xpi) return null
-    return { versao: release.tag_name.replace(/^v/i, ''), link: xpi.browser_download_url }
+    return {
+      versao: release.tag_name.replace(/^v/i, ''),
+      link: xpi.browser_download_url,
+      arquivo: xpi.name,
+      pagina: release.html_url || xpi.browser_download_url
+    }
   }
 
   const api = { REPOSITORIO, ENDERECO_ULTIMA_RELEASE, ENDERECO_ANDAMENTO, compararVersoes, lerRelease }

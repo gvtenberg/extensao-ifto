@@ -12,12 +12,18 @@ test('compararVersoes compara número a número (0.1.10 é mais nova que 0.1.9)'
 test('lerRelease tira o "v" da versão e acha o .xpi', () => {
   const release = {
     tag_name: 'v0.1.3',
+    html_url: 'https://x/releases/tag/v0.1.3',
     assets: [
       { name: 'updates.json', browser_download_url: 'https://x/updates.json' },
       { name: 'extensao-ifto-0.1.3.xpi', browser_download_url: 'https://x/extensao-ifto-0.1.3.xpi' }
     ]
   }
-  assert.deepEqual(lerRelease(release), { versao: '0.1.3', link: 'https://x/extensao-ifto-0.1.3.xpi' })
+  assert.deepEqual(lerRelease(release), {
+    versao: '0.1.3',
+    link: 'https://x/extensao-ifto-0.1.3.xpi',
+    arquivo: 'extensao-ifto-0.1.3.xpi',
+    pagina: 'https://x/releases/tag/v0.1.3'
+  })
 })
 
 test('lerRelease devolve null sem .xpi ou sem Release', () => {
