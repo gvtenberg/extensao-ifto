@@ -6,10 +6,10 @@
 
 Resumo para retomar o trabalho (em outra máquina ou por outra pessoa) sem ler tudo. Atualize ao fim de cada etapa ou rodada.
 
-- **Feito:** cada versão em `historico.md` (última: v0.1.1, 12/11/2026); specs concluídas em `specs/feitas/` (nenhuma ainda).
+- **Feito:** cada versão em `historico.md` (última: v0.1.2, 12/11/2026); specs concluídas em `specs/feitas/` (nenhuma ainda).
 - **Em andamento:** `specs/base-e-sei.md`: etapa 1 feita (v0.1.0); próxima, a etapa 2, aguarda as decisões D7 e D9 a D13 (perguntas P1 a P4 e levantamentos T06 e T07 no `TESTES-PENDENTES.md`).
-- **Ajustes fora de spec:** v0.1.1, senha reconhecida pelo navegador no SEI 5.
-- **Pendente do usuário:** testes T01 a T10 (o SEI virou SEI 5 em 11/2026: refazer T03 a T05); chaves da Mozilla para a assinatura no GitHub (`publicacao.md`).
+- **Ajustes fora de spec:** v0.1.1, senha reconhecida pelo navegador no SEI 5; v0.1.2, atualização automática pelo GitHub.
+- **Pendente do usuário:** testes T01 a T11 (o SEI virou SEI 5 em 11/2026: refazer T03 a T05); chaves da Mozilla para a assinatura no GitHub (`publicacao.md`).
 - **Planejado (com spec):** linhas com **[spec]** abaixo. **Não planejado:** as demais linhas (ideias).
 
 ## Ideias
@@ -38,4 +38,4 @@ Marcas: **[spec]** já tem spec.
 ### Distribuição
 
 - Versão para o Chrome (depois do Firefox).
-- Assinatura "não listada" da Mozilla pelo GitHub: preparada na v0.1.1 (`publicacao.md`); falta o usuário criar as chaves. Depois, talvez, para os colegas do campus (atualização automática). Colegas hoje usam o SEI Pro.
+- Assinatura "não listada" da Mozilla pelo GitHub, com atualização automática: preparada nas v0.1.1 e v0.1.2 (`publicacao.md`); falta o usuário criar as chaves. Depois, talvez, para os colegas do campus. Colegas hoje usam o SEI Pro.

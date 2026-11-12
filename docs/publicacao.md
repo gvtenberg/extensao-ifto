@@ -8,6 +8,7 @@ O Firefox só instala de vez uma extensão assinada pela Mozilla. Usamos a assin
 
 - Arquivo `.github/workflows/assinar.yml`. Roda quando chega ao GitHub um commit que muda o `manifest.json` (ou pelo botão **Run workflow** na aba **Actions**).
 - Faz: `npm test`, `npm run conferir`, assina com `web-ext sign --channel unlisted` e cria em **Releases** a versão `vX.Y.Z` com o arquivo `extensao-ifto-X.Y.Z.xpi`.
+- A Release também leva o `updates.json`. O `manifest.json` aponta para o da última Release (`update_url`), e assim o Firefox instala sozinho cada versão nova (repositório **público**, decidido em 12/11/2026).
 - Se a versão do `manifest.json` já tem Release, não faz nada: a Mozilla não aceita assinar a mesma versão duas vezes (por isso a versão sobe a cada alteração).
 
 ## Preparar uma vez (chaves da Mozilla)
@@ -29,8 +30,7 @@ O Firefox só instala de vez uma extensão assinada pela Mozilla. Usamos a assin
 
 1. No Firefox do trabalho, abra a página **Releases** do repositório e clique no arquivo `extensao-ifto-X.Y.Z.xpi`.
 2. O Firefox pergunta se quer adicionar a extensão: clique em **Adicionar**.
-3. Para atualizar, repita com a versão nova (ela substitui a antiga e mantém as configurações).
-- Repositório **privado**: é preciso estar logado no GitHub nesse Firefox para baixar.
+3. Só na primeira vez. Depois o Firefox atualiza sozinho (confere uma vez por dia). Para atualizar na hora: menu ☰ > **Extensões e temas** > engrenagem ⚙ > **Verificar se há atualizações**. As configurações são mantidas.
 
 ## Problemas comuns
 

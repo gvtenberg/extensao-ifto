@@ -1,6 +1,6 @@
 # Testes pendentes
 
-**Seções** (busque `### T..` ou o título): Levantamento: SEI++ antigo no SEI do IFTO · Base da extensão e botão Novo documento (v0.1.0) · Levantamento: nome e tamanho dos arquivos no SEI · Perguntas para responder (etapas 2 e 3) · Senha reconhecida pelo navegador no SEI 5 (v0.1.1)
+**Seções** (busque `### T..` ou o título): Levantamento: SEI++ antigo no SEI do IFTO · Base da extensão e botão Novo documento (v0.1.0) · Levantamento: nome e tamanho dos arquivos no SEI · Perguntas para responder (etapas 2 e 3) · Senha reconhecida pelo navegador no SEI 5 (v0.1.1) · T11 instalação pelo GitHub (v0.1.2)
 
 Como usar este arquivo:
 
@@ -120,5 +120,12 @@ Antes: instale a extensão temporária (como no T03, escolhendo o `manifest.json
 
 - O que fazer: clique no ícone da extensão > **Configurações** e desmarque "Navegador reconhece o campo de senha". Recarregue a tela de entrada do SEI e clique no campo Senha. Depois marque a opção de novo.
 - O que deve acontecer: desmarcada, a tela volta ao comportamento do SEI novo (o Firefox não oferece a senha). Marcada, volta a oferecer.
+- Resultado: \[ \]
+- Observação:
+
+### T11 – Instalar pelo GitHub e atualização automática (v0.1.2)
+
+- O que fazer: depois de criar as chaves da Mozilla (`docs/publicacao.md`, "Preparar uma vez") e digitar `git push` no computador de desenvolvimento, abra no GitHub a aba **Actions** e espere "Assinar extensão" ficar verde. No Firefox do trabalho, abra a página **Releases** do repositório, clique em `extensao-ifto-0.1.2.xpi` e em **Adicionar**. Feche e abra o Firefox. Na próxima versão (depois do próximo `git push`), abra o menu ☰ > **Extensões e temas** > engrenagem ⚙ > **Verificar se há atualizações**.
+- O que deve acontecer: a extensão fica instalada mesmo depois de fechar o Firefox. Na versão seguinte, o Firefox instala a versão nova sozinho (o número aparece na janela do ícone da extensão).
 - Resultado: \[ \]
 - Observação:

@@ -60,6 +60,11 @@ jobs:
           VERSAO=${{ steps.versao.outputs.versao }}
           XPI=$(ls web-ext-artifacts/*.xpi | head -1)
           cp "$XPI" "extensao-ifto-$VERSAO.xpi"
-          gh release create "v$VERSAO" "extensao-ifto-$VERSAO.xpi" \
+          # v0.1.2: updates.json diz ao Firefox qual é a versão mais nova (atualização automática;
+          # o manifest.json aponta para o updates.json da última Release).
+          ID=$(node -p "require('./manifest.json').browser_specific_settings.gecko.id")
+          LINK="https://github.com/${{ github.repository }}/releases/download/v$VERSAO/extensao-ifto-$VERSAO.xpi"
+          node -e "console.log(JSON.stringify({addons:{[process.argv[1]]:{updates:[{version:process.argv[2],update_link:process.argv[3]}]}}},null,2))" "$ID" "$VERSAO" "$LINK" > updates.json
+          gh release create "v$VERSAO" "extensao-ifto-$VERSAO.xpi" updates.json \
             --title "Versão $VERSAO" \
             --notes "Extensão assinada pela Mozilla. Para instalar: abra este arquivo .xpi no Firefox e clique em Adicionar."

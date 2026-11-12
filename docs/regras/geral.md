@@ -6,7 +6,7 @@ Decidido em 25/10/2026.
 
 - Primeiro o **Firefox**; depois o **Chrome**.
 - Por enquanto, só no navegador do usuário, para testes: **instalação temporária** (`about:debugging#/runtime/this-firefox` > Carregar extensão temporária…), que some quando o Firefox fecha.
-- Para instalar de vez: assinatura **não listada** da Mozilla (grátis, não aparece na loja). Pedida pelo usuário em 12/11/2026: feita **no GitHub**, para instalar no computador do trabalho sem passar pelo de desenvolvimento (`../publicacao.md`).
+- Para instalar de vez: assinatura **não listada** da Mozilla (grátis, não aparece na loja). Pedida pelo usuário em 12/11/2026: feita **no GitHub**, para instalar no computador do trabalho sem passar pelo de desenvolvimento (`../publicacao.md`). Repositório **público**, com atualização automática pelo GitHub (v0.1.2).
 
 ## Login e dados
 
