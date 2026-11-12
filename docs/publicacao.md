@@ -1,14 +1,14 @@
 # Publicação: assinatura na Mozilla pelo GitHub
 
-O Firefox só instala de vez uma extensão assinada pela Mozilla. Usamos a assinatura **não listada** (grátis, não aparece na loja). Quem assina é o GitHub, para o computador do trabalho baixar o arquivo pronto sem passar pelo de desenvolvimento.
+O Firefox só instala de vez uma extensão assinada pela Mozilla. Usamos a assinatura **não listada** (grátis, não aparece na loja). Quem assina é o GitHub, e a extensão está disponível para download direto pelo GitHub, sem precisar ser enviada pelo computador de desenvolvimento.
 
-**Seções**: Como funciona · Preparar uma vez (chaves da Mozilla) · Publicar uma versão nova · Instalar no computador do trabalho · Problemas comuns
+**Seções**: Como funciona · Preparar uma vez (chaves da Mozilla) · Publicar uma versão nova · Instalar no computador · Problemas comuns
 
 ## Como funciona
 
 - Arquivo `.github/workflows/assinar.yml`. Roda quando chega ao GitHub um commit que muda o `manifest.json` (ou pelo botão **Run workflow** na aba **Actions**).
 - Faz: `npm test`, `npm run conferir`, assina com `web-ext sign --channel unlisted` e cria em **Releases** a versão `vX.Y.Z` com o arquivo `extensao-ifto-X.Y.Z.xpi`.
-- A Release também leva o `updates.json`. O `manifest.json` aponta para o da última Release (`update_url`), e assim o Firefox instala sozinho cada versão nova (repositório **público**, decidido em 12/11/2026).
+- A Release também leva o `updates.json`. O `manifest.json` aponta para o da última Release (`update_url`), e assim o Firefox instala sozinho cada versão nova (repositório **público**).
 - Se a versão do `manifest.json` já tem Release, não faz nada: a Mozilla não aceita assinar a mesma versão duas vezes (por isso a versão sobe a cada alteração).
 
 ## Preparar uma vez (chaves da Mozilla)
