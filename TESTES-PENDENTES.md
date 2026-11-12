@@ -16,7 +16,7 @@ F: Com a extensão instalada (T11), clique no ícone dela > Configurações.
 E: A janela mostra o nome e a versão; Configurações abre uma aba com "Botão Novo documento sempre visível" marcado.
 ### T04 – SEI reconhecido (v0.1.0)
 F: Abra o Controle de Processos do SEI e clique no ícone da extensão.
-E: Aparece em verde "SEI 5.0.4 em https://sei.ifto.edu.br". Se ficar a mensagem amarela, comente o endereço do SEI na barra.
+E: Aparece em verde "SEI do IFTO reconhecido (versão 5.0.4)" (texto mudado na v0.4.1). Se ficar a mensagem amarela, comente o endereço do SEI na barra.
 ### T05 – Botão "Novo documento" sempre visível (v0.1.0)
 F: Abra um processo e clique num documento da árvore onde o botão Incluir documento não aparecia; clique no botão. Desmarque a opção nas Configurações, aperte F5 e repita.
 E: Marcada: o botão aparece no começo da barra e abre a escolha do tipo, sem repetir se o SEI já o mostra. Desmarcada: o SEI fica como era.
@@ -85,3 +85,6 @@ E: Desligada, o painel some; "Sempre ligada", aparece em qualquer unidade; a esc
 ### T20 – Botões Assinar e Dar ciência do painel (v0.4.0) (Crítico)
 F: Num item da lista com documento, espere o documento abrir e clique em "Assinar" no painel; digite a senha e assine. Num item com "dar ciência", clique em "Dar ciência" no painel e confirme.
 E: "Assinar" abre a janela de assinatura do SEI pedindo a senha (nada é assinado sem você); "Dar ciência" mostra a confirmação do SEI. Itens sem documento não mostram "Assinar".
+### T21 – Textos da janela do ícone (v0.4.1)
+F: Clique no ícone da extensão e em "Procurar atualização".
+E: Os textos falam só do que acontece (versão, SEI reconhecido, atualização), sem GitHub, Actions ou código. Comente qualquer texto que ainda pareça de programador.

@@ -2,6 +2,7 @@
 
 Uma ou duas linhas por versão, com a data (dd/mm/aaaa). Número 0.ETAPA.AJUSTE.
 
+- v0.4.1 (12/11/2026): textos da extensão revistos para quem a usa (a janela do ícone não fala mais de GitHub, Actions ou envio de código); regra registrada em `padrao-visual.md` e no CLAUDE.md.
 - v0.4.0 (12/11/2026): lista de assinaturas, etapa 3: botões "Assinar" e "Dar ciência" no painel, que clicam no botão do próprio SEI (a senha e a confirmação continuam com o usuário). Melhoria concluída.
 - v0.3.0 (12/11/2026): lista de assinaturas, etapa 2: "Feito e próximo" e contador de feitos, lista completa clicável, itens de ciência em azul, minimizar, atalhos Alt+→ e Alt+←, opção nas configurações (Automática / Sempre ligada / Desligada).
 - v0.2.0 (12/11/2026): lista de assinaturas no SEI, etapa 1: colar a lista (processo, documento, comentário; vários formatos), linhas não reconhecidas em vermelho, painel móvel à direita da barra de botões com Anterior/Próximo e contador, abre cada item pela pesquisa rápida; só na Direção-geral (PAL/REI/IFTO). A extensão passa a agir só em `sei.ifto.edu.br`.

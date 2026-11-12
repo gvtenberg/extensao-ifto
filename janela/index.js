@@ -8,7 +8,7 @@
   if (seiVisto) {
     const quando = new Date(seiVisto.vistoEm).toLocaleString('pt-BR', { dateStyle: 'short', timeStyle: 'short' })
     caixa.className = 'aviso sucesso'
-    caixa.textContent = `SEI ${seiVisto.versao} em ${seiVisto.endereco} (visto em ${quando}).`
+    caixa.textContent = `SEI do IFTO reconhecido (versão ${seiVisto.versao}), aberto em ${quando}.`
   } else {
     caixa.className = 'aviso pendencia'
     caixa.textContent = 'Abra o SEI do IFTO para a extensão reconhecê-lo.'
@@ -35,12 +35,12 @@
   botaoProcurar.addEventListener('click', async () => {
     botaoProcurar.disabled = true
     botaoInstalar.hidden = true
-    avisar('pendencia', 'Procurando no GitHub…')
+    avisar('pendencia', 'Procurando atualização…')
     try {
       const resposta = await fetch(atualizacao.ENDERECO_ULTIMA_RELEASE, { cache: 'no-store' })
       const release = resposta.ok ? atualizacao.lerRelease(await resposta.json()) : null
       if (!release) {
-        avisar('pendencia', 'Nenhuma versão assinada no GitHub ainda. Se acabou de enviar o código, espere "Assinar extensão" terminar na aba Actions do GitHub (alguns minutos).')
+        avisar('pendencia', 'Ainda não há versão para instalar. Tente de novo mais tarde.')
       } else if (atualizacao.compararVersoes(release.versao, versaoInstalada) > 0) {
         avisar('sucesso', `Versão ${release.versao} disponível (instalada: ${versaoInstalada}).`)
         botaoInstalar.textContent = `Instalar a versão ${release.versao}`
@@ -51,10 +51,10 @@
           window.close()
         }
       } else {
-        avisar('sucesso', `Você já tem a versão mais nova (${versaoInstalada}). Se acabou de enviar o código, espere "Assinar extensão" terminar na aba Actions do GitHub e procure de novo.`)
+        avisar('sucesso', `Você já tem a versão mais nova (${versaoInstalada}).`)
       }
     } catch (erro) {
-      avisar('pendencia', 'Não foi possível consultar o GitHub. Confira a internet e tente de novo.')
+      avisar('pendencia', 'Não foi possível procurar atualização. Confira a internet e tente de novo.')
     }
     botaoProcurar.disabled = false
   })

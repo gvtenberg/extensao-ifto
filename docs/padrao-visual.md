@@ -7,6 +7,7 @@ Segue o padrão do sistema (`../sistema-orcamento-ifto/docs/padrao-visual.md`), 
 - Mesmas cores, fonte (IBM Plex Sans), cantos e tamanhos de letra do sistema. Principais: fundo #F5F6F4, cartão #FFFFFF, borda #E2E6E3, texto #1B2420, texto secundário #5B6660, destaque (`marca`) #1E5E33 só no botão principal e no item ativo, erro #9B1C1C, pendência #7A4B00.
 - Botões e campos com 44 px de altura; um só botão principal por área.
 - Avisos perto da ação; explicação longa num botão (?).
+- **Textos para quem usa a extensão** (12/11/2026, v0.4.1): servidores do campus, que não são de TI. Nada de instruções para o programador (GitHub, Actions, "enviar o código", versão assinada, nomes de arquivos, termos técnicos). Diga o que aconteceu e o que a pessoa pode fazer (ex.: "Ainda não há versão para instalar. Tente de novo mais tarde."). Vale para a janela do ícone, as configurações e o que a extensão põe nas páginas.
 
 ## O que a extensão acrescenta nas páginas (SEI e outros sites)
 

@@ -98,7 +98,7 @@
     const formulario = document.getElementById('frmProtocoloPesquisaRapida')
     const campo = document.getElementById('txtPesquisaRapida')
     if (!formulario || !campo) {
-      aviso = 'Não achei a pesquisa rápida do SEI nesta página. Abra a tela inicial do SEI e tente de novo.'
+      aviso = 'Não achei a caixa de pesquisa do SEI nesta página. Abra a tela inicial do SEI e tente de novo.'
       desenhar()
       return
     }
@@ -158,7 +158,7 @@
       corpo.push(el('div', { class: 'erros' },
         el('strong', {}, `${erros.length} ${erros.length === 1 ? 'linha não reconhecida' : 'linhas não reconhecidas'}:`),
         el('ul', {}, erros.map(erro => el('li', {}, `Linha ${erro.numero}: ${erro.texto}`))),
-        el('span', {}, 'Corrija acima e clique em Conferir, ou comece só com as reconhecidas.')))
+        el('span', {}, 'Corrija acima e clique em "Conferir e começar", ou comece só com as reconhecidas.')))
       if (boas) corpo.push(el('button', { type: 'button', class: 'botao', onclick: () => comecar(true) }, `Começar só com as ${boas} reconhecidas`))
     }
     corpo.push(el('div', { class: 'acoes' },

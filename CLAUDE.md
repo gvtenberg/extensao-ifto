@@ -74,6 +74,6 @@ Extensão para o **Firefox** (depois também para o Chrome) que acompanha o Sist
 
 - JavaScript simples, sem compilação, Manifest V3. Regras puras (sem página) em `comum/`, funcionando no navegador e no Node (`module.exports` ou `globalThis.ExtensaoIFTO`); o que mexe na página em `sites/<site>/`.
 - Comentários curtos em português explicando o **porquê**, com a versão quando for regra nova (`// v0.2.0: ...`).
-- Textos da extensão em linguagem simples, sem siglas não explicadas.
+- Textos da extensão em linguagem simples, sem siglas não explicadas, **escritos para quem usa a extensão, não para o programador** (v0.4.1): nada de GitHub, Actions, código, envio, versão assinada, nomes de arquivos ou termos técnicos; o que é para o programador fica em `docs/` (regra em `docs/padrao-visual.md`).
 - Valores com o mesmo formato do sistema ("R$ 1.234,56"); tipos de orçamento **nunca** somados entre si.
 - Nunca grave nada num sistema oficial (SEI, planilha, SIAFI…) sem o usuário ver e confirmar antes.
