@@ -1,17 +1,19 @@
-# Padrão visual da extensão
+# Extension visual pattern
 
-Segue o padrão do sistema (`../sistema-orcamento-ifto/docs/padrao-visual.md`), para a extensão parecer parte dele. Aqui ficam só as diferenças.
+**Sections**: Icon window and settings (the extension's own pages) · What the extension adds to pages (SEI and other sites)
 
-## Janela do ícone e configurações (páginas da própria extensão)
+Follows the system's pattern (`../sistema-orcamento-ifto/docs/padrao-visual.md`), so the extension looks like part of it. Only the differences are here.
 
-- Mesmas cores, fonte (IBM Plex Sans), cantos e tamanhos de letra do sistema. Principais: fundo #F5F6F4, cartão #FFFFFF, borda #E2E6E3, texto #1B2420, texto secundário #5B6660, destaque (`marca`) #1E5E33 só no botão principal e no item ativo, erro #9B1C1C, pendência #7A4B00.
-- Botões e campos com 44 px de altura; um só botão principal por área.
-- Avisos perto da ação; explicação longa num botão (?).
-- **Textos para quem usa a extensão** (12/11/2026, v0.4.1): servidores do campus, que não são de TI. Nada de instruções para o programador (GitHub, Actions, "enviar o código", versão assinada, nomes de arquivos, termos técnicos). Diga o que aconteceu e o que a pessoa pode fazer (ex.: "Ainda não há versão para instalar. Tente de novo mais tarde."). Vale para a janela do ícone, as configurações e o que a extensão põe nas páginas.
+## Icon window and settings (the extension's own pages)
 
-## O que a extensão acrescenta nas páginas (SEI e outros sites)
+- Same colors, font (IBM Plex Sans), corners and text sizes as the system. Main ones: background #F5F6F4, card #FFFFFF, border #E2E6E3, text #1B2420, secondary text #5B6660, highlight (`marca`) #1E5E33 only on the main button and the active item, error #9B1C1C, pending #7A4B00.
+- Buttons and fields 44 px tall; only one main button per area.
+- Messages close to the action; long explanations behind a (?) button.
+- **Texts for the people who use the extension** (12/11/2026, v0.4.1): campus staff, not from IT, in Portuguese. No instructions for the programmer (GitHub, Actions, "push the code", signed version, file names, technical terms). Say what happened and what the person can do (e.g. "Ainda não há versão para instalar. Tente de novo mais tarde."). Applies to the icon window, the settings and what the extension adds to pages.
 
-- **Discreto e no estilo do site**, não no do sistema: o que for acrescentado deve parecer parte da página.
-- Tudo o que a extensão acrescenta fica identificável (ex.: um pequeno ícone da extensão), para o usuário saber o que é do site e o que é da extensão.
-- Nada de mudar o que o site já mostra sem o usuário ligar a função nas configurações. Exceção (v0.3.0): funções do perfil da unidade aberta no SEI podem vir ligadas ("Automática"), como a lista de assinaturas na Direção-geral; o usuário pode desligá-las.
-- **Painel flutuante** (v0.2.0, lista de assinaturas): fica por cima da página, pode ser arrastado e minimizado e guarda a posição; isolado do estilo do site (shadow DOM), com a etiqueta verde "IFTO" e as cores do sistema; botões de 32 px por ser compacto. Lugar padrão: canto superior direito, à direita da barra de botões do processo.
+## What the extension adds to pages (SEI and other sites)
+
+- **Discreet and in the site's style**, not the system's: what is added should look like part of the page.
+- Everything the extension adds is identifiable (e.g. a small extension icon), so the user knows what belongs to the site and what to the extension.
+- Do not change what the site already shows unless the user turns the feature on in the settings. Exception (v0.3.0): features of the open SEI unit's profile may come on ("Automática"), like the signature list in the Director-General's office; the user can turn them off.
+- **Floating panel** (v0.2.0, signature list): sits above the page, can be dragged and minimized and remembers its position; isolated from the site's style (shadow DOM), with the green "IFTO" tag and the system colors; 32 px buttons because it is compact. Default place: top right, to the right of the process button bar.

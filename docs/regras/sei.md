@@ -1,9 +1,11 @@
-# SEI do IFTO
+# IFTO SEI
 
-- Versão do SEI do IFTO: era antiga (antes de 11/2026); agora é o **SEI 5.0.4** (ver abaixo). Toda função tem que funcionar na versão em uso no IFTO.
-- Objetivo inicial: algo simples, como o SEI++ (https://github.com/jonatasrs/sei), que funcionava bem para o campus até por volta da versão 6 e foi perdendo funções úteis nas versões novas, até parar no SEI do IFTO. Colegas usam hoje o SEI Pro.
-- (v0.1.0; v0.2.0) A extensão só age no SEI do IFTO, `sei.ifto.edu.br` (páginas `controlador.php?acao=…` e `login.php`); até a v0.1.3 era qualquer `*.ifto.edu.br`. Guarda a versão e o endereço do último SEI aberto; a janela do ícone mostra a versão e quando foi aberto (v0.4.1).
-- (v0.1.0) **Botão "Novo documento" sempre visível:** quando a barra de ações do processo não tem "Incluir documento" (nem "Incluir documento externo"), a extensão copia o link que o SEI deixa no script da árvore. Ligado por padrão; desliga nas configurações.
-- (12/11/2026) O SEI do IFTO foi atualizado para o **SEI 5** (scripts com `?5.0.4-2.45.1`). As funções feitas para o SEI antigo precisam ser testadas de novo.
-- (v0.1.1) **Senha reconhecida pelo navegador:** o SEI 5 usa o MaskedPassword (campo de texto com "●" e a senha num campo escondido), e o Firefox deixou de guardar e preencher a senha. Na tela de entrada (`login.php`) e na assinatura (`acao=documento_assinar`, inclusive dentro da janela de assinatura), a extensão troca os dois por um campo de senha comum, com o mesmo id e nome (`pwdSenha`), como no SEI antigo. Ligado por padrão; desliga nas configurações.
-- Detalhes do SEI++ (versões, como montar o pacote, licença): `../referencias/seipp.md`.
+- IFTO SEI version: it was old (before 11/2026); it is now **SEI 5.0.4** (see below). Every feature must work on the version used at IFTO.
+- Initial goal: something simple, like SEI++ (https://github.com/jonatasrs/sei), which worked well for the campus up to around version 6 and lost useful features in newer versions, until it stopped working on the IFTO SEI. Colleagues currently use SEI Pro.
+- (v0.1.0; v0.2.0) The extension acts only on the IFTO SEI, `sei.ifto.edu.br` (pages `controlador.php?acao=…` and `login.php`); up to v0.1.3 it was any `*.ifto.edu.br`. It saves the version and address of the last SEI opened; the icon window shows the version and when it was opened (v0.4.1).
+- (v0.1.0) **"Novo documento" button always visible:** when the process action bar has no "Incluir documento" (nor "Incluir documento externo"), the extension copies the link the SEI leaves in the tree script. On by default; can be turned off in the settings.
+- (12/11/2026) The IFTO SEI was updated to **SEI 5** (scripts with `?5.0.4-2.45.1`). Features built for the old SEI need to be tested again.
+- (v0.1.1) **Password recognized by the browser:** SEI 5 uses MaskedPassword (text field with "●" and the password in a hidden field), and Firefox stopped saving and filling in the password. On the login page (`login.php`) and when signing (`acao=documento_assinar`, including inside the signing window), the extension replaces both with a normal password field, with the same id and name (`pwdSenha`), as in the old SEI. On by default; can be turned off in the settings.
+- (v0.5.0) **Saved passwords:** Firefox also suggests passwords from other `ifto.edu.br` sites (SUAP, Moodle…). The extension cannot change this; the fix is the Firefox setting `signon.includeOtherSubdomainsInLookup = false` (step by step in `../publicacao.md`, "Saved passwords in the SEI").
+- SEI 5 signing window (`acao=documento_assinar`): form `#frmAssinaturas`, job title `#selCargoFuncao` (loaded by AJAX), password `#pwdSenha` (Enter signs), button `#btnAssinar` (`assinarSenha()`). Process bar buttons: images with title "Assinar Documento" and "Ciência" inside `#divArvoreAcoes`.
+- SEI++ details (versions, how to build the package, license): `../referencias/seipp.md`.

@@ -1,11 +1,11 @@
-# Regras já decididas
+# Decided rules
 
-Leia **só o arquivo do assunto** da tarefa. Ao decidir regra nova com o usuário, registre no arquivo certo (ou crie um novo e acrescente aqui).
+Read **only the file for the task's subject**. When a new rule is decided with the user, record it in the right file (or create a new one and add it here).
 
-As regras de negócio do orçamento (demandas, empenhos, contratos, solicitação de empenho) ficam no sistema principal, em `../sistema-orcamento-ifto/docs/regras/`. Aqui ficam só as regras da extensão.
+Budget business rules (demands, commitments, contracts, commitment requests) live in the main system, in `../sistema-orcamento-ifto/docs/regras/`. Only the extension's rules are here.
 
-| Arquivo | Assunto |
+| File | Subject |
 | --- | --- |
-| `geral.md` | Navegadores, login e acesso à planilha, instalação, custos |
-| `sei.md` | SEI do IFTO: versão, o que a extensão faz nele, aproveitamento do SEI++ |
-| `lista-assinaturas.md` | Lista de assinaturas no SEI (Direção-geral): formatos aceitos, painel, unidade, configurações |
+| `geral.md` | Browsers, login and spreadsheet access, installation, costs |
+| `sei.md` | IFTO SEI: version, what the extension does there, reuse of SEI++ |
+| `lista-assinaturas.md` | Signature list in the SEI (Director-General): accepted formats, panel, sign and next, unit, settings |

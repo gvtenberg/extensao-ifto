@@ -1,79 +1,84 @@
-# Extensão de navegador – IFTO Campus Palmas (UG 158336)
+# Browser extension – IFTO Campus Palmas (UG 158336)
 
-Extensão para o **Firefox** (depois também para o Chrome) que acompanha o Sistema de Gestão Orçamentária do campus: melhora o SEI do IFTO e, com o login, lê os dados do sistema na Planilha Google para preencher documentos e capturar dados em outros sites (SEI, SUAP, SIAFI, SICAF, Simples Nacional, Comprasnet). Versão em `manifest.json`. O sistema principal fica em `../sistema-orcamento-ifto` (outro repositório): regras de negócio e planilha ficam lá; **não copie**, leia só o trecho necessário.
+Extension for **Firefox** and Chrome (free package, v0.5.0) that goes with the campus Budget Management System: it improves the IFTO SEI and, with login, reads the system data from the Google Spreadsheet to fill documents and capture data on other sites (SEI, SUAP, SIAFI, SICAF, Simples Nacional, Comprasnet). Version in `manifest.json`. The main system lives in `../sistema-orcamento-ifto` (another repository): business rules and the spreadsheet are there; **do not copy**, read only the needed part.
 
-## Leitura econômica
+## Language (12/11/2026)
 
-- **Primeiro comando da sessão:** `diff -q ~/.claude/CLAUDE.md docs/claude-regras-gerais.md` (regras gerais do usuário, iguais em todos os computadores). Se forem diferentes ou o arquivo do computador não existir, siga a seção "Mesmas regras em todos os computadores" de `docs/claude-regras-gerais.md`.
-- No início **não leia** `docs/` nem `TESTES-PENDENTES.md`. Leia só o que a tarefa pedir, só a parte necessária, e não releia o que já leu na sessão.
-- Arquivos com várias seções têm na 3ª linha o índice "**Seções**": leia as 5 primeiras linhas e busque o título da seção. `docs/historico.md`: busque a versão (`v0.1.3`). `TESTES-PENDENTES.md`: `### T12` ou a marca (ver `/testes`); nunca o arquivo inteiro. Para retomar o trabalho: só a seção "Situação" de `docs/melhorias-futuras.md`.
-- Onde está cada coisa: `docs/arquitetura.md` (mapa dos arquivos) · `docs/regras/` (regras decididas, um arquivo por assunto; lista em `LEIA-ME.md`) · `docs/padrao-visual.md` (janela, configurações e o que a extensão põe nas páginas) · `docs/referencias/` (outras extensões e sites, ex.: SEI++) · `docs/melhorias-futuras.md` (Situação: feito, em andamento, pendente; e as ideias, uma linha cada) · `docs/specs/` (uma spec por melhoria em andamento; feitas em `feitas/`) · `docs/historico.md` (o que entrou em cada versão) · `docs/claude-regras-gerais.md` (cópia das regras gerais do Claude, `~/.claude/CLAUDE.md`) · `docs/publicacao.md` (assinatura na Mozilla pelo GitHub e instalação) · `TESTES-PENDENTES.md` (raiz: testes manuais T01, T02…). No sistema principal: `docs/planilha.md` (abas e colunas) e `docs/regras/`.
+- **Chat replies and all `.md` docs in English** (saves tokens; plain, simple English: the user is not from IT). Choice-window questions too.
+- **Stay in Portuguese:** everything the extension shows (texts for its users), `TESTES-PENDENTES.md` (source of the GitHub test cards for the user and colleagues), `README.md`, code comments and identifiers.
 
-## Documentação (para outra pessoa ou outra máquina continuar)
+## Economical reading
 
-- Todos os `.md` vão para o git (menos o que estiver em `ferramentas-de-teste/`). Ao mudar código ou regra, atualize no mesmo commit o `.md` certo (arquitetura, regras, histórico, testes, spec, Situação).
-- Feito: `docs/historico.md` e `docs/specs/feitas/`. Pendente: seção "Situação" de `docs/melhorias-futuras.md` (atualize ao fim de cada etapa ou rodada), `docs/specs/` e `TESTES-PENDENTES.md`. Não crie outro arquivo que repita isso.
-- Um assunto por arquivo; títulos `##` que sirvam de busca; índice "**Seções**" na 3ª linha quando houver várias seções (atualize ao criar ou renomear seção); textos curtos, sem repetir o que está em outro arquivo (aponte para ele).
+- **First command of the session:** `diff -q ~/.claude/CLAUDE.md docs/claude-regras-gerais.md` (the user's general rules, identical on every computer). If they differ or the computer file is missing, follow the section "Same rules on every computer" of `docs/claude-regras-gerais.md`.
+- At the start **do not read** `docs/` or `TESTES-PENDENTES.md`. Read only what the task needs, only the needed part, and do not re-read what was already read in the session.
+- Files with several sections have the "**Sections**" index on line 3: read the first 5 lines and search for the section title. `docs/historico.md`: search for the version (`v0.1.3`). `TESTES-PENDENTES.md`: `### T12` or the mark (see `/testes`); never the whole file. To resume work: only the "Status" section of `docs/melhorias-futuras.md`.
+- Where things are: `docs/arquitetura.md` (file map) · `docs/regras/` (decided rules, one file per subject; list in `LEIA-ME.md`) · `docs/padrao-visual.md` (window, settings and what the extension adds to pages) · `docs/referencias/` (other extensions and sites, e.g. SEI++) · `docs/melhorias-futuras.md` (Status: done, in progress, pending; and the ideas, one line each) · `docs/specs/` (one spec per improvement in progress; finished in `feitas/`) · `docs/historico.md` (what went into each version) · `docs/claude-regras-gerais.md` (copy of Claude's general rules, `~/.claude/CLAUDE.md`) · `docs/publicacao.md` (Mozilla signing via GitHub, installation, Chrome package, saved passwords) · `TESTES-PENDENTES.md` (root: manual tests T01, T02…). In the main system: `docs/planilha.md` (tabs and columns) and `docs/regras/`.
 
-## Como trabalhamos (specs pequenas)
+## Documentation (so another person or machine can continue)
 
-1. **Planejar** (`/planejar <melhoria>`): entreviste o usuário e crie `docs/specs/<nome>.md` a partir de `_modelo.md`, com etapas pequenas (cada uma cabe numa conversa).
-2. **Decisões:** escolha que muda regra, tela, dados lidos ou gravados (planilha, SEI) ou difícil de desfazer vai para "Decisões a confirmar" com `[ ]`; **não programe** com `[ ]` que afete a etapa e nunca decida sozinho.
-   - Toda dúvida é perguntada **no chat assim que aparece** (nunca fica só na spec nem espera a etapa em que será usada); a resposta vai para a spec.
-   - Com alternativas, pergunte pela **janela de escolha** (até 4 perguntas por vez; a sugestão em 1º lugar; cada pergunta se explica sozinha). Texto só quando não houver opções.
-3. **Executar** (`/etapa <spec> <n>`): leia só a spec e o que ela indicar. Ao terminar: testes, versão, histórico, Situação, commit e etapa marcada.
-4. **Fim da melhoria:** regras para `docs/regras/`, linha sai de `melhorias-futuras.md`, spec para `docs/specs/feitas/`.
-- Ajustes pequenos e correções de testes não precisam de spec.
-- **Testes manuais** (`/testes`): o usuário responde nos cartões do GitHub ("✅ Passou" / "❌ Falhou" e comentários). Corrija os que falharam, apague do arquivo os que passaram e acrescente os novos (número novo, nunca reaproveitado).
+- All `.md` files go into git (except what is in `ferramentas-de-teste/`). When changing code or a rule, update the right `.md` in the same commit (architecture, rules, history, tests, spec, Status).
+- Done: `docs/historico.md` and `docs/specs/feitas/`. Pending: "Status" section of `docs/melhorias-futuras.md` (update at the end of each stage or round), `docs/specs/` and `TESTES-PENDENTES.md`. Do not create another file that repeats this.
+- One subject per file; `##` titles that work as search terms; "**Sections**" index on line 3 when there are several sections (update it when creating or renaming a section); short texts, without repeating what is in another file (point to it).
 
-## Quem é o usuário
+## How we work (small specs)
 
-- Chefe da CGOC (Coordenação de Gestão Orçamentária e Contratos), **não é da área de TI**: linguagem simples, sem jargão; comandos com o texto exato a digitar e o caminho dos cliques no navegador. **Sempre em português** (respostas, textos da extensão, comentários).
-- Pergunte quando houver dúvida e dê sugestões. Costuma mandar vários pedidos numa mensagem.
-- Mudança grande, difícil de desfazer ou que grave em sistema oficial (SEI, planilha): proposta + confirmação antes.
-- Instrução permanente nova: proponha acrescentá-la aqui (no lugar certo), não só na memória automática.
-- Ideias novas: uma linha em `docs/melhorias-futuras.md`. Regras novas: no arquivo certo de `docs/regras/`.
-- README.md: só apresentação e licença; o manual de uso irá para lá quando a extensão for distribuída aos colegas.
-- **Quando o usuário sair** e pedir para continuar: faça o que já está decidido (specs sem `[ ]`), planeje o resto e traga as perguntas em blocos no fim, com sugestão.
+1. **Plan** (`/planejar <improvement>`): interview the user and create `docs/specs/<name>.md` from `_modelo.md`, with small stages (each fits in one conversation).
+2. **Decisions:** a choice that changes a rule, a screen, data read or written (spreadsheet, SEI) or that is hard to undo goes to "Decisions to confirm" with `[ ]`; **do not code** with a `[ ]` that affects the stage and never decide alone.
+   - Every doubt is asked **in the chat as soon as it appears** (never left only in the spec nor waiting for the stage where it is used); the answer goes into the spec.
+   - With alternatives, ask through the **choice window** (up to 4 questions at a time; the suggestion first; each question self-explanatory). Plain text only when there are no options.
+3. **Execute** (`/etapa <spec> <n>`): read only the spec and what it points to. When done: tests, version, history, Status, commit and stage checked.
+4. **End of the improvement:** rules to `docs/regras/`, the line leaves `melhorias-futuras.md`, spec to `docs/specs/feitas/`.
+- Small fixes and test fixes do not need a spec.
+- **Manual tests** (`/testes`): the user answers on the GitHub cards ("✅ Passou" / "❌ Falhou" and comments). Fix the failed ones, delete the passed ones from the file and add the new ones (new number, never reused).
 
-## Resposta depois de mexer no código
+## Who the user is
 
-- **O que mudou** (curto) · **O que eu testei** (uma linha) · **Testes**: só número e título, um por linha ("T11 – Instalar pelo GitHub"); o passo a passo fica só no `TESTES-PENDENTES.md`. Teste **crítico** vai completo na resposta.
-- Não liste os arquivos alterados. Diga os commits feitos (e que não foram enviados ao GitHub).
-- **Conversa longa:** quando a conversa estiver grande (várias rodadas ou etapas, muitos arquivos lidos, ou depois de o contexto ser resumido automaticamente), termine a resposta com o aviso: "⚠️ A conversa está grande: recomendo começar uma nova. Digite `/clear` (tudo já está no git e nos arquivos de docs)." Antes do aviso, deixe tudo commitado e anotado (spec, Situação, testes, melhorias).
+- Head of CGOC (Budget Management and Contracts Coordination), **not from IT**: plain language, no jargon; commands with the exact text to type and the click path in the browser.
+- Ask when in doubt and give suggestions. Often sends several requests in one message.
+- Big change, hard to undo, or that writes to an official system (SEI, spreadsheet): proposal + confirmation first.
+- New permanent instruction: propose adding it here (in the right place), not only in the automatic memory.
+- New ideas: one line in `docs/melhorias-futuras.md`. New rules: in the right file of `docs/regras/`.
+- README.md: only presentation and license (in Portuguese); the user manual will go there when the extension is distributed to colleagues.
+- **When the user leaves** and asks you to continue: do what is already decided (specs without `[ ]`), plan the rest and bring the questions in blocks at the end, with suggestions.
 
-## Testes
+## Reply after changing code
 
-- O `TESTES-PENDENTES.md` serve **só** de fonte para os cartões do GitHub (o usuário não o lê): compacto, sem instruções nem linhas de resultado. Formato: "## seção", "> antes de testar" (opcional, uma linha), "### Tnn – título (vX.Y.Z)" (+ " (Crítico)"), "F: o que fazer" e "E: o que deve acontecer" (uma linha cada; resumido, só o necessário para o usuário e colegas que não são de TI: onde clicar e o que deve aparecer); pergunta: "### Pn – título" e "?: pergunta". Teste que depende de arquivo fora do git: diga no "> antes" que é no computador de desenvolvimento.
-- **Cartões no GitHub** (`.github/workflows/testes.yml`): a cada envio, cada teste ou pergunta nova vira um cartão (issue, marca "teste") com o texto por extenso e as caixinhas "✅ Passou" e "❌ Falhou"; os cartões dos testes que saem do arquivo fecham sozinhos. O `/testes` lê os cartões com `node .github/scripts/ler-resultados.js` e apaga os resolvidos com `node .github/scripts/apagar-testes.js T03 T05` (não leia o arquivo nem os cartões inteiros).
-- Teste não comentado = deu certo. Nunca apague teste sem "Passou" no cartão (ou pedido do usuário). Só acrescente no fim e confira que a quantidade não diminuiu.
-- Melhoria com várias etapas: os testes de cada etapa entram no arquivo, mas o usuário testa tudo junto no fim. Só pare antes por teste **crítico** (grava em sistema oficial – SEI, planilha – ou decide o rumo da etapa seguinte), marcado "(Crítico)". Os testes automáticos rodam em toda etapa.
-- Verificação mínima: `npm test` e `npm run conferir`. **Nunca faça testes com captura de tela** (nem abra o navegador para ver a tela) sem pedido expresso do usuário.
+- **What changed** (short) · **What I tested** (one line) · **Tests**: only number and title, one per line ("T11 – Instalar pelo GitHub"); the step-by-step stays only in `TESTES-PENDENTES.md`. A **critical** test goes in full in the reply.
+- Do not list the changed files. Say which commits were made (and that they were not pushed to GitHub).
+- **Long conversation:** when the conversation is large (several rounds or stages, many files read, or after the context was summarized automatically), end the reply with: "⚠️ The conversation is long: I recommend starting a new one. Type `/clear` (everything is already in git and in the docs)." Before that, leave everything committed and noted (spec, Status, tests, improvements).
 
-## Versão e git
+## Tests
 
-- A cada alteração de código: suba `version` no `manifest.json` (0.ETAPA.AJUSTE: meio = funcionalidade nova; último = correções) e uma ou duas linhas em `docs/historico.md` com a data (dd/mm/aaaa). Cada versão enviada ao GitHub é assinada uma única vez pela Mozilla.
-- Faça os commits sem esperar pedido: antes de cada etapa ou rodada (se houver alterações pendentes) e ao terminar, no formato **"vX.Y.Z: tipo: resumo curto"** (ex.: "v0.1.3: feat: procurar atualização na janela"; sem mudança de versão: "docs: resumo"). Tipos: `feat`, `fix`, `style`, `refactor`, `docs`, `chore`, `test`, `ci`. Confira no `git status` que nada de `ferramentas-de-teste/`, chaves ou `.xpi` entrou.
-- **Nunca faça `git push`** sem pedido: o envio dispara a assinatura na Mozilla (e o GitHub Actions tem limite de uso). Diga que o commit não foi enviado.
+- `TESTES-PENDENTES.md` is **only** the source of the GitHub cards (the user does not read it), **in Portuguese**: compact, no instructions or result lines. Format: "## section", "> antes de testar" (optional, one line), "### Tnn – título (vX.Y.Z)" (+ " (Crítico)"), "F: o que fazer" and "E: o que deve acontecer" (one line each; summarized, only what the user and non-IT colleagues need: where to click and what should appear); question: "### Pn – título" and "?: pergunta". A test that depends on a file outside git: say in "> antes" that it is on the development computer.
+- **GitHub cards** (`.github/workflows/testes.yml`): on each push, every new test or question becomes a card (issue, label "teste") with the full text and the "✅ Passou" and "❌ Falhou" boxes; cards of tests that leave the file close by themselves. `/testes` reads the cards with `node .github/scripts/ler-resultados.js` and deletes the resolved ones with `node .github/scripts/apagar-testes.js T03 T05` (do not read the whole file or cards).
+- An uncommented test = it worked. Never delete a test without "Passou" on the card (or the user's request). Only append at the end and check that the count did not go down.
+- Improvement with several stages: each stage's tests go into the file, but the user tests everything together at the end. Only stop earlier for a **critical** test (writes to an official system – SEI, spreadsheet – or decides the direction of the next stage), marked "(Crítico)". Automated tests run at every stage.
+- Minimum check: `npm test` and `npm run conferir`. **Never test with screenshots** (nor open the browser to see the screen) without the user's explicit request.
 
-## Comandos
+## Version and git
 
-- `npm test` (regras em `testes/*.test.js`, executor do Node; crie teste para cada regra nova em `comum/`) · `npm run conferir` (conferência da Mozilla, `web-ext lint --self-hosted`; no fim de cada etapa) · `npm run empacotar` (pacote em `web-ext-artifacts/`, fora do git) · `npm run rodar` (Firefox de teste, perfil limpo sem as senhas; para o SEI, prefira a instalação temporária).
-- Instalação temporária: `about:debugging#/runtime/this-firefox` > **Carregar extensão temporária…** > `manifest.json` da pasta `extensao-ifto`. Some quando o Firefox fecha; depois de mudar o código, **Recarregar** ali.
-- GitHub (`.github/workflows/assinar.yml`): a cada envio confere (`npm test`, `npm run conferir`); se a versão do `manifest.json` é nova, assina na Mozilla (não listada) e publica o `.xpi` e o `updates.json` em Releases. Passo a passo em `docs/publicacao.md`.
-- `ferramentas-de-teste/` está no `.gitignore`: **nunca vai para o git**; todo arquivo de teste ou de referência local (páginas salvas do SEI, pacotes do SEI++) fica lá. Nunca retire linhas do `.gitignore` sem permissão (acrescentar pode, avisando).
-- Chaves e senhas (Google, Mozilla) nunca vão para o git: ficam em `.env.local`, nos segredos do GitHub ou nas configurações do navegador.
+- On every code change: bump `version` in `manifest.json` (0.STAGE.FIX: middle = new feature; last = fixes) and one or two lines in `docs/historico.md` with the date (dd/mm/yyyy). Each version pushed to GitHub is signed only once by Mozilla.
+- Commit without waiting to be asked: before each stage or round (if there are pending changes) and when finished, in the format **"vX.Y.Z: type: short summary"** (e.g. "v0.1.3: feat: procurar atualização na janela"; without a version change: "docs: summary"). Types: `feat`, `fix`, `style`, `refactor`, `docs`, `chore`, `test`, `ci`. Check in `git status` that nothing from `ferramentas-de-teste/`, keys or `.xpi` got in.
+- **Never `git push`** without being asked: the push triggers Mozilla signing (and GitHub Actions has usage limits). Say the commit was not pushed.
 
-## Funcionamento (decidido)
+## Commands
 
-- **Com login** (conta Google @ifto.edu.br) a extensão lê a Planilha Google do sistema. **Sem login**, só as melhorias do SEI. **Sem custos:** nada de serviços pagos.
-- **SEI do IFTO:** toda função tem que funcionar na versão em uso no IFTO (hoje o SEI 5.0.4; ver `docs/regras/sei.md`).
-- **Instalação:** assinada pela Mozilla como "não listada" (grátis, fora da loja), pelo GitHub; repositório público, atualização automática e botão "Procurar atualização" na janela do ícone.
+- `npm test` (rules in `testes/*.test.js`, Node runner; create a test for each new rule in `comum/`) · `npm run conferir` (Mozilla check, `web-ext lint --self-hosted`; at the end of each stage) · `npm run empacotar` (package in `web-ext-artifacts/`, outside git) · `npm run empacotar-chrome` (Chrome/Edge folder and `.zip` in `web-ext-artifacts/chrome/`) · `npm run rodar` (test Firefox, clean profile without passwords; for the SEI, prefer the temporary install).
+- Temporary install: `about:debugging#/runtime/this-firefox` > **Carregar extensão temporária…** > `manifest.json` from the `extensao-ifto` folder. It disappears when Firefox closes; after changing code, **Recarregar** there.
+- GitHub (`.github/workflows/assinar.yml`): on each push it checks (`npm test`, `npm run conferir`); if the `manifest.json` version is new, it signs with Mozilla (unlisted) and publishes the `.xpi`, the Chrome `.zip` and `updates.json` in Releases. Step by step in `docs/publicacao.md`.
+- `ferramentas-de-teste/` is in `.gitignore`: **never goes into git**; every local test or reference file (saved SEI pages, SEI++ packages) lives there. Never remove lines from `.gitignore` without permission (adding is fine, with notice).
+- Keys and passwords (Google, Mozilla) never go into git: they live in `.env.local`, in GitHub secrets or in the browser settings.
 
-## Convenções
+## How it works (decided)
 
-- JavaScript simples, sem compilação, Manifest V3. Regras puras (sem página) em `comum/`, funcionando no navegador e no Node (`module.exports` ou `globalThis.ExtensaoIFTO`); o que mexe na página em `sites/<site>/`.
-- Comentários curtos em português explicando o **porquê**, com a versão quando for regra nova (`// v0.2.0: ...`).
-- Textos da extensão em linguagem simples, sem siglas não explicadas, **escritos para quem usa a extensão, não para o programador** (v0.4.1): nada de GitHub, Actions, código, envio, versão assinada, nomes de arquivos ou termos técnicos; o que é para o programador fica em `docs/` (regra em `docs/padrao-visual.md`).
-- Valores com o mesmo formato do sistema ("R$ 1.234,56"); tipos de orçamento **nunca** somados entre si.
-- Nunca grave nada num sistema oficial (SEI, planilha, SIAFI…) sem o usuário ver e confirmar antes.
+- **With login** (Google account @ifto.edu.br) the extension reads the system's Google Spreadsheet. **Without login**, only the SEI improvements. **No costs:** no paid services.
+- **IFTO SEI:** every feature must work on the version used at IFTO (currently SEI 5.0.4; see `docs/regras/sei.md`). The extension acts only on `sei.ifto.edu.br`.
+- **Installation:** signed by Mozilla as "unlisted" (free, outside the store), via GitHub; public repository, automatic update and "Procurar atualização" button in the icon window. Chrome: free package loaded in developer mode (no store, no automatic update).
+
+## Conventions
+
+- Plain JavaScript, no build step, Manifest V3. Pure rules (no page) in `comum/`, working in the browser and in Node (`module.exports` or `globalThis.ExtensaoIFTO`); page code in `sites/<site>/`.
+- Short comments in Portuguese explaining **why**, with the version when it is a new rule (`// v0.2.0: ...`).
+- Extension texts in plain Portuguese, no unexplained acronyms, **written for the people who use the extension, not for the programmer** (v0.4.1): no GitHub, Actions, code, push, signed version, file names or technical terms; what is for the programmer goes in `docs/` (rule in `docs/padrao-visual.md`).
+- Values in the same format as the system ("R$ 1.234,56"); budget types are **never** added together.
+- Never write anything to an official system (SEI, spreadsheet, SIAFI…) without the user seeing and confirming first. Exception decided on 12/11/2026: "Assinar e próximo" — the user's click is the confirmation for that document (`docs/regras/lista-assinaturas.md`).

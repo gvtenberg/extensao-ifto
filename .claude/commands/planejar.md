@@ -1,12 +1,12 @@
-Vamos planejar a melhoria: $ARGUMENTS
+Let's plan the improvement: $ARGUMENTS
 
-Não programe nada nesta conversa.
+Do not code anything in this conversation.
 
-1. Procure em `docs/melhorias-futuras.md` e em `docs/specs/` só o trecho desta melhoria (use busca, não leia os arquivos inteiros). Leia em `docs/regras/` só o arquivo do assunto, se precisar. Se a melhoria usar dados do sistema, leia só a parte necessária de `../sistema-orcamento-ifto/docs/planilha.md` e de `../sistema-orcamento-ifto/docs/regras/`.
-2. Me entreviste para descobrir o objetivo real e os detalhes: no máximo 4 perguntas por vez, de preferência com opções e com a sua sugestão. Pergunte o que for preciso para não deixar decisão importante em aberto (sites e páginas, o que a extensão lê e grava, login, permissões, telas, prazos, o que fica de fora).
-3. Quando tiver o suficiente, crie ou atualize `docs/specs/<nome>.md` a partir de `docs/specs/_modelo.md`:
-   - objetivo, fora do escopo, regras decididas e o que muda;
-   - em "Decisões a confirmar", tudo o que eu ainda não respondi com clareza, com `[ ]`; **pergunte essas dúvidas no chat antes de terminar** (janela de escolha; não me mande ao arquivo) e grave as respostas como decisões;
-   - etapas pequenas, cada uma cabendo numa conversa e com um jeito de testar.
-4. Na linha da melhoria em `docs/melhorias-futuras.md`, ponha a marca **[spec]** e o caminho da spec.
-5. Atualize a seção "Situação" de `docs/melhorias-futuras.md`. No fim, me diga em poucas linhas quais decisões ainda estão em aberto e faça o commit ("docs: spec <nome>", sem push).
+1. Search `docs/melhorias-futuras.md` and `docs/specs/` for only the part about this improvement (use search, do not read the whole files). Read in `docs/regras/` only the file on the subject, if needed. If the improvement uses system data, read only the needed part of `../sistema-orcamento-ifto/docs/planilha.md` and `../sistema-orcamento-ifto/docs/regras/`.
+2. Interview me to find the real goal and the details: at most 4 questions at a time, preferably with options and your suggestion. Ask whatever is needed so no important decision is left open (sites and pages, what the extension reads and writes, login, permissions, screens, deadlines, what is left out).
+3. When you have enough, create or update `docs/specs/<name>.md` from `docs/specs/_modelo.md`:
+   - goal, out of scope, decided rules and what changes;
+   - in "Decisions to confirm", everything I have not answered clearly yet, with `[ ]`; **ask these in the chat before finishing** (choice window; do not send me to the file) and record the answers as decisions;
+   - small stages, each fitting in one conversation and with a way to test.
+4. On the improvement's line in `docs/melhorias-futuras.md`, add the **[spec]** mark and the spec path.
+5. Update the "Status" section of `docs/melhorias-futuras.md`. At the end, tell me in a few lines which decisions are still open and commit ("docs: spec <name>", no push).

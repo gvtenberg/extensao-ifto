@@ -1,44 +1,44 @@
-# <Nome da melhoria>
+# <Improvement name>
 
-**Seções**: 1. Objetivo · 2. Fora do escopo · 3. Decisões a confirmar · 4. Regras decididas · 5. O que muda · 6. Etapas · 7. Testes manuais
+**Sections**: 1. Goal · 2. Out of scope · 3. Decisions to confirm · 4. Decided rules · 5. What changes · 6. Stages · 7. Manual tests
 
-- **Situação:** rascunho | aguardando decisões | pronta para programar | em andamento | feita
-- **Pedido em:** dd/mm/aaaa · **Prazo ou prioridade:** …
-- **Versão prevista:** 0.NN.0
+- **Status:** draft | waiting for decisions | ready to code | in progress | done
+- **Requested on:** dd/mm/yyyy · **Deadline or priority:** …
+- **Planned version:** 0.NN.0
 
-## 1. Objetivo (para quê)
+## 1. Goal (what for)
 
-Uma ou duas frases: que problema do usuário isso resolve e como ele vai saber que deu certo.
+One or two sentences: what user problem this solves and how they will know it worked.
 
-## 2. Fora do escopo
+## 2. Out of scope
 
-O que **não** será feito agora (evita que a etapa cresça).
+What will **not** be done now (keeps the stage from growing).
 
-## 3. Decisões a confirmar
+## 3. Decisions to confirm
 
-O Claude não programa enquanto houver `[ ]` que afete a etapa. O usuário marca `[x]` e escreve a resposta, ou risca a pergunta.
+Claude does not code while there is a `[ ]` that affects the stage. The user marks `[x]` and writes the answer, or strikes the question.
 
-- [ ] D1 – Pergunta? Opções: (a) … (b) … Sugestão do Claude: … porque …
-  - Resposta:
+- [ ] D1 – Question? Options: (a) … (b) … Claude's suggestion: … because …
+  - Answer:
 
-## 4. Regras decididas
+## 4. Decided rules
 
-Uma linha por regra. No fim da melhoria, estas linhas vão para `docs/regras/`.
+One line per rule. At the end of the improvement, these lines go to `docs/regras/`.
 
-## 5. O que muda
+## 5. What changes
 
-- Sites e páginas em que a extensão age: …
-- Dados lidos ou gravados (planilha do sistema, SEI, outros): …
-- Telas da extensão (janela do ícone, configurações, o que aparece nas páginas): …
-- Arquivos de código prováveis: …
+- Sites and pages where the extension acts: …
+- Data read or written (system spreadsheet, SEI, others): …
+- Extension screens (icon window, settings, what appears on pages): …
+- Likely code files: …
 
-## 6. Etapas
+## 6. Stages
 
-Cada etapa cabe numa conversa curta (`/etapa <nome-da-spec> <n>`) e termina com testes, versão e commit.
+Each stage fits in a short conversation (`/etapa <spec-name> <n>`) and ends with tests, version and commit.
 
-- [ ] Etapa 1 – … (o que fica pronto e como testar)
-- [ ] Etapa 2 – …
+- [ ] Stage 1 – … (what is ready and how to test)
+- [ ] Stage 2 – …
 
-## 7. Testes manuais
+## 7. Manual tests
 
-Os testes de cada etapa vão para o `TESTES-PENDENTES.md` (números T…).
+Each stage's tests go to `TESTES-PENDENTES.md` (numbers T…, in Portuguese).
