@@ -1,7 +1,8 @@
 // Configurações da extensão, guardadas no navegador (D5). Toda opção nova entra em PADROES.
 (function (raiz) {
   const PADROES = Object.freeze({
-    novoDocumentoSempreVisivel: true
+    novoDocumentoSempreVisivel: true,
+    senhaReconhecidaPeloNavegador: true
   })
 
   // Junta o que o usuário gravou com os padrões; opções que não existem mais são ignoradas.

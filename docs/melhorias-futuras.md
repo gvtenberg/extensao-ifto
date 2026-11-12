@@ -1,5 +1,7 @@
 # Melhorias futuras
 
+**Seções**: Ordem sugerida · Outros sites · Distribuição
+
 Uma linha por ideia. Quando uma ideia for planejada, ela ganha uma spec em `docs/specs/` e a linha passa a apontar para ela. Ao terminar, a linha sai daqui e vai para `docs/historico.md`.
 
 Marcas: **[spec]** já tem spec.
@@ -24,4 +26,4 @@ Marcas: **[spec]** já tem spec.
 ## Distribuição
 
 - Versão para o Chrome (depois do Firefox).
-- Assinatura "não listada" da Mozilla (grátis, sem aparecer na loja), para instalar de vez; depois, talvez, para os colegas do campus. Colegas hoje usam o SEI Pro.
+- Assinatura "não listada" da Mozilla pelo GitHub: preparada na v0.1.1 (`publicacao.md`); falta o usuário criar as chaves. Depois, talvez, para os colegas do campus (atualização automática). Colegas hoje usam o SEI Pro.

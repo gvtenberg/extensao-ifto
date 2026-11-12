@@ -1,5 +1,7 @@
 # <Nome da melhoria>
 
+**Seções**: 1. Objetivo · 2. Fora do escopo · 3. Decisões a confirmar · 4. Regras decididas · 5. O que muda · 6. Etapas · 7. Testes manuais
+
 - **Situação:** rascunho | aguardando decisões | pronta para programar | em andamento | feita
 - **Pedido em:** dd/mm/aaaa · **Prazo ou prioridade:** …
 - **Versão prevista:** 0.NN.0

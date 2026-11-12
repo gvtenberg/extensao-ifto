@@ -1,5 +1,7 @@
 # Base da extensão e melhorias do SEI
 
+**Seções**: 1. Objetivo · 2. Fora do escopo · 3. Decisões a confirmar · 4. Regras decididas · 5. O que muda · 6. Etapas · 7. Testes manuais
+
 - **Situação:** em andamento (etapa 1 feita na v0.1.0); próxima: etapa 2, que depende de D1 e D7
 - **Pedido em:** 25/10/2026 · **Prazo ou prioridade:** primeira melhoria da extensão; começar já
 - **Versão prevista:** 0.1.0 (uma versão por etapa: 0.1, 0.2…)

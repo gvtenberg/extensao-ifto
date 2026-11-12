@@ -1,5 +1,7 @@
 # Testes pendentes
 
+**Seções** (busque `### T..` ou o título): Levantamento: SEI++ antigo no SEI do IFTO · Base da extensão e botão Novo documento (v0.1.0) · Levantamento: nome e tamanho dos arquivos no SEI · Perguntas para responder (etapas 2 e 3) · Senha reconhecida pelo navegador no SEI 5 (v0.1.1)
+
 Como usar este arquivo:
 
 - Cada teste tem um número fixo (T01, T02…). Ao testar, troque a marca da linha **Resultado**:
@@ -95,3 +97,28 @@ Escreva a resposta na linha **Resposta**. Depois do `/testes`, elas entram na sp
 
 - Pergunta: no pdf24.org, que opção de compressão vocês usam (nível de qualidade, DPI) para os arquivos que o ilovepdf não consegue compactar? Que tipo de PDF costuma dar problema (digitalizado, com muitas imagens, gerado por algum sistema)? A dica mostra o passo a passo.
 - Resposta:
+
+## Senha reconhecida pelo navegador no SEI 5 (v0.1.1)
+
+Antes: instale a extensão temporária (como no T03, escolhendo o `manifest.json`) ou, depois da assinatura no GitHub, o arquivo `.xpi` (ver `docs/publicacao.md`). Se a extensão já estava carregada, clique em **Recarregar** em `about:debugging#/runtime/this-firefox`.
+
+### T08 – Senha na tela de entrada do SEI (v0.1.1)
+
+- O que fazer: no Firefox, saia do SEI (ou abra uma janela anônima com a extensão permitida) e abra a tela de entrada do SEI do IFTO. Digite o usuário e a senha e clique em **Acessar**. Se o Firefox perguntar se quer salvar (ou atualizar) a senha, clique em **Salvar**. Saia do SEI e abra a tela de entrada de novo.
+- O que deve acontecer: ao digitar, a senha aparece como pontos (●), sem mostrar a última letra. A entrada no SEI funciona normalmente. Na segunda vez, o Firefox preenche a senha sozinho (ou mostra a senha guardada ao clicar no campo Usuário ou Senha).
+- Resultado: \[ \]
+- Observação:
+
+### T09 – Senha na assinatura de documento (v0.1.1) (Crítico)
+
+- O que fazer: no SEI, abra um documento que você precisa assinar e clique em **Assinar documento**. Na janela de assinatura, clique no campo **Senha**. Se o Firefox mostrar a senha guardada, escolha-a; senão, digite-a, aperte **Enter** e, se o Firefox perguntar, salve a senha. Assine um segundo documento.
+- O que deve acontecer: o campo Senha aceita a senha guardada do Firefox (preenchida sozinha ou escolhida na lista ao clicar no campo). Enter e o botão **Assinar** assinam o documento como antes. No segundo documento, não é preciso digitar a senha. Se o Firefox oferecer salvar com o seu nome completo como usuário, anote na Observação.
+- Resultado: \[ \]
+- Observação:
+
+### T10 – Desligar a correção da senha (v0.1.1)
+
+- O que fazer: clique no ícone da extensão > **Configurações** e desmarque "Navegador reconhece o campo de senha". Recarregue a tela de entrada do SEI e clique no campo Senha. Depois marque a opção de novo.
+- O que deve acontecer: desmarcada, a tela volta ao comportamento do SEI novo (o Firefox não oferece a senha). Marcada, volta a oferecer.
+- Resultado: \[ \]
+- Observação:

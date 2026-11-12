@@ -39,3 +39,37 @@ test('extrairLinkNovoDocumento devolve null quando não há link', () => {
   assert.equal(extrairLinkNovoDocumento('Nos[0].acoes = \'\';'), null)
   assert.equal(extrairLinkNovoDocumento(''), null)
 })
+
+test('campo de senha: volta a ser de senha, sem a marca do SEI 5 (v0.1.1)', () => {
+  const { atributosDoCampoDeSenha } = require('../comum/sei.js')
+  // Atributos do campo visível da tela de assinatura do SEI 5 (depois do MaskedPassword).
+  const atributos = [
+    { name: 'id', value: 'pwdSenha' },
+    { name: 'class', value: 'infraText masked' },
+    { name: 'autocomplete', value: 'off' },
+    { name: 'autocorrect', value: 'off' },
+    { name: 'value', value: '●●●' },
+    { name: 'maxlength', value: '100' },
+    { name: 'onkeypress', value: 'return tratarSenha(event);' },
+    { name: 'tabindex', value: '505' },
+    { name: 'type', value: 'text' }
+  ]
+  const resultado = Object.fromEntries(atributosDoCampoDeSenha(atributos, 'pwdSenha'))
+  assert.deepEqual(resultado, {
+    id: 'pwdSenha',
+    class: 'infraText',
+    maxlength: '100',
+    onkeypress: 'return tratarSenha(event);',
+    tabindex: '505',
+    type: 'password',
+    name: 'pwdSenha',
+    autocomplete: 'current-password'
+  })
+})
+
+test('campo de senha: tela de entrada (sem classe além de masked fica sem class)', () => {
+  const { atributosDoCampoDeSenha } = require('../comum/sei.js')
+  const resultado = Object.fromEntries(atributosDoCampoDeSenha([{ name: 'class', value: 'masked' }]))
+  assert.equal('class' in resultado, false)
+  assert.equal(resultado.name, 'pwdSenha')
+})

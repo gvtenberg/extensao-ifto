@@ -1,0 +1,65 @@
+# Assina a extensão na Mozilla ("não listada": grátis, não aparece na loja) e publica o arquivo .xpi
+# na página "Releases" do GitHub, para instalar no computador do trabalho.
+# Roda sozinho quando um commit que muda o manifest.json chega ao GitHub, e também pelo botão
+# "Run workflow" (aba Actions). Se a versão já foi assinada, não faz nada (a Mozilla não aceita repetir versão).
+# Precisa de duas chaves da Mozilla guardadas em Settings > Secrets and variables > Actions:
+# AMO_JWT_ISSUER e AMO_JWT_SECRET.
+name: Assinar extensão
+
+on:
+  push:
+    branches: [master]
+    paths: [manifest.json]
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  assinar:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+
+      - run: npm ci
+      - run: npm test
+      - run: npm run conferir
+
+      - name: Ver se esta versão já foi assinada
+        id: versao
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          VERSAO=$(node -p "require('./manifest.json').version")
+          echo "versao=$VERSAO" >> "$GITHUB_OUTPUT"
+          if gh release view "v$VERSAO" > /dev/null 2>&1; then
+            echo "A versão $VERSAO já foi assinada; nada a fazer."
+            echo "ja_existe=sim" >> "$GITHUB_OUTPUT"
+          fi
+
+      - name: Assinar na Mozilla (não listada)
+        if: steps.versao.outputs.ja_existe != 'sim'
+        env:
+          WEB_EXT_API_KEY: ${{ secrets.AMO_JWT_ISSUER }}
+          WEB_EXT_API_SECRET: ${{ secrets.AMO_JWT_SECRET }}
+        run: >
+          npx web-ext sign --channel unlisted --approval-timeout 1800000
+          --ignore-files "testes/**" "docs/**" "ferramentas-de-teste/**" ".github/**"
+          package.json package-lock.json CLAUDE.md TESTES-PENDENTES.md
+
+      - name: Publicar o .xpi em Releases
+        if: steps.versao.outputs.ja_existe != 'sim'
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          VERSAO=${{ steps.versao.outputs.versao }}
+          XPI=$(ls web-ext-artifacts/*.xpi | head -1)
+          cp "$XPI" "extensao-ifto-$VERSAO.xpi"
+          gh release create "v$VERSAO" "extensao-ifto-$VERSAO.xpi" \
+            --title "Versão $VERSAO" \
+            --notes "Extensão assinada pela Mozilla. Para instalar: abra este arquivo .xpi no Firefox e clique em Adicionar."

@@ -1,0 +1,38 @@
+# Publicação: assinatura na Mozilla pelo GitHub
+
+O Firefox só instala de vez uma extensão assinada pela Mozilla. Usamos a assinatura **não listada** (grátis, não aparece na loja). Quem assina é o GitHub, para o computador do trabalho baixar o arquivo pronto sem passar pelo de desenvolvimento.
+
+**Seções**: Como funciona · Preparar uma vez (chaves da Mozilla) · Publicar uma versão nova · Instalar no computador do trabalho · Problemas comuns
+
+## Como funciona
+
+- Arquivo `.github/workflows/assinar.yml`. Roda quando chega ao GitHub um commit que muda o `manifest.json` (ou pelo botão **Run workflow** na aba **Actions**).
+- Faz: `npm test`, `npm run conferir`, assina com `web-ext sign --channel unlisted` e cria em **Releases** a versão `vX.Y.Z` com o arquivo `extensao-ifto-X.Y.Z.xpi`.
+- Se a versão do `manifest.json` já tem Release, não faz nada: a Mozilla não aceita assinar a mesma versão duas vezes (por isso a versão sobe a cada alteração).
+
+## Preparar uma vez (chaves da Mozilla)
+
+1. Entre em https://addons.mozilla.org/pt-BR/developers/ com uma conta da Mozilla (crie, se não tiver) e aceite o acordo de desenvolvedor.
+2. Abra https://addons.mozilla.org/pt-BR/developers/addon/api/key/ e clique em **Gerar novas credenciais**. Aparecem o **emissor JWT** (começa com `user:`) e o **segredo JWT**.
+3. No GitHub, abra o repositório > **Settings** > **Secrets and variables** > **Actions** > **New repository secret** e crie dois segredos:
+   - nome `AMO_JWT_ISSUER`, valor: o emissor JWT;
+   - nome `AMO_JWT_SECRET`, valor: o segredo JWT.
+4. As chaves nunca vão para o git nem para arquivos do projeto.
+
+## Publicar uma versão nova
+
+1. No computador de desenvolvimento, depois do commit (o Claude faz o commit, mas não envia), envie ao GitHub: no terminal, dentro da pasta `extensao-ifto`, digite `git push`.
+2. No GitHub, aba **Actions**: acompanhe "Assinar extensão" (alguns minutos; a Mozilla confere o pacote).
+3. Pronto: o `.xpi` aparece em **Releases** (lado direito da página do repositório).
+
+## Instalar no computador do trabalho
+
+1. No Firefox do trabalho, abra a página **Releases** do repositório e clique no arquivo `extensao-ifto-X.Y.Z.xpi`.
+2. O Firefox pergunta se quer adicionar a extensão: clique em **Adicionar**.
+3. Para atualizar, repita com a versão nova (ela substitui a antiga e mantém as configurações).
+- Repositório **privado**: é preciso estar logado no GitHub nesse Firefox para baixar.
+
+## Problemas comuns
+
+- "Version already exists": a versão do `manifest.json` já foi assinada; suba a versão.
+- Falta de chave ("API key" ou "401"): confira os dois segredos do passo 3 de "Preparar uma vez".

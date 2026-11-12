@@ -24,7 +24,27 @@
     return null
   }
 
-  const api = { versaoDoSei, extrairLinkNovoDocumento }
+  // v0.1.1: o SEI 5 troca o campo de senha por um campo de texto que mostra "●" (MaskedPassword) e guarda
+  // a senha num campo escondido; assim o navegador não reconhece a senha. A extensão volta a pôr um campo
+  // de senha de verdade, com os mesmos atributos do campo visível (tabindex, onkeypress, maxlength...).
+  const ATRIBUTOS_DESCARTADOS = ['type', 'name', 'value', 'autocomplete', 'autocorrect', 'autocapitalize', 'spellcheck']
+  function atributosDoCampoDeSenha (atributos, nome) {
+    const resultado = []
+    for (const { name, value } of atributos || []) {
+      const chave = name.toLowerCase()
+      if (ATRIBUTOS_DESCARTADOS.includes(chave) || chave.startsWith('_')) continue
+      if (chave === 'class') {
+        const classes = value.split(/\s+/).filter(c => c && c !== 'masked').join(' ')
+        if (classes) resultado.push(['class', classes])
+        continue
+      }
+      resultado.push([name, value])
+    }
+    resultado.push(['type', 'password'], ['name', nome || 'pwdSenha'], ['autocomplete', 'current-password'])
+    return resultado
+  }
+
+  const api = { versaoDoSei, extrairLinkNovoDocumento, atributosDoCampoDeSenha }
   if (typeof module !== 'undefined' && module.exports) module.exports = api
   else raiz.ExtensaoIFTO = Object.assign(raiz.ExtensaoIFTO || {}, { sei: api })
 })(globalThis)

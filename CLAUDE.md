@@ -15,9 +15,16 @@ O sistema principal fica em `../sistema-orcamento-ifto` (outro repositório). L�
   - `docs/melhorias-futuras.md`: lista curta de ideias (uma linha cada).
   - `docs/specs/`: uma spec por melhoria em andamento (ver "Como trabalhamos").
   - `docs/historico.md`: o que entrou em cada versão.
+  - `docs/publicacao.md`: assinatura na Mozilla pelo GitHub e instalação no computador do trabalho.
   - `TESTES-PENDENTES.md` (raiz, no git): testes manuais T01, T02…
   - No sistema principal: `../sistema-orcamento-ifto/docs/planilha.md` (abas e colunas da planilha) e `../sistema-orcamento-ifto/docs/regras/` (regras de negócio, ex.: `solicitacao-empenho.md`).
+- Arquivos de `docs/` com várias seções (e o `TESTES-PENDENTES.md`) têm na 3ª linha o índice "**Seções**": leia as 5 primeiras linhas e busque o título da seção. `docs/historico.md`: busque a versão (`v0.1.1`). `TESTES-PENDENTES.md`: busque `### T12`; nunca o arquivo inteiro.
 - Não releia arquivos que já leu na mesma sessão.
+
+## Documentação (para outra pessoa ou outra máquina continuar)
+
+- Todos os `.md` vão para o git (menos o que estiver em `ferramentas-de-teste/`). Ao mudar código ou regra, atualize no mesmo commit o `.md` certo (arquitetura, regras, histórico, testes, spec).
+- Organização para economizar leitura: um assunto por arquivo; títulos `##` que sirvam de busca; índice "**Seções**" na 3ª linha quando o arquivo tiver várias seções (atualize o índice ao criar ou renomear seção); textos curtos, sem repetir o que já está em outro arquivo (aponte para ele).
 
 ## Como trabalhamos (specs pequenas)
 
@@ -54,6 +61,7 @@ O sistema principal fica em `../sistema-orcamento-ifto` (outro repositório). L�
 - `npm test` – testes automáticos das regras (`testes/*.test.js`, com o executor de testes do próprio Node; crie testes para cada regra nova em `comum/`).
 - `npm run conferir` – conferência da Mozilla (`web-ext lint`): manifest, permissões e código (no fim de cada etapa).
 - `npm run empacotar` – gera o pacote em `web-ext-artifacts/` (fora do git).
+- Assinatura na Mozilla: feita pelo GitHub (`.github/workflows/assinar.yml`) quando o `manifest.json` muda e o usuário envia ao GitHub; passo a passo em `docs/publicacao.md`.
 - `npm run rodar` – abre um Firefox de teste com a extensão (perfil limpo, sem as senhas do usuário; para testar no SEI, prefira a instalação temporária).
 - Instalação temporária no Firefox: `about:debugging#/runtime/this-firefox` > **Carregar extensão temporária…** > escolher o `manifest.json` da pasta `extensao-ifto` (ou um `.xpi`). Some quando o Firefox fecha; depois de mudar o código, clique em **Recarregar** ali.
 - Regras puras (sem página) ficam em `comum/` e funcionam no navegador e no Node (`module.exports` ou `globalThis.ExtensaoIFTO`); o que mexe na página fica em `sites/<site>/`.
