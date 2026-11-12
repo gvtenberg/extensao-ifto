@@ -31,6 +31,8 @@ O sistema principal fica em `../sistema-orcamento-ifto` (outro repositório). L�
 
 1. **Planejar** (comando `/planejar <melhoria>`): entreviste o usuário (perguntas curtas, de preferência com opções), depois crie `docs/specs/<nome>.md` a partir de `docs/specs/_modelo.md`. Divida em etapas pequenas; cada etapa cabe numa conversa.
 2. **Decisões a confirmar:** toda escolha que muda regra, tela, dados lidos ou gravados na planilha, ou que seria difícil de desfazer, vai para a seção "Decisões a confirmar" da spec, com `[ ]`. **Não programe** enquanto houver `[ ]` que afete a etapa. Nunca decida sozinho e anote "decisão do Claude, a confirmar": pergunte.
+   - Toda dúvida é perguntada **no chat assim que aparece** (nunca fica só na spec nem espera a etapa em que será usada); a resposta vai para a spec.
+   - Com alternativas, pergunte pela **janela de escolha** (até 4 perguntas por vez; a sugestão em 1º lugar; cada pergunta se explica sozinha). Texto só quando não houver opções.
 3. **Executar** (comando `/etapa <spec> <n>`): numa conversa nova, leia só a spec e o que ela indicar. Ao terminar: testes, versão, histórico, commit e a etapa marcada como feita na spec.
 4. **Fim da melhoria:** as regras decididas passam para `docs/regras/`, a linha sai de `melhorias-futuras.md` e a spec vai para `docs/specs/feitas/`.
 - Ajustes pequenos e correções de testes não precisam de spec.
@@ -41,8 +43,9 @@ O sistema principal fica em `../sistema-orcamento-ifto` (outro repositório). L�
 - Chefe da CGOC (Coordenação de Gestão Orçamentária e Contratos). **Não é da área de TI**: linguagem simples, sem jargão; comandos sempre com o texto exato a digitar e o caminho dos cliques no navegador.
 - **Sempre em português** (respostas, textos da extensão, comentários).
 - Pergunte quando houver dúvida; informe sugestões. O usuário costuma mandar vários pedidos numa mensagem.
+- **Quando o usuário sair** e pedir para continuar: faça o que já está decidido (specs sem `[ ]`), planeje o resto e traga as perguntas em blocos no fim, com sugestão.
 - Mudança grande, difícil de desfazer ou que grave na planilha oficial: proposta + confirmação antes.
-- **Formato da resposta** depois de mexer no código: **O que mudou** (curto) / **Arquivos alterados** (só os caminhos) / **O que eu testei** (uma linha) / **Testes** ("**Teste N: título**", com "- O que fazer:" e "- O que deve acontecer:"; detalhados: navegador, site e página, conta logada, o que clicar, o que deve aparecer). Os testes também vão para o `TESTES-PENDENTES.md`.
+- **Resposta depois de mexer no código** (curta, para economizar): **O que mudou** (curto) · **O que eu testei** (uma linha) · **Testes**: só número e título, um por linha ("T11 – Senha na tela de entrada"); o passo a passo (navegador, site e página, conta logada, o que clicar, o que deve aparecer) fica só no `TESTES-PENDENTES.md`. Teste **crítico** vai completo na resposta. Não liste os arquivos alterados. Diga os commits feitos (e que não foram enviados ao GitHub).
 - Teste não comentado pelo usuário = deu certo.
 - **Conversa longa:** quando a conversa estiver grande (várias rodadas ou etapas, muitos arquivos lidos, ou depois de o contexto ser resumido automaticamente), termine a resposta com o aviso: "⚠️ A conversa está grande: recomendo começar uma nova. Digite `/clear` (tudo já está no git e nos arquivos de docs)." Antes do aviso, deixe tudo commitado e anotado (spec, situação, testes, melhorias).
 - **Testes manuais no fim:** numa melhoria com várias etapas, os testes de cada etapa vão para o `TESTES-PENDENTES.md`, mas o usuário testa tudo junto ao final. Só pare antes para teste **crítico** (grava em sistema oficial – SEI, planilha oficial – ou decide o rumo da etapa seguinte); marque-o "(Crítico)".

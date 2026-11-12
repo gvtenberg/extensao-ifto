@@ -7,4 +7,4 @@ Execute a(s) etapa(s) indicada(s): $ARGUMENTS (nome da spec em `docs/specs/` e n
 5. Suba a versão no `manifest.json`, registre em `docs/historico.md` (com a data de hoje), marque a etapa como feita na spec, atualize a seção "Situação" de `docs/melhorias-futuras.md` e acrescente os testes manuais no `TESTES-PENDENTES.md`. Faça o commit da etapa (sem push).
 6. Se pedi um intervalo, siga para a próxima etapa sem me pedir testes; só pare antes do fim por teste crítico ou dúvida que só eu resolvo.
 7. Se for a última etapa da spec: passe as regras da spec para `docs/regras/`, tire a linha de `docs/melhorias-futuras.md`, mova a spec para `docs/specs/feitas/` e faça o commit.
-8. Responda no formato do CLAUDE.md, com os testes manuais separados por etapa.
+8. Responda no formato curto do CLAUDE.md (testes só com número e título, separados por etapa).
