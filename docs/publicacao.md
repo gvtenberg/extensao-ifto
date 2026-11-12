@@ -1,39 +1,68 @@
-# Publicação: assinatura na Mozilla pelo GitHub
+# Publishing: Mozilla signing via GitHub, and the Chrome package
 
-O Firefox só instala de vez uma extensão assinada pela Mozilla. Usamos a assinatura **não listada** (grátis, não aparece na loja). Quem assina é o GitHub, e a extensão está disponível para download direto pelo GitHub, sem precisar ser enviada pelo computador de desenvolvimento.
+Firefox only installs an extension permanently if Mozilla has signed it. We use **unlisted** signing (free, not shown in the store). GitHub does the signing, and the extension is downloaded straight from GitHub, so nothing has to be sent from the development computer.
 
-**Seções**: Como funciona · Preparar uma vez (chaves da Mozilla) · Publicar uma versão nova · Instalar no computador · Problemas comuns
+**Sections**: How it works · One-time setup (Mozilla keys) · Publish a new version · Install on a computer (Firefox) · Chrome version · Saved passwords in the SEI · Common problems
 
-## Como funciona
+## How it works
 
-- Arquivo `.github/workflows/assinar.yml`. Roda quando chega ao GitHub um commit que muda o `manifest.json` (ou pelo botão **Run workflow** na aba **Actions**).
-- Faz: `npm test`, `npm run conferir`, assina com `web-ext sign --channel unlisted` e cria em **Releases** a versão `vX.Y.Z` com o arquivo `extensao-ifto-X.Y.Z.xpi`.
-- A Release também leva o `updates.json`. O `manifest.json` aponta para o da última Release (`update_url`), e assim o Firefox instala sozinho cada versão nova (repositório **público**).
-- Se a versão do `manifest.json` já tem Release, não faz nada: a Mozilla não aceita assinar a mesma versão duas vezes (por isso a versão sobe a cada alteração).
+- File `.github/workflows/assinar.yml`. It runs when a commit that changes `manifest.json` reaches GitHub (or from the **Run workflow** button on the **Actions** tab).
+- It runs `npm test` and `npm run conferir`, signs with `web-ext sign --channel unlisted`, and creates the `vX.Y.Z` version in **Releases** with `extensao-ifto-X.Y.Z.xpi` (Firefox) and `extensao-ifto-chrome-X.Y.Z.zip` (Chrome, v0.5.0).
+- The Release also carries `updates.json`. `manifest.json` points to the one in the latest Release (`update_url`), so Firefox installs each new version by itself (the repository is **public**).
+- If the `manifest.json` version already has a Release, it does nothing: Mozilla does not sign the same version twice (that is why the version goes up with every change).
 
-## Preparar uma vez (chaves da Mozilla)
+## One-time setup (Mozilla keys)
 
-1. Entre em https://addons.mozilla.org/pt-BR/developers/ com uma conta da Mozilla (crie, se não tiver) e aceite o acordo de desenvolvedor.
-2. Abra https://addons.mozilla.org/pt-BR/developers/addon/api/key/ e clique em **Gerar novas credenciais**. Aparecem o **emissor JWT** (começa com `user:`) e o **segredo JWT**.
-3. No GitHub, abra o repositório > **Settings** > **Secrets and variables** > **Actions** > **New repository secret** e crie dois segredos:
-   - nome `AMO_JWT_ISSUER`, valor: o emissor JWT;
-   - nome `AMO_JWT_SECRET`, valor: o segredo JWT.
-4. As chaves nunca vão para o git nem para arquivos do projeto.
+1. Go to https://addons.mozilla.org/pt-BR/developers/ with a Mozilla account (create one if needed) and accept the developer agreement.
+2. Open https://addons.mozilla.org/pt-BR/developers/addon/api/key/ and click **Gerar novas credenciais** (Generate new credentials). It shows the **JWT issuer** (starts with `user:`) and the **JWT secret**.
+3. On GitHub, open the repository > **Settings** > **Secrets and variables** > **Actions** > **New repository secret** and create two secrets:
+   - name `AMO_JWT_ISSUER`, value: the JWT issuer;
+   - name `AMO_JWT_SECRET`, value: the JWT secret.
+4. The keys never go into git or into project files.
 
-## Publicar uma versão nova
+## Publish a new version
 
-1. No computador de desenvolvimento, depois do commit (o Claude faz o commit, mas não envia), envie ao GitHub: no terminal, dentro da pasta `extensao-ifto`, digite `git push`.
-2. No GitHub, aba **Actions**: acompanhe "Assinar extensão" (alguns minutos; a Mozilla confere o pacote).
-3. Pronto: o `.xpi` aparece em **Releases** (lado direito da página do repositório).
+1. On the development computer, after the commit (Claude commits but does not push), send it to GitHub: in the terminal, inside the `extensao-ifto` folder, type `git push`.
+2. On GitHub, **Actions** tab: follow "Assinar extensão" (a few minutes; Mozilla checks the package).
+3. Done: the `.xpi` and the Chrome `.zip` show up in **Releases** (right side of the repository page).
 
-## Instalar no computador
+## Install on a computer (Firefox)
 
-1. No Firefox do trabalho, abra a página **Releases** do repositório e clique no arquivo `extensao-ifto-X.Y.Z.xpi`.
-2. O Firefox pergunta se quer adicionar a extensão: clique em **Adicionar**.
-3. Só na primeira vez. Depois o Firefox atualiza sozinho (confere uma vez por dia). Para atualizar na hora (ex.: logo depois de "Assinar extensão" terminar): clique no ícone da extensão > **Procurar atualização** > **Instalar a versão …**; na página da versão que abrir, clique no arquivo `extensao-ifto-X.Y.Z.xpi` > **Permitir** (para o GitHub) > **Adicionar** (v0.4.2: abrir o arquivo direto não mostrava a instalação). Outro jeito, sem a janela da extensão: menu ☰ do Firefox > **Extensões e temas** > engrenagem ⚙ > **Procurar atualizações**. As configurações são mantidas.
-- O botão "Procurar atualização" serve enquanto a extensão está em desenvolvimento; quando ela estiver pronta, o usuário decide se ele sai da janela.
+1. In the work Firefox, open the repository **Releases** page and click `extensao-ifto-X.Y.Z.xpi`.
+2. Firefox asks whether to add the extension: click **Adicionar** (Add).
+3. Only the first time. After that Firefox updates by itself (it checks once a day). To update right away:
+   - **Firefox menu (most reliable):** menu ☰ > **Extensões e temas** (Add-ons and themes) > gear ⚙ > **Procurar atualizações** (Check for updates).
+   - **Extension window:** extension icon > **Procurar atualização** > **Instalar a versão …**; on the version page that opens, click `extensao-ifto-X.Y.Z.xpi` > **Permitir** (Allow, for GitHub) > **Adicionar** (v0.4.2: opening the file directly did not show the install prompt, because Firefox requires the person's own click; Firefox has no `runtime.requestUpdateCheck`).
+   - Settings and the signature list are kept.
+- The "Procurar atualização" button is useful while the extension is in development; when it is ready, the user decides whether it leaves the window.
 
-## Problemas comuns
+## Chrome version
 
-- "Version already exists": a versão do `manifest.json` já foi assinada; suba a versão.
-- Falta de chave ("API key" ou "401"): confira os dois segredos do passo 3 de "Preparar uma vez".
+Free, without the Chrome Web Store (the store charges a one-time US$ 5 developer fee, which breaks the "no costs" rule). Works in Google Chrome and Microsoft Edge. No automatic updates: each new version is installed by replacing the folder.
+
+- **Build (development computer):** in the terminal, inside `extensao-ifto`, type `npm run empacotar-chrome`. It creates the folder and the `.zip` in `web-ext-artifacts/chrome/` (outside git). The script (`scripts/empacotar-chrome.js`) swaps the SVG icon for PNGs (`icones/icone-16/32/48/128.png`) and removes the Firefox-only keys. GitHub also attaches the `.zip` to each Release.
+- **Install (first time):**
+  1. Download `extensao-ifto-chrome-X.Y.Z.zip` from the repository **Releases** page.
+  2. Unzip it into a folder that will stay put (e.g. `Documentos\extensao-ifto-chrome`): right-click the file > **Extrair tudo** (Extract all).
+  3. In Chrome, type `chrome://extensions` in the address bar and press Enter (in Edge: `edge://extensions`).
+  4. Turn on **Modo do desenvolvedor** (Developer mode), top right (in Edge: bottom left).
+  5. Click **Carregar sem compactação** (Load unpacked) and choose the unzipped folder (the one that contains `manifest.json`).
+  6. Optional: puzzle-piece icon 🧩 next to the address bar > pin "Extensão IFTO Palmas".
+- **Update:** download the new `.zip`, unzip it **over the same folder** (replace the files), then in `chrome://extensions` click the circular arrow ↻ on the extension card. Settings and the list are kept.
+- In Chrome the "Procurar atualização" button is hidden (it would look for the Firefox version).
+- Chrome may show a "Desativar extensões no modo do desenvolvedor" (disable developer-mode extensions) warning at startup: click to keep them.
+
+## Saved passwords in the SEI
+
+Firefox suggests passwords saved for **any** `ifto.edu.br` address (SUAP, Moodle, etc.) on the SEI. The extension cannot change this; it is a Firefox setting. To show only the SEI password (`sei.ifto.edu.br`):
+
+1. Type `about:config` in the address bar and press Enter; click **Aceitar o risco e continuar** (Accept the risk and continue).
+2. In the search box, type `signon.includeOtherSubdomainsInLookup`.
+3. Click the toggle button ⇄ on the right so the value becomes `false`.
+
+With only one password for `sei.ifto.edu.br`, Firefox fills it in by itself in the signing window, and "Assinar e próximo" signs with one click (v0.5.0).
+
+## Common problems
+
+- "Version already exists": the `manifest.json` version has already been signed; bump the version.
+- Missing key ("API key" or "401"): check the two secrets from step 3 of "One-time setup".

@@ -61,7 +61,7 @@ jobs:
           WEB_EXT_API_SECRET: ${{ secrets.AMO_JWT_SECRET }}
         run: >
           npx web-ext sign --channel unlisted --approval-timeout 1800000
-          --ignore-files "testes/**" "docs/**" "ferramentas-de-teste/**" ".github/**"
+          --ignore-files "testes/**" "docs/**" "ferramentas-de-teste/**" ".github/**" "scripts/**"
           package.json package-lock.json CLAUDE.md TESTES-PENDENTES.md
 
       - name: Publicar o .xpi em Releases
@@ -77,6 +77,9 @@ jobs:
           ID=$(node -p "require('./manifest.json').browser_specific_settings.gecko.id")
           LINK="https://github.com/${{ github.repository }}/releases/download/v$VERSAO/extensao-ifto-$VERSAO.xpi"
           node -e "console.log(JSON.stringify({addons:{[process.argv[1]]:{updates:[{version:process.argv[2],update_link:process.argv[3]}]}}},null,2))" "$ID" "$VERSAO" "$LINK" > updates.json
-          gh release create "v$VERSAO" "extensao-ifto-$VERSAO.xpi" updates.json \
+          # v0.5.0: pacote do Chrome (grátis, sem a loja) na mesma Release.
+          npm run empacotar-chrome
+          cp "web-ext-artifacts/chrome/extensao-ifto-chrome-$VERSAO.zip" .
+          gh release create "v$VERSAO" "extensao-ifto-$VERSAO.xpi" "extensao-ifto-chrome-$VERSAO.zip" updates.json \
             --title "Versão $VERSAO" \
-            --notes "Extensão assinada pela Mozilla. Para instalar: abra este arquivo .xpi no Firefox e clique em Adicionar."
+            --notes "Firefox: clique no arquivo .xpi e em Adicionar. Chrome: baixe o .zip, descompacte e carregue a pasta em chrome://extensions (Modo do desenvolvedor > Carregar sem compactação)."

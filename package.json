@@ -5,9 +5,10 @@
   "license": "GPL-3.0-only",
   "scripts": {
     "test": "node --test \"testes/**/*.test.js\"",
-    "conferir": "web-ext lint --self-hosted --ignore-files \"testes/**\" \"docs/**\" \"ferramentas-de-teste/**\" \".github/**\" package.json package-lock.json CLAUDE.md TESTES-PENDENTES.md",
+    "conferir": "web-ext lint --self-hosted --ignore-files \"testes/**\" \"docs/**\" \"ferramentas-de-teste/**\" \".github/**\" \"scripts/**\" package.json package-lock.json CLAUDE.md TESTES-PENDENTES.md",
     "rodar": "web-ext run --ignore-files \"testes/**\" \"docs/**\" \"ferramentas-de-teste/**\"",
-    "empacotar": "web-ext build --overwrite-dest --ignore-files \"testes/**\" \"docs/**\" \"ferramentas-de-teste/**\" \".github/**\" package.json package-lock.json CLAUDE.md TESTES-PENDENTES.md"
+    "empacotar-chrome": "node scripts/empacotar-chrome.js",
+    "empacotar": "web-ext build --overwrite-dest --ignore-files \"testes/**\" \"docs/**\" \"ferramentas-de-teste/**\" \".github/**\" \"scripts/**\" package.json package-lock.json CLAUDE.md TESTES-PENDENTES.md"
   },
   "devDependencies": {
     "web-ext": "^8.10.0"

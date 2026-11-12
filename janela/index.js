@@ -23,6 +23,12 @@
   const { atualizacao } = globalThis.ExtensaoIFTO
   const versaoInstalada = navegador.runtime.getManifest().version
   const botaoProcurar = document.getElementById('procurar-atualizacao')
+  // v0.5.0: no Chrome (sem "browser"), a atualização é trocar a pasta pela do pacote novo; o botão
+  // procuraria a versão do Firefox, então fica escondido.
+  if (!globalThis.browser) {
+    botaoProcurar.hidden = true
+    return
+  }
   const avisoAtualizacao = document.getElementById('atualizacao')
   const botaoInstalar = document.getElementById('instalar-atualizacao')
 

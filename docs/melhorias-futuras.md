@@ -1,44 +1,44 @@
-# Melhorias futuras e situação do projeto
+# Future improvements and project status
 
-**Seções**: Situação (feito, em andamento, pendente) · Ideias (Ordem sugerida · Outros sites · Distribuição)
+**Sections**: Status (done, in progress, pending) · Ideas (Suggested order · Other sites · Distribution)
 
-## Situação (feito, em andamento, pendente)
+## Status (done, in progress, pending)
 
-Resumo para retomar o trabalho (em outra máquina ou por outra pessoa) sem ler tudo. Atualize ao fim de cada etapa ou rodada.
+Summary to resume work (on another machine or by another person) without reading everything. Update at the end of each stage or round.
 
-- **Feito:** cada versão em `historico.md` (última: v0.4.2, 12/11/2026); specs concluídas em `specs/feitas/` (lista de assinaturas no SEI, v0.2.0 a v0.4.0; regras em `regras/lista-assinaturas.md`).
-- **Em andamento:** `specs/base-e-sei.md`: etapa 1 feita (v0.1.0); próxima, a etapa 2, aguarda as decisões D7 e D9 a D13 (perguntas P1 a P4 e levantamentos T06 e T07 no `TESTES-PENDENTES.md`).
-- **Ajustes fora de spec:** v0.1.1, senha reconhecida pelo navegador no SEI 5; v0.1.2, atualização automática pelo GitHub; v0.1.3, botão "Procurar atualização" e organização igual à do sistema principal; v0.4.1, textos revistos para quem usa a extensão; v0.4.2, instalar a atualização pela página da versão.
-- **Pendente do usuário:** testes T01 a T20 (T20 crítico: assinar pelo painel) e perguntas P1 a P4 (também como cartões no GitHub, depois do primeiro `git push`) (o SEI virou SEI 5 em 11/2026: refazer T03 a T05); chaves da Mozilla para a assinatura no GitHub (`publicacao.md`).
-- **Planejado (com spec):** linhas com **[spec]** abaixo. **Não planejado:** as demais linhas (ideias).
+- **Done:** each version in `historico.md` (latest: v0.5.0, 12/11/2026); finished specs in `specs/feitas/` (signature list in the SEI, v0.2.0 to v0.5.0; rules in `regras/lista-assinaturas.md`).
+- **In progress:** `specs/base-e-sei.md`: stage 1 done (v0.1.0); next, stage 2, waiting for decisions D7 and D9 to D13 (questions P1 to P4 and surveys T06 and T07 in `TESTES-PENDENTES.md`).
+- **Fixes outside a spec:** v0.1.1, password recognized by the browser in SEI 5; v0.1.2, automatic update via GitHub; v0.1.3, "Procurar atualização" button and organization matching the main system; v0.4.1, texts reviewed for the people who use the extension; v0.4.2, install the update via the version page; v0.5.0, "Assinar e próximo", Chrome package, docs in English.
+- **Pending from the user:** tests T01 to T27 (T20 and T23 critical: signing from the panel) and questions P1 to P4 (also as GitHub cards, after the first `git push`) (the SEI became SEI 5 in 11/2026: redo T03 to T05); Mozilla keys for signing on GitHub (`publicacao.md`); push the commits (v0.2.0 to v0.5.0 are not on GitHub yet).
+- **Planned (with spec):** lines marked **[spec]** below. **Not planned:** the other lines (ideas).
 
-## Ideias
+## Ideas
 
-Uma linha por ideia. Quando uma ideia for planejada, ela ganha uma spec em `docs/specs/` e a linha passa a apontar para ela. Ao terminar, a linha sai daqui e vai para `docs/historico.md`.
+One line per idea. When an idea is planned, it gets a spec in `docs/specs/` and the line points to it. When finished, the line leaves here and goes to `docs/historico.md`.
 
-Marcas: **[spec]** já tem spec.
+Marks: **[spec]** already has a spec.
 
-### Ordem sugerida (a confirmar com o usuário)
+### Suggested order (to confirm with the user)
 
-1. Base da extensão e melhorias do SEI (no lugar do SEI++, que parou no SEI do IFTO): botão Novo documento, documento externo preenchido, arrastar arquivos com o tipo reconhecido, roteiros por tipo de processo **[spec]** → `specs/base-e-sei.md`
-   - Adicionar arquivos direto num processo do SEI 5 (12/11/2026): já é a etapa 3 da spec ("Arrastar arquivos"). Um colega do IFTO conseguiu fazer isso na extensão dele, no SEI 5: pedir a ele o nome ou o endereço da extensão e anotar em `referencias/` antes da etapa 3.
-   - Depois: **compressão automática de PDF** na própria extensão (26/10/2026): compactar, comparar os tamanhos, informar quanto se economiza no servidor de arquivos da Reitoria e mostrar lado a lado o PDF original e o compactado, para o usuário ver a diferença de qualidade e escolher um deles. Obrigatória acima de 10 MB. De preferência sem mandar o arquivo para sites de fora (D13 da spec).
-   - **Perfis padronizados por unidade do SEI** (12/11/2026): Direção-geral, Contratos, Licitação etc., cada um com as suas funções ligadas por padrão, reconhecido pela unidade aberta no SEI (`#lnkInfraUnidade`). A primeira função de perfil é a lista de assinaturas (Direção-geral).
-2. Login Google e leitura da planilha do sistema (sem login, só as melhorias do SEI).
-3. Solicitação de nota de empenho no SEI: preencher o documento com o texto que o sistema já monta (v0.43.0 do sistema; regras em `../sistema-orcamento-ifto/docs/regras/solicitacao-empenho.md`). Depende do teste T40 do sistema ("Colar no SEI").
-4. Lançamento das notas/faturas pagas por demanda (alimenta o liquidado por demanda e, depois, o módulo financeiro do sistema). Decidido em 19/10/2026: logo depois da solicitação de nota de empenho, depois de testes manuais. Exige gravar na planilha.
+1. Extension base and SEI improvements (replacing SEI++, which stopped working on the IFTO SEI): New document button, pre-filled external document, drag files with the type recognized, checklists per process type **[spec]** → `specs/base-e-sei.md`
+   - Add files directly to a SEI 5 process (12/11/2026): already stage 3 of the spec ("Arrastar arquivos"). An IFTO colleague managed this in their own extension on SEI 5: ask for the extension's name or address and note it in `referencias/` before stage 3.
+   - Later: **automatic PDF compression** inside the extension (26/10/2026): compress, compare sizes, report how much is saved on the Rectorate file server, and show the original and compressed PDF side by side so the user sees the quality difference and picks one. Mandatory above 10 MB. Preferably without sending the file to outside sites (D13 of the spec).
+   - **Standard profiles per SEI unit** (12/11/2026): Director-General, Contracts, Procurement etc., each with its own features on by default, recognized by the unit open in the SEI (`#lnkInfraUnidade`). The first profile feature is the signature list (Director-General).
+2. Google login and reading the system spreadsheet (without login, only the SEI improvements).
+3. Commitment note request in the SEI: fill the document with the text the system already builds (system v0.43.0; rules in `../sistema-orcamento-ifto/docs/regras/solicitacao-empenho.md`). Depends on the system's test T40 ("Colar no SEI").
+4. Recording invoices paid per demand (feeds "liquidado" per demand and, later, the system's financial module). Decided on 19/10/2026: right after the commitment note request, after manual tests. Requires writing to the spreadsheet.
 
-### Outros sites (preencher e capturar dados)
+### Other sites (fill in and capture data)
 
-- Contratos (Comprasnet Contratos).
-- Compras parte 3 do sistema: ler o saldo das atas nas páginas do Comprasnet (uma das opções; as outras são o TG e algum serviço público do Comprasnet).
+- Contracts (Comprasnet Contratos).
+- Purchases part 3 of the system: read the price-registration balances from Comprasnet pages (one option; the others are TG and some public Comprasnet service).
 - SUAP.
 - SIAFI.
 - SICAF.
 - Simples Nacional.
 
-### Distribuição
+### Distribution
 
-- Versão para o Chrome (depois do Firefox).
-- Quando a extensão sair do desenvolvimento: decidir se o botão "Procurar atualização" sai da janela do ícone (12/11/2026).
-- Assinatura "não listada" da Mozilla pelo GitHub, com atualização automática: preparada nas v0.1.1 e v0.1.2 (`publicacao.md`); falta o usuário criar as chaves. Depois, talvez, para os colegas do campus. Colegas hoje usam o SEI Pro.
+- Chrome version: free package without the store, done in v0.5.0 (`publicacao.md`, "Chrome version"). Chrome Web Store (US$ 5 fee, automatic updates) only if the "no costs" rule changes.
+- When the extension leaves development: decide whether the "Procurar atualização" button leaves the icon window (12/11/2026).
+- Mozilla "unlisted" signing via GitHub, with automatic updates: prepared in v0.1.1 and v0.1.2 (`publicacao.md`); the user still has to create the keys. Later, maybe, for campus colleagues. Colleagues currently use SEI Pro.

@@ -74,7 +74,7 @@ E: O painel volta no lugar em que você o deixou e no item 3; "Lugar padrão" o 
 F: Com a lista colada, troque para outra unidade no SEI e depois volte para PAL/REI/IFTO.
 E: Na outra unidade o painel some; ao voltar, reaparece no mesmo item.
 ### T17 – Feito e lista completa (v0.3.0)
-F: Com a lista colada, clique em "✓ Feito e próximo" em dois itens, depois em "Lista completa" e num item qualquer da lista.
+F: Com a lista colada, clique em "Marcar feito e ir ao próximo" (link do painel) em dois itens, depois em "Lista completa" e num item qualquer da lista.
 E: O contador mostra "3/28 · 2 feitos"; na lista, os feitos têm ✓ e o clique abre o item escolhido.
 ### T18 – Ciência, minimizar e atalhos (v0.3.0)
 F: Vá a um item com "dar ciência", clique em "–" (minimizar) e depois em "▢"; com o documento aberto, aperte Alt+→ e Alt+←.
@@ -82,12 +82,28 @@ E: O item de ciência aparece em azul com "Só dar ciência"; minimizado, sobra 
 ### T19 – Opção nas configurações (v0.3.0)
 F: Configurações > Lista de assinaturas no SEI: escolha "Desligada", recarregue o SEI; depois "Sempre ligada" e troque para outra unidade; feche e abra o Firefox e veja a escolha.
 E: Desligada, o painel some; "Sempre ligada", aparece em qualquer unidade; a escolha continua marcada depois de reabrir o Firefox.
-### T20 – Botões Assinar e Dar ciência do painel (v0.4.0) (Crítico)
-F: Num item da lista com documento, espere o documento abrir e clique em "Assinar" no painel; digite a senha e assine. Num item com "dar ciência", clique em "Dar ciência" no painel e confirme.
-E: "Assinar" abre a janela de assinatura do SEI pedindo a senha (nada é assinado sem você); "Dar ciência" mostra a confirmação do SEI. Itens sem documento não mostram "Assinar".
+### T20 – Botões do painel conforme o item (v0.4.0; v0.5.0)
+F: Passe por um item com documento, um de "dar ciência" e um só com o processo.
+E: Com documento: "Assinar e próximo"; de ciência: "Dar ciência e próximo"; só processo: "✓ Feito e próximo".
 ### T21 – Textos da janela do ícone (v0.4.1)
 F: Clique no ícone da extensão e em "Procurar atualização".
 E: Os textos falam só do que acontece (versão, SEI reconhecido, atualização), sem GitHub, Actions ou código. Comente qualquer texto que ainda pareça de programador.
 ### T22 – Instalar a atualização pela página da versão (v0.4.2)
 F: Com uma versão nova pronta, clique no ícone > Procurar atualização > Instalar a versão…; na página que abrir, clique no arquivo que termina em .xpi e em Adicionar. Em outra versão, tente o caminho ☰ > Extensões e temas > ⚙ > Procurar atualizações.
 E: A janela de instalação do Firefox aparece já no primeiro clique, sem recarregar a página; pelo menu, a extensão atualiza sozinha.
+### T23 – Assinar e próximo (v0.5.0) (Crítico)
+F: Com a senha do SEI guardada no Firefox, num item com documento clique em "Assinar e próximo" e espere.
+E: A janela de assinatura abre, a senha aparece preenchida, o documento é assinado sozinho e o painel abre o próximo item com o anterior marcado ✓. Se a senha não vier preenchida, digite e aperte Enter: depois de assinar, avança. Comente se não avançar.
+### T24 – Senha errada ou janela fechada (v0.5.0)
+F: Clique em "Assinar e próximo", digite uma senha errada; depois feche a janela de assinatura.
+E: O painel não avança e mostra "Aguardando a assinatura…"; "Cancelar a espera" volta ao normal.
+### T25 – Dar ciência e próximo (v0.5.0)
+F: Num item de "dar ciência", clique em "Dar ciência e próximo" e confirme no OK do SEI.
+E: A ciência é registrada e o painel abre o próximo item, com o anterior marcado ✓.
+### T26 – Só a senha do SEI (v0.5.0)
+F: Siga "Saved passwords in the SEI" em docs/publicacao.md (about:config > signon.includeOtherSubdomainsInLookup = false) e abra a assinatura de um documento.
+E: O Firefox oferece só a senha do sei.ifto.edu.br (sem SUAP, Moodle etc.).
+### T27 – Instalar no Chrome (v0.5.0)
+> No computador de desenvolvimento (ou com o .zip da Release, depois do git push).
+F: Rode npm run empacotar-chrome, abra chrome://extensions > Modo do desenvolvedor > Carregar sem compactação > pasta web-ext-artifacts/chrome/extensao-ifto-chrome-0.5.0; entre no SEI na unidade PAL/REI/IFTO.
+E: A extensão aparece sem erros, o painel da lista de assinaturas funciona e a janela do ícone não mostra "Procurar atualização".

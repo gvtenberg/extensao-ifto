@@ -2,7 +2,7 @@
   "manifest_version": 3,
   "name": "Extensão IFTO Palmas",
   "short_name": "IFTO Palmas",
-  "version": "0.4.2",
+  "version": "0.5.0",
   "description": "Melhorias no SEI e apoio ao Sistema de Gestão Orçamentária do IFTO Campus Palmas.",
   "icons": { "48": "icones/icone.svg", "96": "icones/icone.svg" },
   "permissions": ["storage"],
@@ -48,6 +48,12 @@
       "run_at": "document_idle",
       "all_frames": true,
       "js": ["comum/sei.js", "comum/configuracoes.js", "sites/sei/campo-senha.js"]
+    },
+    {
+      "matches": ["*://sei.ifto.edu.br/*controlador.php?acao=documento_assinar*"],
+      "run_at": "document_idle",
+      "all_frames": true,
+      "js": ["sites/sei/assinar-e-proximo.js"]
     }
   ],
   "browser_specific_settings": {

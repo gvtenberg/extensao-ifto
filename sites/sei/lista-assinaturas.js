@@ -184,7 +184,7 @@
     await irPara(0)
   }
 
-  // v0.3.0: "Feito e próximo", lista completa, ciência em destaque, minimizar.
+  // v0.3.0: "Feito e próximo" (v0.5.0: "Assinar e próximo"), lista completa, ciência em destaque, minimizar.
   function desenharNavegar () {
     const item = estado.itens[estado.posicao]
     const total = estado.itens.length
@@ -212,18 +212,23 @@
       el('div', { class: 'acoes' },
         el('button', { type: 'button', class: 'botao', title: 'Alt+←', disabled: estado.posicao === 0, onclick: () => irPara(estado.posicao - 1) }, '◀ Anterior'),
         el('button', { type: 'button', class: 'botao', title: 'Alt+→', disabled: estado.posicao === total - 1, onclick: () => irPara(estado.posicao + 1) }, 'Próximo ▶')),
-      // Sem documento, "Assinar" não faz sentido (abre só o processo); "Dar ciência" vale para o processo.
-      (item.documento || item.ciencia) && el('button', {
-        type: 'button',
-        class: 'botao sei',
-        title: item.ciencia ? 'Clica no botão "Ciência" do SEI; o SEI pede a confirmação' : 'Clica no botão "Assinar Documento" do SEI; o SEI pede a senha',
-        onclick: () => clicarBotaoDoSei(item.ciencia ? 'Ciência' : 'Assinar Documento')
-      }, item.ciencia ? 'Dar ciência' : 'Assinar'),
-      el('button', { type: 'button', class: 'botao principal', onclick: feitoEProximo }, '✓ Feito e próximo'),
+      // v0.5.0: o botão principal assina (ou dá ciência) e avança. Sem documento e sem ciência, só marca
+      // como feito, porque "Assinar" precisa de um documento aberto.
+      estado.pendente ? el('div', { class: 'aguardando' }, estado.pendente.tipo === 'ciencia'
+        ? 'Aguardando a ciência no SEI (confirme no OK)…'
+        : 'Aguardando a assinatura no SEI… Se a senha não aparecer preenchida, digite e aperte Enter.') : null,
+      item.ciencia
+        ? el('button', { type: 'button', class: 'botao principal', title: 'Clica em "Ciência" no SEI; depois de você confirmar, abre o próximo', onclick: () => agirEAvancar('ciencia') }, 'Dar ciência e próximo')
+        : item.documento
+          ? el('button', { type: 'button', class: 'botao principal', title: 'Assina com a senha guardada no Firefox e abre o próximo', onclick: () => agirEAvancar('assinar') }, 'Assinar e próximo')
+          : el('button', { type: 'button', class: 'botao principal', onclick: feitoEProximo }, '✓ Feito e próximo'),
       el('div', { class: 'links' },
         el('button', { type: 'button', class: 'link', onclick: () => { verLista = !verLista; desenhar() } }, verLista ? 'Esconder a lista' : `Lista completa (${total})`),
         el('button', { type: 'button', class: 'link', onclick: () => irPara(estado.posicao) }, 'Abrir de novo'),
-        item.feito ? el('button', { type: 'button', class: 'link', onclick: desmarcarFeito }, 'Desmarcar feito') : null,
+        item.feito
+          ? el('button', { type: 'button', class: 'link', onclick: desmarcarFeito }, 'Desmarcar feito')
+          : (item.documento || item.ciencia) ? el('button', { type: 'button', class: 'link', onclick: feitoEProximo }, 'Marcar feito e ir ao próximo') : null,
+        estado.pendente ? el('button', { type: 'button', class: 'link', onclick: cancelarPendente }, 'Cancelar a espera') : null,
         el('button', { type: 'button', class: 'link', onclick: voltarAoLugarPadrao }, 'Lugar padrão'),
         el('button', { type: 'button', class: 'link perigo', onclick: limpar }, 'Limpar lista')),
       verLista ? listaCompleta() : null
@@ -260,6 +265,7 @@
   function clicarBotaoDoSei (titulo) {
     const botao = acharBotaoDoSei(titulo)
     if (!botao) {
+      if (estado.pendente) { delete estado.pendente; gravarEstado() }
       aviso = titulo === 'Ciência'
         ? 'Não achei o botão "Ciência" do SEI. Espere o documento abrir ou clique nele na árvore do processo.'
         : 'Não achei o botão "Assinar Documento" do SEI. Espere o documento abrir ou clique nele na árvore do processo.'
@@ -269,6 +275,47 @@
     aviso = ''
     desenhar()
     botao.click()
+    return true
+  }
+
+  // v0.5.0: "Assinar e próximo" e "Dar ciência e próximo". Guarda o que está esperando (estado.pendente) e
+  // clica no botão do SEI. Na janela de assinatura, sites/sei/assinar-e-proximo.js clica em "Assinar" se o
+  // Firefox já preencheu a senha e marca "enviado". Quando o SEI recarrega a árvore ou o documento depois
+  // disso, a assinatura (ou a ciência) foi feita: marca o item e abre o próximo. Senha errada ou janela
+  // fechada: a árvore não recarrega e o painel continua esperando (dá para cancelar a espera).
+  async function agirEAvancar (tipo) {
+    estado.pendente = { tipo, posicao: estado.posicao, desde: Date.now(), enviado: tipo === 'ciencia' }
+    await gravarEstado()
+    clicarBotaoDoSei(tipo === 'ciencia' ? 'Ciência' : 'Assinar Documento')
+  }
+  async function cancelarPendente () {
+    delete estado.pendente
+    await gravarEstado()
+    desenhar()
+  }
+  const ESPERA_MAXIMA = 3 * 60 * 1000
+  async function conferirPendente () {
+    const pendente = estado && estado.pendente
+    if (!pendente) return
+    if (Date.now() - pendente.desde > ESPERA_MAXIMA || pendente.posicao !== estado.posicao) {
+      delete estado.pendente
+      await gravarEstado()
+      desenhar()
+      return
+    }
+    if (!pendente.enviado) return
+    delete estado.pendente
+    await feitoEProximo()
+  }
+  // A árvore e o documento ficam em quadros da página principal; o SEI os recarrega depois de assinar.
+  function vigiarQuadros () {
+    for (const id of ['ifrArvore', 'ifrConteudoVisualizacao', 'ifrVisualizacao']) {
+      const quadro = document.getElementById(id)
+      if (quadro && !quadro.dataset.extensaoIftoVigiado) {
+        quadro.dataset.extensaoIftoVigiado = '1'
+        quadro.addEventListener('load', () => { setTimeout(conferirPendente, 300) })
+      }
+    }
   }
 
   async function feitoEProximo () {
@@ -350,6 +397,9 @@
     if (mudancas.configuracoes || mudancas[CHAVE]) desenhar()
   })
 
+  vigiarQuadros()
+  // A página principal recarregou depois de assinar (ex.: o SEI abriu o processo de novo): confere já.
+  if (estado && estado.pendente && estado.pendente.enviado) conferirPendente()
   desenhar()
 
   function CSS () {
@@ -402,6 +452,7 @@
       .botao:hover:not(:disabled) { background: #F5F6F4; }
       .botao.principal { background: #1E5E33; border-color: #1E5E33; color: #fff; font-weight: 600; }
       .botao.principal:hover:not(:disabled) { background: #174A28; }
+      .aguardando { background: #FFF1D6; color: #7A4B00; border-radius: 6px; padding: 6px 8px; font-size: 12px; }
       .botao.sei { border-color: #1E5E33; color: #1E5E33; font-weight: 600; }
       .botao:disabled { opacity: .45; cursor: default; }
       .links { display: flex; flex-wrap: wrap; gap: 4px 12px; }
