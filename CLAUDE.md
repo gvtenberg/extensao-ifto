@@ -12,7 +12,7 @@ O sistema principal fica em `../sistema-orcamento-ifto` (outro repositório). L�
   - `docs/regras/`: regras já decididas, **um arquivo por assunto** (lista em `docs/regras/LEIA-ME.md`).
   - `docs/padrao-visual.md`: padrão visual da extensão (janela da extensão, configurações e o que ela acrescenta nas páginas).
   - `docs/referencias/`: anotações sobre outras extensões e sites (ex.: SEI++).
-  - `docs/melhorias-futuras.md`: lista curta de ideias (uma linha cada).
+  - `docs/melhorias-futuras.md`: **situação do projeto** no topo (feito, em andamento, pendente: leia só essa seção para retomar o trabalho) e a lista curta de ideias (uma linha cada; **[spec]** = já planejada).
   - `docs/specs/`: uma spec por melhoria em andamento (ver "Como trabalhamos").
   - `docs/historico.md`: o que entrou em cada versão.
   - `docs/publicacao.md`: assinatura na Mozilla pelo GitHub e instalação no computador do trabalho.
@@ -24,6 +24,7 @@ O sistema principal fica em `../sistema-orcamento-ifto` (outro repositório). L�
 ## Documentação (para outra pessoa ou outra máquina continuar)
 
 - Todos os `.md` vão para o git (menos o que estiver em `ferramentas-de-teste/`). Ao mudar código ou regra, atualize no mesmo commit o `.md` certo (arquitetura, regras, histórico, testes, spec).
+- Feito e pendente: o feito fica em `docs/historico.md` (uma linha por versão) e em `docs/specs/feitas/`; o pendente, na seção "Situação" de `docs/melhorias-futuras.md` (atualize ao fim de cada etapa ou rodada), em `docs/specs/` e no `TESTES-PENDENTES.md`. Não crie outro arquivo que repita isso.
 - Organização para economizar leitura: um assunto por arquivo; títulos `##` que sirvam de busca; índice "**Seções**" na 3ª linha quando o arquivo tiver várias seções (atualize o índice ao criar ou renomear seção); textos curtos, sem repetir o que já está em outro arquivo (aponte para ele).
 
 ## Como trabalhamos (specs pequenas)
@@ -43,6 +44,7 @@ O sistema principal fica em `../sistema-orcamento-ifto` (outro repositório). L�
 - Mudança grande, difícil de desfazer ou que grave na planilha oficial: proposta + confirmação antes.
 - **Formato da resposta** depois de mexer no código: **O que mudou** (curto) / **Arquivos alterados** (só os caminhos) / **O que eu testei** (uma linha) / **Testes** ("**Teste N: título**", com "- O que fazer:" e "- O que deve acontecer:"; detalhados: navegador, site e página, conta logada, o que clicar, o que deve aparecer). Os testes também vão para o `TESTES-PENDENTES.md`.
 - Teste não comentado pelo usuário = deu certo.
+- **Conversa longa:** quando a conversa estiver grande (várias rodadas ou etapas, muitos arquivos lidos, ou depois de o contexto ser resumido automaticamente), termine a resposta com o aviso: "⚠️ A conversa está grande: recomendo começar uma nova. Digite `/clear` (tudo já está no git e nos arquivos de docs)." Antes do aviso, deixe tudo commitado e anotado (spec, situação, testes, melhorias).
 - **Testes manuais no fim:** numa melhoria com várias etapas, os testes de cada etapa vão para o `TESTES-PENDENTES.md`, mas o usuário testa tudo junto ao final. Só pare antes para teste **crítico** (grava em sistema oficial – SEI, planilha oficial – ou decide o rumo da etapa seguinte); marque-o "(Crítico)".
 - **Versão:** a cada alteração de código, suba `version` no `manifest.json`. Número 0.ETAPA.AJUSTE (meio = funcionalidade nova; último = rodada de correções). Uma ou duas linhas em `docs/historico.md`, com a data (dd/mm/aaaa).
 - Ideias novas do usuário: uma linha em `docs/melhorias-futuras.md`. Regras novas decididas: no arquivo certo de `docs/regras/`.
@@ -53,7 +55,7 @@ O sistema principal fica em `../sistema-orcamento-ifto` (outro repositório). L�
 
 - **Com login** (conta Google @ifto.edu.br) a extensão lê a Planilha Google do sistema. **Sem login**, funcionam só as melhorias do SEI.
 - **Sem custos:** nada de serviços pagos.
-- **SEI do IFTO é antigo:** toda função do SEI deve funcionar na versão em uso no IFTO (ver `docs/regras/sei.md`), não só nas versões novas.
+- **SEI do IFTO:** toda função do SEI deve funcionar na versão em uso no IFTO (hoje o SEI 5.0.4; ver `docs/regras/sei.md`).
 - **Uso por enquanto:** só no navegador do usuário, para testes (instalação temporária). Assinatura da Mozilla "não listada" (grátis, sem aparecer na loja) só quando o usuário pedir.
 
 ## Comandos

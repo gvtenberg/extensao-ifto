@@ -2,7 +2,7 @@
 
 **Seções**: 1. Objetivo · 2. Fora do escopo · 3. Decisões a confirmar · 4. Regras decididas · 5. O que muda · 6. Etapas · 7. Testes manuais
 
-- **Situação:** em andamento (etapa 1 feita na v0.1.0); próxima: etapa 2, que depende de D1 e D7
+- **Situação:** em andamento (etapa 1 feita na v0.1.0); próxima: etapa 2, que depende de D7 e D9 a D13
 - **Pedido em:** 25/10/2026 · **Prazo ou prioridade:** primeira melhoria da extensão; começar já
 - **Versão prevista:** 0.1.0 (uma versão por etapa: 0.1, 0.2…)
 
@@ -22,8 +22,8 @@ Voltar a ter no SEI do IFTO as funções do SEI++ que a CGOC usava (o SEI++ paro
 
 O Claude não programa enquanto houver `[ ]` que afete a etapa. O usuário marca `[x]` e escreve a resposta, ou risca a pergunta.
 
-- [ ] D1 – Qual é a versão do SEI do IFTO (rodapé ou tela de login)? Afeta as etapas 2 em diante (os nomes dos campos mudam entre versões).
-  - Resposta:
+- [x] D1 – Qual é a versão do SEI do IFTO (rodapé ou tela de login)? Afeta as etapas 2 em diante (os nomes dos campos mudam entre versões).
+  - Resposta: **SEI 5.0.4** (scripts `?5.0.4-2.45.1` nas páginas salvas em 10/11/2026; o SEI foi atualizado em 11/2026). As etapas 2 em diante são feitas para o SEI 5; as páginas de referência ficam em `ferramentas-de-teste/paginas-sei/` (fora do git).
 - [ ] D2 – Além das funções desta spec, que outras funções do SEI++ eram úteis (T01 e T02)? Entram numa etapa extra no fim.
   - Resposta:
 - [x] D3 – Licença: aproveitar o código do SEI++ (GPL-3.0) e do SEI Pro (AGPL-3.0) faz a extensão ser GPL-3.0 (o código fica aberto se um dia for distribuída). Pode ser assim? Afeta a etapa 1.
