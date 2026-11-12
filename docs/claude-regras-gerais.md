@@ -39,6 +39,7 @@ Atualizado em 12/11/2026. Modelo: `/home/berg/Desktop/Sistema Gestão Orçament�
 - `TESTES-PENDENTES.md`: "### Tnn – título (vX.Y.Z)", "- O que fazer:", "- O que deve acontecer:" (detalhados), "- Resultado: \[ \]", "- Observação:". O usuário marca `[x]` ou `[!]`; `/testes` acha as marcas com `grep`, apaga os `[x]` por script (conferindo a quantidade), corrige os `[!]`.
 - Teste não comentado = deu certo. Nunca apague teste sem `[x]`; só acrescente no fim; número novo, nunca reaproveitado.
 - Várias etapas: o usuário testa tudo junto no fim; só pare antes por teste **crítico** (grava em sistema oficial ou decide o rumo), marcado "(Crítico)". Testes automáticos em toda etapa.
+- **Cartões no GitHub:** os testes manuais também viram cartões (issues): uma Action cria um cartão por teste novo do `TESTES-PENDENTES.md`, com as caixinhas "✅ Passou" e "❌ Falhou" (comentário para observações), e fecha os cartões dos testes que saem do arquivo; o `/testes` lê os cartões por um script de resumo. Modelo: `extensao-ifto` (`.github/workflows/testes.yml` e `.github/scripts/`). Em projeto existente, monte só quando o usuário pedir.
 - **Nunca faça testes com captura de tela** sem pedido expresso.
 
 ## Versão e git
@@ -54,5 +55,5 @@ Atualizado em 12/11/2026. Modelo: `/home/berg/Desktop/Sistema Gestão Orçament�
 ## Mesmas regras em todos os computadores
 
 - Este arquivo (`~/.claude/CLAUDE.md`) é a memória geral, que vale para todos os projetos do computador. A memória de cada projeto (`~/.claude/projects/…/memory/`) fica só com o que for daquele projeto.
-- Cópia no git: `docs/claude-regras-gerais.md` em cada repositório do usuário (hoje: extensao-ifto). No início da sessão, rode `diff -q ~/.claude/CLAUDE.md docs/claude-regras-gerais.md` (não leia os arquivos). Se forem diferentes ou o local não existir, compare só a linha "Atualizado em" e as diferenças (`diff`) e pergunte ao usuário (janela de escolha) qual vale: o do repositório (copiar para o computador), o do computador (copiar para o repositório e fazer commit) ou juntar os dois.
+- Cópia no git: `docs/claude-regras-gerais.md` em cada repositório do usuário (hoje: extensao-ifto e sistema-orcamento-ifto). No início da sessão, rode `diff -q ~/.claude/CLAUDE.md docs/claude-regras-gerais.md` (não leia os arquivos). Se forem diferentes ou o local não existir, compare só a linha "Atualizado em" e as diferenças (`diff`) e pergunte ao usuário (janela de escolha) qual vale: o do repositório (copiar para o computador), o do computador (copiar para o repositório e fazer commit) ou juntar os dois.
 - Ao mudar este arquivo: atualize a data em "Atualizado em", copie para `docs/claude-regras-gerais.md` e faça o commit ("docs: regras gerais do Claude").
