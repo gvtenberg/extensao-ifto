@@ -18,6 +18,7 @@ JavaScript simples, sem compilação, Manifest V3 (D4 de `specs/base-e-sei.md`).
 | `configuracoes/` | Página de configurações (cada opção grava na hora) |
 | `icones/icone.svg` | Ícone (SVG: o Chrome vai pedir PNG) |
 | `testes/` | Testes automáticos (`npm test`) |
+| `.github/workflows/testes.yml` e `.github/scripts/` | Cartões de teste no GitHub: cria um cartão por teste novo e fecha os resolvidos (`testes-para-cartoes.js`); `ler-resultados.js` resume o que o usuário marcou (para o `/testes`); `testes-pendentes.js` lê o arquivo |
 | `.claude/` | Comandos (`/planejar`, `/etapa`, `/testes`) e permissões do Claude Code |
 | `.github/workflows/assinar.yml` | GitHub: a cada envio testa e confere; versão nova: assina na Mozilla (não listada) e publica o `.xpi` em Releases (ver `publicacao.md`) |
 

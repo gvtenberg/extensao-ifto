@@ -4,9 +4,10 @@ Extensão para o **Firefox** (depois também para o Chrome) que acompanha o Sist
 
 ## Leitura econômica
 
+- **Primeiro comando da sessão:** `diff -q ~/.claude/CLAUDE.md docs/claude-regras-gerais.md` (regras gerais do usuário, iguais em todos os computadores). Se forem diferentes ou o arquivo do computador não existir, siga a seção "Mesmas regras em todos os computadores" de `docs/claude-regras-gerais.md`.
 - No início **não leia** `docs/` nem `TESTES-PENDENTES.md`. Leia só o que a tarefa pedir, só a parte necessária, e não releia o que já leu na sessão.
 - Arquivos com várias seções têm na 3ª linha o índice "**Seções**": leia as 5 primeiras linhas e busque o título da seção. `docs/historico.md`: busque a versão (`v0.1.3`). `TESTES-PENDENTES.md`: `### T12` ou a marca (ver `/testes`); nunca o arquivo inteiro. Para retomar o trabalho: só a seção "Situação" de `docs/melhorias-futuras.md`.
-- Onde está cada coisa: `docs/arquitetura.md` (mapa dos arquivos) · `docs/regras/` (regras decididas, um arquivo por assunto; lista em `LEIA-ME.md`) · `docs/padrao-visual.md` (janela, configurações e o que a extensão põe nas páginas) · `docs/referencias/` (outras extensões e sites, ex.: SEI++) · `docs/melhorias-futuras.md` (Situação: feito, em andamento, pendente; e as ideias, uma linha cada) · `docs/specs/` (uma spec por melhoria em andamento; feitas em `feitas/`) · `docs/historico.md` (o que entrou em cada versão) · `docs/publicacao.md` (assinatura na Mozilla pelo GitHub e instalação) · `TESTES-PENDENTES.md` (raiz: testes manuais T01, T02…). No sistema principal: `docs/planilha.md` (abas e colunas) e `docs/regras/`.
+- Onde está cada coisa: `docs/arquitetura.md` (mapa dos arquivos) · `docs/regras/` (regras decididas, um arquivo por assunto; lista em `LEIA-ME.md`) · `docs/padrao-visual.md` (janela, configurações e o que a extensão põe nas páginas) · `docs/referencias/` (outras extensões e sites, ex.: SEI++) · `docs/melhorias-futuras.md` (Situação: feito, em andamento, pendente; e as ideias, uma linha cada) · `docs/specs/` (uma spec por melhoria em andamento; feitas em `feitas/`) · `docs/historico.md` (o que entrou em cada versão) · `docs/claude-regras-gerais.md` (cópia das regras gerais do Claude, `~/.claude/CLAUDE.md`) · `docs/publicacao.md` (assinatura na Mozilla pelo GitHub e instalação) · `TESTES-PENDENTES.md` (raiz: testes manuais T01, T02…). No sistema principal: `docs/planilha.md` (abas e colunas) e `docs/regras/`.
 
 ## Documentação (para outra pessoa ou outra máquina continuar)
 
@@ -44,7 +45,8 @@ Extensão para o **Firefox** (depois também para o Chrome) que acompanha o Sist
 ## Testes
 
 - No `TESTES-PENDENTES.md`, cada teste: "### Tnn – título (vX.Y.Z)", "- O que fazer:" e "- O que deve acontecer:" detalhados (navegador, site e página, conta logada, o que clicar, o que deve aparecer), "- Resultado: \[ \]" e "- Observação:".
-- Teste não comentado pelo usuário = deu certo. Nunca apague teste sem `[x]`. Só acrescente no fim e confira que a quantidade não diminuiu. Atualize o índice "**Seções**" ao criar seção.
+- **Cartões no GitHub** (`.github/workflows/testes.yml`): a cada envio, cada teste ou pergunta nova vira um cartão (issue, marca "teste") com as caixinhas "✅ Passou" e "❌ Falhou"; o usuário clica e comenta no computador do trabalho. Os cartões dos testes que saem do arquivo fecham sozinhos. O `/testes` lê os cartões com `node .github/scripts/ler-resultados.js` (resumo curto; não abra os cartões um a um). O arquivo continua sendo a base.
+- Teste não comentado pelo usuário = deu certo. Nunca apague teste sem `[x]` (no arquivo) ou "Passou" (no cartão). Só acrescente no fim e confira que a quantidade não diminuiu. Atualize o índice "**Seções**" ao criar seção.
 - Melhoria com várias etapas: os testes de cada etapa entram no arquivo, mas o usuário testa tudo junto no fim. Só pare antes por teste **crítico** (grava em sistema oficial – SEI, planilha – ou decide o rumo da etapa seguinte), marcado "(Crítico)". Os testes automáticos rodam em toda etapa.
 - Verificação mínima: `npm test` e `npm run conferir`. **Nunca faça testes com captura de tela** (nem abra o navegador para ver a tela) sem pedido expresso do usuário.
 

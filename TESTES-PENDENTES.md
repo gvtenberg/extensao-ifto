@@ -8,6 +8,7 @@ Como usar este arquivo:
     - `[ ]` ainda não testado;
     - `[x]` deu certo;
     - `[!]` falhou ou precisa de ajuste. Escreva na linha **Observação** o que aconteceu ou o que quer mudar.
+- **No GitHub (mais prático, também no computador do trabalho):** cada teste vira um cartão em https://github.com/gvtenberg/extensao-ifto/issues. Abra o cartão, clique em "✅ Passou" ou "❌ Falhou" e, se quiser, escreva o que aconteceu ou sugestões num comentário (botão **Comment**). Não precisa mexer neste arquivo.
 - Depois, no Claude Code, digite `/testes` (ou diga "atualizei os testes"): o Claude lê este arquivo, corrige o que falhou e apaga os testes que deram certo.
 - Instalação temporária no Firefox: digite `about:debugging#/runtime/this-firefox` na barra de endereço, clique em **Carregar extensão temporária…** e escolha o arquivo. A extensão some quando o Firefox fecha.
 
