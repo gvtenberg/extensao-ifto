@@ -26,7 +26,7 @@ O Firefox só instala de vez uma extensão assinada pela Mozilla. Usamos a assin
 2. No GitHub, aba **Actions**: acompanhe "Assinar extensão" (alguns minutos; a Mozilla confere o pacote).
 3. Pronto: o `.xpi` aparece em **Releases** (lado direito da página do repositório).
 
-## Instalar no computador do trabalho
+## Instalar no computador
 
 1. No Firefox do trabalho, abra a página **Releases** do repositório e clique no arquivo `extensao-ifto-X.Y.Z.xpi`.
 2. O Firefox pergunta se quer adicionar a extensão: clique em **Adicionar**.
