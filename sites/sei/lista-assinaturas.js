@@ -212,6 +212,13 @@
       el('div', { class: 'acoes' },
         el('button', { type: 'button', class: 'botao', title: 'Alt+←', disabled: estado.posicao === 0, onclick: () => irPara(estado.posicao - 1) }, '◀ Anterior'),
         el('button', { type: 'button', class: 'botao', title: 'Alt+→', disabled: estado.posicao === total - 1, onclick: () => irPara(estado.posicao + 1) }, 'Próximo ▶')),
+      // Sem documento, "Assinar" não faz sentido (abre só o processo); "Dar ciência" vale para o processo.
+      (item.documento || item.ciencia) && el('button', {
+        type: 'button',
+        class: 'botao sei',
+        title: item.ciencia ? 'Clica no botão "Ciência" do SEI; o SEI pede a confirmação' : 'Clica no botão "Assinar Documento" do SEI; o SEI pede a senha',
+        onclick: () => clicarBotaoDoSei(item.ciencia ? 'Ciência' : 'Assinar Documento')
+      }, item.ciencia ? 'Dar ciência' : 'Assinar'),
       el('button', { type: 'button', class: 'botao principal', onclick: feitoEProximo }, '✓ Feito e próximo'),
       el('div', { class: 'links' },
         el('button', { type: 'button', class: 'link', onclick: () => { verLista = !verLista; desenhar() } }, verLista ? 'Esconder a lista' : `Lista completa (${total})`),
@@ -234,6 +241,34 @@
     // Deixa o item atual à vista.
     setTimeout(() => { const atual = lista.querySelector('.atual'); if (atual) atual.scrollIntoView({ block: 'nearest' }) }, 0)
     return lista
+  }
+
+  // v0.4.0: clica no botão do próprio SEI (barra de botões, dentro do quadro da direita). A senha e a
+  // confirmação continuam com o usuário, na janela do SEI.
+  function acharBotaoDoSei (titulo, janela = window, profundidade = 0) {
+    let documento
+    try { documento = janela.document } catch (erro) { return null }
+    const imagem = documento.querySelector(`#divArvoreAcoes a > img[title="${titulo}"]`)
+    if (imagem) return imagem.parentElement
+    if (profundidade > 3) return null
+    for (const quadro of documento.querySelectorAll('iframe')) {
+      const achado = quadro.contentWindow && acharBotaoDoSei(titulo, quadro.contentWindow, profundidade + 1)
+      if (achado) return achado
+    }
+    return null
+  }
+  function clicarBotaoDoSei (titulo) {
+    const botao = acharBotaoDoSei(titulo)
+    if (!botao) {
+      aviso = titulo === 'Ciência'
+        ? 'Não achei o botão "Ciência" do SEI. Espere o documento abrir ou clique nele na árvore do processo.'
+        : 'Não achei o botão "Assinar Documento" do SEI. Espere o documento abrir ou clique nele na árvore do processo.'
+      desenhar()
+      return
+    }
+    aviso = ''
+    desenhar()
+    botao.click()
   }
 
   async function feitoEProximo () {
@@ -367,6 +402,7 @@
       .botao:hover:not(:disabled) { background: #F5F6F4; }
       .botao.principal { background: #1E5E33; border-color: #1E5E33; color: #fff; font-weight: 600; }
       .botao.principal:hover:not(:disabled) { background: #174A28; }
+      .botao.sei { border-color: #1E5E33; color: #1E5E33; font-weight: 600; }
       .botao:disabled { opacity: .45; cursor: default; }
       .links { display: flex; flex-wrap: wrap; gap: 4px 12px; }
       .link { border: 0; background: none; padding: 0; color: #1E5E33; font: inherit; font-size: 12px;

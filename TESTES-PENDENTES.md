@@ -82,3 +82,6 @@ E: O item de ciência aparece em azul com "Só dar ciência"; minimizado, sobra 
 ### T19 – Opção nas configurações (v0.3.0)
 F: Configurações > Lista de assinaturas no SEI: escolha "Desligada", recarregue o SEI; depois "Sempre ligada" e troque para outra unidade; feche e abra o Firefox e veja a escolha.
 E: Desligada, o painel some; "Sempre ligada", aparece em qualquer unidade; a escolha continua marcada depois de reabrir o Firefox.
+### T20 – Botões Assinar e Dar ciência do painel (v0.4.0) (Crítico)
+F: Num item da lista com documento, espere o documento abrir e clique em "Assinar" no painel; digite a senha e assine. Num item com "dar ciência", clique em "Dar ciência" no painel e confirme.
+E: "Assinar" abre a janela de assinatura do SEI pedindo a senha (nada é assinado sem você); "Dar ciência" mostra a confirmação do SEI. Itens sem documento não mostram "Assinar".
