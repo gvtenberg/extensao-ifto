@@ -129,7 +129,7 @@
     const fornecedores = []
     for (const item of resultados) {
       const grupo = (pedido && pedido.grupos.find(outro => outro.cnpj === item.cnpj)) || { cnpj: item.cnpj, nome: '', notas: [] }
-      const fornecedor = { ...grupo, nomeNoSicaf: item.nome || '', erro: item.erro || null, bytes: null, nomeDoArquivo: item.nomeDoArquivo, avisos: [], pediuSicaf: !item.semSicaf, pediuSimples: Boolean(item.simples) }
+      const fornecedor = { ...grupo, nomeNoSicaf: item.nome || '', erro: item.erro || null, bytes: null, nomeDoArquivo: item.nomeDoArquivo, avisos: [], pediuSicaf: !item.semSicaf, pediuSimples: Boolean(item.simples), salvo: Boolean(item.salvo), simplesSalvo: Boolean(item.simples && item.simples.salvo) }
       // v0.18.0: consulta do Simples Nacional (PDF da extensão, com texto) vai para a Consulta.
       if (item.simples && item.simples.arquivo) {
         fornecedor.simplesBytes = regras.deBase64(item.simples.arquivo)
@@ -143,7 +143,8 @@
         try {
           const lido = regras.lerPdfDoSicaf(await pdfTexto.textoDoPdf(fornecedor.bytes))
           if (lido.cnpj && lido.cnpj !== item.cnpj) fornecedor.avisos.push({ nivel: 'vermelho', texto: `O PDF do SICAF é de outro CNPJ (${regras.formatarCnpj(lido.cnpj)}).` })
-          if (!fornecedor.nomeNoSicaf) fornecedor.nomeNoSicaf = lido.razaoSocial
+          // v0.18.2: a razão social do próprio PDF vale mais que a lida na página do SICAF.
+          if (lido.razaoSocial) fornecedor.nomeNoSicaf = lido.razaoSocial
         } catch (erro) {
           fornecedor.avisos.push({ nivel: 'amarelo', texto: 'Não consegui ler o PDF do SICAF para conferir o CNPJ.' })
         }
@@ -191,8 +192,8 @@
       const doFornecedor = itens.filter(item => item.cnpj === fornecedor.cnpj)
       return criar('div', { className: 'cartao' }, [
         criar('h2', { textContent: regras.formatarCnpj(fornecedor.cnpj) + (fornecedor.nomeNoSicaf ? ' – ' + fornecedor.nomeNoSicaf : '') }),
-        !fornecedor.pediuSicaf ? null : fornecedor.erro ? criar('p', { className: 'aviso vermelho', textContent: 'SICAF: ' + fornecedor.erro }) : criar('p', {}, ['PDF do SICAF obtido (também na pasta Downloads). ', linkDoPdf(fornecedor.bytes)]),
-        !fornecedor.pediuSimples ? null : fornecedor.simplesErro ? criar('p', { className: 'aviso vermelho', textContent: 'Simples Nacional: ' + fornecedor.simplesErro }) : criar('p', {}, ['PDF do Simples Nacional obtido (também na pasta Downloads). ', linkDoPdf(fornecedor.simplesBytes)]),
+        !fornecedor.pediuSicaf ? null : fornecedor.erro ? criar('p', { className: 'aviso vermelho', textContent: 'SICAF: ' + fornecedor.erro }) : criar('p', {}, ['PDF do SICAF obtido agora' + (fornecedor.salvo ? ' (cópia na pasta Downloads). ' : '. '), linkDoPdf(fornecedor.bytes)]),
+        !fornecedor.pediuSimples ? null : fornecedor.simplesErro ? criar('p', { className: 'aviso vermelho', textContent: 'Simples Nacional: ' + fornecedor.simplesErro }) : criar('p', {}, ['PDF do Simples Nacional obtido agora' + (fornecedor.simplesSalvo ? ' (cópia na pasta Downloads). ' : '. '), linkDoPdf(fornecedor.simplesBytes)]),
         ...fornecedor.avisos.map(aviso => criar('p', { className: 'aviso ' + aviso.nivel, textContent: aviso.texto })),
         doFornecedor.length ? criar('p', { className: 'apoio', textContent: 'Será incluído:' }) : null,
         doFornecedor.length ? criar('ul', {}, doFornecedor.map(item => criar('li', { textContent: nomeDoItem(item) + (item.arquivo ? ' (com o PDF)' : '') + (item.emBranco ? (item.nomeArvore || item.arquivo ? ` – no ${item.tipo} em branco ${item.emBranco.sei}` : ` – já existe em branco (${item.emBranco.sei})`) : '') }))) : null

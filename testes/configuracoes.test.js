@@ -33,3 +33,9 @@ test('SICAF automático começa automático (só na CGOC) (v0.10.0)', () => {
   assert.equal(PADROES.incluirSicaf, 'automatica')
   assert.equal(comPadroes({ incluirSicaf: 'sempre' }).incluirSicaf, 'sempre')
 })
+
+test('v0.18.2: cópia em Downloads de cada PDF ligada por padrão', () => {
+  assert.equal(PADROES.copiaSicaf, true)
+  assert.equal(PADROES.copiaConsulta, true)
+  assert.equal(comPadroes({ copiaSicaf: false }).copiaSicaf, false)
+})

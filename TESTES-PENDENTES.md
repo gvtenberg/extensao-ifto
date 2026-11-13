@@ -299,3 +299,7 @@ E: a barra mostra só "Incluir SICAF" (sem aviso de notas); no fim, só o Sicaf 
 ### T83 – Nomes dos arquivos para baixar (v0.18.1)
 F: Abra a página da versão 0.18.1 no GitHub (ícone da extensão > Procurar atualização > Abrir a página da versão).
 E: Aparecem extensao-ifto-firefox-0.18.1.xpi e extensao-ifto-chrome-edge-0.18.1.zip; clicar no do Firefox instala normalmente.
+
+### T84 – PDFs buscados na hora e cópia opcional (v0.18.2)
+F: Em Configurações, desmarque "Guardar uma cópia do PDF do SICAF na pasta Downloads"; num processo da CGOC, clique em "Incluir SICAF, Simples e Anexo" duas vezes seguidas (cancelando a primeira inclusão).
+E: Nas duas vezes o SICAF e o Simples Nacional abrem e buscam de novo; o nome do fornecedor aparece limpo (só o nome da empresa); só o PDF do Simples vai para Downloads.

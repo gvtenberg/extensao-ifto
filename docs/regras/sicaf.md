@@ -36,7 +36,7 @@ Decided on 13/11/2026 (spec `specs/feitas/sicaf-automatico.md`, v0.10.0 to v0.15
 - The extension opens the SICAF "Situação do Fornecedor" page in a new tab. If the SICAF refuses (acesso negado / sessão expirada), it opens the Compras login page once (and clicks "Entrar com Gov.br"); after the login, on the Área de Trabalho, it opens the user menu (`#avatar-dropdown-trigger`) and clicks "SICAF" (v0.17.3: going straight to the SICAF address right after the login gives "Sessão expirada"). If the SICAF still refuses, it goes to the Área de Trabalho at most twice more, then a notice says where to click. Any SICAF page that opens continues the search.
 - The SEI window does not block the page (v0.17.3): the user can click the tree and see the note while it is open.
 - For each CNPJ: Pessoa Jurídica, CNPJ, Pesquisar, "Situação do Fornecedor"; the PDF the SICAF sends is caught and checked (CNPJ inside the PDF must be the same; otherwise red).
-- D5: the PDF goes into the SEI **and** is saved in Downloads as `consultarSituacaoFornecedor_<CNPJ>_<yyyy-mm-dd>.pdf`. Today's PDFs are kept in the browser (one per CNPJ): asking again on the same day does not open the SICAF.
+- D5 (changed 13/11/2026, v0.18.2, user): every click fetches the SICAF and Simples PDFs again from the sites; **nothing is kept by the extension** (PDFs live only inside the running search and are erased at the end; old day memory `sicafPdfs`/`simplesPdfs` is deleted on start). The PDF goes into the SEI; a copy in Downloads (`consultarSituacaoFornecedor_<CNPJ>_<yyyy-mm-dd>.pdf`) only with the setting on: "copiaSicaf" and "copiaConsulta" (both on by default). The supplier name shown comes from the SICAF PDF (razão social).
 
 ## Adding to the SEI
 

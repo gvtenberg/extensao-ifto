@@ -65,8 +65,18 @@
         <input type="radio" name="incluirSicaf" value="desligada">
         <span>Desligada</span>
       </label>
+      <!-- v0.18.2: cópia de cada PDF na pasta Downloads, uma opção por documento. -->
+      <p class="apoio">Os PDFs são buscados nos sites a cada clique e vão direto para o processo no SEI. Marque abaixo se também quer uma cópia na pasta Downloads do computador:</p>
+      <label class="opcao">
+        <input type="checkbox" id="copiaSicaf">
+        <span>Guardar uma cópia do PDF do SICAF na pasta Downloads</span>
+      </label>
+      <label class="opcao">
+        <input type="checkbox" id="copiaConsulta">
+        <span>Guardar uma cópia do PDF da consulta do Simples Nacional na pasta Downloads</span>
+      </label>
       <!-- v0.13.0: acesso ao Compras.gov.br e a Downloads, pedido só a quem usa o SICAF. v0.17.2: e ao Simples Nacional. -->
-      <p class="apoio">Para buscar no SICAF e consultar o Simples Nacional, a extensão precisa abrir o Compras.gov.br e o site do Simples Nacional e salvar os PDFs na pasta Downloads. O navegador pede essa permissão uma vez.</p>
+      <p class="apoio">Para buscar no SICAF e consultar o Simples Nacional, a extensão precisa abrir o Compras.gov.br e o site do Simples Nacional e poder salvar as cópias na pasta Downloads. O navegador pede essa permissão uma vez.</p>
       <button type="button" class="botao principal" id="permitirSicaf">Permitir acesso ao Compras.gov.br e ao Simples Nacional</button>
       <div class="aviso sucesso" id="sicafPermitido" hidden>Acesso ao Compras.gov.br e ao Simples Nacional permitido.</div>
     </section>

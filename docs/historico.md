@@ -2,6 +2,7 @@
 
 One or two lines per version, with the date (dd/mm/yyyy). Number 0.STAGE.FIX.
 
+- v0.18.2 (13/11/2026): SICAF and Simples PDFs fetched again on every click (the day memory kept in the browser was removed and is erased; it was the source of old PDFs and of the supplier name with SICAF code); settings to keep or not a copy in Downloads for each PDF; name taken from the SICAF PDF.
 - v0.18.1 (13/11/2026): download files named by browser: `extensao-ifto-firefox-X.Y.Z.xpi` and `extensao-ifto-chrome-edge-X.Y.Z.zip` (user request: easier to know where to click).
 - v0.18.0 (13/11/2026): one button in the CGOC ("N notas sem SICAF ou Simples – Buscar") searches SICAF and Simples Nacional and adds Sicaf and Consulta with the PDFs and a blank Anexo per invoice (Simples spec stage 3); the blank-documents button and its setting left; "Sempre ligada" = only "Incluir SICAF" (Sicaf only, bidding team); selected CNPJ: CGOC "Incluir SICAF, Simples e Anexo", other units "Incluir SICAF" / "Incluir Simples Nacional".
 - v0.17.6 (13/11/2026): icon window no longer shows "SEI do IFTO reconhecido"; it warns only when the SEI was never opened or is on a version other than 5.0.4 (rule `seiTestado` in `comum/sei.js`).

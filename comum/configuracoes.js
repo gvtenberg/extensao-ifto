@@ -9,7 +9,10 @@
     // v0.10.0: SICAF automático: "automatica" (notas sem SICAF, só na CGOC), "sempre" (botão "Incluir SICAF"
     // em qualquer unidade) ou "desligada". v0.18.0: o botão "Incluir Sicaf, Consulta e Anexo" (documentos em
     // branco) saiu; o botão das notas faz tudo. "sempre" = só "Incluir SICAF" (equipe de licitação).
-    incluirSicaf: 'automatica'
+    incluirSicaf: 'automatica',
+    // v0.18.2: cópia de cada PDF buscado na pasta Downloads (o PDF vai para o SEI de qualquer jeito).
+    copiaSicaf: true,
+    copiaConsulta: true
   })
 
   // Junta o que o usuário gravou com os padrões; opções que não existem mais são ignoradas.
