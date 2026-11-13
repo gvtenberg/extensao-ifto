@@ -135,7 +135,9 @@
       if (pedidoPeloUsuario) { aviso = 'Abra o processo deste item ("Abrir de novo") e espere a árvore aparecer.'; desenhar() }
       return
     }
-    const novos = regras.expandirIntervalo(item, rotulos, lida.numero)
+    // v0.9.3: externos ficam de fora (ícone da árvore: só os feitos no SEI podem ser assinados).
+    const externos = lida.documentos.filter(doc => !doc.feitoNoSei).map(doc => regras.numeroDoRotulo(doc.rotulo))
+    const novos = regras.expandirIntervalo(item, rotulos, lida.numero, externos)
     if (!novos.length) {
       aviso = `Nenhum documento de ${item.documento} a ${item.ate} neste processo. Se houver pastas fechadas na árvore, abra-as e clique em "Conferir de novo".`
       desenhar()
@@ -313,7 +315,9 @@
       if (estado.pendente) { delete estado.pendente; gravarEstado() }
       aviso = titulo === 'Ciência'
         ? 'Não achei o botão "Ciência" do SEI. Espere o documento abrir ou clique nele na árvore do processo.'
-        : 'Não achei o botão "Assinar Documento" do SEI. Espere o documento abrir ou clique nele na árvore do processo.'
+        // v0.9.3: documento de outro setor fora de bloco de assinatura (ou externo): o SEI não mostra o botão
+        // e a extensão não tenta assinar.
+        : 'O SEI não mostra "Assinar Documento" para este documento. Se ele ainda está abrindo, espere e tente de novo. Se for de outro setor (sem bloco de assinatura) ou um arquivo incluído, não dá para assinar aqui: clique em "Próximo".'
       desenhar()
       return
     }

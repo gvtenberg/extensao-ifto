@@ -54,11 +54,14 @@
 
   // v0.9.2: troca o item de intervalo pelos documentos do processo com número entre o primeiro e o último
   // (nem todos os números seguidos são do mesmo processo), do menor ao maior, um item para cada.
-  function expandirIntervalo (item, rotulosDaArvore, processoDaArvore) {
+  // v0.9.3: documentos externos (arquivos incluídos) não são assinados no SEI: ficam de fora, a não ser
+  // que o item seja de dar ciência (ciência vale para qualquer documento).
+  function expandirIntervalo (item, rotulosDaArvore, processoDaArvore, numerosExternos = []) {
+    const externos = new Set(item.ciencia ? [] : numerosExternos)
     const inicio = Number(item.documento)
     const fim = Number(item.ate)
     const numeros = [...new Set((rotulosDaArvore || []).map(numeroDoRotulo).filter(Boolean))]
-      .filter(numero => Number(numero) >= inicio && Number(numero) <= fim)
+      .filter(numero => Number(numero) >= inicio && Number(numero) <= fim && !externos.has(numero))
       .sort((a, b) => Number(a) - Number(b))
     return numeros.map(documento => ({
       processo: item.processo || processoDaArvore || '',

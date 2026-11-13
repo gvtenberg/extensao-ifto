@@ -135,3 +135,12 @@ test('intervalo: só os documentos do processo entre os dois números, do menor 
   assert.equal(lista.numeroDoRotulo('Despacho 163 (3229092)'), '3229092')
   assert.deepEqual(lista.expandirIntervalo(item, ['Ofício (3383904)'], ''), [])
 })
+
+// v0.9.3: externos ficam de fora do intervalo, menos em item de ciência.
+test('intervalo: documentos externos ficam de fora, menos para dar ciência', () => {
+  const rotulos = ['Despacho (3383754)', 'Nota Fiscal (3383760)', 'Ofício (3383800)']
+  const assinar = lista.lerLinha('23236.022730/2026-41 - 3383754-3383903')
+  assert.deepEqual(lista.expandirIntervalo(assinar, rotulos, '', ['3383760']).map(i => i.documento), ['3383754', '3383800'])
+  const ciencia = lista.lerLinha('23236.022730/2026-41 - 3383754-3383903 dar ciência')
+  assert.equal(lista.expandirIntervalo(ciencia, rotulos, '', ['3383760']).length, 3)
+})

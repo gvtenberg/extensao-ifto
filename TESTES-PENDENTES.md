@@ -157,3 +157,7 @@ E: O processo abre e a linha vira um item para cada documento do processo entre 
 ### T40 – Intervalo sem o processo (v0.9.2)
 F: Cole só "3383754 a 3383903" e comece.
 E: Abre o documento 3383754 no processo dele e a linha vira os documentos desse processo no intervalo.
+
+### T41 – Intervalo com documento externo ou de outro setor (v0.9.3)
+F: Cole um intervalo de um processo que tenha, entre o primeiro e o último, um arquivo incluído (externo) e um documento de outro setor que não foi enviado em bloco de assinatura; clique em "Assinar e próximo" em cada item.
+E: O arquivo externo não entra na lista. No documento de outro setor, a extensão não assina e pede para clicar em "Próximo"; se ele estiver em bloco de assinatura, assina normalmente.
