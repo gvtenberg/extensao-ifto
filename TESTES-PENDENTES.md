@@ -165,3 +165,7 @@ E: O arquivo externo não entra na lista. No documento de outro setor, a extens�
 ### T42 – Erros e sugestões nas configurações (v0.9.4)
 F: Clique no ícone da extensão > Configurações e role até o fim da página; clique em "abrir um pedido".
 E: Aparece o quadro "Erros e sugestões de melhoria" com a orientação de procurar a CGOC; o link abre a página de pedidos numa nova aba.
+
+### T43 – Novo ícone com a marca do IF (v0.9.5)
+F: Depois de atualizar a extensão, olhe o ícone na barra do navegador (Firefox e Chrome), no tema claro e no escuro, e em Extensões (about:addons ou chrome://extensions).
+E: Aparece a marca do Instituto Federal (bolinha vermelha e quadrados verdes), nítida e fácil de reconhecer. Se não ficar bom, comente no cartão para voltar ao ícone anterior.

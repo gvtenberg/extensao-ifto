@@ -2,6 +2,7 @@
 
 One or two lines per version, with the date (dd/mm/yyyy). Number 0.STAGE.FIX.
 
+- v0.9.5 (12/11/2026): extension icon replaced by the Instituto Federal mark (red circle and green squares; SVG for Firefox, 16/32/48/128 PNG for Chrome/Edge, 128 with the 16 px transparent border Chrome asks for). Previous icon: in git history (commit before v0.9.5).
 - v0.9.4 (12/11/2026): README rewritten as the user manual (browsers, download, install, settings, data, precautions, errors and suggestions); "Erros e sugestões de melhoria" card on the settings page; GitHub check and signing skip pushes that only change text files.
 - v0.9.3 (12/11/2026): range in the signature list leaves out external documents (except acknowledgement items); clearer message when the SEI has no "Assinar Documento" button (another unit's document outside a signature block): the extension never tries to sign it.
 - v0.9.2 (12/11/2026): signature list accepts a document range ("processo - 3383754-3383903", "3383754 a 3383903"): when the process opens, the line becomes one item per document of that process inside the range. Process tree reading and the "on by unit" check moved to `comum/sei.js`, shared by both features.
