@@ -80,8 +80,28 @@
   }
 
   // v0.13.0: CNPJ escolhido vai direto para o SICAF.
-  function buscarCnpj (cnpj, aberta, quais) {
-    buscarNoSicaf([{ cnpj, nome: '', notas: [], precisaSicaf: quais !== 'simples', precisaSimples: quais !== 'sicaf' }], null, aberta, quais)
+  // v0.18.2: com um processo aberto, confere antes o que já está nele (Sicaf e Consulta deste CNPJ).
+  async function buscarCnpj (cnpj, aberta, quais) {
+    const grupo = { cnpj, nome: '', notas: [], precisaSicaf: quais !== 'simples', precisaSimples: quais !== 'sicaf' }
+    const lida = quadroArvore ? seiPedidos.arvoreAberta() : null
+    if (lida) {
+      aberta.trocarConteudo([criar('p', { textContent: 'Conferindo o que já está no processo…' })])
+      const existentes = await jaNoProcesso(lida)
+      if (existentes.cnpjsComSicaf.has(cnpj)) grupo.precisaSicaf = false
+      if (existentes.raizesComConsulta.has(regras.raizDoCnpj(cnpj))) grupo.precisaSimples = false
+      if (!grupo.precisaSicaf && !grupo.precisaSimples && quais !== 'tudo') {
+        aberta.trocarConteudo([criar('p', { className: 'aviso verde', textContent: (quais === 'sicaf' ? 'O Sicaf' : 'A Consulta do Simples Nacional') + ' deste CNPJ já está no processo, depois da última Folha de Encaminhamento. Nada a incluir.' })])
+        aberta.trocarBotoes([{ texto: 'Fechar', tipo: 'principal', aoClicar: j => j.fechar() }])
+        return
+      }
+      if (!grupo.precisaSicaf && !grupo.precisaSimples) {
+        // Na CGOC ainda pode faltar o Anexo das notas: segue sem abrir os sites.
+        mostrarResultadoDoSicaf([{ ...grupo, nomeNoSicaf: '', avisos: [], pediuSicaf: false, pediuSimples: false }], { grupos: [grupo], quais })
+        aberta.fechar()
+        return
+      }
+    }
+    buscarNoSicaf([grupo], null, aberta, quais)
   }
 
   // ---------- Busca no SICAF (v0.13.0) ----------
@@ -175,10 +195,16 @@
         }
       } catch (erro) {}
     }
+    // v0.18.2: última conferência, com a árvore de agora: Sicaf ou Consulta que já está no processo com o
+    // CNPJ deste fornecedor não é incluído de novo.
+    const existentes = lida ? await jaNoProcesso(lida) : null
     for (const fornecedor of fornecedores) {
-      fornecedor.temPdf = Boolean(fornecedor.bytes)
-      fornecedor.temSimples = Boolean(fornecedor.simplesBytes)
+      fornecedor.jaTemSicaf = Boolean(existentes && existentes.cnpjsComSicaf.has(fornecedor.cnpj))
+      fornecedor.jaTemConsulta = Boolean(existentes && existentes.raizesComConsulta.has(regras.raizDoCnpj(fornecedor.cnpj)))
+      fornecedor.temPdf = Boolean(fornecedor.bytes) && !fornecedor.jaTemSicaf
+      fornecedor.temSimples = Boolean(fornecedor.simplesBytes) && !fornecedor.jaTemConsulta
     }
+    const naoLidos = existentes ? existentes.naoLidos : []
     // v0.16.0: Sicaf, Consulta e Anexo em branco depois da última Folha são preenchidos em vez de criar outros.
     const oQue = { sicaf: quais !== 'simples', simples: quais !== 'sicaf', anexo: quais === 'tudo' }
     const itens = regras.aproveitarEmBranco(regras.documentosParaIncluir(fornecedores, oQue), lida ? lida.documentos : [])
@@ -194,14 +220,18 @@
         criar('h2', { textContent: regras.formatarCnpj(fornecedor.cnpj) + (fornecedor.nomeNoSicaf ? ' – ' + fornecedor.nomeNoSicaf : '') }),
         !fornecedor.pediuSicaf ? null : fornecedor.erro ? criar('p', { className: 'aviso vermelho', textContent: 'SICAF: ' + fornecedor.erro }) : criar('p', {}, ['PDF do SICAF obtido agora' + (fornecedor.salvo ? ' (cópia na pasta Downloads). ' : '. '), linkDoPdf(fornecedor.bytes)]),
         !fornecedor.pediuSimples ? null : fornecedor.simplesErro ? criar('p', { className: 'aviso vermelho', textContent: 'Simples Nacional: ' + fornecedor.simplesErro }) : criar('p', {}, ['PDF do Simples Nacional obtido agora' + (fornecedor.simplesSalvo ? ' (cópia na pasta Downloads). ' : '. '), linkDoPdf(fornecedor.simplesBytes)]),
+        fornecedor.jaTemSicaf ? criar('p', { className: 'aviso verde', textContent: 'O Sicaf deste fornecedor já está no processo: não será incluído de novo.' }) : null,
+        fornecedor.jaTemConsulta ? criar('p', { className: 'aviso verde', textContent: 'A Consulta do Simples Nacional deste fornecedor já está no processo: não será incluída de novo.' }) : null,
         ...fornecedor.avisos.map(aviso => criar('p', { className: 'aviso ' + aviso.nivel, textContent: aviso.texto })),
         doFornecedor.length ? criar('p', { className: 'apoio', textContent: 'Será incluído:' }) : null,
         doFornecedor.length ? criar('ul', {}, doFornecedor.map(item => criar('li', { textContent: nomeDoItem(item) + (item.arquivo ? ' (com o PDF)' : '') + (item.emBranco ? (item.nomeArvore || item.arquivo ? ` – no ${item.tipo} em branco ${item.emBranco.sei}` : ` – já existe em branco (${item.emBranco.sei})`) : '') }))) : null
       ])
     })
+    // Sicaf ou Consulta do processo que não abriu: não dá para saber de quem é; a pessoa confere.
+    if (naoLidos.length) cartoes.push(criar('p', { className: 'aviso amarelo', textContent: 'Não consegui abrir ' + naoLidos.map(doc => doc.rotulo).join(', ') + ' para ver de qual fornecedor é. Confira na árvore antes de incluir.' }))
     const botoesDeFechar = [{ texto: 'Fechar', tipo: 'principal', aoClicar: j => j.fechar() }]
     if (!lida) {
-      janela.abrir({ titulo: TITULOS[quais], conteudo: [...cartoes, criar('p', { className: 'apoio', textContent: 'Para incluir no SEI, abra o processo e busque de novo (os PDFs de hoje já estão guardados).' })], botoes: botoesDeFechar })
+      janela.abrir({ titulo: TITULOS[quais], conteudo: [...cartoes, criar('p', { className: 'apoio', textContent: 'Para incluir no SEI, abra o processo e clique de novo.' })], botoes: botoesDeFechar })
       return
     }
     if (!itens.length) {
@@ -276,44 +306,60 @@
 
   // ---------- Leitura do processo ----------
   // O que já foi lido não é lido de novo (o documento não muda depois de assinado ou incluído).
-  const atestesLidos = new Map()
-  const sicafsLidos = new Map()
-  const consultasLidas = new Map()
-  async function lerAteste (doc) {
-    if (!atestesLidos.has(doc.id)) {
-      atestesLidos.set(doc.id, seiPedidos.pedir(doc.link).then(pagina => regras.lerAteste(regras.textoDoHtml(pagina.html))).catch(() => []))
+  // v0.18.2: só fica guardada a leitura que deu certo; a que falhou (ou Sicaf em branco preenchido depois,
+  // com o mesmo número) é lida de novo na próxima vez. Antes a falha ficava guardada até recarregar a página
+  // e a nota continuava "sem SICAF".
+  const lidos = new Map()
+  function lerUmaVez (chave, ler) {
+    if (!lidos.has(chave)) {
+      const leitura = ler()
+      lidos.set(chave, leitura)
+      leitura.then(valor => { if (Array.isArray(valor) && !valor.length) lidos.delete(chave) }, () => lidos.delete(chave))
     }
-    return atestesLidos.get(doc.id)
+    return lidos.get(chave)
   }
-  async function cnpjsDoSicaf (doc) {
-    if (!sicafsLidos.has(doc.id)) {
-      sicafsLidos.set(doc.id, seiPedidos.baixarPdf(doc.link).then(bytes => pdfTexto.textoDoPdf(bytes)).then(regras.acharCnpjs).catch(() => []))
+  const lerAteste = doc => lerUmaVez('ateste' + doc.id, () => seiPedidos.pedir(doc.link).then(pagina => regras.lerAteste(regras.textoDoHtml(pagina.html)))).catch(() => [])
+  // Texto do PDF (nota, Sicaf, Consulta); null quando não abriu.
+  const textoDoDocumento = doc => lerUmaVez('texto' + doc.id, () => seiPedidos.baixarPdf(doc.link).then(bytes => pdfTexto.textoDoPdf(bytes)))
+  // CNPJs dentro do PDF do Sicaf ou da Consulta; null quando não abriu (aviso na janela).
+  const cnpjsDoDocumento = doc => textoDoDocumento(doc).then(regras.acharCnpjs, erro => {
+    console.warn('Extensão IFTO: não consegui ler', doc.rotulo, '-', erro && erro.message)
+    return null
+  })
+
+  // v0.18.2: Sicaf e Consulta com arquivo depois da última Folha, com os CNPJs de dentro de cada PDF.
+  // Usado no aviso, no clique, no CNPJ selecionado e de novo logo antes de incluir.
+  async function jaNoProcesso (lida) {
+    const inicial = regras.situacaoDoProcesso(lida.documentos)
+    const cnpjsDosSicafs = {}
+    const cnpjsDasConsultas = {}
+    const naoLidos = []
+    for (const doc of inicial.sicafs) { const cnpjs = await cnpjsDoDocumento(doc); if (cnpjs) cnpjsDosSicafs[doc.id] = cnpjs; else naoLidos.push(doc) }
+    for (const doc of inicial.consultas) { const cnpjs = await cnpjsDoDocumento(doc); if (cnpjs) cnpjsDasConsultas[doc.id] = cnpjs; else naoLidos.push(doc) }
+    return {
+      inicial,
+      cnpjsDosSicafs,
+      cnpjsDasConsultas,
+      naoLidos,
+      cnpjsComSicaf: new Set(Object.values(cnpjsDosSicafs).flat()),
+      raizesComConsulta: new Set(Object.values(cnpjsDasConsultas).flat().map(regras.raizDoCnpj))
     }
-    return sicafsLidos.get(doc.id)
-  }
-  // v0.18.0: CNPJs dentro do PDF da Consulta (Simples Nacional).
-  async function cnpjsDaConsulta (doc) {
-    if (!consultasLidas.has(doc.id)) {
-      consultasLidas.set(doc.id, seiPedidos.baixarPdf(doc.link).then(bytes => pdfTexto.textoDoPdf(bytes)).then(regras.acharCnpjs).catch(() => []))
-    }
-    return consultasLidas.get(doc.id)
   }
 
   // Situação do processo aberto: notas pendentes e o que já existe depois da última Folha.
   async function analisar () {
     const lida = seiPedidos.arvoreAberta()
     if (!lida) return null
-    const inicial = regras.situacaoDoProcesso(lida.documentos)
-    if (!inicial.notas.length) return { lida, situacao: inicial }
+    const existentes = await jaNoProcesso(lida)
+    const { inicial, cnpjsDosSicafs, cnpjsDasConsultas, cnpjsComSicaf, raizesComConsulta, naoLidos } = existentes
+    if (!inicial.notas.length) return { lida, situacao: inicial, cnpjsComSicaf, raizesComConsulta, naoLidos }
     const atestes = {}
     for (const doc of inicial.atestes) atestes[doc.id] = await lerAteste(doc)
-    const cnpjsDosSicafs = {}
-    for (const doc of inicial.sicafs) cnpjsDosSicafs[doc.id] = await cnpjsDoSicaf(doc)
-    const cnpjsDasConsultas = {}
-    for (const doc of inicial.consultas) cnpjsDasConsultas[doc.id] = await cnpjsDaConsulta(doc)
-    const cnpjsComSicaf = new Set(Object.values(cnpjsDosSicafs).flat())
-    const raizesComConsulta = new Set(Object.values(cnpjsDasConsultas).flat().map(regras.raizDoCnpj))
-    return { lida, situacao: regras.situacaoDoProcesso(lida.documentos, { atestes, cnpjsDosSicafs, cnpjsDasConsultas }), cnpjsComSicaf, raizesComConsulta }
+    // v0.18.2: CNPJ do emitente lido na própria nota (o mesmo que a busca usa).
+    const cnpjsDasNotas = {}
+    for (const nota of inicial.notas) cnpjsDasNotas[nota.id] = await textoDoDocumento(nota).then(regras.cnpjsDaNota, () => [])
+    const situacao = regras.situacaoDoProcesso(lida.documentos, { atestes, cnpjsDosSicafs, cnpjsDasConsultas, cnpjsDasNotas })
+    return { lida, situacao, cnpjsComSicaf, raizesComConsulta, naoLidos }
   }
 
   // ---------- Aviso na barra ----------
@@ -368,7 +414,7 @@
     let texto = ''
     let naoLeu = false
     try {
-      texto = await pdfTexto.textoDoPdf(await seiPedidos.baixarPdf(nota.link))
+      texto = await textoDoDocumento(nota)
     } catch (erro) {
       naoLeu = true
       console.warn('Extensão IFTO: não consegui ler a nota', nota.sei || nota.id, '-', erro && erro.message)

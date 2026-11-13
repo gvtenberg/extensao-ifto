@@ -315,3 +315,14 @@ test('conferirNota: nota que não abriu não é chamada de imagem', () => {
   assert.match(falhou.avisos[0].texto, /Não consegui ler a nota/)
   assert.equal(sicaf.paginaDoCompras(sicaf.URL_AREA_DE_TRABALHO), 'areaDeTrabalho')
 })
+
+test('v0.18.2: Sicaf e Consulta com o CNPJ lido na nota contam, mesmo com outro CNPJ no ateste', () => {
+  const atestes = { 8: [{ empresa: 'CHC SOLUCOES', cnpj: '31302907000139', notas: ['70'], seis: [], empenhos: [], valores: [] }] }
+  const documentos = [...arvoreExemplo, { id: '12', rotulo: 'Consulta Simples Nacional CHC (3385700)', temArquivo: true }]
+  const idDaNota = sicaf.situacaoDoProcesso(documentos, { atestes }).notas.find(n => n.numero === '70').id
+  // Ateste com a matriz (0001-39), nota e SICAF da filial (0002-10): antes ficava "sem SICAF" para sempre.
+  const situacao = sicaf.situacaoDoProcesso(documentos, { atestes, cnpjsDosSicafs: { 9: ['31302907000210'] }, cnpjsDasConsultas: { 12: ['31302907000210'] }, cnpjsDasNotas: { [idDaNota]: ['31302907000210'] } })
+  const nota = situacao.notas.find(n => n.numero === '70')
+  assert.equal(nota.temSicaf, true)
+  assert.equal(nota.temConsulta, true)
+})

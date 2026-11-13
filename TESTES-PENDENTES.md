@@ -303,3 +303,7 @@ E: Aparecem extensao-ifto-firefox-0.18.1.xpi e extensao-ifto-chrome-edge-0.18.1.
 ### T84 – PDFs buscados na hora e cópia opcional (v0.18.2)
 F: Em Configurações, desmarque "Guardar uma cópia do PDF do SICAF na pasta Downloads"; num processo da CGOC, clique em "Incluir SICAF, Simples e Anexo" duas vezes seguidas (cancelando a primeira inclusão).
 E: Nas duas vezes o SICAF e o Simples Nacional abrem e buscam de novo; o nome do fornecedor aparece limpo (só o nome da empresa); só o PDF do Simples vai para Downloads.
+
+### T85 – Não incluir de novo o Sicaf e a Consulta que já estão no processo (v0.18.2)
+F: Num processo onde a extensão já incluiu o Sicaf e a Consulta da nota, recarregue a página (F5); depois selecione o CNPJ do fornecedor e clique em "Incluir SICAF, Simples e Anexo".
+E: Depois do F5, o botão "notas sem SICAF ou Simples" não aparece para essa nota; com o CNPJ selecionado, os sites não abrem e a janela diz que o Sicaf e a Consulta já estão no processo e não serão incluídos de novo.

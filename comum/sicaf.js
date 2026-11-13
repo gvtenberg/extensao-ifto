@@ -201,7 +201,9 @@
   // v0.17.6 (pedido de 13/11/2026, um botão só): a nota também fica pendente sem a Consulta do Simples
   // Nacional (Consulta com arquivo cujo PDF tem o CNPJ; o Simples vale para a empresa toda, então conta a
   // raiz, os 8 primeiros números).
-  function situacaoDoProcesso (documentos, { atestes = {}, cnpjsDosSicafs = {}, cnpjsDasConsultas = {} } = {}) {
+  // v0.18.2: cnpjsDasNotas { idDaNota: [CNPJs lidos no PDF da nota] }: a busca usa o CNPJ da nota (pode ser
+  // outro que o do ateste); um Sicaf com qualquer um dos dois (ateste ou emitente da nota) vale.
+  function situacaoDoProcesso (documentos, { atestes = {}, cnpjsDosSicafs = {}, cnpjsDasConsultas = {}, cnpjsDasNotas = {} } = {}) {
     const trecho = trechoPendente(documentos)
     const itensDeAteste = trecho.filter(doc => tipoNaArvore(doc.rotulo) === 'ateste').flatMap(doc => (atestes[doc.id] || []).map(item => ({ ...item, idAteste: doc.id })))
     const sicafsComArquivo = trecho.filter(doc => tipoNaArvore(doc.rotulo) === 'sicaf' && doc.temArquivo)
@@ -223,8 +225,9 @@
     const cnpjsComSicaf = new Set(sicafsComArquivo.flatMap(doc => cnpjsDosSicafs[doc.id] || []))
     const raizesComConsulta = new Set(consultasComArquivo.flatMap(doc => (cnpjsDasConsultas[doc.id] || []).map(raizDoCnpj)))
     for (const nota of notas) {
-      nota.temSicaf = Boolean(nota.cnpj && cnpjsComSicaf.has(nota.cnpj))
-      nota.temConsulta = Boolean(nota.cnpj && raizesComConsulta.has(raizDoCnpj(nota.cnpj)))
+      const cnpjs = [nota.cnpj, (cnpjsDasNotas[nota.id] || [])[0]].filter(Boolean)
+      nota.temSicaf = cnpjs.some(cnpj => cnpjsComSicaf.has(cnpj))
+      nota.temConsulta = cnpjs.some(cnpj => raizesComConsulta.has(raizDoCnpj(cnpj)))
     }
     return {
       notas,
