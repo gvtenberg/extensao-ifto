@@ -11,19 +11,30 @@
   const estilo = document.createElement('style')
   estilo.textContent = `
     :host { all: initial; }
-    .barra { position: fixed; z-index: 1000; display: flex; gap: 6px; flex-wrap: wrap; justify-content: flex-end;
-      max-width: calc(100vw - 24px); font: 13px/1.4 system-ui, sans-serif; }
-    .barra:empty, .barra.vazia { display: none; }
-    button { display: flex; align-items: center; gap: 6px; padding: 6px 10px; border-radius: 6px;
-      border: 1px solid #C9D1CC; background: #fff; color: #1B2420; font: inherit; cursor: pointer;
-      box-shadow: 0 2px 6px rgba(0,0,0,.12); }
+    /* v0.17.4: botões juntos numa só caixa pequena (um embaixo do outro), para não cobrir os links do SEI */
+    .barra { position: fixed; z-index: 1000; display: flex; flex-direction: column; align-items: stretch;
+      max-width: min(260px, calc(100vw - 24px)); font: 12px/1.3 system-ui, sans-serif;
+      background: #fff; border: 1px solid #C9D1CC; border-radius: 6px; box-shadow: 0 2px 6px rgba(0,0,0,.12); overflow: hidden; }
+    .barra.vazia { display: none; }
+    .marca { align-self: flex-start; background: #1E5E33; color: #fff; font-size: 10px; font-weight: 700;
+      padding: 1px 6px; border-bottom-right-radius: 4px; }
+    .botoes { display: flex; flex-direction: column; }
+    button { display: block; width: 100%; text-align: left; padding: 4px 8px; border: 0; border-top: 1px solid #E3E8E5;
+      background: #fff; color: #1B2420; font: inherit; cursor: pointer; }
+    .botoes > button:first-child { border-top: 0; }
+    .botoes > button[hidden] + button:not([hidden]) { border-top: 0; }
     button:hover:not(:disabled) { background: #E7F2EA; }
     button:disabled { opacity: .6; cursor: default; }
     button[hidden] { display: none; }
-    .marca { background: #1E5E33; color: #fff; font-size: 10px; font-weight: 700; padding: 1px 4px; border-radius: 4px; }
   `
   const barra = document.createElement('div')
   barra.className = 'barra vazia'
+  const marca = document.createElement('span')
+  marca.className = 'marca'
+  marca.textContent = 'IFTO'
+  const lista = document.createElement('div')
+  lista.className = 'botoes'
+  barra.append(marca, lista)
   raiz.append(estilo, barra)
   document.body.append(hospedeiro)
 
@@ -40,7 +51,7 @@
   const botoes = new Map()
   function atualizar () {
     const ordenados = [...botoes.values()].sort((a, b) => a.ordem - b.ordem)
-    barra.replaceChildren(...ordenados.map(item => item.elemento))
+    lista.replaceChildren(...ordenados.map(item => item.elemento))
     barra.classList.toggle('vazia', !ordenados.some(item => !item.elemento.hidden))
     posicionar()
   }
@@ -51,10 +62,7 @@
     const elemento = document.createElement('button')
     elemento.type = 'button'
     elemento.title = titulo || ''
-    const marca = document.createElement('span')
-    marca.className = 'marca'
-    marca.textContent = 'IFTO'
-    elemento.append(marca, ' ' + texto)
+    elemento.append(' ' + texto)
     elemento.hidden = true
     elemento.addEventListener('click', aoClicar)
     botoes.set(id, { elemento, ordem })

@@ -256,3 +256,7 @@ E: A extensão clica em "Entrar com Gov.br"; depois do Gov.br, abre sozinha o SI
 ### T73 – Incluir no processo com o PDF (v0.17.3) (Crítico)
 F: Depois do T72, na janela "Incluir no processo…", clique em "Incluir no processo".
 E: A árvore recarrega com "Sicaf <nome da empresa>" (abre o PDF do SICAF), "Consulta" e "Anexo Instrumento de Cobrança NF nº 3626 …", sem a mensagem de erro 404.
+
+### T74 – Botões da extensão juntos numa caixa só (v0.17.4)
+F: no SEI da CGOC, abra um processo com nota sem SICAF.
+E: no alto à direita aparece uma caixa pequena com "IFTO" e os botões um embaixo do outro ("1 nota sem SICAF – Buscar" e "Incluir Sicaf, Consulta e Anexo"), sem cobrir os links do SEI; cada botão funciona como antes.
