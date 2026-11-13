@@ -3,7 +3,7 @@
 // (storage.local, chave listaAssinaturas) até o usuário limpar; nada vai para a internet.
 (async function () {
   if (window.top !== window) return
-  const { listaAssinaturas: regras, configuracoes } = globalThis.ExtensaoIFTO
+  const { listaAssinaturas: regras, configuracoes, barra: barraExtensao } = globalThis.ExtensaoIFTO
   const navegador = globalThis.browser || globalThis.chrome
   const CHAVE = 'listaAssinaturas'
 
@@ -50,6 +50,9 @@
     let topo = 8
     if (quadro && quadro.getBoundingClientRect().height > 0) topo = quadro.getBoundingClientRect().top + 4
     else if (barraDoAlto) topo = barraDoAlto.getBoundingClientRect().bottom + 8
+    // v0.7.0: com botões na barra da extensão, o painel abre logo abaixo dela.
+    const fimDaBarra = barraExtensao && barraExtensao.fundo()
+    if (fimDaBarra) topo = fimDaBarra + 6
     return { top: Math.max(topo, 4), right: 12 }
   }
   function posicionar () {
@@ -134,11 +137,18 @@
     return topo
   }
 
+  // v0.7.0: sem lista, o botão "Lista de assinaturas" fica na barra da extensão (sites/sei/barra-extensao.js).
   function desenharFechado () {
     painel.className = 'painel fechado'
-    const botao = el('button', { class: 'abrir', type: 'button', title: 'Colar uma lista de processos e documentos para assinar', onclick: () => { modo = 'colar'; desenhar() } },
-      el('span', { class: 'marca' }, 'IFTO'), ' Lista de assinaturas')
-    painel.replaceChildren(botao)
+    painel.replaceChildren()
+  }
+  if (barraExtensao) {
+    barraExtensao.botao('lista-assinaturas', {
+      texto: 'Lista de assinaturas',
+      titulo: 'Colar uma lista de processos e documentos para assinar',
+      ordem: 10,
+      aoClicar: () => { modo = 'colar'; desenhar() }
+    })
   }
 
   function desenharColar () {
@@ -378,8 +388,9 @@
   function desenhar () {
     const ligada = regras.funcaoLigada(opcoes.listaAssinaturas, unidade)
     hospedeiro.style.display = ligada ? '' : 'none'
-    if (!ligada) return
     if (modo === 'navegar' && !estado) modo = 'fechado'
+    if (barraExtensao) barraExtensao.mostrar('lista-assinaturas', ligada && modo === 'fechado')
+    if (!ligada) return
     if (modo === 'fechado') desenharFechado()
     else if (modo === 'colar') desenharColar()
     else desenharNavegar()
@@ -408,11 +419,7 @@
       .painel { position: fixed; z-index: 1000; width: 300px; max-width: calc(100vw - 16px);
         background: #fff; color: #1B2420; border: 1px solid #C9D1CC; border-radius: 8px;
         box-shadow: 0 4px 16px rgba(0,0,0,.18); font: 13px/1.4 system-ui, sans-serif; }
-      .painel.fechado { width: auto; border: 0; background: transparent; box-shadow: none; }
-      .abrir { display: flex; align-items: center; gap: 6px; padding: 6px 10px; border-radius: 6px;
-        border: 1px solid #C9D1CC; background: #fff; color: #1B2420; font: inherit; cursor: pointer;
-        box-shadow: 0 2px 6px rgba(0,0,0,.12); }
-      .abrir:hover { background: #E7F2EA; }
+      .painel.fechado { display: none; }
       .marca { background: #1E5E33; color: #fff; font-size: 10px; font-weight: 700; padding: 1px 4px; border-radius: 4px; }
       .cabecalho { display: flex; align-items: center; gap: 6px; padding: 6px 8px; background: #F5F6F4;
         border-bottom: 1px solid #E2E6E3; border-radius: 8px 8px 0 0; cursor: move; user-select: none; }

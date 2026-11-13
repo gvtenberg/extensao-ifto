@@ -5,7 +5,9 @@
     preencherDocumentoExterno: true,
     senhaReconhecidaPeloNavegador: true,
     // v0.2.0: "automatica" (só na Direção-geral, PAL/REI/IFTO), "sempre" ou "desligada"
-    listaAssinaturas: 'automatica'
+    listaAssinaturas: 'automatica',
+    // v0.7.0: botão "Incluir Sicaf, Consulta e Anexo": "automatica" (só na CGOC), "sempre" ou "desligada"
+    documentosPagamento: 'automatica'
   })
 
   // Junta o que o usuário gravou com os padrões; opções que não existem mais são ignoradas.

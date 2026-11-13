@@ -7,13 +7,14 @@
   <style>
     main { max-width: 720px; margin: 0 auto; padding: 32px 16px; display: grid; gap: 16px; }
     .titulo-pagina { font-size: 28px; font-weight: 700; margin: 0; }
+    .titulo-secao { font-size: 20px; font-weight: 700; margin: 8px 0 0; }
   </style>
 </head>
 <body>
   <main>
     <h1 class="titulo-pagina">Configurações</h1>
     <section class="cartao">
-      <h1>SEI</h1>
+      <h1>Geral (todas as unidades)</h1>
       <label class="opcao">
         <input type="checkbox" id="preencherDocumentoExterno">
         <span>
@@ -29,15 +30,14 @@
         </span>
       </label>
     </section>
+    <h2 class="titulo-secao">Por unidade</h2>
+    <p class="apoio">Cada função aparece num botão no alto, à direita, nas páginas do SEI. "Automática" liga a função só na unidade indicada.</p>
     <section class="cartao">
-      <h1>Lista de assinaturas no SEI</h1>
-      <p class="apoio">Painel no SEI para colar uma lista de processos e documentos e abrir um por vez, para assinar ou dar ciência.</p>
+      <h1>Direção-geral (PAL/REI/IFTO): lista de assinaturas</h1>
+      <p class="apoio">Painel para colar uma lista de processos e documentos e abrir um por vez, para assinar ou dar ciência. Aparece em todas as páginas do SEI.</p>
       <label class="opcao">
         <input type="radio" name="listaAssinaturas" value="automatica">
-        <span>
-          Automática
-          <span class="apoio" style="display:block">Aparece só quando a unidade aberta no SEI é a Direção-geral (PAL/REI/IFTO).</span>
-        </span>
+        <span>Automática (só na Direção-geral)</span>
       </label>
       <label class="opcao">
         <input type="radio" name="listaAssinaturas" value="sempre">
@@ -45,6 +45,22 @@
       </label>
       <label class="opcao">
         <input type="radio" name="listaAssinaturas" value="desligada">
+        <span>Desligada</span>
+      </label>
+    </section>
+    <section class="cartao">
+      <h1>CGOC (CGOC/GAC/DAP/PAL/REI/IFTO): documentos do pagamento</h1>
+      <p class="apoio">Botão "Incluir Sicaf, Consulta e Anexo", que inclui no processo aberto os três documentos externos em branco (data de hoje, Nato-digital, Público). Aparece só com um processo aberto.</p>
+      <label class="opcao">
+        <input type="radio" name="documentosPagamento" value="automatica">
+        <span>Automática (só na CGOC)</span>
+      </label>
+      <label class="opcao">
+        <input type="radio" name="documentosPagamento" value="sempre">
+        <span>Sempre ligada, em qualquer unidade</span>
+      </label>
+      <label class="opcao">
+        <input type="radio" name="documentosPagamento" value="desligada">
         <span>Desligada</span>
       </label>
     </section>

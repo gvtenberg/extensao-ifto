@@ -24,3 +24,7 @@ test('lista de assinaturas começa automática (só na Direção-geral) e guarda
   assert.equal(PADROES.listaAssinaturas, 'automatica')
   assert.equal(comPadroes({ listaAssinaturas: 'sempre' }).listaAssinaturas, 'sempre')
 })
+
+test('documentos do pagamento começam automáticos (só na CGOC) (v0.7.0)', () => {
+  assert.equal(PADROES.documentosPagamento, 'automatica')
+})
