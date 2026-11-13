@@ -24,19 +24,22 @@ test('chave de acesso da Mozilla (JWT HS256) válida por 60 s', () => {
   assert.equal(assinatura, crypto.createHmac('sha256', 'segredo').update(cabecalho + '.' + corpo).digest('base64url'))
 })
 
-// v0.9.4: queda de conexão ("fetch failed") ou Mozilla ocupada não derruba a publicação: tenta de novo.
+// v0.9.4: queda de conexão ("fetch failed"), também no meio do download, ou Mozilla ocupada: tenta de novo.
 test('tenta de novo quando a conexão cai ou a Mozilla está ocupada', async () => {
   const original = globalThis.fetch
-  const respostas = [() => { throw new TypeError('fetch failed') }, () => ({ ok: false, status: 503 }), () => ({ ok: true, status: 200 })]
+  const ok = { ok: true, status: 200, json: async () => ({ certo: true }) }
+  const caiNoMeio = { ok: true, status: 200, json: async () => { throw new TypeError('terminated') } }
+  const respostas = [() => { throw new TypeError('fetch failed') }, () => ({ ok: false, status: 503 }), () => caiNoMeio, () => ok]
   globalThis.fetch = async () => respostas.shift()()
   const chaves = { emissor: 'user:1', segredo: 's' }
+  const ler = resposta => resposta.json()
   try {
     const { pedir } = require('../.github/scripts/baixar-assinada.js')
-    assert.equal((await pedir('https://x', chaves, 5, 0)).status, 200)
+    assert.deepEqual(await pedir('https://x', chaves, ler, 5, 0), { certo: true })
     globalThis.fetch = async () => ({ ok: false, status: 401 })
-    await assert.rejects(pedir('https://x', chaves, 5, 0), /respondeu 401/)
-    globalThis.fetch = async () => { throw new TypeError('fetch failed') }
-    await assert.rejects(pedir('https://x', chaves, 3, 0), /3 tentativas/)
+    await assert.rejects(pedir('https://x', chaves, ler, 5, 0), /respondeu 401/)
+    globalThis.fetch = async () => { throw 'sem mensagem' } // eslint-disable-line no-throw-literal
+    await assert.rejects(pedir('https://x', chaves, ler, 3, 0), /3 tentativas \(sem mensagem\)/)
   } finally {
     globalThis.fetch = original
   }

@@ -30,7 +30,7 @@ jobs:
   assinar:
     # Versão fixa do Ubuntu: a troca do ubuntu-latest não muda nada sem aviso
     runs-on: ubuntu-24.04
-    timeout-minutes: 90 # v0.9.4: espera da aprovação (até 30 min) + download da versão já assinada (até 30 min)
+    timeout-minutes: 90 # v0.9.4: espera da aprovação (até 30 min) + download da versão já assinada (até 30 min) + folga
     steps:
       - name: Baixar o código
         uses: actions/checkout@v5
@@ -64,10 +64,11 @@ jobs:
             echo "ja_existe=sim" >> "$GITHUB_OUTPUT"
           fi
 
-      # Se o envio falhar por qualquer motivo (v0.9.4: "fetch failed" = queda de conexão enquanto esperava a
-      # aprovação; "Version X already exists" = execução anterior cancelada), não desiste: se a Mozilla já tem a
-      # versão, baixa de lá o .xpi assinado (esperando a assinatura, com novas tentativas se a conexão cair);
-      # se não tem (saída 2), envia de novo, até 3 vezes.
+      # Se o envio falhar (v0.9.4: "fetch failed" = queda de conexão enquanto esperava a aprovação; "Version X
+      # already exists" = execução anterior cancelada), primeiro vê se a Mozilla já tem a versão: se tem, baixa de lá
+      # o .xpi assinado (esperando a assinatura, com novas tentativas se a conexão cair). Se não tem (saída 2), só
+      # envia de novo quando a falha foi de conexão (até 3 vezes); outro erro (pacote recusado, chave errada) para
+      # na hora, com a mensagem da Mozilla acima.
       - name: Assinar na Mozilla (não listada)
         if: github.event_name != 'pull_request' && steps.versao.outputs.ja_existe != 'sim'
         env:
@@ -76,18 +77,28 @@ jobs:
           VERSAO: ${{ steps.versao.outputs.versao }}
         run: |
           set +e
+          LOG="$RUNNER_TEMP/assinar.log"
           for TENTATIVA in 1 2 3; do
             echo "Envio à Mozilla: tentativa $TENTATIVA de 3."
             npx web-ext sign --channel unlisted --approval-timeout 1800000 \
               --ignore-files "testes/**" "docs/**" "ferramentas-de-teste/**" ".github/**" "scripts/**" \
-              package.json package-lock.json CLAUDE.md TESTES-PENDENTES.md
-            [ $? -eq 0 ] && exit 0
+              package.json package-lock.json CLAUDE.md TESTES-PENDENTES.md 2>&1 | tee "$LOG"
+            ENVIO=${PIPESTATUS[0]}
+            [ "$ENVIO" -eq 0 ] && exit 0
             echo "O envio falhou; vendo se a Mozilla já recebeu a versão $VERSAO."
             node .github/scripts/baixar-assinada.js "$VERSAO"
-            RESULTADO=$?
-            [ $RESULTADO -eq 0 ] && exit 0
-            [ $RESULTADO -ne 2 ] && exit $RESULTADO
-            sleep 60
+            BAIXAR=$?
+            [ "$BAIXAR" -eq 0 ] && exit 0
+            [ "$BAIXAR" -ne 2 ] && exit "$BAIXAR"
+            if grep -q "already exists" "$LOG"; then
+              echo "A Mozilla diz que a versão $VERSAO já existe, mas não a mostra (versão usada antes e apagada?). Aumente a versão no manifest.json."
+              exit 1
+            fi
+            if ! grep -qiE "fetch failed|ECONNRESET|ETIMEDOUT|EAI_AGAIN|socket hang up|terminated|\b50[234]\b" "$LOG"; then
+              echo "A Mozilla recusou o envio (mensagem acima); não é queda de conexão, então não adianta enviar de novo."
+              exit "$ENVIO"
+            fi
+            [ "$TENTATIVA" -lt 3 ] && echo "Queda de conexão: nova tentativa em 60 s." && sleep 60
           done
           exit 1
 
