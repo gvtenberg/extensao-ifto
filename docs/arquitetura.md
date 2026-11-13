@@ -28,6 +28,7 @@ Plain JavaScript, no build step, Manifest V3 (D4 in `specs/base-e-sei.md`). Pure
 | `scripts/empacotar-chrome.js` | `npm run empacotar-chrome`: Chrome/Edge package (folder + `.zip` in `web-ext-artifacts/chrome/`, PNG icons, no Firefox keys) |
 | `testes/` | Automated tests (`npm test`) |
 | `.github/workflows/testes.yml` and `.github/scripts/` | Test cards on GitHub: one card per new test, closes resolved ones (`testes-para-cartoes.js`); `ler-resultados.js` summarizes what the user marked (for `/testes`); `testes-pendentes.js` reads the file |
+| `.github/scripts/baixar-assinada.js` | When Mozilla answers "Version X already exists", downloads that version's already-signed `.xpi` (AMO API v5, waits up to 30 min) so `assinar.yml` publishes the Release anyway (12/11/2026) |
 | `.claude/` | Commands (`/planejar`, `/etapa`, `/testes`) and Claude Code permissions |
 | `.github/workflows/assinar.yml` | GitHub: on every push tests and checks; new version: signs with Mozilla (unlisted) and publishes the `.xpi`, the Chrome `.zip` and `updates.json` in Releases (see `publicacao.md`) |
 

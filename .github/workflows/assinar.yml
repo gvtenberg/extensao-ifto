@@ -1,7 +1,8 @@
 # Verificação e assinatura (GitHub Actions). A cada envio (push) ao GitHub: confere a extensão (testes e
 # conferência da Mozilla). Se a versão do manifest.json ainda não tem Release, assina na Mozilla ("não listada":
 # grátis, não aparece na loja) e publica o .xpi e o updates.json em Releases (instalação e atualização automática).
-# Também roda pelo botão "Run workflow" (aba Actions). A Mozilla não aceita assinar a mesma versão duas vezes.
+# Também roda pelo botão "Run workflow" (aba Actions). A Mozilla não aceita assinar a mesma versão duas vezes:
+# se ela já tiver a versão, o .xpi já assinado é baixado de lá (.github/scripts/baixar-assinada.js).
 # Precisa de duas chaves da Mozilla guardadas em Settings > Secrets and variables > Actions:
 # AMO_JWT_ISSUER e AMO_JWT_SECRET.
 name: Assinar extensão
@@ -15,6 +16,11 @@ on:
 
 permissions:
   contents: write
+
+# Uma execução por vez: a segunda espera a primeira terminar (nunca cancela uma assinatura em andamento).
+concurrency:
+  group: assinar-extensao
+  cancel-in-progress: false
 
 jobs:
   assinar:
@@ -54,15 +60,28 @@ jobs:
             echo "ja_existe=sim" >> "$GITHUB_OUTPUT"
           fi
 
+      # "Version X already exists": a versão já foi enviada antes (por exemplo, numa execução cancelada
+      # enquanto a Mozilla assinava). Em vez de falhar, baixa da Mozilla o .xpi já assinado dessa versão.
       - name: Assinar na Mozilla (não listada)
         if: github.event_name != 'pull_request' && steps.versao.outputs.ja_existe != 'sim'
         env:
           WEB_EXT_API_KEY: ${{ secrets.AMO_JWT_ISSUER }}
           WEB_EXT_API_SECRET: ${{ secrets.AMO_JWT_SECRET }}
-        run: >
-          npx web-ext sign --channel unlisted --approval-timeout 1800000
-          --ignore-files "testes/**" "docs/**" "ferramentas-de-teste/**" ".github/**" "scripts/**"
-          package.json package-lock.json CLAUDE.md TESTES-PENDENTES.md
+        run: |
+          set +e
+          npx web-ext sign --channel unlisted --approval-timeout 1800000 \
+            --ignore-files "testes/**" "docs/**" "ferramentas-de-teste/**" ".github/**" "scripts/**" \
+            package.json package-lock.json CLAUDE.md TESTES-PENDENTES.md 2>&1 | tee "$RUNNER_TEMP/assinar.log"
+          RESULTADO=${PIPESTATUS[0]}
+          set -e
+          if [ "$RESULTADO" -ne 0 ]; then
+            if grep -q "already exists" "$RUNNER_TEMP/assinar.log"; then
+              echo "A Mozilla já tem esta versão: baixando o arquivo já assinado."
+              node .github/scripts/baixar-assinada.js "${{ steps.versao.outputs.versao }}"
+            else
+              exit "$RESULTADO"
+            fi
+          fi
 
       - name: Publicar o .xpi em Releases
         if: github.event_name != 'pull_request' && steps.versao.outputs.ja_existe != 'sim'
@@ -70,7 +89,7 @@ jobs:
           GH_TOKEN: ${{ github.token }}
         run: |
           VERSAO=${{ steps.versao.outputs.versao }}
-          XPI=$(ls web-ext-artifacts/*.xpi | head -1)
+          XPI=$(ls -t web-ext-artifacts/*.xpi | head -1)
           cp "$XPI" "extensao-ifto-$VERSAO.xpi"
           # v0.1.2: updates.json diz ao Firefox qual é a versão mais nova (atualização automática;
           # o manifest.json aponta para o updates.json da última Release).

@@ -64,5 +64,5 @@ With only one password for `sei.ifto.edu.br`, Firefox fills it in by itself in t
 
 ## Common problems
 
-- "Version already exists": the `manifest.json` version has already been signed; bump the version.
+- "Version already exists" (12/11/2026): Mozilla already has this version (e.g. a run was cancelled while Mozilla was signing; signing can take up to 30 min). Since 12/11/2026 the workflow handles it: it downloads the already-signed `.xpi` from Mozilla (`.github/scripts/baixar-assinada.js`, AMO API v5, waits up to 30 min if still signing) and publishes the Release normally. Only bump the version if Mozilla refused it ("disabled"). Do not cancel a run during "Assinar na Mozilla"; runs never overlap (`concurrency`).
 - Missing key ("API key" or "401"): check the two secrets from step 3 of "One-time setup".
