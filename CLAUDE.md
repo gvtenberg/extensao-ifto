@@ -57,7 +57,7 @@ Extension for **Firefox** and Chrome (free package, v0.5.0) that goes with the c
 
 ## Version and git
 
-- On every code change: bump `version` in `manifest.json` (0.STAGE.FIX: middle = new feature; last = fixes) and one or two lines in `docs/historico.md` with the date (dd/mm/yyyy). Each version pushed to GitHub is signed only once by Mozilla.
+- On every code change: bump `version` in `manifest.json` (middle number only for a big change or new feature; stages of the same feature, fixes and small changes bump the last number; docs only: no bump — rule in `docs/claude-regras-gerais.md`) and one or two lines in `docs/historico.md` with the date (dd/mm/yyyy). Each version pushed to GitHub is signed only once by Mozilla.
 - Commit without waiting to be asked: before each stage or round (if there are pending changes) and when finished, in the format **"vX.Y.Z: type: short summary"** (e.g. "v0.1.3: feat: procurar atualização na janela"; without a version change: "docs: summary"). Types: `feat`, `fix`, `style`, `refactor`, `docs`, `chore`, `test`, `ci`. Check in `git status` that nothing from `ferramentas-de-teste/`, keys or `.xpi` got in.
 - **Never `git push`** without being asked: the push triggers Mozilla signing (and GitHub Actions has usage limits). Say the commit was not pushed.
 
