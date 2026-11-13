@@ -286,3 +286,18 @@ test('árvore guardada: link para alterar o Sicaf em branco (se existir no compu
   assert.deepEqual(itens.map(item => item.emBranco.sei), ['3385629', '3385630', '3385631'])
   assert.match(itens[0].emBranco.linkAlterar, /^controlador\.php\?acao=documento_alterar_recebido&.*id_documento=3663596&.*infra_hash=/)
 })
+
+// v0.17.3: a página lida sem abrir a tela não tem o endereço do formulário (erro 404 no envio do arquivo).
+test('enderecoDoUpload: endereço tirado do script do SEI', () => {
+  const html = "<form id=\"frmAnexos\" target=\"ifrfrmAnexos\">\nobjUpload = new infraUpload('frmAnexos','controlador.php?acao=documento_upload_anexo&arvore=1&id_serie=-1&infra_hash=abc', true);"
+  assert.equal(sicaf.enderecoDoUpload(html), 'controlador.php?acao=documento_upload_anexo&arvore=1&id_serie=-1&infra_hash=abc')
+  assert.equal(sicaf.enderecoDoUpload('<form id="frmAnexos" method="post" action="controlador.php?acao=documento_upload_anexo&amp;x=1">'), 'controlador.php?acao=documento_upload_anexo&x=1')
+  assert.equal(sicaf.enderecoDoUpload('<form id="frmAnexos">'), null)
+})
+
+test('conferirNota: nota que não abriu não é chamada de imagem', () => {
+  const falhou = sicaf.conferirNota('', atesteChc, { naoLeu: true })
+  assert.equal(falhou.cnpj, '31302907000139')
+  assert.match(falhou.avisos[0].texto, /Não consegui ler a nota/)
+  assert.equal(sicaf.paginaDoCompras(sicaf.URL_AREA_DE_TRABALHO), 'areaDeTrabalho')
+})

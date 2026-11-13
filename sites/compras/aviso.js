@@ -1,14 +1,18 @@
 // v0.13.0: aviso da extensão nas páginas do Compras.gov.br durante a busca no SICAF (posto pelo fundo).
-// "login": abre o cartão "Governo" e destaca "Entrar com Gov.br" (o login é pessoal: a extensão nunca
-// entra sozinha). "menu": o SICAF não abriu direto; pede para abrir pelo menu do usuário.
+// v0.17.3 (pedido do usuário em 13/11/2026): a extensão clica sozinha em "Entrar com Gov.br" (o login no
+// Gov.br continua sendo da pessoa) e, na Área de Trabalho, abre o SICAF pelo menu do usuário. Textos curtos;
+// quando um passo não dá certo, o aviso diz exatamente onde clicar.
 (function () {
   const dados = globalThis.extensaoIftoAviso || {}
   const anterior = document.querySelector('[data-extensao-ifto="aviso-compras"]')
   if (anterior) anterior.remove()
 
   const TEXTOS = {
-    login: 'Para buscar o SICAF, entre com Gov.br no cartão "Governo" (destacado abaixo). Depois do login, a extensão abre o SICAF e continua sozinha.',
-    menu: 'O SICAF não abriu direto. Abra o SICAF pelo menu do usuário (no alto, à direita) › SICAF. A extensão continua sozinha quando a página do SICAF abrir.'
+    login: 'Entrando com Gov.br para buscar o SICAF…',
+    loginManual: 'Para buscar o SICAF, clique em "Entrar com Gov.br" (destacado abaixo).',
+    areaDeTrabalho: 'Abrindo o SICAF…',
+    menuManual: 'Clique no seu nome (no alto, à direita) e depois em "SICAF". O resto é automático.',
+    naoAbriu: 'O SICAF não abriu. Entre no Compras.gov.br com Gov.br, clique no seu nome (no alto, à direita) e depois em "SICAF". O resto é automático.'
   }
   const hospedeiro = document.createElement('div')
   hospedeiro.dataset.extensaoIfto = 'aviso-compras'
@@ -29,7 +33,7 @@
   marca.className = 'marca'
   marca.textContent = 'IFTO'
   const texto = document.createElement('p')
-  texto.textContent = 'Extensão IFTO: ' + (TEXTOS[dados.modo] || TEXTOS.menu)
+  const escrever = chave => { texto.textContent = TEXTOS[chave] }
   const fechar = document.createElement('button')
   fechar.textContent = '×'
   fechar.title = 'Fechar'
@@ -38,18 +42,54 @@
   raiz.append(estilo, caixa)
   document.documentElement.append(hospedeiro)
 
+  const esperar = ms => new Promise(pronto => setTimeout(pronto, ms))
+  // Tenta várias vezes (as páginas montam os botões aos poucos).
+  async function tentar (achar, vezes = 20) {
+    for (let vez = 0; vez < vezes; vez++) {
+      const achado = achar()
+      if (achado) return achado
+      await esperar(500)
+    }
+    return null
+  }
+
   if (dados.modo === 'login') {
+    escrever(dados.clicar ? 'login' : 'loginManual')
+    // Abre o cartão "Governo" e clica (ou só destaca) "Entrar com Gov.br".
     const cartao = document.querySelector('.br-card.governo')
     if (cartao && cartao.getAttribute('expanded') !== 'on') {
       const abrir = cartao.querySelector('button.expand')
       if (abrir) abrir.click()
     }
-    setTimeout(() => {
-      const entrar = document.querySelector('.br-card.governo button.is-primary')
-      if (!entrar) return
+    tentar(() => document.querySelector('.br-card.governo button.is-primary')).then(entrar => {
+      if (!entrar) { escrever('loginManual'); return }
+      if (dados.clicar) { entrar.click(); return }
       entrar.style.outline = '4px solid #1E5E33'
       entrar.style.outlineOffset = '3px'
       entrar.scrollIntoView({ block: 'center' })
-    }, 400)
+    })
+  } else if (dados.modo === 'areaDeTrabalho') {
+    escrever('areaDeTrabalho')
+    // A página pode avisar mais de uma vez que terminou de abrir: só uma tentativa por página.
+    if (!globalThis.extensaoIftoAbrindoSicaf) {
+      globalThis.extensaoIftoAbrindoSicaf = true
+      abrirSicafPeloMenu().then(abriu => { if (!abriu) escrever('menuManual') })
+    }
+  } else {
+    escrever(TEXTOS[dados.modo] ? dados.modo : 'naoAbriu')
+  }
+
+  // Menu do usuário (botão com o nome, no alto à direita) › SICAF.
+  async function abrirSicafPeloMenu () {
+    const ehSicaf = elemento => /\bSICAF\b/i.test(elemento.textContent || '') && (elemento.textContent || '').trim().length < 120
+    const itemDoSicaf = () => [...document.querySelectorAll('.systems a, .systems button, .system, .dropdown-menu a, .dropdown-menu button')].find(ehSicaf)
+    const menu = await tentar(() => document.getElementById('avatar-dropdown-trigger'))
+    if (!menu) return false
+    if (!itemDoSicaf()) menu.click()
+    const item = await tentar(itemDoSicaf, 10)
+    if (!item) return false
+    const clicavel = item.closest('a, button') || item.querySelector('a, button') || item
+    clicavel.click()
+    return true
   }
 })()

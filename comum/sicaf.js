@@ -262,7 +262,8 @@
 
   // Confere uma nota. ateste: item de lerAteste (ou null). Devolve o CNPJ do fornecedor pela nota, as
   // opções para escolher e os avisos: vermelho (precisa de "Continuar mesmo assim") ou amarelo (só aviso).
-  function conferirNota (texto, ateste) {
+  // v0.17.3: naoLeu = o PDF da nota não abriu (erro ao baixar ou ler); antes isso aparecia como "imagem".
+  function conferirNota (texto, ateste, { naoLeu = false } = {}) {
     const avisos = []
     const vermelho = mensagem => avisos.push({ nivel: 'vermelho', texto: mensagem })
     const amarelo = mensagem => avisos.push({ nivel: 'amarelo', texto: mensagem })
@@ -270,8 +271,12 @@
     const daNota = semTexto ? [] : cnpjsDaNota(texto)
     const cnpj = daNota[0] || null
     const opcoes = [...new Set([cnpj, ateste && ateste.cnpj].filter(Boolean))]
+    if (naoLeu) {
+      amarelo('Não consegui ler a nota. Confira o CNPJ do fornecedor (botão "Ver a nota").')
+      return { cnpj: ateste && ateste.cnpj ? ateste.cnpj : null, escolher: true, opcoes, avisos }
+    }
     if (semTexto) {
-      amarelo('A nota é uma imagem (sem texto): confira o CNPJ do fornecedor.')
+      amarelo('A nota é uma imagem digitalizada. Confira o CNPJ do fornecedor (botão "Ver a nota").')
       return { cnpj: ateste && ateste.cnpj ? ateste.cnpj : null, escolher: true, opcoes, avisos }
     }
     // Tomador: Campus Palmas.
@@ -320,6 +325,9 @@
   // v0.13.0: endereços do SICAF e do Compras (acesso pedido só quando a opção é usada: permissão opcional).
   const URL_CONSULTA_SICAF = 'https://www3.comprasnet.gov.br/sicaf-web/private/geral/consultarSituacaoFornecedor.jsf'
   const URL_LOGIN_COMPRAS = 'https://comprasnet.gov.br/seguro/loginPortalUASG.asp'
+  // v0.17.3: o SICAF só aceita quem chega pela Área de Trabalho (menu do usuário › SICAF); ir direto ao
+  // endereço do SICAF logo depois do login dá "Sessão expirada".
+  const URL_AREA_DE_TRABALHO = 'https://cnetmobile.estaleiro.serpro.gov.br/comprasnet-area-trabalho-web/seguro/governo/area-trabalho'
   const ORIGENS_COMPRAS = Object.freeze(['*://www3.comprasnet.gov.br/*', '*://comprasnet.gov.br/*', '*://www.comprasnet.gov.br/*', '*://cnetmobile.estaleiro.serpro.gov.br/*'])
 
   // Que página do Compras/SICAF está aberta (pelo endereço).
@@ -415,6 +423,15 @@
     if (partes.length < 5) return { erro: 'O SEI não aceitou o arquivo.' }
     return { nomeUpload: partes[0], nome: partes[1], tipo: partes[2], tamanho: partes[3], dataHora: partes[4] }
   }
+  // v0.17.3: endereço do "Anexar Arquivo..." do SEI. O formulário frmAnexos só ganha o endereço quando o
+  // script do SEI roda (new infraUpload('frmAnexos','…')); lido sem abrir a tela, ele vem vazio (erro 404).
+  function enderecoDoUpload (html) {
+    const achado = /new\s+infraUpload\(\s*['"]frmAnexos['"]\s*,\s*['"]([^'"]+)['"]/.exec(html || '')
+    if (achado) return achado[1].replace(/&amp;/g, '&')
+    const formulario = /<form[^>]*id=["']frmAnexos["'][^>]*>/i.exec(html || '')
+    const acao = formulario && /\saction=["']([^"']+)["']/i.exec(formulario[0])
+    return acao ? acao[1].replace(/&amp;/g, '&') : null
+  }
   // Usuário e unidade que a página do documento externo põe na tabela de anexos (funcaoConclusao do SEI).
   function lerUsuarioDoUpload (html) {
     const achado = /infraFormatarTamanhoBytes\(arr\['tamanho'\]\)\s*,\s*'([^']*)'\s*,\s*'([^']*)'/.exec(html || '')
@@ -444,8 +461,8 @@
     normalizar, mesmoNumero, textoDoHtml, nomesParecidos,
     tipoNaArvore, numeroSei, lerRotuloDaNota, trechoPendente, lerAteste, situacaoDoProcesso, textoDoAviso,
     cnpjsDaNota, notaSemTexto, empenhosDoTexto, nomeNoTexto, conferirNota, agruparPorFornecedor,
-    URL_CONSULTA_SICAF, URL_LOGIN_COMPRAS, ORIGENS_COMPRAS, paginaDoCompras, nomeDoArquivo, lerLinhaDoResultado, lerPdfDoSicaf, paraBase64, deBase64,
-    nomeNaArvore, nomeDoSicaf, nomeDoAnexo, documentosParaIncluir, aproveitarEmBranco, lerRespostaDoUpload, lerUsuarioDoUpload, formatarTamanho, linhaDoAnexo
+    URL_CONSULTA_SICAF, URL_LOGIN_COMPRAS, URL_AREA_DE_TRABALHO, ORIGENS_COMPRAS, paginaDoCompras, nomeDoArquivo, lerLinhaDoResultado, lerPdfDoSicaf, paraBase64, deBase64,
+    nomeNaArvore, nomeDoSicaf, nomeDoAnexo, documentosParaIncluir, aproveitarEmBranco, lerRespostaDoUpload, enderecoDoUpload, lerUsuarioDoUpload, formatarTamanho, linhaDoAnexo
   }
   if (typeof module !== 'undefined' && module.exports) module.exports = api
   else raiz.ExtensaoIFTO = Object.assign(raiz.ExtensaoIFTO || {}, { sicaf: api })

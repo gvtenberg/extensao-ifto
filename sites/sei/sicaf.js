@@ -96,7 +96,7 @@
     aberta.trocarConteudo([
       criar('p', { textContent: 'Buscando no SICAF:' }),
       criar('ul', {}, grupos.map(grupo => criar('li', { textContent: regras.formatarCnpj(grupo.cnpj) + (grupo.nome ? ' – ' + grupo.nome : '') }))),
-      criar('p', { className: 'apoio', textContent: 'Uma aba do Compras.gov.br foi aberta. Se ele pedir, entre com Gov.br (perfil Governo): a extensão continua sozinha e volta para esta aba com o PDF.' })
+      criar('p', { className: 'apoio', textContent: 'O SICAF e o Simples Nacional abrem numa nova aba. Se pedirem, entre com Gov.br. O resto é automático e, no fim, você volta para cá.' })
     ])
     aberta.trocarBotoes([{ texto: 'Parar a busca', aoClicar: j => { navegador.runtime.sendMessage({ tipo: 'sicafCancelar' }); pedidoAtual = null; j.fechar() } }])
     const resposta = await navegador.runtime.sendMessage({ tipo: 'sicafBuscar', cnpjs: grupos.map(grupo => grupo.cnpj) })
@@ -257,7 +257,7 @@
   }
   async function cnpjsDoSicaf (doc) {
     if (!sicafsLidos.has(doc.id)) {
-      sicafsLidos.set(doc.id, seiPedidos.baixar(doc.link).then(bytes => pdfTexto.textoDoPdf(bytes)).then(regras.acharCnpjs).catch(() => []))
+      sicafsLidos.set(doc.id, seiPedidos.baixarPdf(doc.link).then(bytes => pdfTexto.textoDoPdf(bytes)).then(regras.acharCnpjs).catch(() => []))
     }
     return sicafsLidos.get(doc.id)
   }
@@ -322,11 +322,18 @@
     }
   }
 
-  // Texto do PDF da nota (vazio se for imagem ou não abrir) conferido com o ateste.
+  // Texto do PDF da nota (vazio se for imagem) conferido com o ateste.
+  // v0.17.3: nota que não abriu tem aviso próprio (antes aparecia como "imagem"); o motivo vai para o console.
   async function conferir (nota) {
     let texto = ''
-    try { texto = await pdfTexto.textoDoPdf(await seiPedidos.baixar(nota.link)) } catch (erro) { texto = '' }
-    const resultado = regras.conferirNota(texto, nota.ateste)
+    let naoLeu = false
+    try {
+      texto = await pdfTexto.textoDoPdf(await seiPedidos.baixarPdf(nota.link))
+    } catch (erro) {
+      naoLeu = true
+      console.warn('Extensão IFTO: não consegui ler a nota', nota.sei || nota.id, '-', erro && erro.message)
+    }
+    const resultado = regras.conferirNota(texto, nota.ateste, { naoLeu })
     return { ...nota, ...resultado, cnpjEscolhido: resultado.cnpj }
   }
 
@@ -338,7 +345,7 @@
     let confirmouVermelho = false
     janela.abrir({
       titulo: regras.textoDoAviso(notas.length),
-      conteudo: [criar('p', { className: 'apoio', textContent: 'Notas depois da última Folha de Encaminhamento. A nota fiscal é a referência; o ateste é conferido com ela.' }), ...cartoes, alerta],
+      conteudo: [criar('p', { className: 'apoio', textContent: 'Notas depois da última Folha de Encaminhamento, conferidas com o ateste. Você pode clicar na árvore do processo com esta janela aberta.' }), ...cartoes, alerta],
       botoes: [
         { texto: 'Cancelar', aoClicar: j => j.fechar() },
         {
@@ -369,7 +376,7 @@
 
   function cartaoDaNota (nota, cnpjsComSicaf) {
     const titulo = `Nota ${nota.numero || '?'} – ${nota.fornecedor || 'fornecedor'}` + (nota.sei ? ` (SEI ${nota.sei})` : '')
-    const partes = [criar('h2', { textContent: titulo })]
+    const partes = [criar('div', { className: 'linha' }, [criar('h2', { textContent: titulo }), botaoVerNota(nota)])]
     if (nota.escolher) {
       const nome = 'cnpj-' + nota.id
       const outro = criar('input', { type: 'text', placeholder: 'Outro CNPJ' })
@@ -391,6 +398,18 @@
     for (const aviso of nota.avisos) partes.push(criar('p', { className: 'aviso ' + aviso.nivel, textContent: aviso.texto }))
     if (nota.cnpj && cnpjsComSicaf.has(nota.cnpj)) partes.push(criar('p', { className: 'aviso verde', textContent: 'Este fornecedor já tem Sicaf neste trecho do processo.' }))
     return criar('div', { className: 'cartao' }, partes)
+  }
+
+  // v0.17.3: "Ver a nota" abre a nota ao lado da árvore, como o clique na árvore (a janela não tampa mais o SEI).
+  function botaoVerNota (nota) {
+    const botao = criar('button', { type: 'button', className: 'pequeno', textContent: 'Ver a nota' })
+    botao.addEventListener('click', () => {
+      let ancora = null
+      try { ancora = quadroArvore.contentDocument.getElementById('anchor' + nota.id) } catch (erro) {}
+      if (ancora) ancora.click()
+      else window.open(nota.link, '_blank', 'noopener')
+    })
+    return botao
   }
 
   // v0.13.0: fornecedores conferidos vão para o SICAF (os que já têm Sicaf neste trecho ficam de fora).

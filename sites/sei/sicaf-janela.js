@@ -1,19 +1,23 @@
 // v0.11.0: janela da extensão no meio da página do SEI (SICAF automático): título, conteúdo e botões.
 // Fica numa "shadow root" para o estilo do SEI não mudar a janela (e vice-versa).
+// v0.17.3: a janela não bloqueia mais o SEI (sem fundo escuro): dá para clicar na árvore e ver a nota com ela
+// aberta. Fica à direita, arrasta pelo título e o "–" a recolhe até só o título.
 (function () {
   if (window.top !== window) return
   const ExtensaoIFTO = globalThis.ExtensaoIFTO
 
   const ESTILO = `
     :host { all: initial; }
-    .fundo { position: fixed; inset: 0; z-index: 2147483000; background: rgba(27,36,32,.35); display: flex;
-      align-items: flex-start; justify-content: center; padding: 8vh 16px; font: 14px/1.5 system-ui, sans-serif; color: #1B2420; }
-    .janela { background: #fff; border-radius: 12px; border: 1px solid #E2E6E3; box-shadow: 0 8px 28px rgba(0,0,0,.25);
-      width: min(640px, 100%); max-height: 84vh; display: flex; flex-direction: column; }
-    .topo { display: flex; align-items: center; gap: 8px; padding: 16px 20px 8px; }
+    .janela { position: fixed; z-index: 2147483000; top: 70px; right: 16px; font: 14px/1.5 system-ui, sans-serif; color: #1B2420;
+      background: #fff; border-radius: 12px; border: 2px solid #1E5E33; box-shadow: 0 8px 28px rgba(0,0,0,.3);
+      width: min(560px, calc(100vw - 32px)); max-height: calc(100vh - 90px); display: flex; flex-direction: column; }
+    .janela.recolhida .corpo, .janela.recolhida .botoes { display: none; }
+    .topo { display: flex; align-items: center; gap: 8px; padding: 12px 16px 8px; cursor: move; user-select: none; }
     .marca { background: #1E5E33; color: #fff; font-size: 10px; font-weight: 700; padding: 1px 4px; border-radius: 4px; }
     h1 { font-size: 17px; font-weight: 600; margin: 0; flex: 1; }
     .fechar { border: 0; background: none; font-size: 20px; cursor: pointer; color: #5B6660; padding: 0 4px; }
+    .linha { display: flex; gap: 8px; align-items: center; justify-content: space-between; }
+    button.pequeno { flex: none; min-height: 28px; padding: 0 10px; border-radius: 6px; border: 1px solid #1E5E33; background: #fff; color: #1E5E33; font: inherit; font-size: 13px; cursor: pointer; }
     .corpo { padding: 4px 20px 12px; overflow: auto; display: grid; gap: 10px; }
     .botoes { display: flex; gap: 8px; justify-content: flex-end; flex-wrap: wrap; padding: 12px 20px 16px; border-top: 1px solid #E2E6E3; }
     button.acao { min-height: 36px; padding: 0 14px; border-radius: 8px; border: 1px solid #D5DBD7; background: #fff; color: #1B2420; font: inherit; cursor: pointer; }
@@ -43,16 +47,15 @@
     const raiz = hospedeiro.attachShadow({ mode: 'open' })
     const estilo = document.createElement('style')
     estilo.textContent = ESTILO
-    const fundo = criar('div', { className: 'fundo' })
     const janela = criar('div', { className: 'janela' })
     janela.setAttribute('role', 'dialog')
+    const recolher = criar('button', { className: 'fechar', textContent: '–', title: 'Recolher ou abrir a janela' })
     const fechar = criar('button', { className: 'fechar', textContent: '×', title: 'Fechar' })
-    const topo = criar('div', { className: 'topo' }, [criar('span', { className: 'marca', textContent: 'IFTO' }), criar('h1', { textContent: titulo }), fechar])
+    const topo = criar('div', { className: 'topo' }, [criar('span', { className: 'marca', textContent: 'IFTO' }), criar('h1', { textContent: titulo }), recolher, fechar])
     const corpo = criar('div', { className: 'corpo' }, conteudo)
     const barraDeBotoes = criar('div', { className: 'botoes' })
     janela.append(topo, corpo, barraDeBotoes)
-    fundo.append(janela)
-    raiz.append(estilo, fundo)
+    raiz.append(estilo, janela)
     document.body.append(hospedeiro)
 
     let aberta = true
@@ -77,11 +80,34 @@
       },
       trocarConteudo (lista) { corpo.replaceChildren(...lista) }
     }
-    const teclas = evento => { if (evento.key === 'Escape') { evento.stopPropagation(); api.fechar() } }
+    // Esc só fecha quando o cursor do teclado está na janela (o SEI continua usável por trás).
+    const teclas = evento => { if (evento.key === 'Escape' && evento.composedPath().includes(hospedeiro)) { evento.stopPropagation(); api.fechar() } }
     document.addEventListener('keydown', teclas, true)
     fechar.addEventListener('click', () => api.fechar())
+    recolher.addEventListener('click', () => janela.classList.toggle('recolhida'))
+    arrastar(janela, topo)
     api.trocarBotoes(botoes)
     return api
+  }
+
+  // Arrastar a janela pelo título (fica dentro da tela).
+  function arrastar (janela, topo) {
+    topo.addEventListener('pointerdown', evento => {
+      if (evento.button !== 0 || evento.target.closest('button')) return
+      const caixa = janela.getBoundingClientRect()
+      const dx = evento.clientX - caixa.left
+      const dy = evento.clientY - caixa.top
+      const mover = movimento => {
+        const esquerda = Math.min(Math.max(0, movimento.clientX - dx), window.innerWidth - 80)
+        const alto = Math.min(Math.max(0, movimento.clientY - dy), window.innerHeight - 40)
+        Object.assign(janela.style, { left: esquerda + 'px', top: alto + 'px', right: 'auto' })
+      }
+      const soltar = () => { topo.removeEventListener('pointermove', mover); topo.removeEventListener('pointerup', soltar) }
+      topo.setPointerCapture(evento.pointerId)
+      topo.addEventListener('pointermove', mover)
+      topo.addEventListener('pointerup', soltar)
+      evento.preventDefault()
+    })
   }
 
   // criar('p', { className: 'apoio', textContent: '…' }, [filhos])

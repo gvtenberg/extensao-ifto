@@ -111,7 +111,7 @@ async function iniciarBusca (cnpjs, abaSei) {
   const consultas = await lerSimplesDeHoje()
   const simplesFaltam = pedidos.filter(cnpj => !consultas[cnpj])
   const tarefa = {
-    idAbaSei: abaSei.id, pedidos, faltam, posicao: 0, pesquisado: false, erros: {}, idAbaSicaf: null, voltasDoLogin: 0,
+    idAbaSei: abaSei.id, pedidos, faltam, posicao: 0, pesquisado: false, erros: {}, idAbaSicaf: null, foiAoLogin: false, cliqueiEntrar: false, idasAreaDeTrabalho: 0,
     // v0.17.2: Simples Nacional depois do SICAF ("fase"), com a matriz quando o site recusa a filial (D7).
     fase: faltam.length ? 'sicaf' : 'simples', simplesFaltam, simplesPosicao: 0, simplesPesquisado: false, simplesMatriz: false, simplesErros: {}
   }
@@ -142,21 +142,27 @@ navegador.tabs.onUpdated.addListener(async (idDaAba, mudanca, aba) => {
     tarefa.idAbaSicaf = idDaAba
     await gravarTarefa(tarefa)
   }
+  // v0.17.3: sem login, vai à entrada do Compras e clica em "Entrar com Gov.br" (uma vez). Depois do login,
+  // abre o SICAF pelo menu da Área de Trabalho (o endereço direto dá "Sessão expirada"). Cada passo tem
+  // limite de vezes, para não ficar dando voltas; aí o aviso pede o passo à pessoa.
   if (pagina === 'acessoNegado' || pagina === 'sicafPublico') {
-    // Sem login: abre a página de entrada do Compras. Se já voltou do login e o SICAF ainda nega, ajuda
-    // a abrir o SICAF pelo menu da área de trabalho.
-    if (tarefa.voltasDoLogin === 0) await navegador.tabs.update(idDaAba, { url: regras.URL_LOGIN_COMPRAS })
-    else await injetar(idDaAba, ['sites/compras/aviso.js'], { modo: 'menu' })
-  } else if (pagina === 'login') {
-    await injetar(idDaAba, ['sites/compras/aviso.js'], { modo: 'login' })
-  } else if (pagina === 'areaDeTrabalho') {
-    if (tarefa.voltasDoLogin === 0) {
-      tarefa.voltasDoLogin = 1
+    if (!tarefa.foiAoLogin) {
+      tarefa.foiAoLogin = true
       await gravarTarefa(tarefa)
-      await navegador.tabs.update(idDaAba, { url: regras.URL_CONSULTA_SICAF })
+      await navegador.tabs.update(idDaAba, { url: regras.URL_LOGIN_COMPRAS })
+    } else if ((tarefa.idasAreaDeTrabalho || 0) < 2) {
+      tarefa.idasAreaDeTrabalho = (tarefa.idasAreaDeTrabalho || 0) + 1
+      await gravarTarefa(tarefa)
+      await navegador.tabs.update(idDaAba, { url: regras.URL_AREA_DE_TRABALHO })
     } else {
-      await injetar(idDaAba, ['sites/compras/aviso.js'], { modo: 'menu' })
+      await injetar(idDaAba, ['sites/compras/aviso.js'], { modo: 'naoAbriu' })
     }
+  } else if (pagina === 'login') {
+    const clicar = !tarefa.cliqueiEntrar
+    if (clicar) { tarefa.cliqueiEntrar = true; await gravarTarefa(tarefa) }
+    await injetar(idDaAba, ['sites/compras/aviso.js'], { modo: 'login', clicar })
+  } else if (pagina === 'areaDeTrabalho') {
+    await injetar(idDaAba, ['sites/compras/aviso.js'], { modo: 'areaDeTrabalho' })
   } else {
     await injetar(idDaAba, ['comum/sei.js', 'comum/sicaf.js', 'sites/sicaf/consulta.js'])
   }

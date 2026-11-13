@@ -166,9 +166,6 @@ E: Aparece só o botão "Abrir a página da versão…" (sem "Instalar a versão
 
 ## SICAF automático: notas sem SICAF (v0.10.0)
 > Na CGOC (CGOC/GAC/DAP/PAL/REI/IFTO), com a opção "SICAF da nota fiscal" em Automática (padrão).
-### T47 – Aviso de notas sem SICAF (v0.10.0)
-F: Abra um processo de pagamento com nota fiscal e ateste depois da última Folha de Encaminhamento e ainda sem Sicaf com PDF (ex.: 23236.023830/2025-11 antes de incluir o Sicaf da HM).
-E: Em poucos segundos aparece no alto, à direita, "1 nota sem SICAF – Buscar"; parando o mouse em cima, aparece a nota e a empresa.
 ### T48 – Sem aviso quando o SICAF já está no processo (v0.10.0)
 F: Abra um processo em que todas as notas depois da última Folha já têm Sicaf com o PDF; depois, abra um processo sem notas.
 E: O aviso não aparece em nenhum dos dois; em outra unidade (não CGOC) ele também não aparece.
@@ -185,9 +182,6 @@ F: Abra a janela (T49), apague o CNPJ e digite um errado (mude o último número
 E: Com o errado aparece em vermelho "CNPJ com número errado"; com o certo, "conferido" e, por enquanto, "CNPJ encontrado".
 
 ## SICAF automático: conferência da nota com o ateste (v0.12.0)
-### T52 – Conferir nota e ateste iguais (v0.12.0)
-F: Num processo com "1 nota sem SICAF – Buscar" (T47), clique no aviso.
-E: Abre a janela com a nota, o CNPJ do fornecedor tirado do PDF da nota e nenhum aviso vermelho; "Buscar no SICAF" mostra o fornecedor conferido.
 ### T53 – Diferença entre nota e ateste (v0.12.0)
 F: Num processo em que o ateste tem um número, valor, empenho ou CNPJ diferente da nota (ou nota para outra unidade do IFTO), clique no aviso e depois em "Buscar no SICAF".
 E: A diferença aparece em vermelho; o primeiro clique troca o botão para "Continuar mesmo assim" e só o segundo continua. Nome da empresa escrito diferente aparece só em amarelo.
@@ -196,9 +190,6 @@ F: Num processo com uma nota fiscal que é só imagem (escaneada), clique no avi
 E: Aparece em amarelo que a nota é uma imagem e a opção de escolher o CNPJ do ateste ou digitar outro.
 
 ## SICAF automático: PDF do SICAF (v0.13.0)
-### T55 – Buscar o PDF no SICAF (v0.13.0) (Crítico)
-F: Na CGOC, num processo com "1 nota sem SICAF – Buscar", clique no aviso > "Buscar no SICAF". Se pedir permissão, clique em "Abrir configurações" > "Permitir acesso ao Compras.gov.br" > Permitir, volte e clique de novo. Se o Compras pedir login, entre com Gov.br (perfil Governo).
-E: Abre uma aba do SICAF, a pesquisa do CNPJ é feita sozinha, o PDF "consultarSituacaoFornecedor_…" aparece na pasta Downloads e o SEI volta para a frente com a janela "SICAF" mostrando o nome do fornecedor e "Ver o PDF". Comente em que página parou, se parar.
 ### T56 – Pedir SICAF de novo no mesmo dia (v0.13.0)
 F: Depois do T55, clique de novo em "Buscar" e "Buscar no SICAF" no mesmo processo.
 E: Não abre o SICAF de novo: a janela "SICAF" aparece logo, com o mesmo PDF.
@@ -207,9 +198,6 @@ F: Selecione um CNPJ num documento do SEI > "Buscar SICAF" > "Buscar no SICAF".
 E: O SICAF desse CNPJ é buscado como no T55 e volta para o SEI com o PDF.
 
 ## SICAF automático: incluir no SEI (v0.14.0)
-### T58 – Incluir Sicaf, Consulta e Anexo com o PDF (v0.14.0) (Crítico)
-F: Depois do T55, na janela "Incluir no processo…", confira a lista e clique em "Incluir no processo".
-E: A árvore recarrega com "Sicaf <nome da empresa no SICAF>" (abre o PDF do SICAF), "Consulta" e "Anexo Instrumento de Cobrança NF nº <número> <empresa>", com a data de hoje, Nato-digital e Público.
 ### T59 – Duas notas da mesma empresa (v0.14.0)
 F: Num processo com duas notas da mesma empresa sem SICAF, faça o T55 e o T58.
 E: Aparecem um Sicaf e uma Consulta e dois Anexos, um com o número de cada nota.
@@ -247,12 +235,24 @@ E: Aparece "Você já tem a versão mais nova" ou, se houver versão nova, "Vers
 
 ## Consulta do Simples Nacional no site (v0.17.2)
 > Nas configurações, clique de novo em "Permitir acesso ao Compras.gov.br e ao Simples Nacional" e confirme.
-### T67 – Consulta automática no Simples Nacional (v0.17.2) (Crítico)
-F: Num processo com nota sem SICAF (de preferência duas empresas, uma delas filial), clique em "Buscar" e siga até o fim do SICAF; deixe a aba seguir para o Simples Nacional e, se pedir a verificação de imagens, resolva.
-E: A aba consulta cada CNPJ sozinha, abre "Mais informações" e volta ao SEI no fim; na pasta Downloads aparece um "ConsultaOptantes_<CNPJ>_<data>.pdf" por empresa, com o texto da consulta. Comente: quantas vezes a verificação apareceu e se a filial deu certo.
 ### T68 – Consulta com SICAF já buscado hoje (v0.17.2)
 F: Repita o "Buscar" no mesmo processo no mesmo dia.
 E: Não abre o SICAF nem o Simples Nacional de novo (os PDFs de hoje já servem).
 ### T69 – Configurações mais largas (v0.17.2)
 F: Clique no ícone da extensão e em "Configurações".
 E: A página ocupa mais a largura da tela que antes, sem textos cortados.
+
+## SICAF: correções depois do primeiro teste (v0.17.3)
+> Na CGOC, num processo com nota sem SICAF (ex.: 23236.023830/2025-11). Antes, saia do Compras.gov.br (ou use outro navegador) para testar o login.
+### T70 – Janela da nota não bloqueia o SEI (v0.17.3)
+F: Clique em "1 nota sem SICAF – Buscar"; com a janela aberta, clique em "Ver a nota", depois num documento da árvore; arraste a janela pelo título e clique em "–".
+E: A nota e o documento abrem ao lado da árvore com a janela aberta; a janela muda de lugar e o "–" a recolhe até só o título (clique de novo para abrir).
+### T71 – Nota da HM lida pelo texto (v0.17.3)
+F: No processo 23236.023830/2025-11, clique em "1 nota sem SICAF – Buscar".
+E: A nota 3626 mostra o CNPJ 14.159.957/0006-02 tirado da nota, sem o aviso de "imagem". Se aparecer "Não consegui ler a nota", comente.
+### T72 – Login do Compras e SICAF sem cliques (v0.17.3) (Crítico)
+F: Saído do Compras.gov.br, clique em "Buscar" > "Buscar no SICAF".
+E: A extensão clica em "Entrar com Gov.br"; depois do Gov.br, abre sozinha o SICAF pelo seu nome (no alto, à direita) e faz a busca. Comente em que página parou, se parar, e o texto do aviso.
+### T73 – Incluir no processo com o PDF (v0.17.3) (Crítico)
+F: Depois do T72, na janela "Incluir no processo…", clique em "Incluir no processo".
+E: A árvore recarrega com "Sicaf <nome da empresa>" (abre o PDF do SICAF), "Consulta" e "Anexo Instrumento de Cobrança NF nº 3626 …", sem a mensagem de erro 404.

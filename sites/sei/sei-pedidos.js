@@ -29,6 +29,21 @@
     return resposta.arrayBuffer()
   }
 
+  // v0.17.3: PDF de um documento da árvore. Se o SEI devolve uma página (e não o PDF), procura nela o link
+  // do arquivo (documento_download_anexo) e baixa esse; se não for PDF, explica o motivo.
+  const ehPdf = bytes => new TextDecoder('latin1').decode(new Uint8Array(bytes).slice(0, 1024)).includes('%PDF')
+  async function baixarPdf (endereco) {
+    const bytes = await baixar(endereco)
+    if (ehPdf(bytes)) return bytes
+    const html = new TextDecoder('windows-1252').decode(bytes)
+    const dentro = (/["'](controlador\.php\?acao=documento_download_anexo[^"']*)["']/.exec(html) || [])[1]
+    if (dentro) {
+      const outro = await baixar(new URL(dentro.replace(/&amp;/g, '&'), new URL(endereco, location.href)).href)
+      if (ehPdf(outro)) return outro
+    }
+    throw new Error(/pwdSenha|login\.php/i.test(html) ? 'a sessão do SEI terminou' : 'o SEI não devolveu um PDF')
+  }
+
   const lerHtml = html => new DOMParser().parseFromString(html, 'text/html')
 
   // Campos que o navegador enviaria ao clicar em Salvar (mesmas regras do envio de formulário).
@@ -149,13 +164,14 @@
   // v0.14.0: arquivo do documento externo, como o "Anexar Arquivo..." do SEI (formulário frmAnexos, que o
   // SEI envia num quadro escondido). Devolve a linha do campo hdnAnexos para o Salvar.
   async function enviarArquivo (paginaDoTipo, pagina, arquivo, sicaf) {
-    const formulario = paginaDoTipo.getElementById('frmAnexos')
-    if (!formulario) throw new Error('O SEI não mostrou o campo do arquivo.')
+    // v0.17.3: o endereço vem do script do SEI (o formulário lido sem abrir a tela não tem; dava erro 404).
+    const acao = sicaf.enderecoDoUpload(pagina.html)
+    if (!paginaDoTipo.getElementById('frmAnexos') || !acao) throw new Error('O SEI não mostrou o campo do arquivo.')
     const dados = new FormData()
-    const identificador = formulario.querySelector('input[name="UPLOAD_IDENTIFIER"]')
-    if (identificador) dados.append('UPLOAD_IDENTIFIER', identificador.getAttribute('value') || '')
+    // Número do andamento do envio, sorteado como o próprio SEI faz (InfraUpload.js).
+    dados.append('UPLOAD_IDENTIFIER', String(Math.floor(Math.random() * 999999)))
     dados.append('filArquivo', new Blob([arquivo.bytes], { type: 'application/pdf' }), arquivo.nome)
-    const destino = new URL(formulario.getAttribute('action'), pagina.endereco).href
+    const destino = new URL(acao, pagina.endereco).href
     const resposta = await fetch(destino, { method: 'POST', credentials: 'same-origin', body: dados })
     if (!resposta.ok) throw new Error('O SEI não recebeu o arquivo (erro ' + resposta.status + ').')
     const upload = sicaf.lerRespostaDoUpload(new TextDecoder('windows-1252').decode(await resposta.arrayBuffer()))
@@ -178,5 +194,5 @@
     try { quadro.contentWindow.location.reload() } catch (erro) { quadro.setAttribute('src', quadro.getAttribute('src')) }
   }
 
-  ExtensaoIFTO.seiPedidos = { pedir, baixar, lerHtml, camposDoFormulario, enviar, incluirExternos, arvoreAberta, recarregarArvore }
+  ExtensaoIFTO.seiPedidos = { pedir, baixar, baixarPdf, lerHtml, camposDoFormulario, enviar, incluirExternos, arvoreAberta, recarregarArvore }
 })()
