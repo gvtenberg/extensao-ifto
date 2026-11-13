@@ -10,6 +10,12 @@
     return numeros.join('.')
   }
 
+  // v0.17.6: versão do SEI em que a extensão foi testada (só os três primeiros números contam).
+  const VERSAO_SEI_TESTADA = '5.0.4'
+  function seiTestado (versao) {
+    return (versao || '').split('.').slice(0, 3).join('.') === VERSAO_SEI_TESTADA
+  }
+
   // v0.1.1: o SEI 5 troca o campo de senha por um campo de texto que mostra "●" (MaskedPassword) e guarda
   // a senha num campo escondido; assim o navegador não reconhece a senha. A extensão volta a pôr um campo
   // de senha de verdade, com os mesmos atributos do campo visível (tabindex, onkeypress, maxlength...).
@@ -89,7 +95,7 @@
     return (espaco > 0 ? cortado.slice(0, espaco) : limpo.slice(0, maximo)).replace(/[\s.,;:-]+$/, '')
   }
 
-  const api = { versaoDoSei, atributosDoCampoDeSenha, lerArvore, ligadaNaUnidade, nomeNaArvore }
+  const api = { versaoDoSei, VERSAO_SEI_TESTADA, seiTestado, atributosDoCampoDeSenha, lerArvore, ligadaNaUnidade, nomeNaArvore }
   if (typeof module !== 'undefined' && module.exports) module.exports = api
   else raiz.ExtensaoIFTO = Object.assign(raiz.ExtensaoIFTO || {}, { sei: api })
 })(globalThis)

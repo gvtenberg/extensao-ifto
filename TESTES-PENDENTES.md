@@ -268,3 +268,7 @@ E: o cartão da nota mostra o CNPJ lido da nota (sem "não consegui ler"); depoi
 ### T76 – Nome do fornecedor limpo e janela sem rolagem para o lado (v0.17.5)
 F: no fim da busca do T75, olhe a janela "Incluir Sicaf, Consulta e Anexo".
 E: o título mostra só "CNPJ – NOME DA EMPRESA" (sem "Relatórios" nem texto estranho) e a janela não tem barra de rolagem para o lado.
+
+### T77 – Janela do ícone sem a mensagem do SEI reconhecido (v0.17.6)
+F: abra o SEI do IFTO e depois clique no ícone da extensão.
+E: não aparece mais "SEI do IFTO reconhecido"; só aparece aviso amarelo se o SEI tiver um problema (com o motivo).

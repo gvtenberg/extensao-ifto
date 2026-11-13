@@ -1,17 +1,19 @@
-// Janela do ícone: versão da extensão e o último SEI visto (versão e endereço).
+// Janela do ícone: versão da extensão e aviso quando o SEI não foi reconhecido.
 (async function () {
   const navegador = globalThis.browser || globalThis.chrome
   document.getElementById('versao').textContent = 'Versão ' + navegador.runtime.getManifest().version
 
+  // v0.17.6 (pedido de 13/11/2026): mensagem de sucesso não aparece; só o aviso, com o motivo, quando o SEI
+  // ainda não foi reconhecido ou está numa versão em que a extensão não foi testada.
   const { seiVisto } = await navegador.storage.local.get('seiVisto')
   const caixa = document.getElementById('sei')
-  if (seiVisto) {
-    const quando = new Date(seiVisto.vistoEm).toLocaleString('pt-BR', { dateStyle: 'short', timeStyle: 'short' })
-    caixa.className = 'aviso sucesso'
-    caixa.textContent = `SEI do IFTO reconhecido (versão ${seiVisto.versao}), aberto em ${quando}.`
+  caixa.className = 'aviso pendencia'
+  if (!seiVisto) {
+    caixa.textContent = 'A extensão ainda não reconheceu o SEI do IFTO: ele não foi aberto neste navegador desde a instalação. Abra o SEI e entre com sua senha.'
+  } else if (!globalThis.ExtensaoIFTO.sei.seiTestado(seiVisto.versao)) {
+    caixa.textContent = `O SEI do IFTO mudou para a versão ${seiVisto.versao}, e a extensão foi feita para a versão ${globalThis.ExtensaoIFTO.sei.VERSAO_SEI_TESTADA}. Algumas funções podem não funcionar: se notar algum erro, avise.`
   } else {
-    caixa.className = 'aviso pendencia'
-    caixa.textContent = 'Abra o SEI do IFTO para a extensão reconhecê-lo.'
+    caixa.hidden = true
   }
 
   // v0.9.6: no Firefox, sem a licença permanente para o SEI, a extensão só age na página aberta quando a

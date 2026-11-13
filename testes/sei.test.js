@@ -1,6 +1,6 @@
 const { test } = require('node:test')
 const assert = require('node:assert/strict')
-const { versaoDoSei } = require('../comum/sei.js')
+const { versaoDoSei, seiTestado } = require('../comum/sei.js')
 
 // Versão do SEI: vem do endereço do script "js/sei.js?<versão>" das páginas do SEI.
 test('versaoDoSei lê a versão do endereço do script e completa com zeros', () => {
@@ -50,4 +50,11 @@ test('campo de senha: tela de entrada (sem classe além de masked fica sem class
   const resultado = Object.fromEntries(atributosDoCampoDeSenha([{ name: 'class', value: 'masked' }]))
   assert.equal('class' in resultado, false)
   assert.equal(resultado.name, 'pwdSenha')
+})
+
+test('seiTestado: só a versão 5.0.4 do SEI conta como testada', () => {
+  assert.equal(seiTestado('5.0.4.0'), true)
+  assert.equal(seiTestado('5.0.4.2'), true)
+  assert.equal(seiTestado('5.0.5.0'), false)
+  assert.equal(seiTestado(null), false)
 })
