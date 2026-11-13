@@ -17,10 +17,13 @@ Plain JavaScript, no build step, Manifest V3 (D4 in `specs/base-e-sei.md`). Pure
 | `sites/sei/todas-as-paginas.js` | On every SEI page: saves the SEI version and address (`seiVisto`) |
 | `sites/sei/barra-extensao.js` | Extension bar at the top right of full SEI pages; features add buttons (`ExtensaoIFTO.barra.botao/mostrar/fundo`) (v0.7.0) |
 | `sites/sei/documentos-pagamento.js` | "Incluir Sicaf, Consulta e Anexo" button in the bar, only with a process open (`#ifrArvore`) (v0.7.0); confirmation (v0.8.0); sends the SEI forms directly (Incluir Documento › Externo › type › Salvar, three times) and reloads the tree (v0.9.0) |
-| `comum/sicaf.js` | Automatic SICAF (v0.10.0): CNPJ check digits and search (`cnpjValido`, `acharCnpjs`), HTML to text, tree names (`tipoNaArvore`, `lerRotuloDaNota`), pending part after the last Folha (`trechoPendente`), ateste reading (`lerAteste`), similar names, invoices without SICAF (`situacaoDoProcesso`) |
+| `comum/sicaf.js` | Automatic SICAF (v0.10.0): CNPJ check digits and search (`cnpjValido`, `acharCnpjs`, `cnpjDaSelecao`), HTML to text, tree names (`tipoNaArvore`, `lerRotuloDaNota`), pending part after the last Folha (`trechoPendente`), ateste reading (`lerAteste`), similar names, invoices without SICAF (`situacaoDoProcesso`) |
 | `sites/sei/sei-pedidos.js` | Talk to the SEI without screens (v0.10.0, from documentos-pagamento): `pedir` (ISO-8859-1), `baixar` (file), `enviar` (form), `arvoreAberta`, `recarregarArvore` |
 | `sites/sei/pdf-texto.js` | PDF text with pdf.js (`bibliotecas/pdfjs/`, Apache-2.0, loaded only when needed, no separate worker) (v0.10.0) |
 | `sites/sei/sicaf.js` | Automatic SICAF in the SEI (v0.10.0): CGOC notice "N notas sem SICAF – Buscar" in the bar, re-read when the tree reloads |
+| `sites/sei/sicaf-janela.js` | Extension window in the middle of the SEI page (`ExtensaoIFTO.janela.abrir`, `criar`), used by the SICAF (v0.11.0) |
+| `sites/sei/cnpj-selecionado.js` | All SEI frames: "Buscar SICAF" button next to a selected CNPJ (v0.11.0) |
+| `fundo/fundo.js` | Background (Firefox page, Chrome service worker): right-click menu "Buscar SICAF deste CNPJ", sends the CNPJ to the SEI main page (v0.11.0) |
 | `sites/sei/lista-assinaturas.js` | Signature list floating panel (SEI main page): paste, navigate, open via quick search, "Assinar e próximo" / "Dar ciência e próximo" (waits for the SEI to reload the tree, then advances) |
 | `sites/sei/lista-assinaturas-teclas.js` | Alt+→ and Alt+← shortcuts with focus inside SEI frames (notifies the main page) |
 | `sites/sei/assinar-e-proximo.js` | Inside the SEI signing window: clicks "Assinar" if Firefox already filled in the password and marks the pending item as sent (v0.5.0) |

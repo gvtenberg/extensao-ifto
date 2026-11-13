@@ -51,6 +51,15 @@
     return achados
   }
 
+  // v0.11.0: CNPJ selecionado ou colado: só o CNPJ (com ou sem pontos), talvez com "CNPJ:" antes.
+  // Devolve { cnpj, valido } ou null quando o texto não tem a forma de um CNPJ.
+  function cnpjDaSelecao (texto) {
+    const limpo = String(texto || '').replace(/^\s*CNPJ\s*(\/\s*CPF)?\s*:?\s*/i, '').replace(/\s+/g, '').replace(/[.,;:)]+$/, '').replace(/^\(/, '')
+    if (!/^\d{2}\.?\d{3}\.?\d{3}\/?\d{4}-?\d{2}$/.test(limpo)) return null
+    const cnpj = soDigitos(limpo)
+    return { cnpj, valido: cnpjValido(cnpj) }
+  }
+
   // ---------- Textos ----------
   // Sem acento, maiúsculas, um espaço só.
   function normalizar (texto) {
@@ -205,7 +214,7 @@
 
   const api = {
     UNIDADE_CGOC, CNPJ_CAMPUS_PALMAS, funcaoLigada, ehCgoc,
-    soDigitos, cnpjValido, formatarCnpj, ehDoIfto, acharCnpjs,
+    soDigitos, cnpjValido, formatarCnpj, ehDoIfto, acharCnpjs, cnpjDaSelecao,
     normalizar, mesmoNumero, textoDoHtml, nomesParecidos,
     tipoNaArvore, numeroSei, lerRotuloDaNota, trechoPendente, lerAteste, situacaoDoProcesso, textoDoAviso
   }

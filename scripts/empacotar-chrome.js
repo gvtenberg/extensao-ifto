@@ -15,10 +15,12 @@ const PNG = { 16: 'icones/icone-16.png', 32: 'icones/icone-32.png', 48: 'icones/
 delete manifest.browser_specific_settings
 manifest.icons = PNG
 manifest.action.default_icon = PNG
+// v0.11.0: o Chrome usa um "service worker" (fundo/fundo.js carrega as regras com importScripts).
+manifest.background = { service_worker: 'fundo/fundo.js' }
 
 fs.rmSync(pasta, { recursive: true, force: true })
 fs.mkdirSync(pasta, { recursive: true })
-for (const item of ['comum', 'configuracoes', 'janela', 'sites', 'icones', 'LICENSE']) {
+for (const item of ['comum', 'configuracoes', 'janela', 'sites', 'icones', 'fundo', 'bibliotecas', 'LICENSE']) {
   fs.cpSync(path.join(raiz, item), path.join(pasta, item), { recursive: true })
 }
 fs.writeFileSync(path.join(pasta, 'manifest.json'), JSON.stringify(manifest, null, 2) + '\n')

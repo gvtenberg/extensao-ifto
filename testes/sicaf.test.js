@@ -103,3 +103,14 @@ test('árvore guardada do processo 23236.023830/2025-11: HM pendente, CHC feita 
   assert.match(situacao.pendentes[0].link, /documento_download_anexo/)
   assert.equal(situacao.sicafs.length, 0)
 })
+
+// v0.11.0: etapa 2 (CNPJ selecionado).
+test('cnpjDaSelecao: só um CNPJ, com ou sem pontos, e confere os dígitos', () => {
+  assert.deepEqual(sicaf.cnpjDaSelecao(' 14.159.957/0006-02 '), { cnpj: '14159957000602', valido: true })
+  assert.deepEqual(sicaf.cnpjDaSelecao('14159957000602'), { cnpj: '14159957000602', valido: true })
+  assert.deepEqual(sicaf.cnpjDaSelecao('CNPJ: 14.159.957/0006-02.'), { cnpj: '14159957000602', valido: true })
+  assert.deepEqual(sicaf.cnpjDaSelecao('14.159.957/0006-03'), { cnpj: '14159957000603', valido: false })
+  assert.equal(sicaf.cnpjDaSelecao('Nota 14.159.957/0006-02 e 31.302.907/0001-39'), null)
+  assert.equal(sicaf.cnpjDaSelecao('030.123.456-06'), null)
+  assert.equal(sicaf.cnpjDaSelecao(''), null)
+})

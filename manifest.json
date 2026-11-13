@@ -2,11 +2,14 @@
   "manifest_version": 3,
   "name": "Extensão IFTO Palmas",
   "short_name": "IFTO Palmas",
-  "version": "0.10.0",
+  "version": "0.11.0",
   "description": "Melhorias no SEI e apoio ao Sistema de Gestão Orçamentária do IFTO Campus Palmas.",
   "icons": { "48": "icones/icone.svg", "96": "icones/icone.svg" },
-  "permissions": ["storage"],
+  "permissions": ["storage", "contextMenus"],
   "host_permissions": ["*://sei.ifto.edu.br/*controlador.php?acao=*", "*://sei.ifto.edu.br/*login.php*"],
+  "background": {
+    "scripts": ["comum/sei.js", "comum/sicaf.js", "fundo/fundo.js"]
+  },
   "action": {
     "default_icon": "icones/icone.svg",
     "default_title": "Extensão IFTO Palmas",
@@ -31,6 +34,7 @@
         "sites/sei/barra-extensao.js",
         "sites/sei/sei-pedidos.js",
         "sites/sei/pdf-texto.js",
+        "sites/sei/sicaf-janela.js",
         "sites/sei/lista-assinaturas.js",
         "sites/sei/documentos-pagamento.js",
         "sites/sei/sicaf.js"
@@ -41,6 +45,12 @@
       "run_at": "document_idle",
       "all_frames": true,
       "js": ["sites/sei/lista-assinaturas-teclas.js"]
+    },
+    {
+      "matches": ["*://sei.ifto.edu.br/*controlador.php?acao=*"],
+      "run_at": "document_idle",
+      "all_frames": true,
+      "js": ["comum/sei.js", "comum/configuracoes.js", "comum/sicaf.js", "sites/sei/cnpj-selecionado.js"]
     },
     {
       "matches": ["*://sei.ifto.edu.br/*controlador.php?acao=documento_receber*"],

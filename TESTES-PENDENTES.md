@@ -195,3 +195,14 @@ E: Em poucos segundos aparece no alto, à direita, "1 nota sem SICAF – Buscar"
 ### T48 – Sem aviso quando o SICAF já está no processo (v0.10.0)
 F: Abra um processo em que todas as notas depois da última Folha já têm Sicaf com o PDF; depois, abra um processo sem notas.
 E: O aviso não aparece em nenhum dos dois; em outra unidade (não CGOC) ele também não aparece.
+
+## SICAF automático: CNPJ selecionado (v0.11.0)
+### T49 – Botão ao selecionar um CNPJ (v0.11.0)
+F: Num documento do SEI (ex.: um ateste), selecione com o mouse só o CNPJ da empresa e clique no botão "Buscar SICAF" que aparece logo abaixo.
+E: Abre a janela "Buscar SICAF" com o CNPJ e a mensagem "conferido"; selecionando um texto que não é CNPJ, o botão não aparece.
+### T50 – Botão direito no PDF da nota (v0.11.0)
+F: Abra no SEI o PDF de uma nota fiscal, selecione o CNPJ do emitente, clique com o botão direito > "Buscar SICAF deste CNPJ". Faça no Firefox e, se usar, no Chrome.
+E: A janela "Buscar SICAF" abre na página do SEI com esse CNPJ. Comente se o item não aparecer no menu do leitor de PDF.
+### T51 – Colar ou digitar o CNPJ (v0.11.0)
+F: Abra a janela (T49), apague o CNPJ e digite um errado (mude o último número); depois cole um certo e clique em "Buscar no SICAF".
+E: Com o errado aparece em vermelho "CNPJ com número errado"; com o certo, "conferido" e, por enquanto, "CNPJ encontrado".
