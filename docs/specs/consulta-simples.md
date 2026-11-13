@@ -4,7 +4,7 @@
 
 - **Status:** ready to code (after `specs/feitas/sicaf-automatico.md`)
 - **Requested on:** 13/11/2026 · **Deadline or priority:** next improvement after the automatic SICAF
-- **Planned version:** 0.16.0
+- **Planned version:** 0.17.0
 
 ## 1. Goal (what for)
 
@@ -34,7 +34,7 @@ Today, for each invoice, CGOC opens the Simples Nacional "Consulta Optantes", ty
 - **Text PDF:** A4, same order and labels as the page (including "Mais informações"), accents kept, plus the source line from D2. Built by the extension (no outside service). Old picture sample: `ferramentas-de-teste/simples-nacional/ConsultaOptantes.pdf`.
 - **Several suppliers:** one tab, one CNPJ after the other (form → result → Mais informações → read → back); each supplier only once per "Buscar".
 - **Captcha:** if a puzzle appears, a notice in the tab: "Resolva a verificação para continuar"; the extension waits and continues by itself.
-- **50-character limit (13/11/2026, every SEI external document):** the SEI field "Nome na Árvore" accepts at most 50 characters (`maxlength="50"` in `ferramentas-de-teste/paginas-sei/SEI-registrar-documento-externo.html`; the type "Consulta" is not counted). Use the existing `nomeNaArvore()` (`comum/sicaf.js`, v0.14.0: cuts at the last whole word, drops a final dot/comma). E.g. "Simples Nacional HM COMERCIO IMPORTACAO E EXPORTACAO LTDA." (58) → "Simples Nacional HM COMERCIO IMPORTACAO E" (≤ 50). In stage 1, after the SICAF spec is closed: move `nomeNaArvore()` to `comum/sei.js` and the rule to `docs/regras/sei.md` (it applies to every external document, not only SICAF), with a test.
+- **50-character limit (13/11/2026, every SEI external document):** the SEI field "Nome na Árvore" accepts at most 50 characters (`maxlength="50"` in `ferramentas-de-teste/paginas-sei/SEI-registrar-documento-externo.html`; the type "Consulta" is not counted). Use the existing `nomeNaArvore()` (`comum/sicaf.js`, v0.14.0, also used by `nomeDoSicaf` and `nomeDoAnexo`: cuts at the last whole word, drops a final dot/comma). E.g. "Simples Nacional HM COMERCIO IMPORTACAO E EXPORTACAO LTDA." (58) → "Simples Nacional HM COMERCIO IMPORTACAO E" (≤ 50). In stage 1, after the SICAF spec is closed: move `nomeNaArvore()` to `comum/sei.js` and the rule to `docs/regras/sei.md` (it applies to every external document, not only SICAF), with a test.
 - **Nothing in the SEI before the confirmation** (`CLAUDE.md`, Conventions); the Consulta gets the PDF only after the user confirms.
 
 ## 5. What changes
@@ -48,9 +48,9 @@ Today, for each invoice, CGOC opens the Simples Nacional "Consulta Optantes", ty
 
 Each stage fits in a short conversation (`/etapa consulta-simples <n>`) and ends with tests, version and commit. Prerequisite: `sicaf-automatico.md` finished.
 
-- [ ] Stage 1 – **Read the result and make the text PDF** (v0.16.0): rules for the result page and the PDF maker, automated tests with the saved page; the test writes a sample PDF to `ferramentas-de-teste/simples-nacional/` for the user to open and search (Ctrl+F) the CNPJ.
-- [ ] Stage 2 – **Lookup on the site** (v0.17.0): permission, open the form, fill the CNPJ, Consultar, captcha notice, Mais informações, read, PDF, Voltar, next CNPJ; branch → head office when refused (D7). Critical test (does the site accept the automatic search, how often the captcha appears, branch CNPJ).
-- [ ] Stage 3 – **Together with the SICAF and into the SEI** (v0.18.0): the "Buscar" click also runs the Simples lookups; confirmation window lists the PDF; Consulta with the PDF and tree name from D6; copy in Downloads. Critical test (writes to the SEI).
+- [ ] Stage 1 – **Read the result and make the text PDF** (v0.17.0): rules for the result page and the PDF maker, automated tests with the saved page; the test writes a sample PDF to `ferramentas-de-teste/simples-nacional/` for the user to open and search (Ctrl+F) the CNPJ.
+- [ ] Stage 2 – **Lookup on the site** (v0.18.0): permission, open the form, fill the CNPJ, Consultar, captcha notice, Mais informações, read, PDF, Voltar, next CNPJ; branch → head office when refused (D7). Critical test (does the site accept the automatic search, how often the captcha appears, branch CNPJ).
+- [ ] Stage 3 – **Together with the SICAF and into the SEI** (v0.19.0): the "Buscar" click also runs the Simples lookups; confirmation window lists the PDF; Consulta with the PDF and tree name from D6; copy in Downloads. A blank Consulta after the last Folha (reused since v0.16.0 and today "left as is") also gets the PDF and the name through "Alterar Documento Externo"; a supplier with a Consulta **with a file** after the last Folha whose PDF has its CNPJ is already done (same rule as the Sicaf). Update `docs/regras/sicaf.md` (Consulta no longer blank). Critical test (writes to the SEI).
 
 ## 7. Manual tests
 
