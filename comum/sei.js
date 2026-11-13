@@ -79,7 +79,17 @@
     return String(unidadeAberta || '').trim().toUpperCase() === unidadeDaFuncao
   }
 
-  const api = { versaoDoSei, atributosDoCampoDeSenha, lerArvore, ligadaNaUnidade }
+  // v0.14.0 (v0.17.0: em comum/sei.js, vale para todo documento externo): "Nome na Árvore" do SEI tem no
+  // máximo 50 letras (maxlength="50"): corta na última palavra inteira e tira ponto ou vírgula do fim.
+  function nomeNaArvore (texto, maximo = 50) {
+    const limpo = String(texto || '').replace(/\s+/g, ' ').trim()
+    if (limpo.length <= maximo) return limpo
+    const cortado = limpo.slice(0, maximo + 1)
+    const espaco = cortado.lastIndexOf(' ')
+    return (espaco > 0 ? cortado.slice(0, espaco) : limpo.slice(0, maximo)).replace(/[\s.,;:-]+$/, '')
+  }
+
+  const api = { versaoDoSei, atributosDoCampoDeSenha, lerArvore, ligadaNaUnidade, nomeNaArvore }
   if (typeof module !== 'undefined' && module.exports) module.exports = api
   else raiz.ExtensaoIFTO = Object.assign(raiz.ExtensaoIFTO || {}, { sei: api })
 })(globalThis)

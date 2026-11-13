@@ -2,9 +2,9 @@
 
 **Sections**: 1. Goal · 2. Out of scope · 3. Decisions to confirm · 4. Decided rules · 5. What changes · 6. Stages · 7. Manual tests
 
-- **Status:** ready to code (after `specs/feitas/sicaf-automatico.md`)
+- **Status:** in progress: stage 1 done (v0.17.0)
 - **Requested on:** 13/11/2026 · **Deadline or priority:** next improvement after the automatic SICAF
-- **Planned version:** 0.17.0
+- **Planned version:** 0.17.0 (stages: 0.17.0, 0.17.1, 0.17.2; rule of 13/11/2026: stages of one feature keep the middle number)
 
 ## 1. Goal (what for)
 
@@ -48,9 +48,9 @@ Today, for each invoice, CGOC opens the Simples Nacional "Consulta Optantes", ty
 
 Each stage fits in a short conversation (`/etapa consulta-simples <n>`) and ends with tests, version and commit. Prerequisite: `sicaf-automatico.md` finished.
 
-- [ ] Stage 1 – **Read the result and make the text PDF** (v0.17.0): rules for the result page and the PDF maker, automated tests with the saved page; the test writes a sample PDF to `ferramentas-de-teste/simples-nacional/` for the user to open and search (Ctrl+F) the CNPJ.
-- [ ] Stage 2 – **Lookup on the site** (v0.18.0): permission, open the form, fill the CNPJ, Consultar, captcha notice, Mais informações, read, PDF, Voltar, next CNPJ; branch → head office when refused (D7). Critical test (does the site accept the automatic search, how often the captcha appears, branch CNPJ).
-- [ ] Stage 3 – **Together with the SICAF and into the SEI** (v0.19.0): the "Buscar" click also runs the Simples lookups; confirmation window lists the PDF; Consulta with the PDF and tree name from D6; copy in Downloads. A blank Consulta after the last Folha (reused since v0.16.0 and today "left as is") also gets the PDF and the name through "Alterar Documento Externo"; a supplier with a Consulta **with a file** after the last Folha whose PDF has its CNPJ is already done (same rule as the Sicaf). Update `docs/regras/sicaf.md` (Consulta no longer blank). Critical test (writes to the SEI).
+- [x] Stage 1 – **Read the result and make the text PDF** (v0.17.0; sample `ferramentas-de-teste/simples-nacional/exemplo-ConsultaOptantes_14159957000190_2026-11-13.pdf`): rules for the result page and the PDF maker, automated tests with the saved page; the test writes a sample PDF to `ferramentas-de-teste/simples-nacional/` for the user to open and search (Ctrl+F) the CNPJ.
+- [ ] Stage 2 – **Lookup on the site** (v0.17.1): permission, open the form, fill the CNPJ, Consultar, captcha notice, Mais informações, read, PDF, Voltar, next CNPJ; branch → head office when refused (D7). Critical test (does the site accept the automatic search, how often the captcha appears, branch CNPJ).
+- [ ] Stage 3 – **Together with the SICAF and into the SEI** (v0.17.2): the "Buscar" click also runs the Simples lookups; confirmation window lists the PDF; Consulta with the PDF and tree name from D6; copy in Downloads. A blank Consulta after the last Folha (reused since v0.16.0 and today "left as is") also gets the PDF and the name through "Alterar Documento Externo"; a supplier with a Consulta **with a file** after the last Folha whose PDF has its CNPJ is already done (same rule as the Sicaf). Update `docs/regras/sicaf.md` (Consulta no longer blank). Critical test (writes to the SEI).
 
 ## 7. Manual tests
 

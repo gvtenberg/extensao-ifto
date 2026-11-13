@@ -1,6 +1,7 @@
 // v0.10.0: SICAF automático (spec sicaf-automatico): regras sem depender da página (testáveis no computador).
 (function (raiz) {
-  const { ligadaNaUnidade } = typeof module !== 'undefined' && module.exports ? require('./sei.js') : raiz.ExtensaoIFTO.sei
+  // v0.17.0: nomeNaArvore passou para comum/sei.js (vale para todo documento externo do SEI).
+  const { ligadaNaUnidade, nomeNaArvore } = typeof module !== 'undefined' && module.exports ? require('./sei.js') : raiz.ExtensaoIFTO.sei
   const UNIDADE_CGOC = 'CGOC/GAC/DAP/PAL/REI/IFTO'
 
   // "automatica": notas sem SICAF só na CGOC; "sempre": botão "Incluir SICAF" em qualquer unidade; "desligada".
@@ -38,6 +39,24 @@
     return `${n.slice(0, 2)}.${n.slice(2, 5)}.${n.slice(5, 8)}/${n.slice(8, 12)}-${n.slice(12)}`
   }
   const ehDoIfto = cnpj => soDigitos(cnpj).startsWith(RAIZ_IFTO)
+  // v0.17.0 (consulta-simples D7): CNPJ da matriz de uma filial: 8 primeiros números + 0001 + dígitos refeitos.
+  function cnpjMatriz (cnpj) {
+    const n = soDigitos(cnpj)
+    if (n.length !== 14) return null
+    const base = n.slice(0, 8) + '0001'
+    const digito = parcial => {
+      let soma = 0
+      let peso = parcial.length - 7
+      for (const c of parcial) {
+        soma += Number(c) * peso--
+        if (peso < 2) peso = 9
+      }
+      const resto = soma % 11
+      return String(resto < 2 ? 0 : 11 - resto)
+    }
+    const com12 = base + digito(base)
+    return com12 + digito(com12)
+  }
 
   // CNPJs formatados (00.000.000/0000-00) e válidos, na ordem do texto, sem repetir.
   function acharCnpjs (texto) {
@@ -353,14 +372,6 @@
   }
 
   // ---------- Inclusão no SEI (etapa 5) ----------
-  // v0.14.0: "Nome na Árvore" do SEI tem no máximo 50 letras: corta na última palavra inteira.
-  function nomeNaArvore (texto, maximo = 50) {
-    const limpo = String(texto || '').replace(/\s+/g, ' ').trim()
-    if (limpo.length <= maximo) return limpo
-    const cortado = limpo.slice(0, maximo + 1)
-    const espaco = cortado.lastIndexOf(' ')
-    return (espaco > 0 ? cortado.slice(0, espaco) : limpo.slice(0, maximo)).replace(/[\s.,;:-]+$/, '')
-  }
   // Decisão D3: "Sicaf <razão social do SICAF>" (sem o ponto final de "LTDA.").
   const nomeDoSicaf = nome => nomeNaArvore(String(nome || '').replace(/\.\s*$/, ''))
   // Decisão D7: "Anexo Instrumento de Cobrança NF nº 63 CHC SOLUÇOES EM SERV. E COM. LTDA".
@@ -429,7 +440,7 @@
 
   const api = {
     UNIDADE_CGOC, CNPJ_CAMPUS_PALMAS, funcaoLigada, ehCgoc,
-    soDigitos, cnpjValido, formatarCnpj, ehDoIfto, acharCnpjs, cnpjDaSelecao,
+    soDigitos, cnpjValido, formatarCnpj, ehDoIfto, cnpjMatriz, acharCnpjs, cnpjDaSelecao,
     normalizar, mesmoNumero, textoDoHtml, nomesParecidos,
     tipoNaArvore, numeroSei, lerRotuloDaNota, trechoPendente, lerAteste, situacaoDoProcesso, textoDoAviso,
     cnpjsDaNota, notaSemTexto, empenhosDoTexto, nomeNoTexto, conferirNota, agruparPorFornecedor,

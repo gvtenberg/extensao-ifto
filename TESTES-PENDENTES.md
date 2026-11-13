@@ -256,3 +256,9 @@ E: A janela diz "no Sicaf em branco …", "já existe em branco" e "no Anexo em 
 ### T64 – Buscar SICAF fora da CGOC com Automática (v0.16.0)
 F: Com "SICAF da nota fiscal" em Automática, numa unidade que não é a CGOC, selecione um CNPJ num documento; depois clique com o botão direito > "Buscar SICAF deste CNPJ".
 E: O botão "Buscar SICAF" não aparece; o menu abre uma janela dizendo para escolher "Sempre ligada" nas configurações.
+
+## Consulta do Simples Nacional: PDF em texto (v0.17.0)
+> O PDF de exemplo está no computador de desenvolvimento, na pasta ferramentas-de-teste/simples-nacional.
+### T65 – PDF da consulta com texto (v0.17.0)
+F: Abra o arquivo "exemplo-ConsultaOptantes_14159957000190_2026-11-13.pdf" e procure (Ctrl+F) "14.159.957/0001-90" e "optante".
+E: O PDF mostra os mesmos dados da página do Simples Nacional (com acentos) e a linha "Consulta feita em …"; a busca encontra o CNPJ e a palavra.

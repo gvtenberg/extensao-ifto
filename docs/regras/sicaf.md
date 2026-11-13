@@ -42,7 +42,7 @@ Decided on 13/11/2026 (spec `specs/feitas/sicaf-automatico.md`, v0.10.0 to v0.15
 - One confirmation window lists each supplier, CNPJ, the PDF obtained and the documents to create; nothing is written to the SEI before the click (`CLAUDE.md`, Conventions). Red warnings need a second click.
 - Order: per supplier Sicaf (PDF, "Nome na Árvore" = SICAF company name without the final dot, D3) and Consulta (plain); per invoice one Anexo "Instrumento de Cobrança NF nº <number without leading zeros> <supplier as in the invoice tree name>" (D7). Example: CHC invoices 63 and 64 → Sicaf, Consulta, Anexo 63, Anexo 64.
 - **Blank documents are reused** (decided 13/11/2026, v0.16.0): blank Sicaf, Consulta and Anexo after the last Folha that still have no tree name ("Sicaf (3385629)") are filled through "Alterar Documento Externo", in tree order: Sicaf gets the PDF and name, Anexo the name, Consulta stays as is. Only the missing ones are created.
-- Same fields as the one-click payment documents (`specs/documentos-pagamento.md`): today's date, Nato-digital, Público. "Nome na Árvore" takes at most **50 letters**: cut at the last whole word.
+- Same fields as the one-click payment documents (`specs/documentos-pagamento.md`): today's date, Nato-digital, Público. "Nome na Árvore" takes at most **50 letters**: cut at the last whole word (rule for every external document in `sei.md`).
 
 ## Selected CNPJ
 
