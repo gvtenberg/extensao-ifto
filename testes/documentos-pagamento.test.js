@@ -20,7 +20,7 @@ test('sempre ligada e desligada valem em qualquer unidade', () => {
 })
 
 // v0.8.0: leitura da árvore do processo (formato do SEI 5.0.4, quadro ifrArvore).
-const { lerArvore, documentosEmBranco, acharOpcao, listaEmTexto, textoDaConfirmacao } = require('../comum/documentos-pagamento.js')
+const { lerArvore, documentosEmBranco, acharOpcao, listaEmTexto, textoDaConfirmacao, codificarLatin1, montarCorpo, trocarCampos, mensagemDoSei } = require('../comum/documentos-pagamento.js')
 const arvore = [
   'Nos[0] = new infraArvoreNo("PROCESSO","3479546",null,"controlador.php?acao=arvore_visualizar","ifrVisualizacao","23236.012523/2026-88","Gestão","svg/processo.svg?25",null,null,true,true,null,null,null,null);',
   'Nos[1] = new infraArvoreNo("PASTA","PASTA2","3479546","javascript:abrirFecharPasta(\'PASTA2\')",null,"II","II",null,null,null,true,true,null,null,null);',
@@ -64,14 +64,30 @@ test('acharOpcao pelo nome exato do tipo', () => {
   assert.equal(acharOpcao(opcoes, 'Consulta'), null)
 })
 
-test('texto da confirmação, com e sem avisos', () => {
+// v0.9.0: texto curto (decisão D9).
+test('texto da confirmação, curto, com e sem avisos', () => {
   assert.equal(listaEmTexto(['Sicaf', 'Consulta', 'Anexo']), 'Sicaf, Consulta e Anexo')
-  const simples = textoDaConfirmacao({ numero: '23236.012523/2026-88' })
-  assert.match(simples, /^Incluir no processo 23236\.012523\/2026-88 os documentos externos em branco: Sicaf, Consulta e Anexo\?/)
-  assert.doesNotMatch(simples, /ATENÇÃO/)
-  const comAviso = textoDaConfirmacao({ numero: 'X', jaIncluidosHoje: true, emBranco: [{ rotulo: 'Sicaf (1)' }] })
-  assert.match(comAviso, /já incluiu estes documentos neste processo hoje/)
-  assert.match(comAviso, /sem arquivo: Sicaf \(1\)\./)
+  assert.equal(textoDaConfirmacao({}), 'Incluir Sicaf, Consulta e Anexo neste processo?')
+  const emBranco = [{ rotulo: 'Anexo (3)' }, { rotulo: 'Sicaf (1)' }, { rotulo: 'Sicaf (2)' }]
+  assert.equal(textoDaConfirmacao({ jaIncluidosHoje: true, emBranco }), 'Este processo já tem Sicaf e Anexo sem arquivo. Incluir mais três?')
+  assert.equal(textoDaConfirmacao({ jaIncluidosHoje: true }), 'Sicaf, Consulta e Anexo já foram incluídos hoje pela extensão. Incluir mais três?')
+})
+
+// v0.9.0: formulário enviado direto ao SEI (decisão D8).
+test('corpo do formulário em latim-1, como o navegador envia ao SEI', () => {
+  assert.equal(codificarLatin1('Campus Palmas'), 'Campus+Palmas')
+  assert.equal(codificarLatin1('100004274±Público'), '100004274%B1P%FAblico')
+  assert.equal(codificarLatin1('12/11/2026'), '12%2F11%2F2026')
+  assert.equal(codificarLatin1('€'), '%26%238364%3B')
+  assert.equal(codificarLatin1(null), '')
+  const campos = trocarCampos([['a', '1'], ['rdo', 'X'], ['b', '']], { rdo: 'N', novo: 'é' })
+  assert.deepEqual(campos, [['a', '1'], ['b', ''], ['rdo', 'N'], ['novo', 'é']])
+  assert.equal(montarCorpo(campos), 'a=1&b=&rdo=N&novo=%E9')
+})
+
+test('mensagem de erro do SEI na página devolvida', () => {
+  assert.equal(mensagemDoSei('<div id="divInfraExcecao" class="x"><b>Erro:</b>&nbsp;Data inválida.</div>'), 'Erro: Data inválida.')
+  assert.equal(mensagemDoSei('<form id="frmDocumentoCadastro"></form>'), '')
 })
 
 test('árvore guardada de um processo de pagamento com Sicaf, Consulta e Anexo em branco (se existir no computador)', () => {

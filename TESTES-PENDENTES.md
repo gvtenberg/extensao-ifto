@@ -129,12 +129,21 @@ E: Primeiro "Geral (todas as unidades)"; depois "Por unidade", com Direção-ger
 
 ## Documentos do pagamento: incluir os três documentos (v0.8.0)
 > Use um processo de teste (ou um processo de pagamento que vá mesmo receber os três), na unidade CGOC.
-### T33 – Incluir Sicaf, Consulta e Anexo (v0.8.0) (Crítico)
-F: Abra o processo e clique em "Incluir Sicaf, Consulta e Anexo" no alto à direita; leia a pergunta e clique em OK. Não mexa no SEI até terminar.
-E: O SEI abre Incluir Documento > Externo três vezes sozinho e salva; o botão mostra "Incluindo… (1/3)"; no fim aparece "Pronto…" e a árvore tem Sicaf, Consulta e Anexo, cada um com a data de hoje, Nato-digital e Público. Se parar no meio, comente a mensagem e o que ficou na árvore.
-### T34 – Aviso de documento sem arquivo ou já incluído hoje (v0.8.0)
-F: No mesmo processo do T33, clique de novo no botão.
-E: A pergunta mostra "ATENÇÃO" (já incluídos hoje e o Sicaf/Consulta/Anexo sem arquivo); clicando em Cancelar nada é incluído.
 ### T35 – Parar a inclusão (v0.8.0)
 F: Em outro processo de teste, comece a inclusão e, enquanto o botão mostra "Incluindo…", clique nele e confirme que quer parar.
 E: Aparece qual documento já foi incluído e a extensão não inclui mais nada.
+
+## Documentos do pagamento: inclusão rápida (v0.9.0)
+> Use um processo de teste, na unidade CGOC. Antes, em Firefox › about:debugging, clique em "Recarregar" na extensão (ou instale a versão nova).
+### T36 – Incluir Sicaf, Consulta e Anexo direto, sem abrir telas (v0.9.0) (Crítico)
+F: Abra um processo sem Sicaf, Consulta e Anexo, clique em "Incluir Sicaf, Consulta e Anexo" e em OK.
+E: Nenhuma tela do SEI abre; em cerca de 1 a 3 segundos a árvore recarrega com Sicaf, Consulta e Anexo (data de hoje, Nato-digital, Público) e o botão mostra "Incluídos ✓". Se aparecer mensagem de erro, comente o texto e o que ficou na árvore.
+### T37 – Pergunta curta antes de incluir (v0.9.0)
+F: No mesmo processo do T36, clique de novo no botão e leia a pergunta; clique em Cancelar.
+E: A pergunta é curta: "Este processo já tem Sicaf, Consulta e Anexo sem arquivo. Incluir mais três?"; nada é incluído.
+
+## Atualização da extensão (v0.9.1)
+> Só depois que a versão 0.9.1 (ou mais nova) estiver instalada no Firefox e uma versão mais nova for publicada.
+### T38 – Instalar a atualização direto pela janela (v0.9.1)
+F: Clique no ícone da extensão › "Procurar atualização" › "Instalar a versão …".
+E: O Firefox pede "Permitir" e depois "Adicionar", sem abrir a página do GitHub. Se nada aparecer, comente; o link "abra a página da versão" é a reserva.

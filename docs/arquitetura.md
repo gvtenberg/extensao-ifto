@@ -11,13 +11,12 @@ Plain JavaScript, no build step, Manifest V3 (D4 in `specs/base-e-sei.md`). Pure
 | `comum/configuracoes.js` | Settings in the browser: defaults (`PADROES`), `comPadroes`, read and write |
 | `comum/lista-assinaturas.js` | Signature list: parse pasted lines (`lerLista`), acknowledgement item, feature on by unit (`funcaoLigada`), counter and next pending |
 | `comum/documento-externo.js` | External document: new vs. existing page (`ehDocumentoExternoNovo`), today's date (`dataDeHoje`), what is still empty (`oQuePreencher`) (v0.6.0) |
-| `comum/documentos-pagamento.js` | Payment documents (CGOC): unit, types in order (`TIPOS`), feature on by unit (`funcaoLigada`) (v0.7.0); process tree reading (`lerArvore`: done in the SEI, with file), blank documents (`documentosEmBranco`), type option (`acharOpcao`), confirmation text (v0.8.0) |
+| `comum/documentos-pagamento.js` | Payment documents (CGOC): unit, types in order (`TIPOS`), feature on by unit (`funcaoLigada`) (v0.7.0); process tree reading (`lerArvore`: done in the SEI, with file), blank documents (`documentosEmBranco`), type option (`acharOpcao`), confirmation text (v0.8.0); short question, form body in ISO-8859-1 (`codificarLatin1`, `montarCorpo`, `trocarCampos`), SEI error text (`mensagemDoSei`) (v0.9.0) |
 | `comum/atualizacao.js` | Check for update: latest GitHub Release address, `compararVersoes`, `lerRelease` (version, `.xpi`, Release page) |
 | `comum/estilo.css` | Colors and components of the extension's own pages (system pattern) |
 | `sites/sei/todas-as-paginas.js` | On every SEI page: saves the SEI version and address (`seiVisto`) |
 | `sites/sei/barra-extensao.js` | Extension bar at the top right of full SEI pages; features add buttons (`ExtensaoIFTO.barra.botao/mostrar/fundo`) (v0.7.0) |
-| `sites/sei/documentos-pagamento.js` | "Incluir Sicaf, Consulta e Anexo" button in the bar, only with a process open (`#ifrArvore`) (v0.7.0); confirmation, opens Incluir Documento, advances when the tree reloads after Salvar, stops after 90 s without progress (v0.8.0) |
-| `sites/sei/documentos-pagamento-quadros.js` | Steps inside the right frame during the creation: clicks "Externo", picks the type (the SEI reloads the form), fills and clicks Salvar (v0.8.0); marks "salvo" when the process page (`#divArvoreHtml`) opens after Salvar (v0.8.1) |
+| `sites/sei/documentos-pagamento.js` | "Incluir Sicaf, Consulta e Anexo" button in the bar, only with a process open (`#ifrArvore`) (v0.7.0); confirmation (v0.8.0); sends the SEI forms directly (Incluir Documento › Externo › type › Salvar, three times) and reloads the tree (v0.9.0) |
 | `sites/sei/lista-assinaturas.js` | Signature list floating panel (SEI main page): paste, navigate, open via quick search, "Assinar e próximo" / "Dar ciência e próximo" (waits for the SEI to reload the tree, then advances) |
 | `sites/sei/lista-assinaturas-teclas.js` | Alt+→ and Alt+← shortcuts with focus inside SEI frames (notifies the main page) |
 | `sites/sei/assinar-e-proximo.js` | Inside the SEI signing window: clicks "Assinar" if Firefox already filled in the password and marks the pending item as sent (v0.5.0) |

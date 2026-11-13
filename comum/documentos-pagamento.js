@@ -68,18 +68,48 @@
     return lista.slice(0, -1).join(', ') + ' e ' + lista[lista.length - 1]
   }
 
-  // Pergunta antes de incluir, com os avisos (D5): já incluídos hoje pela extensão e documentos sem arquivo.
-  function textoDaConfirmacao ({ numero, tipos = TIPOS, jaIncluidosHoje, emBranco }) {
-    const linhas = [`Incluir no processo ${numero || 'aberto'} os documentos externos em branco: ${listaEmTexto(tipos)}?`,
-      '(Data de hoje, Nato-digital e Público. A extensão clica em Salvar em cada um.)']
-    const avisos = []
-    if (jaIncluidosHoje) avisos.push('A extensão já incluiu estes documentos neste processo hoje.')
-    if (emBranco && emBranco.length) avisos.push('Este processo já tem documento sem arquivo: ' + listaEmTexto(emBranco.map(doc => doc.rotulo)) + '.')
-    if (avisos.length) linhas.push('', 'ATENÇÃO: ' + avisos.join(' '), 'Incluir os três mesmo assim?')
-    return linhas.join('\n')
+  // Pergunta antes de incluir, com os avisos (D5). v0.9.0: texto curto e direto (decisão D9).
+  function textoDaConfirmacao ({ tipos = TIPOS, jaIncluidosHoje, emBranco }) {
+    const lista = listaEmTexto(tipos)
+    const tiposEmBranco = tipos.filter(tipo => (emBranco || []).some(doc => ehDoTipo(doc.rotulo, tipo)))
+    let aviso = ''
+    if (tiposEmBranco.length) aviso = `Este processo já tem ${listaEmTexto(tiposEmBranco)} sem arquivo.`
+    else if (jaIncluidosHoje) aviso = `${lista} já foram incluídos hoje pela extensão.`
+    if (!aviso) return `Incluir ${lista} neste processo?`
+    return aviso + (tipos.length === 3 ? ' Incluir mais três?' : ' Incluir mesmo assim?')
   }
 
-  const api = { UNIDADE_CGOC, TIPOS, funcaoLigada, lerArvore, ehDoTipo, documentosEmBranco, acharOpcao, listaEmTexto, textoDaConfirmacao }
+  // v0.9.0: envio direto ao SEI (decisão D8). O SEI é ISO-8859-1: o corpo do formulário vai codificado
+  // como o navegador faria (letra fora do latim-1 vira &#código;).
+  function codificarLatin1 (texto) {
+    let saida = ''
+    for (const letra of String(texto == null ? '' : texto)) {
+      const codigo = letra.codePointAt(0)
+      if (/[A-Za-z0-9*\-._]/.test(letra)) saida += letra
+      else if (letra === ' ') saida += '+'
+      else if (codigo < 256) saida += '%' + codigo.toString(16).toUpperCase().padStart(2, '0')
+      else saida += codificarLatin1('&#' + codigo + ';')
+    }
+    return saida
+  }
+  // campos: lista de [nome, valor] (a ordem do formulário).
+  function montarCorpo (campos) {
+    return campos.map(([nome, valor]) => codificarLatin1(nome) + '=' + codificarLatin1(valor)).join('&')
+  }
+  // Troca valores (todos os campos com o nome) ou acrescenta no fim.
+  function trocarCampos (campos, novos) {
+    const resultado = campos.filter(([nome]) => !(nome in novos))
+    for (const [nome, valor] of Object.entries(novos)) if (valor !== undefined) resultado.push([nome, valor])
+    return resultado
+  }
+  // Mensagem de erro que o SEI mostra na página devolvida (quadro de exceção), sem as marcas do HTML.
+  function mensagemDoSei (html) {
+    const achado = /id="divInfraExcecao"[^>]*>([\s\S]*?)<\/div>/i.exec(html || '')
+    if (!achado) return ''
+    return achado[1].replace(/<[^>]*>/g, ' ').replace(/&nbsp;/g, ' ').replace(/\s+/g, ' ').trim()
+  }
+
+  const api = { UNIDADE_CGOC, TIPOS, funcaoLigada, lerArvore, ehDoTipo, documentosEmBranco, acharOpcao, listaEmTexto, textoDaConfirmacao, codificarLatin1, montarCorpo, trocarCampos, mensagemDoSei }
   if (typeof module !== 'undefined' && module.exports) module.exports = api
   else raiz.ExtensaoIFTO = Object.assign(raiz.ExtensaoIFTO || {}, { documentosPagamento: api })
 })(globalThis)

@@ -1,9 +1,9 @@
 // v0.7.0: botão "Incluir Sicaf, Consulta e Anexo" na barra da extensão (spec documentos-pagamento).
 // Só com um processo aberto (página com a árvore, #ifrArvore).
-// v0.8.0: depois da confirmação, inclui os três documentos externos em branco. A tarefa fica guardada no
-// navegador (CHAVE_TAREFA) e anda por passos: "incluir" (aqui: Incluir Documento) › "tipo" (escolher Externo
-// e o tipo) › "salvar" (preencher e clicar Salvar), feitos por sites/sei/documentos-pagamento-quadros.js.
-// Quando a árvore recarrega depois do Salvar, o documento foi incluído e passa ao próximo tipo.
+// v0.9.0 (decisão D8): depois da confirmação, a extensão envia os formulários do SEI direto, sem abrir as
+// telas (como o próprio SEI faria): Incluir Documento › Externo, uma vez; depois, para cada tipo, escolher o
+// tipo (o SEI devolve o formulário do tipo) e Salvar com data de hoje, Nato-digital e Público. No fim,
+// recarrega a árvore para os documentos aparecerem. Substitui os passos pelas telas da v0.8.0.
 (async function () {
   if (window.top !== window) return
   const { documentosPagamento: regras, documentoExterno, configuracoes, barra } = globalThis.ExtensaoIFTO
@@ -11,9 +11,9 @@
   if (!barra || !campoUnidade || !document.getElementById('ifrArvore')) return
   const unidade = campoUnidade.textContent.trim()
   const navegador = globalThis.browser || globalThis.chrome
-  const CHAVE_TAREFA = 'documentosPagamentoTarefa'
   const CHAVE_FEITOS = 'documentosPagamentoFeitos'
-  const ESPERA_MAXIMA = 90 * 1000
+  // Tarefa dos passos pelas telas (até a v0.8.1): não é mais usada; apaga se ficou guardada.
+  navegador.storage.local.remove('documentosPagamentoTarefa')
 
   let opcoes = await configuracoes.lerConfiguracoes()
   const ID = 'documentos-pagamento'
@@ -25,6 +25,7 @@
     aoClicar: () => clicou()
   })
   const desenhar = () => barra.mostrar(ID, regras.funcaoLigada(opcoes.documentosPagamento, unidade))
+  const escreverNoBotao = texto => { botao.lastChild.textContent = ' ' + texto }
 
   // ---------- Árvore do processo (quadro ifrArvore) ----------
   function arvore () {
@@ -36,16 +37,12 @@
     lida.linkIncluir = (/<a href="(controlador\.php\?acao=documento_escolher_tipo[^"]*)"/.exec(texto) || [])[1] || null
     return lida.idProcesso ? lida : null
   }
+  function recarregarArvore () {
+    const quadro = document.getElementById('ifrArvore')
+    try { quadro.contentWindow.location.reload() } catch (erro) { quadro.setAttribute('src', quadro.getAttribute('src')) }
+  }
 
-  // ---------- Tarefa guardada ----------
-  async function lerTarefa () {
-    const { [CHAVE_TAREFA]: tarefa } = await navegador.storage.local.get(CHAVE_TAREFA)
-    return tarefa || null
-  }
-  async function gravarTarefa (tarefa) {
-    if (tarefa) await navegador.storage.local.set({ [CHAVE_TAREFA]: tarefa })
-    else await navegador.storage.local.remove(CHAVE_TAREFA)
-  }
+  // ---------- Feitos hoje (aviso D5) ----------
   async function feitosHoje (idProcesso) {
     const { [CHAVE_FEITOS]: feitos } = await navegador.storage.local.get(CHAVE_FEITOS)
     return Boolean(feitos && feitos[idProcesso] === documentoExterno.dataDeHoje())
@@ -59,11 +56,100 @@
     await navegador.storage.local.set({ [CHAVE_FEITOS]: novos })
   }
 
+  // ---------- Conversa com o SEI (formulários enviados direto) ----------
+  // O SEI responde em ISO-8859-1: lê os bytes e decodifica (o .text() leria como UTF-8).
+  async function pedir (endereco, corpo) {
+    const resposta = await fetch(endereco, {
+      method: corpo ? 'POST' : 'GET',
+      credentials: 'same-origin',
+      headers: corpo ? { 'Content-Type': 'application/x-www-form-urlencoded' } : {},
+      body: corpo || undefined
+    })
+    if (!resposta.ok) throw new Error('O SEI não respondeu (erro ' + resposta.status + '). Tente de novo.')
+    const html = new TextDecoder('windows-1252').decode(await resposta.arrayBuffer())
+    return { endereco: resposta.url || endereco, html }
+  }
+  const lerHtml = html => new DOMParser().parseFromString(html, 'text/html')
+
+  // Campos que o navegador enviaria ao clicar em Salvar (mesmas regras do envio de formulário).
+  function camposDoFormulario (formulario) {
+    const campos = []
+    for (const campo of formulario.elements) {
+      const nome = campo.getAttribute('name')
+      if (!nome || campo.hasAttribute('disabled')) continue
+      const tag = campo.tagName.toLowerCase()
+      const tipo = (campo.getAttribute('type') || '').toLowerCase()
+      if (tag === 'button' || ['button', 'submit', 'reset', 'image', 'file'].includes(tipo)) continue
+      if (tag === 'select') {
+        const opcoesDaLista = [...campo.options]
+        let escolhidas = opcoesDaLista.filter(opcao => opcao.hasAttribute('selected'))
+        if (!campo.multiple && !escolhidas.length && opcoesDaLista.length && !(Number(campo.getAttribute('size')) > 1)) escolhidas = [opcoesDaLista[0]]
+        if (!campo.multiple) escolhidas = escolhidas.slice(-1)
+        for (const opcao of escolhidas) campos.push([nome, opcao.getAttribute('value') !== null ? opcao.getAttribute('value') : opcao.textContent])
+      } else if (tag === 'textarea') {
+        campos.push([nome, campo.textContent])
+      } else if (tipo === 'radio' || tipo === 'checkbox') {
+        if (campo.hasAttribute('checked')) campos.push([nome, campo.getAttribute('value') || 'on'])
+      } else {
+        campos.push([nome, campo.getAttribute('value') || ''])
+      }
+    }
+    return campos
+  }
+  async function enviar (formulario, enderecoDaPagina, novos) {
+    const destino = new URL(formulario.getAttribute('action'), enderecoDaPagina).href
+    return pedir(destino, regras.montarCorpo(regras.trocarCampos(camposDoFormulario(formulario), novos)))
+  }
+  function formularioDoExterno (pagina) {
+    return lerHtml(pagina.html).getElementById('frmDocumentoCadastro')
+  }
+
+  // Inclui os tipos um a um. aoAvancar(posição) atualiza o botão; deveParar() vê se a pessoa pediu para parar.
+  async function incluirDireto (lida, tipos, { aoAvancar, deveParar, incluidos }) {
+    if (!lida.linkIncluir) throw new Error('Não achei "Incluir Documento" na árvore do processo.')
+    // Incluir Documento › Externo (escolher(-1) do SEI): devolve o formulário do documento externo novo.
+    let pagina = await pedir(new URL(lida.linkIncluir.replace(/&amp;/g, '&'), location.href).href)
+    const escolherTipo = lerHtml(pagina.html).getElementById('frmDocumentoEscolherTipo')
+    if (!escolherTipo) throw new Error('O SEI não abriu "Incluir Documento". Confira se a sessão do SEI ainda está aberta.')
+    const paginaEmBranco = await enviar(escolherTipo, pagina.endereco, { hdnIdSerie: '-1' })
+    if (!formularioDoExterno(paginaEmBranco)) throw new Error('O SEI não abriu o documento externo.')
+
+    for (let posicao = 0; posicao < tipos.length; posicao++) {
+      if (deveParar()) return
+      const tipo = tipos[posicao]
+      aoAvancar(posicao)
+      // 1º: escolher o tipo (trocarSerie() do SEI), sempre a partir do formulário em branco.
+      const emBranco = formularioDoExterno(paginaEmBranco)
+      const lista = emBranco.querySelector('#selSerie')
+      const opcao = lista && regras.acharOpcao([...lista.options].map(item => ({ valor: item.getAttribute('value'), texto: item.textContent })), tipo)
+      if (!opcao) throw new Error(`O tipo de documento "${tipo}" não aparece na lista do SEI.`)
+      pagina = await enviar(emBranco, paginaEmBranco.endereco, { hdnIdSerie: opcao.valor, selSerie: opcao.valor })
+      const doTipo = formularioDoExterno(pagina)
+      // O tipo ficou se o SEI devolve o formulário com ele (no campo escondido ou marcado na lista).
+      const serie = doTipo && doTipo.querySelector('#hdnIdSerie')
+      const marcada = doTipo && doTipo.querySelector('#selSerie option[selected]')
+      if (!doTipo || ((serie && serie.getAttribute('value')) !== opcao.valor && (marcada && marcada.getAttribute('value')) !== opcao.valor)) {
+        throw new Error(`O SEI não aceitou o tipo "${tipo}".`)
+      }
+      // 2º: Salvar (confirmarDados() do SEI) com data de hoje, Nato-digital e Público; nível público limpa
+      // grau de sigilo e hipótese legal (alterarNivelAcesso() do SEI).
+      const novos = { hdnIdSerie: opcao.valor, selSerie: opcao.valor, txtDataElaboracao: documentoExterno.dataDeHoje(), rdoFormato: 'N', rdoNivelAcesso: '0', hdnFlagDocumentoCadastro: '2' }
+      for (const nome of ['selGrauSigilo', 'selHipoteseLegal']) {
+        const listaNula = doTipo.querySelector(`select[name="${nome}"]`)
+        if (listaNula && [...listaNula.options].some(item => item.getAttribute('value') === 'null')) novos[nome] = 'null'
+      }
+      pagina = await enviar(doTipo, pagina.endereco, novos)
+      // Se o SEI devolve o formulário de novo, não salvou.
+      if (formularioDoExterno(pagina)) throw new Error(regras.mensagemDoSei(pagina.html) || `O SEI não salvou o documento "${tipo}".`)
+      incluidos.push(tipo)
+    }
+  }
+
   // ---------- Clique no botão ----------
+  let andamento = null // { parar } enquanto inclui
   async function clicou () {
-    const tarefa = await lerTarefa()
-    if (tarefa) {
-      if (window.confirm('A extensão está incluindo ' + regras.listaEmTexto(tarefa.tipos) + '. Parar agora?')) await parar('Inclusão parada.')
+    if (andamento) {
+      if (window.confirm('Parar a inclusão?')) andamento.parar = true
       return
     }
     const lida = arvore()
@@ -72,121 +158,42 @@
       return
     }
     const pergunta = regras.textoDaConfirmacao({
-      numero: lida.numero,
       jaIncluidosHoje: await feitosHoje(lida.idProcesso),
       emBranco: regras.documentosEmBranco(lida.documentos)
     })
     if (!window.confirm(pergunta)) return
-    await gravarTarefa({ idProcesso: lida.idProcesso, numero: lida.numero, tipos: [...regras.TIPOS], posicao: 0, incluidos: [], passo: 'incluir', desde: Date.now() })
-    await abrirIncluirDocumento()
-  }
-
-  // Abre "Incluir Documento": o botão do SEI (barra do quadro da direita) ou o link da árvore.
-  function acharBotaoIncluir (janela = window, profundidade = 0) {
-    let doc
-    try { doc = janela.document } catch (erro) { return null }
-    const imagem = doc.querySelector('#divArvoreAcoes a > img[title="Incluir Documento"]')
-    if (imagem) return imagem.parentElement
-    if (profundidade > 3) return null
-    for (const quadro of doc.querySelectorAll('iframe')) {
-      const achado = quadro.contentWindow && acharBotaoIncluir(quadro.contentWindow, profundidade + 1)
-      if (achado) return achado
+    const tipos = [...regras.TIPOS]
+    const incluidos = []
+    andamento = { parar: false }
+    let erro = null
+    try {
+      await incluirDireto(lida, tipos, {
+        incluidos,
+        deveParar: () => andamento.parar,
+        aoAvancar: posicao => escreverNoBotao(`Incluindo ${tipos[posicao]} (${posicao + 1}/${tipos.length})…`)
+      })
+    } catch (falha) {
+      erro = falha
     }
-    return null
-  }
-  function acharQuadro (nome, janela = window, profundidade = 0) {
-    let doc
-    try { doc = janela.document } catch (erro) { return null }
-    for (const quadro of doc.querySelectorAll('iframe')) {
-      if (quadro.name === nome || quadro.id === nome) return quadro
-      const achado = profundidade < 3 && quadro.contentWindow && acharQuadro(nome, quadro.contentWindow, profundidade + 1)
-      if (achado) return achado
-    }
-    return null
-  }
-  async function abrirIncluirDocumento (tentativa = 0) {
-    const botaoDoSei = acharBotaoIncluir()
-    if (botaoDoSei) { botaoDoSei.click(); return }
-    const lida = arvore()
-    const quadro = acharQuadro('ifrVisualizacao') || document.getElementById('ifrConteudoVisualizacao')
-    if (lida && lida.linkIncluir && quadro) { quadro.src = lida.linkIncluir.replace(/&amp;/g, '&'); return }
-    // O quadro da direita ainda está abrindo: tenta de novo por alguns segundos.
-    if (tentativa < 20) { setTimeout(() => abrirIncluirDocumento(tentativa + 1), 500); return }
-    await parar('Não achei o botão "Incluir Documento" do SEI.')
-  }
-
-  // ---------- Andamento ----------
-  async function parar (motivo) {
-    const tarefa = await lerTarefa()
-    await gravarTarefa(null)
-    mostrarAndamento(null)
-    const feitos = tarefa && tarefa.incluidos.length ? 'Incluídos: ' + regras.listaEmTexto(tarefa.incluidos) + '.' : 'Nenhum documento foi incluído.'
-    window.alert(motivo + '\n' + feitos + '\nConfira a árvore do processo.')
-  }
-
-  // Depois do Salvar, o SEI abre a página do processo no quadro do formulário (o quadro marca "salvo") e
-  // recarrega a árvore (ou a página toda): o documento do passo foi incluído.
-  let conferindo = false
-  async function arvoreRecarregou () {
-    if (conferindo) return
-    conferindo = true
-    try { await avancarSeSalvou() } finally { conferindo = false }
-  }
-  async function avancarSeSalvou () {
-    const tarefa = await lerTarefa()
-    if (!tarefa || (tarefa.passo !== 'salvando' && tarefa.passo !== 'salvo')) return
-    const lida = arvore()
-    if (lida && lida.idProcesso !== tarefa.idProcesso) return
-    tarefa.incluidos.push(tarefa.tipos[tarefa.posicao])
-    tarefa.posicao++
-    if (tarefa.posicao >= tarefa.tipos.length) {
-      await gravarTarefa(null)
-      await marcarFeitosHoje(tarefa.idProcesso)
-      mostrarAndamento(null)
-      window.alert('Pronto: ' + regras.listaEmTexto(tarefa.incluidos) + ' incluídos no processo ' + (tarefa.numero || '') + '.')
+    const parou = andamento.parar
+    andamento = null
+    if (incluidos.length) { await marcarFeitosHoje(lida.idProcesso); recarregarArvore() }
+    if (erro || parou) {
+      escreverNoBotao(textoDoBotao)
+      const feitos = incluidos.length ? 'Incluídos: ' + regras.listaEmTexto(incluidos) + '.' : 'Nenhum documento foi incluído.'
+      window.alert((erro ? erro.message : 'Inclusão parada.') + '\n' + feitos)
       return
     }
-    Object.assign(tarefa, { passo: 'incluir', desde: Date.now() })
-    await gravarTarefa(tarefa)
-    mostrarAndamento(tarefa)
-    setTimeout(() => abrirIncluirDocumento(), 800)
+    // Como no SEI: sem janela no fim; a árvore recarrega e o botão confirma por alguns segundos.
+    escreverNoBotao('Incluídos ✓')
+    setTimeout(() => { if (!andamento) escreverNoBotao(textoDoBotao) }, 3000)
   }
-
-  function mostrarAndamento (tarefa) {
-    const texto = tarefa
-      ? `Incluindo ${tarefa.tipos[tarefa.posicao]} (${tarefa.posicao + 1}/${tarefa.tipos.length})… clique para parar`
-      : textoDoBotao
-    botao.lastChild.textContent = ' ' + texto
-  }
-
-  // Passo parado há muito tempo (pergunta do SEI cancelada, página que não abriu): para e avisa.
-  async function vigiar () {
-    const tarefa = await lerTarefa()
-    if (!tarefa) return
-    mostrarAndamento(tarefa)
-    if (Date.now() - tarefa.desde > ESPERA_MAXIMA) await parar('A inclusão parou: um passo demorou demais ou foi cancelado.')
-  }
-
-  const quadroArvore = document.getElementById('ifrArvore')
-  quadroArvore.addEventListener('load', () => setTimeout(arvoreRecarregou, 300))
 
   navegador.storage.onChanged.addListener(async (mudancas, area) => {
-    if (area !== 'local') return
-    if (mudancas.configuracoes) { opcoes = await configuracoes.lerConfiguracoes(); desenhar() }
-    if (mudancas[CHAVE_TAREFA]) {
-      const nova = mudancas[CHAVE_TAREFA].newValue || null
-      if (nova && nova.passo === 'erro') await parar('A inclusão parou: o SEI não aceitou o tipo do documento.')
-      else if (nova && nova.passo === 'salvo') arvoreRecarregou()
-      else mostrarAndamento(nova)
-    }
+    if (area !== 'local' || !mudancas.configuracoes) return
+    opcoes = await configuracoes.lerConfiguracoes()
+    desenhar()
   })
 
   desenhar()
-  setInterval(vigiar, 3000)
-  // A página toda recarregou depois do Salvar (a árvore já veio nova): confere já.
-  const tarefaAoAbrir = await lerTarefa()
-  if (tarefaAoAbrir) {
-    mostrarAndamento(tarefaAoAbrir)
-    if (tarefaAoAbrir.passo === 'salvando' || tarefaAoAbrir.passo === 'salvo') setTimeout(arvoreRecarregou, 1000)
-  }
 })()
