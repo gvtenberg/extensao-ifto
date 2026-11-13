@@ -47,7 +47,7 @@ function tratarRecado (recado, remetente) {
     case 'sicafCnpj': return levarParaOSei({ ...recado, valido: regras.cnpjValido(recado.cnpj) }, aba)
     case 'sicafPermissao': return temPermissao().then(sim => ({ permitido: sim }))
     case 'abrirConfiguracoes': return navegador.tabs.create({ url: navegador.runtime.getURL('configuracoes/index.html#sicaf') }).then(() => ({ ok: true }))
-    case 'sicafBuscar': return iniciarBusca(recado.cnpjs || [], aba)
+    case 'sicafBuscar': return iniciarBusca(recado.cnpjs || [], aba, recado.cnpjsSimples)
     case 'sicafCancelar': return gravarTarefa(null).then(() => ({ ok: true }))
     case 'sicafQualCnpj': return qualCnpj(aba)
     case 'sicafPesquisei': return marcarPesquisa(recado.cnpj)
@@ -105,15 +105,19 @@ async function lerPdfsDeHoje () {
   return Object.fromEntries(Object.entries(pdfs).filter(([, pdf]) => pdf.data === hoje()))
 }
 
-async function iniciarBusca (cnpjs, abaSei) {
+// v0.17.6: SICAF e Simples Nacional podem ter listas diferentes (cnpjs = SICAF; cnpjsSimples = Simples;
+// sem cnpjsSimples, os mesmos do SICAF). Botões de um só ("Incluir SICAF", "Incluir Simples Nacional").
+async function iniciarBusca (cnpjs, abaSei, cnpjsSimples) {
   if (!await temPermissao()) return { semPermissao: true }
-  const pedidos = [...new Set(cnpjs.filter(regras.cnpjValido))]
+  const doSicaf = [...new Set(cnpjs.filter(regras.cnpjValido))]
+  const doSimples = cnpjsSimples ? [...new Set(cnpjsSimples.filter(regras.cnpjValido))] : doSicaf
+  const pedidos = [...new Set([...doSicaf, ...doSimples])]
   const pdfs = await lerPdfsDeHoje()
-  const faltam = pedidos.filter(cnpj => !pdfs[cnpj])
+  const faltam = doSicaf.filter(cnpj => !pdfs[cnpj])
   const consultas = await lerSimplesDeHoje()
-  const simplesFaltam = pedidos.filter(cnpj => !consultas[cnpj])
+  const simplesFaltam = doSimples.filter(cnpj => !consultas[cnpj])
   const tarefa = {
-    idAbaSei: abaSei.id, pedidos, faltam, posicao: 0, pesquisado: false, erros: {}, idAbaSicaf: null, foiAoLogin: false, cliqueiEntrar: false, idasAreaDeTrabalho: 0,
+    idAbaSei: abaSei.id, pedidos, doSicaf, doSimples, faltam, posicao: 0, pesquisado: false, erros: {}, idAbaSicaf: null, foiAoLogin: false, cliqueiEntrar: false, idasAreaDeTrabalho: 0,
     // v0.17.2: Simples Nacional depois do SICAF ("fase"), com a matriz quando o site recusa a filial (D7).
     fase: faltam.length ? 'sicaf' : 'simples', simplesFaltam, simplesPosicao: 0, simplesPesquisado: false, simplesMatriz: false, simplesErros: {}
   }
@@ -298,11 +302,15 @@ async function terminar (tarefa) {
   const consultas = await lerSimplesDeHoje()
   const errosDoSimples = tarefa.simplesErros || {}
   // v0.17.2: cada resultado leva também a consulta do Simples Nacional (usada no SEI na etapa 3).
+  // v0.17.6: só a parte pedida de cada CNPJ (SICAF, Simples ou os dois).
+  const doSicaf = tarefa.doSicaf || tarefa.pedidos
+  const doSimples = tarefa.doSimples || tarefa.pedidos
   const resultados = tarefa.pedidos.map(cnpj => ({
-    ...(pdfs[cnpj]
-      ? { cnpj, nome: pdfs[cnpj].nome, arquivo: pdfs[cnpj].arquivo, nomeDoArquivo: pdfs[cnpj].nomeDoArquivo }
-      : { cnpj, erro: tarefa.erros[cnpj] || 'O SICAF não devolveu o PDF.' }),
-    simples: consultas[cnpj]
+    cnpj,
+    ...(!doSicaf.includes(cnpj) ? { semSicaf: true } : pdfs[cnpj]
+      ? { nome: pdfs[cnpj].nome, arquivo: pdfs[cnpj].arquivo, nomeDoArquivo: pdfs[cnpj].nomeDoArquivo }
+      : { erro: tarefa.erros[cnpj] || 'O SICAF não devolveu o PDF.' }),
+    simples: !doSimples.includes(cnpj) ? null : consultas[cnpj]
       ? { nome: consultas[cnpj].nome, situacao: consultas[cnpj].situacao, arquivo: consultas[cnpj].arquivo, nomeDoArquivo: consultas[cnpj].nomeDoArquivo }
       : { erro: errosDoSimples[cnpj] || 'A consulta do Simples Nacional não foi feita.' }
   }))

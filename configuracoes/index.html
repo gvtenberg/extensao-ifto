@@ -48,32 +48,18 @@
         <span>Desligada</span>
       </label>
     </section>
-    <section class="cartao">
-      <h1>CGOC (CGOC/GAC/DAP/PAL/REI/IFTO): documentos do pagamento</h1>
-      <p class="apoio">Botão "Incluir Sicaf, Consulta e Anexo", que inclui no processo aberto os três documentos externos em branco (data de hoje, Nato-digital, Público). Aparece só com um processo aberto.</p>
-      <label class="opcao">
-        <input type="radio" name="documentosPagamento" value="automatica">
-        <span>Automática (só na CGOC)</span>
-      </label>
-      <label class="opcao">
-        <input type="radio" name="documentosPagamento" value="sempre">
-        <span>Sempre ligada, em qualquer unidade</span>
-      </label>
-      <label class="opcao">
-        <input type="radio" name="documentosPagamento" value="desligada">
-        <span>Desligada</span>
-      </label>
-    </section>
     <section class="cartao" id="sicaf">
-      <h1>SICAF da nota fiscal</h1>
-      <p class="apoio">Na CGOC, avisa quando o processo aberto tem notas fiscais sem SICAF ("2 notas sem SICAF – Buscar"), depois da última Folha de Encaminhamento. Selecionar um CNPJ numa página do SEI mostra o botão "Buscar SICAF" (na CGOC; nas outras unidades, com "Sempre ligada").</p>
+      <h1>SICAF e Simples Nacional</h1>
+      <!-- v0.18.0: um botão só na CGOC; "Sempre ligada" é a da equipe de licitação (só o Sicaf). -->
+      <p class="apoio">Na CGOC, com um processo aberto, aparece o botão "2 notas sem SICAF ou Simples – Buscar" quando há notas fiscais depois da última Folha de Encaminhamento. Um clique busca o SICAF e o Simples Nacional de cada fornecedor e, depois que você confirma, inclui o Sicaf e a Consulta com os PDFs e um Anexo em branco para cada nota.</p>
+      <p class="apoio">Ao selecionar um CNPJ numa página do SEI, aparece "Incluir SICAF, Simples e Anexo" (na CGOC) ou "Incluir SICAF" e "Incluir Simples Nacional" (nas outras unidades).</p>
       <label class="opcao">
         <input type="radio" name="incluirSicaf" value="automatica">
-        <span>Automática (aviso das notas só na CGOC)</span>
+        <span>Automática (pagamento de notas fiscais, só na CGOC)</span>
       </label>
       <label class="opcao">
         <input type="radio" name="incluirSicaf" value="sempre">
-        <span>Sempre ligada, em qualquer unidade (botões "Buscar SICAF" e "Incluir SICAF")</span>
+        <span>Sempre ligada, em qualquer unidade: só o botão "Incluir SICAF", sem precisar de nota fiscal (equipe de licitação)</span>
       </label>
       <label class="opcao">
         <input type="radio" name="incluirSicaf" value="desligada">

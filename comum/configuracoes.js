@@ -6,10 +6,9 @@
     senhaReconhecidaPeloNavegador: true,
     // v0.2.0: "automatica" (só na Direção-geral, PAL/REI/IFTO), "sempre" ou "desligada"
     listaAssinaturas: 'automatica',
-    // v0.7.0: botão "Incluir Sicaf, Consulta e Anexo": "automatica" (só na CGOC), "sempre" ou "desligada"
-    documentosPagamento: 'automatica',
     // v0.10.0: SICAF automático: "automatica" (notas sem SICAF, só na CGOC), "sempre" (botão "Incluir SICAF"
-    // em qualquer unidade) ou "desligada"
+    // em qualquer unidade) ou "desligada". v0.18.0: o botão "Incluir Sicaf, Consulta e Anexo" (documentos em
+    // branco) saiu; o botão das notas faz tudo. "sempre" = só "Incluir SICAF" (equipe de licitação).
     incluirSicaf: 'automatica'
   })
 

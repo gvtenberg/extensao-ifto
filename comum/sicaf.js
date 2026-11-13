@@ -198,10 +198,14 @@
   // ---------- Situação do processo (etapa 1) ----------
   // documentos: lerArvore().documentos; atestes: { idDoDocumento: lerAteste() }; cnpjsDosSicafs:
   // { idDoDocumento: [CNPJs achados no PDF] }. Devolve as notas pendentes e os fornecedores.
-  function situacaoDoProcesso (documentos, { atestes = {}, cnpjsDosSicafs = {} } = {}) {
+  // v0.17.6 (pedido de 13/11/2026, um botão só): a nota também fica pendente sem a Consulta do Simples
+  // Nacional (Consulta com arquivo cujo PDF tem o CNPJ; o Simples vale para a empresa toda, então conta a
+  // raiz, os 8 primeiros números).
+  function situacaoDoProcesso (documentos, { atestes = {}, cnpjsDosSicafs = {}, cnpjsDasConsultas = {} } = {}) {
     const trecho = trechoPendente(documentos)
     const itensDeAteste = trecho.filter(doc => tipoNaArvore(doc.rotulo) === 'ateste').flatMap(doc => (atestes[doc.id] || []).map(item => ({ ...item, idAteste: doc.id })))
     const sicafsComArquivo = trecho.filter(doc => tipoNaArvore(doc.rotulo) === 'sicaf' && doc.temArquivo)
+    const consultasComArquivo = trecho.filter(doc => tipoNaArvore(doc.rotulo) === 'consulta' && doc.temArquivo)
     const anexosComArquivo = trecho.filter(doc => tipoNaArvore(doc.rotulo) === 'anexo' && doc.temArquivo)
     const notas = trecho.filter(doc => tipoNaArvore(doc.rotulo) === 'nota' && doc.temArquivo).map(doc => {
       const { numero, fornecedor } = lerRotuloDaNota(doc.rotulo)
@@ -217,14 +221,20 @@
       return { id: doc.id, rotulo: doc.rotulo, link: doc.link, sei, numero, fornecedor, ateste, cnpj: ateste ? ateste.cnpj : null, anexoFeito }
     })
     const cnpjsComSicaf = new Set(sicafsComArquivo.flatMap(doc => cnpjsDosSicafs[doc.id] || []))
-    for (const nota of notas) nota.temSicaf = Boolean(nota.cnpj && cnpjsComSicaf.has(nota.cnpj))
+    const raizesComConsulta = new Set(consultasComArquivo.flatMap(doc => (cnpjsDasConsultas[doc.id] || []).map(raizDoCnpj)))
+    for (const nota of notas) {
+      nota.temSicaf = Boolean(nota.cnpj && cnpjsComSicaf.has(nota.cnpj))
+      nota.temConsulta = Boolean(nota.cnpj && raizesComConsulta.has(raizDoCnpj(nota.cnpj)))
+    }
     return {
       notas,
-      pendentes: notas.filter(nota => !nota.temSicaf),
+      pendentes: notas.filter(nota => !nota.temSicaf || !nota.temConsulta),
       atestes: trecho.filter(doc => tipoNaArvore(doc.rotulo) === 'ateste'),
-      sicafs: sicafsComArquivo
+      sicafs: sicafsComArquivo,
+      consultas: consultasComArquivo
     }
   }
+  const raizDoCnpj = cnpj => soDigitos(cnpj).slice(0, 8)
 
 
   // ---------- Nota fiscal × ateste (etapa 3; decisões D8 e D9) ----------
@@ -388,13 +398,15 @@
 
   // Documentos a incluir, na ordem: por fornecedor Sicaf (com o PDF) e Consulta; por nota um Anexo.
   // Só o Sicaf quando "soSicaf" (outras unidades, etapa 6). Notas com Anexo já feito ficam de fora.
-  function documentosParaIncluir (fornecedores, { soSicaf = false } = {}) {
+  // v0.17.6 (pedido de 13/11/2026, um botão só): o que incluir depende do pedido. CGOC (notas): Sicaf com o
+  // PDF, Consulta com o PDF do Simples Nacional ("Consulta Simples Nacional <nome>", fornecedor.nomeConsulta)
+  // e um Anexo em branco por nota. Fora da CGOC: só o Sicaf ou só a Consulta, conforme o botão.
+  function documentosParaIncluir (fornecedores, { sicaf = true, simples = true, anexo = true } = {}) {
     const itens = []
     for (const fornecedor of fornecedores || []) {
-      if (!fornecedor.temPdf) continue
-      itens.push({ tipo: 'Sicaf', nomeArvore: nomeDoSicaf(fornecedor.nomeNoSicaf || fornecedor.nome), cnpj: fornecedor.cnpj })
-      if (soSicaf) continue
-      itens.push({ tipo: 'Consulta', nomeArvore: '', cnpj: fornecedor.cnpj })
+      if (sicaf && fornecedor.temPdf) itens.push({ tipo: 'Sicaf', nomeArvore: nomeDoSicaf(fornecedor.nomeNoSicaf || fornecedor.nome), cnpj: fornecedor.cnpj })
+      if (simples && fornecedor.temSimples) itens.push({ tipo: 'Consulta', nomeArvore: fornecedor.nomeConsulta || '', cnpj: fornecedor.cnpj })
+      if (!anexo) continue
       for (const nota of fornecedor.notas || []) {
         if (!nota.anexoFeito) itens.push({ tipo: 'Anexo', nomeArvore: nomeDoAnexo(nota.numero, nota.fornecedor), cnpj: fornecedor.cnpj, nota: nota.numero })
       }
@@ -453,12 +465,13 @@
 
   // "1 nota sem SICAF" / "2 notas sem SICAF"
   function textoDoAviso (quantidade) {
-    return quantidade === 1 ? '1 nota sem SICAF' : `${quantidade} notas sem SICAF`
+    // v0.17.6: o botão busca SICAF e Simples Nacional juntos.
+    return quantidade === 1 ? '1 nota sem SICAF ou Simples' : `${quantidade} notas sem SICAF ou Simples`
   }
 
   const api = {
     UNIDADE_CGOC, CNPJ_CAMPUS_PALMAS, funcaoLigada, ehCgoc,
-    soDigitos, cnpjValido, formatarCnpj, ehDoIfto, cnpjMatriz, acharCnpjs, cnpjDaSelecao,
+    soDigitos, raizDoCnpj, cnpjValido, formatarCnpj, ehDoIfto, cnpjMatriz, acharCnpjs, cnpjDaSelecao,
     normalizar, mesmoNumero, textoDoHtml, nomesParecidos,
     tipoNaArvore, numeroSei, lerRotuloDaNota, trechoPendente, lerAteste, situacaoDoProcesso, textoDoAviso,
     cnpjsDaNota, notaSemTexto, empenhosDoTexto, nomeNoTexto, conferirNota, agruparPorFornecedor,

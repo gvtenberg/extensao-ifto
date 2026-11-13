@@ -272,3 +272,26 @@ E: o título mostra só "CNPJ – NOME DA EMPRESA" (sem "Relatórios" nem texto 
 ### T77 – Janela do ícone sem a mensagem do SEI reconhecido (v0.17.6)
 F: abra o SEI do IFTO e depois clique no ícone da extensão.
 E: não aparece mais "SEI do IFTO reconhecido"; só aparece aviso amarelo se o SEI tiver um problema (com o motivo).
+
+## Um botão só para SICAF, Simples Nacional e Anexo (v0.18.0)
+> antes de testar: Configurações > "SICAF e Simples Nacional" em "Automática"; unidade CGOC no SEI.
+
+### T78 – Botão único na CGOC (v0.18.0)
+F: abra um processo de pagamento com nota fiscal depois da última Folha de Encaminhamento, sem Sicaf nem Consulta.
+E: a barra mostra só "1 nota sem SICAF ou Simples – Buscar"; o botão "Incluir Sicaf, Consulta e Anexo" não aparece mais. Num processo sem notas pendentes, nenhum botão.
+
+### T79 – Busca do SICAF e do Simples juntos (v0.18.0)
+F: clique no botão do T78 e em "Buscar SICAF e Simples"; faça o login Gov.br e a verificação, se pedirem.
+E: na volta, a janela mostra para cada fornecedor "PDF do SICAF obtido" e "PDF do Simples Nacional obtido", cada um com "Ver o PDF", e a lista: Sicaf (com o PDF), Consulta Simples Nacional … (com o PDF) e Anexo de cada nota.
+
+### T80 – Incluir os três no processo (v0.18.0) (Crítico)
+F: na janela do T79, clique em "Incluir no processo".
+E: aparecem na árvore o Sicaf com o PDF, a "Consulta Simples Nacional NOME DA EMPRESA" com o PDF (dá para procurar o CNPJ com Ctrl+F) e o Anexo em branco de cada nota; o botão da barra some.
+
+### T81 – CNPJ selecionado (v0.18.0)
+F: na CGOC, selecione um CNPJ num documento do SEI. Depois, em outra unidade com "Sempre ligada", faça o mesmo.
+E: na CGOC aparece "Incluir SICAF, Simples e Anexo"; na outra unidade aparecem "Incluir SICAF" e "Incluir Simples Nacional", e cada um inclui só o seu documento.
+
+### T82 – Equipe de licitação: "Sempre ligada" (v0.18.0)
+F: Configurações > "SICAF e Simples Nacional" > "Sempre ligada"; abra qualquer processo (também na CGOC), clique em "Incluir SICAF" e digite um CNPJ.
+E: a barra mostra só "Incluir SICAF" (sem aviso de notas); no fim, só o Sicaf com o PDF é incluído, sem Consulta nem Anexo. Depois, volte a opção para "Automática".

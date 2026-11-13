@@ -83,10 +83,11 @@ test('situação: só depois da última Folha; Sicaf com o CNPJ no PDF; Anexo pe
   }
   const situacao = sicaf.situacaoDoProcesso(arvoreExemplo, { atestes, cnpjsDosSicafs: { 9: ['31302907000139'] } })
   assert.deepEqual(situacao.notas.map(n => [n.numero, n.cnpj, n.temSicaf, n.anexoFeito]), [['3626', '14159957000602', false, false], ['70', '31302907000139', true, true]])
-  assert.deepEqual(situacao.pendentes.map(n => n.numero), ['3626'])
+  // v0.17.6: sem Consulta com o PDF do Simples, a nota 70 também fica pendente.
+  assert.deepEqual(situacao.pendentes.map(n => n.numero), ['3626', '70'])
   assert.deepEqual(situacao.sicafs.map(doc => doc.id), ['9'])
-  assert.equal(sicaf.textoDoAviso(1), '1 nota sem SICAF')
-  assert.equal(sicaf.textoDoAviso(2), '2 notas sem SICAF')
+  assert.equal(sicaf.textoDoAviso(1), '1 nota sem SICAF ou Simples')
+  assert.equal(sicaf.textoDoAviso(2), '2 notas sem SICAF ou Simples')
   // Sem ateste: a nota fica pendente (o CNPJ vem do PDF da nota, na etapa 3).
   assert.equal(sicaf.situacaoDoProcesso(arvoreExemplo).pendentes.length, 2)
 })
@@ -239,15 +240,26 @@ test('nomes na árvore: até 50 letras, sem cortar palavra', () => {
   assert.equal(sicaf.nomeNaArvore('x'.repeat(60)).length, 50)
 })
 
-test('documentos: Sicaf e Consulta por fornecedor, Anexo por nota sem Anexo', () => {
+test('documentos: Sicaf e Consulta (com PDF) por fornecedor, Anexo por nota sem Anexo', () => {
   const fornecedores = [
-    { cnpj: 'A', nomeNoSicaf: 'CHC LTDA.', temPdf: true, notas: [{ numero: '63', fornecedor: 'CHC' }, { numero: '64', fornecedor: 'CHC' }, { numero: '65', anexoFeito: true }] },
-    { cnpj: 'B', nomeNoSicaf: 'SEM PDF', temPdf: false, notas: [{ numero: '1' }] }
+    { cnpj: 'A', nomeNoSicaf: 'CHC LTDA.', temPdf: true, temSimples: true, nomeConsulta: 'Simples Nacional CHC LTDA', notas: [{ numero: '63', fornecedor: 'CHC' }, { numero: '64', fornecedor: 'CHC' }, { numero: '65', anexoFeito: true }] },
+    { cnpj: 'B', nomeNoSicaf: 'SEM PDF', temPdf: false, temSimples: false, notas: [] }
   ]
   assert.deepEqual(sicaf.documentosParaIncluir(fornecedores).map(d => [d.tipo, d.nomeArvore]), [
-    ['Sicaf', 'CHC LTDA'], ['Consulta', ''], ['Anexo', 'Instrumento de Cobrança NF nº 63 CHC'], ['Anexo', 'Instrumento de Cobrança NF nº 64 CHC']
+    ['Sicaf', 'CHC LTDA'], ['Consulta', 'Simples Nacional CHC LTDA'], ['Anexo', 'Instrumento de Cobrança NF nº 63 CHC'], ['Anexo', 'Instrumento de Cobrança NF nº 64 CHC']
   ])
-  assert.deepEqual(sicaf.documentosParaIncluir(fornecedores, { soSicaf: true }).map(d => d.tipo), ['Sicaf'])
+  // Fora da CGOC: só o que o botão pediu.
+  assert.deepEqual(sicaf.documentosParaIncluir(fornecedores, { simples: false, anexo: false }).map(d => d.tipo), ['Sicaf'])
+  assert.deepEqual(sicaf.documentosParaIncluir(fornecedores, { sicaf: false, anexo: false }).map(d => d.tipo), ['Consulta'])
+})
+
+test('situação: Consulta com o PDF do Simples conta pela raiz do CNPJ (matriz ou filial)', () => {
+  const atestes = { 8: [{ empresa: 'CHC SOLUCOES', cnpj: '31302907000139', notas: ['70'], seis: [], empenhos: [], valores: [] }] }
+  const documentos = [...arvoreExemplo, { id: '12', rotulo: 'Consulta Simples Nacional CHC (3385700)', temArquivo: true }]
+  const situacao = sicaf.situacaoDoProcesso(documentos, { atestes, cnpjsDosSicafs: { 9: ['31302907000139'] }, cnpjsDasConsultas: { 12: ['31302907000210'] } })
+  assert.deepEqual(situacao.notas.find(n => n.numero === '70').temConsulta, true)
+  assert.deepEqual(situacao.pendentes.map(n => n.numero), ['3626'])
+  assert.deepEqual(situacao.consultas.map(doc => doc.id), ['12'])
 })
 
 test('resposta do envio do arquivo ao SEI e linha da tabela de anexos', () => {

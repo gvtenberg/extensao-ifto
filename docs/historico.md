@@ -2,6 +2,7 @@
 
 One or two lines per version, with the date (dd/mm/yyyy). Number 0.STAGE.FIX.
 
+- v0.18.0 (13/11/2026): one button in the CGOC ("N notas sem SICAF ou Simples – Buscar") searches SICAF and Simples Nacional and adds Sicaf and Consulta with the PDFs and a blank Anexo per invoice (Simples spec stage 3); the blank-documents button and its setting left; "Sempre ligada" = only "Incluir SICAF" (Sicaf only, bidding team); selected CNPJ: CGOC "Incluir SICAF, Simples e Anexo", other units "Incluir SICAF" / "Incluir Simples Nacional".
 - v0.17.6 (13/11/2026): icon window no longer shows "SEI do IFTO reconhecido"; it warns only when the SEI was never opened or is on a version other than 5.0.4 (rule `seiTestado` in `comum/sei.js`).
 - v0.17.5 (13/11/2026): PDF reading never worked in Firefox (pdf.js 6 has no `documento.destroy`, so every read ended in error; and Firefox blocks pdf.js inside the SEI page): the page now sends the PDF to the background part, which reads it (Chrome keeps reading in the page); fixes "Não consegui ler o PDF do SICAF" and unread invoices. SICAF supplier name taken only from the "CNPJ - Razão Social" cell (it carried "Relatórios" and SICAF script code). SEI window: long text wraps, no horizontal scroll bar.
 - v0.17.4 (13/11/2026): extension bar condensed into one small box at the top right (one "IFTO" tag, buttons stacked as short lines) so "N notas sem SICAF – Buscar" and "Incluir Sicaf, Consulta e Anexo" no longer cover the SEI links.
