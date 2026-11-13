@@ -161,3 +161,7 @@ E: Abre o documento 3383754 no processo dele e a linha vira os documentos desse 
 ### T41 – Intervalo com documento externo ou de outro setor (v0.9.3)
 F: Cole um intervalo de um processo que tenha, entre o primeiro e o último, um arquivo incluído (externo) e um documento de outro setor que não foi enviado em bloco de assinatura; clique em "Assinar e próximo" em cada item.
 E: O arquivo externo não entra na lista. No documento de outro setor, a extensão não assina e pede para clicar em "Próximo"; se ele estiver em bloco de assinatura, assina normalmente.
+
+### T42 – Erros e sugestões nas configurações (v0.9.4)
+F: Clique no ícone da extensão > Configurações e role até o fim da página; clique em "abrir um pedido".
+E: Aparece o quadro "Erros e sugestões de melhoria" com a orientação de procurar a CGOC; o link abre a página de pedidos numa nova aba.

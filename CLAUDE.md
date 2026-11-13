@@ -38,7 +38,7 @@ Extension for **Firefox** and Chrome (free package, v0.5.0) that goes with the c
 - Big change, hard to undo, or that writes to an official system (SEI, spreadsheet): proposal + confirmation first.
 - New permanent instruction: propose adding it here (in the right place), not only in the automatic memory.
 - New ideas: one line in `docs/melhorias-futuras.md`. New rules: in the right file of `docs/regras/`.
-- README.md: only presentation and license (in Portuguese); the user manual will go there when the extension is distributed to colleagues.
+- README.md (v0.9.4): the user manual for colleagues, in Portuguese (what it does, browsers, download and install, settings, data read, precautions, how to report errors) plus license. Update it when a feature, setting or install step changes; the contact text also appears on the settings page (same wording).
 - **When the user leaves** and asks you to continue: do what is already decided (specs without `[ ]`), plan the rest and bring the questions in blocks at the end, with suggestions.
 
 ## Reply after changing code

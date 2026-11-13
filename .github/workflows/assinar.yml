@@ -7,11 +7,15 @@
 # AMO_JWT_ISSUER e AMO_JWT_SECRET.
 name: Assinar extensão
 
+# Envio que só muda textos (README, docs, lista de testes, licença) não roda: não há o que conferir nem assinar.
+# Se o envio tiver também algum arquivo da extensão, roda normalmente.
 on:
   push:
     branches: [master]
+    paths-ignore: ['**.md', 'docs/**', 'LICENSE', '.claude/**']
   pull_request:
     branches: [master]
+    paths-ignore: ['**.md', 'docs/**', 'LICENSE', '.claude/**']
   workflow_dispatch: # permite rodar à mão na aba Actions
 
 permissions:
