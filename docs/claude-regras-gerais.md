@@ -2,7 +2,7 @@
 
 **Sections**: Language · Economical reading (tokens) · Project and documentation organization · How we work (small specs) · Chat messages (short) · Tests · Version and git · Reusing code · Improvements that serve several projects · Same rules on every computer
 
-Updated on 12/11/2026 (4). Model: `/home/berg/Desktop/Sistema Gestão Orçamentária/sistema-orcamento-ifto` (CLAUDE.md, docs/, .claude/). New project or one without this organization: propose applying it. The user is not from IT: plain, simple language, commands with the exact text to type and the click path.
+Updated on 12/11/2026 (5). Model: `/home/berg/Desktop/Sistema Gestão Orçamentária/sistema-orcamento-ifto` (CLAUDE.md, docs/, .claude/). New project or one without this organization: propose applying it. The user is not from IT: plain, simple language, commands with the exact text to type and the click path.
 
 ## Language
 
@@ -25,6 +25,7 @@ Updated on 12/11/2026 (4). Model: `/home/berg/Desktop/Sistema Gestão Orçament�
 - `ferramentas-de-teste/` in `.gitignore` (local test and reference files); keys and passwords never in git (`.env.local`, GitHub secrets). Never remove lines from `.gitignore` without permission.
 - `.claude/commands/`: `/planejar`, `/etapa`, `/testes`. `.claude/settings.json`: allows the check commands and `git status/diff/log`; blocks reading `.env.local`.
 - GitHub Actions: checks the project on every push; fixed OS version (e.g. `ubuntu-24.04`), `timeout-minutes`, step names in Portuguese.
+- (12/11/2026) Workflows that check, build or publish **do not run when the push only changes text files**: `paths-ignore: ['**.md', 'docs/**', 'LICENSE', '.claude/**']` on `push` and `pull_request` (a push with any program file still runs everything). The test-cards workflow is the exception (it runs exactly on `TESTES-PENDENTES.md`).
 
 ## How we work (small specs)
 
