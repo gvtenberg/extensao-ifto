@@ -118,10 +118,10 @@ E: O documento existente fica como estava, sem aviso verde; com a opção desmar
 
 ## Documentos do pagamento: barra da extensão e botão da CGOC (v0.7.0)
 ### T30 – Botão da CGOC só com processo aberto (v0.7.0)
-F: No SEI, na unidade CGOC/GAC/DAP/PAL/REI/IFTO, veja a página inicial e depois abra um processo.
-E: Na página inicial não há botão; com o processo aberto aparece, no alto à direita, "IFTO Incluir Sicaf, Consulta e Anexo" (por enquanto, ao clicar, só avisa que chega na próxima versão).
+F: No SEI, na unidade CGOC/GAC/DAP/PAL/REI/IFTO, veja o Controle de Processos e depois abra um processo; troque para uma unidade sem função da extensão (ex.: outra coordenação).
+E: No Controle de Processos não há botão nem barra; na outra unidade a barra não aparece; com o processo aberto aparece, no alto à direita, "IFTO Incluir Sicaf, Consulta e Anexo" (por enquanto, ao clicar, só avisa que chega na próxima versão).
 ### T31 – Lista de assinaturas na mesma barra (v0.7.0)
-F: Na unidade PAL/REI/IFTO, veja a página inicial e um processo; clique em "Lista de assinaturas". Depois, nas Configurações, ponha os dois em "Sempre ligada" e abra um processo.
+F: Na unidade PAL/REI/IFTO, veja o Controle de Processos e um processo; clique em "Lista de assinaturas". Depois, nas Configurações, ponha os dois em "Sempre ligada" e abra um processo.
 E: O botão da lista fica no mesmo lugar de antes e o painel abre logo abaixo; com as duas ligadas, os dois botões ficam lado a lado.
 ### T32 – Configurações por unidade (v0.7.0)
 F: Clique no ícone da extensão > Configurações.
