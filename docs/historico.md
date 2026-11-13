@@ -2,6 +2,7 @@
 
 One or two lines per version, with the date (dd/mm/yyyy). Number 0.STAGE.FIX.
 
+- v0.8.1 (12/11/2026): the creation advances when the SEI opens the process page after Salvar (same check as SEI++, `divArvoreHtml`), with the tree reload as a backup.
 - v0.8.0 (12/11/2026): payment documents, stage 3: the button creates Sicaf, Consulta and Anexo (blank, today's date, Nato-digital, Público) after one confirmation, warning first when the extension already did it today or the tree has one of them without a file (blank = SEI icon `documento_sem_conteudo`).
 - v0.7.0 (12/11/2026): payment documents, stage 2: extension bar at the top right (signature list button moved there); "Incluir Sicaf, Consulta e Anexo" button with a process open (CGOC by default; creation comes in stage 3); settings page split into general and per unit.
 - v0.6.0 (12/11/2026): payment documents, stage 1: new external document page comes with today's date, Nato-digital and Público (setting on by default; existing documents untouched); "Novo documento" button removed (SEI 5 always shows Incluir Documento).

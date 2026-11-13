@@ -124,7 +124,8 @@
     window.alert(motivo + '\n' + feitos + '\nConfira a árvore do processo.')
   }
 
-  // Depois do Salvar, o SEI recarrega a árvore (ou a página toda): o documento do passo foi incluído.
+  // Depois do Salvar, o SEI abre a página do processo no quadro do formulário (o quadro marca "salvo") e
+  // recarrega a árvore (ou a página toda): o documento do passo foi incluído.
   let conferindo = false
   async function arvoreRecarregou () {
     if (conferindo) return
@@ -133,7 +134,7 @@
   }
   async function avancarSeSalvou () {
     const tarefa = await lerTarefa()
-    if (!tarefa || tarefa.passo !== 'salvando') return
+    if (!tarefa || (tarefa.passo !== 'salvando' && tarefa.passo !== 'salvo')) return
     const lida = arvore()
     if (lida && lida.idProcesso !== tarefa.idProcesso) return
     tarefa.incluidos.push(tarefa.tipos[tarefa.posicao])
@@ -175,6 +176,7 @@
     if (mudancas[CHAVE_TAREFA]) {
       const nova = mudancas[CHAVE_TAREFA].newValue || null
       if (nova && nova.passo === 'erro') await parar('A inclusão parou: o SEI não aceitou o tipo do documento.')
+      else if (nova && nova.passo === 'salvo') arvoreRecarregou()
       else mostrarAndamento(nova)
     }
   })
@@ -185,6 +187,6 @@
   const tarefaAoAbrir = await lerTarefa()
   if (tarefaAoAbrir) {
     mostrarAndamento(tarefaAoAbrir)
-    if (tarefaAoAbrir.passo === 'salvando') setTimeout(arvoreRecarregou, 1000)
+    if (tarefaAoAbrir.passo === 'salvando' || tarefaAoAbrir.passo === 'salvo') setTimeout(arvoreRecarregou, 1000)
   }
 })()

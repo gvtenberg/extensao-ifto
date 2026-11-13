@@ -1,6 +1,7 @@
 // v0.8.0: passos da inclusão dos documentos do pagamento dentro do quadro da direita (spec documentos-pagamento).
 // Só age quando há uma tarefa guardada para o MESMO processo (id_procedimento do endereço).
 // - Gerar Documento (documento_escolher_tipo): clica em "Externo".
+// - Página do processo depois do Salvar: marca "salvo" (a página de cima passa ao próximo tipo).
 // - Documento externo novo (documento_receber): escolhe o tipo (o SEI recarrega a página), depois preenche
 //   data de hoje, Nato-digital e Público e clica em Salvar. A pergunta de documento repetido é do SEI.
 (async function () {
@@ -17,6 +18,13 @@
   async function passo (nome) {
     Object.assign(tarefa, { passo: nome, desde: Date.now() })
     await navegador.storage.local.set({ [CHAVE_TAREFA]: tarefa })
+  }
+
+  // Depois do Salvar, o SEI abre a página do processo (com #divArvoreHtml) no quadro do formulário
+  // (o SEI++ confere o mesmo, dropzone.js): o documento foi incluído.
+  if (acao === 'arvore_visualizar' || acao === 'procedimento_visualizar') {
+    if (tarefa.passo === 'salvando' && document.getElementById('divArvoreHtml')) await passo('salvo')
+    return
   }
 
   if (acao === 'documento_escolher_tipo') {
