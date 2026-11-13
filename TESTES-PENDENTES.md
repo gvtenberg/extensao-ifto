@@ -276,3 +276,6 @@ E: A aba consulta cada CNPJ sozinha, abre "Mais informações" e volta ao SEI no
 ### T68 – Consulta com SICAF já buscado hoje (v0.17.2)
 F: Repita o "Buscar" no mesmo processo no mesmo dia.
 E: Não abre o SICAF nem o Simples Nacional de novo (os PDFs de hoje já servem).
+### T69 – Configurações mais largas (v0.17.2)
+F: Clique no ícone da extensão e em "Configurações".
+E: A página ocupa mais a largura da tela que antes, sem textos cortados.
