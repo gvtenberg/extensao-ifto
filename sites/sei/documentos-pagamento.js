@@ -27,20 +27,8 @@
   const desenhar = () => barra.mostrar(ID, regras.funcaoLigada(opcoes.documentosPagamento, unidade))
   const escreverNoBotao = texto => { botao.lastChild.textContent = ' ' + texto }
 
-  // ---------- Árvore do processo (quadro ifrArvore) ----------
-  function arvore () {
-    let documentoDaArvore
-    try { documentoDaArvore = document.getElementById('ifrArvore').contentDocument } catch (erro) { return null }
-    if (!documentoDaArvore) return null
-    const texto = [...documentoDaArvore.scripts].map(script => script.textContent).join('\n')
-    const lida = regras.lerArvore(texto)
-    lida.linkIncluir = (/<a href="(controlador\.php\?acao=documento_escolher_tipo[^"]*)"/.exec(texto) || [])[1] || null
-    return lida.idProcesso ? lida : null
-  }
-  function recarregarArvore () {
-    const quadro = document.getElementById('ifrArvore')
-    try { quadro.contentWindow.location.reload() } catch (erro) { quadro.setAttribute('src', quadro.getAttribute('src')) }
-  }
+  // ---------- Árvore do processo (sites/sei/sei-pedidos.js desde v0.10.0) ----------
+  const { arvoreAberta: arvore, recarregarArvore } = globalThis.ExtensaoIFTO.seiPedidos
 
   // ---------- Feitos hoje (aviso D5) ----------
   async function feitosHoje (idProcesso) {
@@ -57,49 +45,7 @@
   }
 
   // ---------- Conversa com o SEI (formulários enviados direto) ----------
-  // O SEI responde em ISO-8859-1: lê os bytes e decodifica (o .text() leria como UTF-8).
-  async function pedir (endereco, corpo) {
-    const resposta = await fetch(endereco, {
-      method: corpo ? 'POST' : 'GET',
-      credentials: 'same-origin',
-      headers: corpo ? { 'Content-Type': 'application/x-www-form-urlencoded' } : {},
-      body: corpo || undefined
-    })
-    if (!resposta.ok) throw new Error('O SEI não respondeu (erro ' + resposta.status + '). Tente de novo.')
-    const html = new TextDecoder('windows-1252').decode(await resposta.arrayBuffer())
-    return { endereco: resposta.url || endereco, html }
-  }
-  const lerHtml = html => new DOMParser().parseFromString(html, 'text/html')
-
-  // Campos que o navegador enviaria ao clicar em Salvar (mesmas regras do envio de formulário).
-  function camposDoFormulario (formulario) {
-    const campos = []
-    for (const campo of formulario.elements) {
-      const nome = campo.getAttribute('name')
-      if (!nome || campo.hasAttribute('disabled')) continue
-      const tag = campo.tagName.toLowerCase()
-      const tipo = (campo.getAttribute('type') || '').toLowerCase()
-      if (tag === 'button' || ['button', 'submit', 'reset', 'image', 'file'].includes(tipo)) continue
-      if (tag === 'select') {
-        const opcoesDaLista = [...campo.options]
-        let escolhidas = opcoesDaLista.filter(opcao => opcao.hasAttribute('selected'))
-        if (!campo.multiple && !escolhidas.length && opcoesDaLista.length && !(Number(campo.getAttribute('size')) > 1)) escolhidas = [opcoesDaLista[0]]
-        if (!campo.multiple) escolhidas = escolhidas.slice(-1)
-        for (const opcao of escolhidas) campos.push([nome, opcao.getAttribute('value') !== null ? opcao.getAttribute('value') : opcao.textContent])
-      } else if (tag === 'textarea') {
-        campos.push([nome, campo.textContent])
-      } else if (tipo === 'radio' || tipo === 'checkbox') {
-        if (campo.hasAttribute('checked')) campos.push([nome, campo.getAttribute('value') || 'on'])
-      } else {
-        campos.push([nome, campo.getAttribute('value') || ''])
-      }
-    }
-    return campos
-  }
-  async function enviar (formulario, enderecoDaPagina, novos) {
-    const destino = new URL(formulario.getAttribute('action'), enderecoDaPagina).href
-    return pedir(destino, regras.montarCorpo(regras.trocarCampos(camposDoFormulario(formulario), novos)))
-  }
+  const { pedir, lerHtml, enviar } = globalThis.ExtensaoIFTO.seiPedidos
   function formularioDoExterno (pagina) {
     return lerHtml(pagina.html).getElementById('frmDocumentoCadastro')
   }

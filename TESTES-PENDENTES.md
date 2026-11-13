@@ -186,3 +186,12 @@ E: O processo abre e o painel da lista continua na tela, também depois de recar
 F: Com uma versão nova pronta, clique no ícone da extensão > Procurar atualização > Abrir a página da versão…; na página, clique no arquivo que termina em .xpi > Permitir > Adicionar.
 E: Aparece só o botão "Abrir a página da versão…" (sem "Instalar a versão…"); a página abre numa nova aba e, depois de Adicionar, a janela do ícone mostra a versão nova.
 
+
+## SICAF automático: notas sem SICAF (v0.10.0)
+> Na CGOC (CGOC/GAC/DAP/PAL/REI/IFTO), com a opção "SICAF da nota fiscal" em Automática (padrão).
+### T47 – Aviso de notas sem SICAF (v0.10.0)
+F: Abra um processo de pagamento com nota fiscal e ateste depois da última Folha de Encaminhamento e ainda sem Sicaf com PDF (ex.: 23236.023830/2025-11 antes de incluir o Sicaf da HM).
+E: Em poucos segundos aparece no alto, à direita, "1 nota sem SICAF – Buscar"; parando o mouse em cima, aparece a nota e a empresa.
+### T48 – Sem aviso quando o SICAF já está no processo (v0.10.0)
+F: Abra um processo em que todas as notas depois da última Folha já têm Sicaf com o PDF; depois, abra um processo sem notas.
+E: O aviso não aparece em nenhum dos dois; em outra unidade (não CGOC) ele também não aparece.

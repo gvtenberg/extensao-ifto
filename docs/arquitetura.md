@@ -17,6 +17,10 @@ Plain JavaScript, no build step, Manifest V3 (D4 in `specs/base-e-sei.md`). Pure
 | `sites/sei/todas-as-paginas.js` | On every SEI page: saves the SEI version and address (`seiVisto`) |
 | `sites/sei/barra-extensao.js` | Extension bar at the top right of full SEI pages; features add buttons (`ExtensaoIFTO.barra.botao/mostrar/fundo`) (v0.7.0) |
 | `sites/sei/documentos-pagamento.js` | "Incluir Sicaf, Consulta e Anexo" button in the bar, only with a process open (`#ifrArvore`) (v0.7.0); confirmation (v0.8.0); sends the SEI forms directly (Incluir Documento › Externo › type › Salvar, three times) and reloads the tree (v0.9.0) |
+| `comum/sicaf.js` | Automatic SICAF (v0.10.0): CNPJ check digits and search (`cnpjValido`, `acharCnpjs`), HTML to text, tree names (`tipoNaArvore`, `lerRotuloDaNota`), pending part after the last Folha (`trechoPendente`), ateste reading (`lerAteste`), similar names, invoices without SICAF (`situacaoDoProcesso`) |
+| `sites/sei/sei-pedidos.js` | Talk to the SEI without screens (v0.10.0, from documentos-pagamento): `pedir` (ISO-8859-1), `baixar` (file), `enviar` (form), `arvoreAberta`, `recarregarArvore` |
+| `sites/sei/pdf-texto.js` | PDF text with pdf.js (`bibliotecas/pdfjs/`, Apache-2.0, loaded only when needed, no separate worker) (v0.10.0) |
+| `sites/sei/sicaf.js` | Automatic SICAF in the SEI (v0.10.0): CGOC notice "N notas sem SICAF – Buscar" in the bar, re-read when the tree reloads |
 | `sites/sei/lista-assinaturas.js` | Signature list floating panel (SEI main page): paste, navigate, open via quick search, "Assinar e próximo" / "Dar ciência e próximo" (waits for the SEI to reload the tree, then advances) |
 | `sites/sei/lista-assinaturas-teclas.js` | Alt+→ and Alt+← shortcuts with focus inside SEI frames (notifies the main page) |
 | `sites/sei/assinar-e-proximo.js` | Inside the SEI signing window: clicks "Assinar" if Firefox already filled in the password and marks the pending item as sent (v0.5.0) |
@@ -24,6 +28,7 @@ Plain JavaScript, no build step, Manifest V3 (D4 in `specs/base-e-sei.md`). Pure
 | `sites/sei/campo-senha.js` | Password field recognized by the browser (`login.php` and `acao=documento_assinar`, also inside the signing window) |
 | `janela/` | Icon window: extension version, recognized SEI, Settings and Check for update buttons (the latter hidden in Chrome) |
 | `configuracoes/` | Settings page (each choice is saved immediately) |
+| `bibliotecas/pdfjs/` | pdf.js 6.4.299 legacy build (Mozilla, Apache-2.0, unmodified copy from npm `pdfjs-dist`): reads PDF text |
 | `icones/` | Instituto Federal mark (v0.9.5): `icone.svg` (Firefox) and `icone-16/32/48/128.png` (Chrome; drawn pixel-aligned per size, 128 with a 16 px transparent border) |
 | `scripts/empacotar-chrome.js` | `npm run empacotar-chrome`: Chrome/Edge package (folder + `.zip` in `web-ext-artifacts/chrome/`, PNG icons, no Firefox keys) |
 | `testes/` | Automated tests (`npm test`) |

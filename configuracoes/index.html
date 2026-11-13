@@ -64,6 +64,22 @@
         <span>Desligada</span>
       </label>
     </section>
+    <section class="cartao">
+      <h1>SICAF da nota fiscal</h1>
+      <p class="apoio">Na CGOC, avisa quando o processo aberto tem notas fiscais sem SICAF ("2 notas sem SICAF – Buscar"), depois da última Folha de Encaminhamento. Em qualquer unidade, selecionar um CNPJ numa página do SEI mostra o botão "Buscar SICAF".</p>
+      <label class="opcao">
+        <input type="radio" name="incluirSicaf" value="automatica">
+        <span>Automática (aviso das notas só na CGOC)</span>
+      </label>
+      <label class="opcao">
+        <input type="radio" name="incluirSicaf" value="sempre">
+        <span>Sempre ligada, em qualquer unidade (botão "Incluir SICAF")</span>
+      </label>
+      <label class="opcao">
+        <input type="radio" name="incluirSicaf" value="desligada">
+        <span>Desligada</span>
+      </label>
+    </section>
     <div class="aviso sucesso" id="gravado" hidden>Configuração gravada.</div>
     <!-- v0.9.4: onde informar erros e pedir melhorias (o mesmo texto do README). -->
     <section class="cartao">

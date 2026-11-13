@@ -59,7 +59,9 @@
       rotulo: no.rotulo,
       feitoNoSei: /documento_interno/.test(no.icone),
       semConteudo: /documento_sem_conteudo/.test(no.icone),
-      temArquivo: /documento_download_anexo/.test(no.src) || /documento_pdf/.test(no.icone)
+      temArquivo: /documento_download_anexo/.test(no.src) || /documento_pdf/.test(no.icone),
+      // v0.10.0: endereço do documento (ver o texto ou baixar o arquivo), para o SICAF automático.
+      link: no.src.replace(/&amp;/g, '&')
     }))
     return { idProcesso: processo ? processo.id : null, numero: processo ? processo.rotulo : null, documentos }
   }

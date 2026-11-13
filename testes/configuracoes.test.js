@@ -28,3 +28,8 @@ test('lista de assinaturas começa automática (só na Direção-geral) e guarda
 test('documentos do pagamento começam automáticos (só na CGOC) (v0.7.0)', () => {
   assert.equal(PADROES.documentosPagamento, 'automatica')
 })
+
+test('SICAF automático começa automático (só na CGOC) (v0.10.0)', () => {
+  assert.equal(PADROES.incluirSicaf, 'automatica')
+  assert.equal(comPadroes({ incluirSicaf: 'sempre' }).incluirSicaf, 'sempre')
+})

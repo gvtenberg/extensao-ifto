@@ -2,6 +2,7 @@
 
 One or two lines per version, with the date (dd/mm/yyyy). Number 0.STAGE.FIX.
 
+- v0.10.0 (13/11/2026): automatic SICAF, stage 1: "SICAF da nota fiscal" option in the settings; in the CGOC, with a process open, the bar shows "N notas sem SICAF – Buscar" (invoices after the last Folha de Encaminhamento whose supplier, by the ateste CNPJ, has no Sicaf with that CNPJ in its PDF). PDF text read with pdf.js 6.4.299 (`bibliotecas/pdfjs/`). SEI request helpers moved to `sites/sei/sei-pedidos.js`.
 - v0.9.7 (13/11/2026): icon window: "Procurar atualização" now only offers "Abrir a página da versão" (the direct install link did not work); README updated.
 - v0.9.6 (13/11/2026): signature list reads several documents on one line ("processo - 3384598, 3384645, 3384674", also ";", "e" or spaces; repeated numbers count once). Icon window warns when Firefox has not given the extension permanent access to the SEI (panel vanished after opening a process) and offers "Permitir no SEI".
 - v0.9.5 (12/11/2026): extension icon replaced by the Instituto Federal mark (red circle and green squares; SVG for Firefox, 16/32/48/128 PNG for Chrome/Edge, 128 with the 16 px transparent border Chrome asks for). Previous icon: in git history (commit before v0.9.5).

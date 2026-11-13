@@ -2,7 +2,7 @@
 
 **Sections**: 1. Goal · 2. Out of scope · 3. Decisions to confirm · 4. Decided rules · 5. What changes · 6. Stages · 7. Manual tests
 
-- **Status:** ready to code
+- **Status:** in progress (stage 1 done, v0.10.0)
 - **Requested on:** 13/11/2026 · **Deadline or priority:** high (done for every invoice that arrives for payment)
 - **Planned version:** 0.10.0
 
@@ -54,7 +54,7 @@ For every invoice, CGOC today logs in to Compras.gov.br (gov.br + SerproID + cod
 
 Each stage fits in a short conversation (`/etapa sicaf-automatico <n>`) and ends with tests, version and commit. Prerequisite: T36 (creating the three payment documents); the saved process shows the three blank documents created by the extension.
 
-- [ ] Stage 1 – **Find pending invoices** (v0.10.0): option "Incluir SICAF" in the settings; in the CGOC unit, read the tree (invoices, atestes, Folha de encaminhamento, existing Sicafs) and the ateste CNPJ; notice "N notas sem SICAF – Buscar" in the bar (button does nothing yet). Saved tree (13/11/2026): `ferramentas-de-teste/paginas-sei/SEI - Árvore Montar.html` (ISO-8859-1; process 23236.023830/2025-11: CHC invoices 3375105/3375106, atestes 3375107/3375110, Sicaf 3376789, Consulta 3376790, Anexos 3376791/3376792, Folha 269 = 3376800; then HM invoice 3.626 = 3384844, ateste 3384848 and blank Sicaf/Consulta/Anexo 3385629–31 → HM pending, CHC done).
+- [x] Stage 1 – **Find pending invoices** (v0.10.0): option "Incluir SICAF" in the settings; in the CGOC unit, read the tree (invoices, atestes, Folha de encaminhamento, existing Sicafs) and the ateste CNPJ; notice "N notas sem SICAF – Buscar" in the bar (button does nothing yet). Saved tree (13/11/2026): `ferramentas-de-teste/paginas-sei/SEI - Árvore Montar.html` (ISO-8859-1; process 23236.023830/2025-11: CHC invoices 3375105/3375106, atestes 3375107/3375110, Sicaf 3376789, Consulta 3376790, Anexos 3376791/3376792, Folha 269 = 3376800; then HM invoice 3.626 = 3384844, ateste 3384848 and blank Sicaf/Consulta/Anexo 3385629–31 → HM pending, CHC done).
 - [ ] Stage 2 – **Selected CNPJ** (v0.11.0): button next to a CNPJ selected on SEI pages, right-click menu "Buscar SICAF deste CNPJ" (check it works in the Firefox and Chrome PDF viewers), paste field; CNPJ check digits. Until stage 4 the action only shows the CNPJ found.
 - [ ] Stage 3 – **CNPJ from the invoice and checks** (v0.12.0; D8, D9): read the invoice PDF text, compare with the ateste, window to pick or type when they differ or the invoice is a scanned image. Samples: `ferramentas-de-teste/notas-fiscais/` (7 models; `2026NE174.pdf` is a commitment note with two CNPJs of the same company).
 - [ ] Stage 4 – **Get the PDF from the SICAF** (v0.13.0): permission request, open the SICAF tab, login page help, fill CNPJ, Pesquisar, get the PDF (and supplier name), save it in Downloads and return it to the SEI tab. SICAF PDF sample: `ferramentas-de-teste/pagina-compras/consultarSituacaoFornecedor_14159957000602_2026-11-13.pdf`. **Before:** confirm the SICAF link from the Compras desktop (user menu › SICAF). Critical test (decides whether the SICAF accepts the automatic search).

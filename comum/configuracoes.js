@@ -7,7 +7,10 @@
     // v0.2.0: "automatica" (só na Direção-geral, PAL/REI/IFTO), "sempre" ou "desligada"
     listaAssinaturas: 'automatica',
     // v0.7.0: botão "Incluir Sicaf, Consulta e Anexo": "automatica" (só na CGOC), "sempre" ou "desligada"
-    documentosPagamento: 'automatica'
+    documentosPagamento: 'automatica',
+    // v0.10.0: SICAF automático: "automatica" (notas sem SICAF, só na CGOC), "sempre" (botão "Incluir SICAF"
+    // em qualquer unidade) ou "desligada"
+    incluirSicaf: 'automatica'
   })
 
   // Junta o que o usuário gravou com os padrões; opções que não existem mais são ignoradas.
