@@ -107,3 +107,11 @@ E: O Firefox oferece só a senha do sei.ifto.edu.br (sem SUAP, Moodle etc.).
 > No computador de desenvolvimento (ou com o .zip da Release, depois do git push).
 F: Rode npm run empacotar-chrome, abra chrome://extensions > Modo do desenvolvedor > Carregar sem compactação > pasta web-ext-artifacts/chrome/extensao-ifto-chrome-0.5.0; entre no SEI na unidade PAL/REI/IFTO.
 E: A extensão aparece sem erros, o painel da lista de assinaturas funciona e a janela do ícone não mostra "Procurar atualização".
+
+## Documentos do pagamento: preenchimento do documento externo (v0.6.0)
+### T28 – Documento externo novo já preenchido (v0.6.0)
+F: Num processo, clique em Incluir Documento > Externo (não salve).
+E: Data de hoje, Nato-digital e Público já marcados, com o aviso verde "Preenchido pela extensão: confira…"; o botão "Novo documento" da extensão não aparece mais.
+### T29 – Documento externo que já existe não muda (v0.6.0)
+F: Abra um documento externo já incluído (com ou sem arquivo) e clique em Alterar; depois desmarque "Preencher documento externo novo" nas Configurações e repita o T28.
+E: O documento existente fica como estava, sem aviso verde; com a opção desmarcada, o documento novo vem em branco, como no SEI.

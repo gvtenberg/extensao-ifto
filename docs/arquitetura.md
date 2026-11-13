@@ -7,16 +7,17 @@ Plain JavaScript, no build step, Manifest V3 (D4 in `specs/base-e-sei.md`). Pure
 | File or folder | Purpose |
 | --- | --- |
 | `manifest.json` | Name, version, permissions, sites where the extension acts (`sei.ifto.edu.br/…controlador.php?acao=…` and `…login.php…`) and scripts per page |
-| `comum/sei.js` | SEI page-reading rules: version (`versaoDoSei`), New document link (`extrairLinkNovoDocumento`), password field attributes (`atributosDoCampoDeSenha`) |
+| `comum/sei.js` | SEI page-reading rules: version (`versaoDoSei`), password field attributes (`atributosDoCampoDeSenha`) |
 | `comum/configuracoes.js` | Settings in the browser: defaults (`PADROES`), `comPadroes`, read and write |
 | `comum/lista-assinaturas.js` | Signature list: parse pasted lines (`lerLista`), acknowledgement item, feature on by unit (`funcaoLigada`), counter and next pending |
+| `comum/documento-externo.js` | External document: new vs. existing page (`ehDocumentoExternoNovo`), today's date (`dataDeHoje`), what is still empty (`oQuePreencher`) (v0.6.0) |
 | `comum/atualizacao.js` | Check for update: latest GitHub Release address, `compararVersoes`, `lerRelease` (version, `.xpi`, Release page) |
 | `comum/estilo.css` | Colors and components of the extension's own pages (system pattern) |
 | `sites/sei/todas-as-paginas.js` | On every SEI page: saves the SEI version and address (`seiVisto`) |
 | `sites/sei/lista-assinaturas.js` | Signature list floating panel (SEI main page): paste, navigate, open via quick search, "Assinar e próximo" / "Dar ciência e próximo" (waits for the SEI to reload the tree, then advances) |
 | `sites/sei/lista-assinaturas-teclas.js` | Alt+→ and Alt+← shortcuts with focus inside SEI frames (notifies the main page) |
 | `sites/sei/assinar-e-proximo.js` | Inside the SEI signing window: clicks "Assinar" if Firefox already filled in the password and marks the pending item as sent (v0.5.0) |
-| `sites/sei/botao-novo-documento.js` | "Novo documento" button always visible (`acao=arvore_visualizar`) |
+| `sites/sei/documento-externo.js` | New external document (`acao=documento_receber`): today's date, Nato-digital and Público in empty fields, with a note (v0.6.0) |
 | `sites/sei/campo-senha.js` | Password field recognized by the browser (`login.php` and `acao=documento_assinar`, also inside the signing window) |
 | `janela/` | Icon window: extension version, recognized SEI, Settings and Check for update buttons (the latter hidden in Chrome) |
 | `configuracoes/` | Settings page (each choice is saved immediately) |

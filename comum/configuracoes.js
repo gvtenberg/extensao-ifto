@@ -1,7 +1,8 @@
 // Configurações da extensão, guardadas no navegador (D5). Toda opção nova entra em PADROES.
 (function (raiz) {
   const PADROES = Object.freeze({
-    novoDocumentoSempreVisivel: true,
+    // v0.6.0: data de hoje, Nato-digital e Público em todo documento externo novo
+    preencherDocumentoExterno: true,
     senhaReconhecidaPeloNavegador: true,
     // v0.2.0: "automatica" (só na Direção-geral, PAL/REI/IFTO), "sempre" ou "desligada"
     listaAssinaturas: 'automatica'

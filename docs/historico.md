@@ -2,6 +2,7 @@
 
 One or two lines per version, with the date (dd/mm/yyyy). Number 0.STAGE.FIX.
 
+- v0.6.0 (12/11/2026): payment documents, stage 1: new external document page comes with today's date, Nato-digital and Público (setting on by default; existing documents untouched); "Novo documento" button removed (SEI 5 always shows Incluir Documento).
 - v0.5.0 (12/11/2026): signature list: "Assinar e próximo" (signs with the password Firefox already filled in and opens the next item) and "Dar ciência e próximo"; Chrome/Edge package (`npm run empacotar-chrome`, PNG icons, `.zip` in each Release); tip to show only the SEI password (`publicacao.md`). Docs switched to English.
 - v0.4.2 (12/11/2026): "Instalar a versão…" opens the version page on GitHub (Firefox did not show the install prompt when the file was opened directly, and does not let the extension request an update); the message explains clicking the file and the Firefox menu path (Check for updates).
 - v0.4.1 (12/11/2026): extension texts reviewed for the people who use it (the icon window no longer mentions GitHub, Actions or pushing code); rule recorded in `padrao-visual.md` and CLAUDE.md.
