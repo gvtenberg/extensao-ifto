@@ -78,6 +78,7 @@ Extension for **Firefox** and Chrome (free package, v0.5.0) that goes with the c
 ## Conventions
 
 - Plain JavaScript, no build step, Manifest V3. Pure rules (no page) in `comum/`, working in the browser and in Node (`module.exports` or `globalThis.ExtensaoIFTO`); page code in `sites/<site>/`.
+- **Reuse functions** (12/11/2026): before writing a new function, look for one that already does it (`comum/`); a rule used by two features moves to the shared file (e.g. `comum/sei.js`) instead of being copied. Less code, lighter extension.
 - Short comments in Portuguese explaining **why**, with the version when it is a new rule (`// v0.2.0: ...`).
 - Extension texts in plain Portuguese, no unexplained acronyms, **written for the people who use the extension, not for the programmer** (v0.4.1): no GitHub, Actions, code, push, signed version, file names or technical terms; what is for the programmer goes in `docs/` (rule in `docs/padrao-visual.md`).
 - Values in the same format as the system ("R$ 1.234,56"); budget types are **never** added together.

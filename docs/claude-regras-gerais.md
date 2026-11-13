@@ -1,8 +1,8 @@
 # Instructions for all projects
 
-**Sections**: Language · Economical reading (tokens) · Project and documentation organization · How we work (small specs) · Chat messages (short) · Tests · Version and git · Improvements that serve several projects · Same rules on every computer
+**Sections**: Language · Economical reading (tokens) · Project and documentation organization · How we work (small specs) · Chat messages (short) · Tests · Version and git · Reusing code · Improvements that serve several projects · Same rules on every computer
 
-Updated on 12/11/2026 (3). Model: `/home/berg/Desktop/Sistema Gestão Orçamentária/sistema-orcamento-ifto` (CLAUDE.md, docs/, .claude/). New project or one without this organization: propose applying it. The user is not from IT: plain, simple language, commands with the exact text to type and the click path.
+Updated on 12/11/2026 (4). Model: `/home/berg/Desktop/Sistema Gestão Orçamentária/sistema-orcamento-ifto` (CLAUDE.md, docs/, .claude/). New project or one without this organization: propose applying it. The user is not from IT: plain, simple language, commands with the exact text to type and the click path.
 
 ## Language
 
@@ -53,6 +53,10 @@ Updated on 12/11/2026 (3). Model: `/home/berg/Desktop/Sistema Gestão Orçament�
 - On every code change: bump the version (0.STAGE.FIX) and record it in `historico.md` with the date (dd/mm/yyyy).
 - Commit without being asked (before and at the end of each stage or round), in the format **"vX.Y.Z: type: short summary"** (no version: "docs: summary"). Types: `feat`, `fix`, `style`, `refactor`, `docs`, `chore`, `test`, `ci`. Check in `git status` that nothing from tests, keys or packages got in.
 - **Never `git push`** without being asked.
+
+## Reusing code
+
+- Before writing a new function, look for one that already does it; a rule used by two features goes to a shared file instead of being copied (less code, lighter program).
 
 ## Improvements that serve several projects
 
