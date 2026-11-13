@@ -7,11 +7,11 @@ Plain JavaScript, no build step, Manifest V3 (D4 in `specs/base-e-sei.md`). Pure
 | File or folder | Purpose |
 | --- | --- |
 | `manifest.json` | Name, version, permissions, sites where the extension acts (`sei.ifto.edu.br/…controlador.php?acao=…` and `…login.php…`) and scripts per page |
-| `comum/sei.js` | SEI page-reading rules: version (`versaoDoSei`), password field attributes (`atributosDoCampoDeSenha`) |
+| `comum/sei.js` | SEI page-reading rules: version (`versaoDoSei`), password field attributes (`atributosDoCampoDeSenha`); process tree reading (`lerArvore`: done in the SEI, with file), shared by payment documents and signature list; feature on by unit (`ligadaNaUnidade`) (v0.9.2) |
 | `comum/configuracoes.js` | Settings in the browser: defaults (`PADROES`), `comPadroes`, read and write |
-| `comum/lista-assinaturas.js` | Signature list: parse pasted lines (`lerLista`), acknowledgement item, feature on by unit (`funcaoLigada`), counter and next pending |
+| `comum/lista-assinaturas.js` | Signature list: parse pasted lines (`lerLista`), acknowledgement item, feature on by unit (`funcaoLigada`), counter and next pending; document range (`expandirIntervalo`, v0.9.2) |
 | `comum/documento-externo.js` | External document: new vs. existing page (`ehDocumentoExternoNovo`), today's date (`dataDeHoje`), what is still empty (`oQuePreencher`) (v0.6.0) |
-| `comum/documentos-pagamento.js` | Payment documents (CGOC): unit, types in order (`TIPOS`), feature on by unit (`funcaoLigada`) (v0.7.0); process tree reading (`lerArvore`: done in the SEI, with file), blank documents (`documentosEmBranco`), type option (`acharOpcao`), confirmation text (v0.8.0); short question, form body in ISO-8859-1 (`codificarLatin1`, `montarCorpo`, `trocarCampos`), SEI error text (`mensagemDoSei`) (v0.9.0) |
+| `comum/documentos-pagamento.js` | Payment documents (CGOC): unit, types in order (`TIPOS`), feature on by unit (`funcaoLigada`) (v0.7.0); blank documents (`documentosEmBranco`), type option (`acharOpcao`), confirmation text (v0.8.0); short question, form body in ISO-8859-1 (`codificarLatin1`, `montarCorpo`, `trocarCampos`), SEI error text (`mensagemDoSei`) (v0.9.0) |
 | `comum/atualizacao.js` | Check for update: latest GitHub Release address, `compararVersoes`, `lerRelease` (version, `.xpi`, Release page) |
 | `comum/estilo.css` | Colors and components of the extension's own pages (system pattern) |
 | `sites/sei/todas-as-paginas.js` | On every SEI page: saves the SEI version and address (`seiVisto`) |

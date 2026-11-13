@@ -30,7 +30,49 @@
     return resultado
   }
 
-  const api = { versaoDoSei, atributosDoCampoDeSenha }
+  // v0.8.0 (em comum/sei.js desde v0.9.2, usada também pela lista de assinaturas): lê a árvore do processo a partir do script do quadro da árvore (Nos[n] = new infraArvoreNo(...)).
+  // Externo com arquivo: tem o link de baixar (documento_download_anexo) ou o ícone de PDF; feito no SEI:
+  // ícone documento_interno. Em branco: ícone documento_sem_conteudo (visto no SEI 5.0.4) ou externo sem
+  // nenhum dos sinais acima.
+  function lerArgumentos (texto) {
+    const valores = []
+    const padrao = /"((?:[^"\\]|\\.)*)"|(null|true|false|-?\d+)/g
+    let achado
+    while ((achado = padrao.exec(texto))) valores.push(achado[1] !== undefined ? achado[1].replace(/\\(.)/g, '$1') : (achado[2] === 'null' ? null : achado[2]))
+    return valores
+  }
+  function lerArvore (textoDoScript) {
+    const texto = textoDoScript || ''
+    const nos = {}
+    const padraoNo = /Nos\[(\d+)\]\s*=\s*new infraArvoreNo\((.*?)\);?\s*\n/g
+    let achado
+    while ((achado = padraoNo.exec(texto))) {
+      const [tipo, id, pai, , , rotulo, , icone] = lerArgumentos(achado[2])
+      nos[achado[1]] = { tipo, id, pai, rotulo: rotulo || '', icone: icone || '', src: '' }
+    }
+    const padraoSrc = /Nos\[(\d+)\]\.src\s*=\s*'([^']*)'/g
+    while ((achado = padraoSrc.exec(texto))) if (nos[achado[1]]) nos[achado[1]].src = achado[2]
+    const lista = Object.values(nos)
+    const processo = lista.find(no => no.tipo === 'PROCESSO')
+    const documentos = lista.filter(no => no.tipo === 'DOCUMENTO').map(no => ({
+      id: no.id,
+      rotulo: no.rotulo,
+      feitoNoSei: /documento_interno/.test(no.icone),
+      semConteudo: /documento_sem_conteudo/.test(no.icone),
+      temArquivo: /documento_download_anexo/.test(no.src) || /documento_pdf/.test(no.icone)
+    }))
+    return { idProcesso: processo ? processo.id : null, numero: processo ? processo.rotulo : null, documentos }
+  }
+
+  // v0.9.2: opção de uma função nas configurações: "automatica" (só na unidade dela), "sempre" ou
+  // "desligada". A mesma regra serve à lista de assinaturas e aos documentos do pagamento.
+  function ligadaNaUnidade (opcao, unidadeAberta, unidadeDaFuncao) {
+    if (opcao === 'sempre') return true
+    if (opcao === 'desligada') return false
+    return String(unidadeAberta || '').trim().toUpperCase() === unidadeDaFuncao
+  }
+
+  const api = { versaoDoSei, atributosDoCampoDeSenha, lerArvore, ligadaNaUnidade }
   if (typeof module !== 'undefined' && module.exports) module.exports = api
   else raiz.ExtensaoIFTO = Object.assign(raiz.ExtensaoIFTO || {}, { sei: api })
 })(globalThis)

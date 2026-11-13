@@ -1,48 +1,14 @@
 // v0.7.0: documentos do pagamento (spec documentos-pagamento): Sicaf, Consulta e Anexo em branco, para a CGOC.
 (function (raiz) {
+  // v0.9.2: a leitura da árvore do processo é a mesma da lista de assinaturas (comum/sei.js).
+  const { lerArvore, ligadaNaUnidade } = typeof module !== 'undefined' && module.exports ? require('./sei.js') : raiz.ExtensaoIFTO.sei
   const UNIDADE_CGOC = 'CGOC/GAC/DAP/PAL/REI/IFTO'
   // Ordem em que os documentos externos são incluídos (nomes da lista "Tipo do Documento" do SEI).
   const TIPOS = Object.freeze(['Sicaf', 'Consulta', 'Anexo'])
 
   // "automatica": só na CGOC; "sempre": qualquer unidade; "desligada": nunca.
   function funcaoLigada (opcao, unidade) {
-    if (opcao === 'sempre') return true
-    if (opcao === 'desligada') return false
-    return String(unidade || '').trim().toUpperCase() === UNIDADE_CGOC
-  }
-
-  // v0.8.0: lê a árvore do processo a partir do script do quadro da árvore (Nos[n] = new infraArvoreNo(...)).
-  // Externo com arquivo: tem o link de baixar (documento_download_anexo) ou o ícone de PDF; feito no SEI:
-  // ícone documento_interno. Em branco: ícone documento_sem_conteudo (visto no SEI 5.0.4) ou externo sem
-  // nenhum dos sinais acima.
-  function lerArgumentos (texto) {
-    const valores = []
-    const padrao = /"((?:[^"\\]|\\.)*)"|(null|true|false|-?\d+)/g
-    let achado
-    while ((achado = padrao.exec(texto))) valores.push(achado[1] !== undefined ? achado[1].replace(/\\(.)/g, '$1') : (achado[2] === 'null' ? null : achado[2]))
-    return valores
-  }
-  function lerArvore (textoDoScript) {
-    const texto = textoDoScript || ''
-    const nos = {}
-    const padraoNo = /Nos\[(\d+)\]\s*=\s*new infraArvoreNo\((.*?)\);?\s*\n/g
-    let achado
-    while ((achado = padraoNo.exec(texto))) {
-      const [tipo, id, pai, , , rotulo, , icone] = lerArgumentos(achado[2])
-      nos[achado[1]] = { tipo, id, pai, rotulo: rotulo || '', icone: icone || '', src: '' }
-    }
-    const padraoSrc = /Nos\[(\d+)\]\.src\s*=\s*'([^']*)'/g
-    while ((achado = padraoSrc.exec(texto))) if (nos[achado[1]]) nos[achado[1]].src = achado[2]
-    const lista = Object.values(nos)
-    const processo = lista.find(no => no.tipo === 'PROCESSO')
-    const documentos = lista.filter(no => no.tipo === 'DOCUMENTO').map(no => ({
-      id: no.id,
-      rotulo: no.rotulo,
-      feitoNoSei: /documento_interno/.test(no.icone),
-      semConteudo: /documento_sem_conteudo/.test(no.icone),
-      temArquivo: /documento_download_anexo/.test(no.src) || /documento_pdf/.test(no.icone)
-    }))
-    return { idProcesso: processo ? processo.id : null, numero: processo ? processo.rotulo : null, documentos }
+    return ligadaNaUnidade(opcao, unidade, UNIDADE_CGOC)
   }
 
   // "Sicaf (3600001)", "Sicaf 12 (3600001)": o rótulo começa com o nome do tipo.

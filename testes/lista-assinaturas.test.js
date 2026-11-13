@@ -98,3 +98,40 @@ test('próximo pendente: depois da posição, senão o primeiro antes; todos fei
   assert.equal(lista.proximoPendente(itens, 2), 0)
   assert.equal(lista.proximoPendente(itens.map(() => ({ feito: true })), 1), -1)
 })
+
+// v0.9.2: intervalo de documentos numa linha.
+test('intervalo: "processo - 3383754-3383903", " - " e " a "', () => {
+  for (const linha of ['23236.022730/2026-41 - 3383754-3383903', '23236.022730/2026-41 - 3383754 - 3383903', '23236.022730/2026-41 3383754 a 3383903 edital']) {
+    const item = lista.lerLinha(linha)
+    assert.equal(item.processo, '23236.022730/2026-41')
+    assert.equal(item.documento, '3383754')
+    assert.equal(item.ate, '3383903')
+  }
+  assert.equal(lista.lerLinha('23236.022730/2026-41 3383754 a 3383903 edital').comentario, 'edital')
+  const semProcesso = lista.lerLinha('3383754 a 3383903')
+  assert.equal(semProcesso.processo, '')
+  assert.equal(semProcesso.ate, '3383903')
+  assert.equal(lista.lerLinha('3383903 - 3383754').documento, '3383754')
+  assert.equal(lista.lerLinha('3383754 - 3383754').ate, undefined)
+  // Sem segundo número continua sendo um documento só, com comentário.
+  const simples = lista.lerLinha('23236.022730/2026-41 - 3383754 assinar tudo')
+  assert.equal(simples.ate, undefined)
+  assert.equal(simples.comentario, 'assinar tudo')
+})
+
+test('intervalo: pesquisa abre o processo; sem processo, o primeiro documento', () => {
+  assert.equal(lista.textoDaPesquisa({ processo: '23236.022730/2026-41', documento: '3383754', ate: '3383903' }), '23236.022730/2026-41')
+  assert.equal(lista.textoDaPesquisa({ processo: '', documento: '3383754', ate: '3383903' }), '3383754')
+})
+
+test('intervalo: só os documentos do processo entre os dois números, do menor ao maior', () => {
+  const item = lista.lerLinha('3383754 a 3383903 ciência')
+  const rotulos = ['23236.022730/2026-41', 'Edital (3383760)', 'Anexo I (3383754)', 'Despacho 1 (3383500)', 'Anexo II (3383903)', 'Anexo I (3383754)', 'Ofício (3383904)', 'II']
+  const itens = lista.expandirIntervalo(item, rotulos, '23236.022730/2026-41')
+  assert.deepEqual(itens.map(i => i.documento), ['3383754', '3383760', '3383903'])
+  assert.equal(itens[0].processo, '23236.022730/2026-41')
+  assert.equal(itens[0].ciencia, true)
+  assert.equal(itens[0].doIntervalo, '3383754 a 3383903')
+  assert.equal(lista.numeroDoRotulo('Despacho 163 (3229092)'), '3229092')
+  assert.deepEqual(lista.expandirIntervalo(item, ['Ofício (3383904)'], ''), [])
+})

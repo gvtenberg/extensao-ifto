@@ -3,7 +3,7 @@
 // (storage.local, chave listaAssinaturas) até o usuário limpar; nada vai para a internet.
 (async function () {
   if (window.top !== window) return
-  const { listaAssinaturas: regras, configuracoes, barra: barraExtensao } = globalThis.ExtensaoIFTO
+  const { listaAssinaturas: regras, configuracoes, barra: barraExtensao, sei } = globalThis.ExtensaoIFTO
   const navegador = globalThis.browser || globalThis.chrome
   const CHAVE = 'listaAssinaturas'
 
@@ -116,6 +116,35 @@
     abrirItem()
   }
 
+  // ---------- v0.9.2: intervalo de documentos ("3383754 a 3383903") ----------
+  // Com a árvore do processo aberta, troca o item pelos documentos do processo dentro do intervalo
+  // (mesma leitura da árvore dos documentos do pagamento: comum/sei.js). Também lê os nomes à vista na
+  // árvore, para pegar documentos de pastas abertas pelo usuário.
+  function conferirIntervalo (pedidoPeloUsuario) {
+    const item = estado && estado.itens[estado.posicao]
+    if (!item || !item.ate || estado.pendente) return
+    let arvore
+    try { arvore = document.getElementById('ifrArvore').contentDocument } catch (erro) { arvore = null }
+    const lida = arvore && arvore.body ? sei.lerArvore([...arvore.scripts].map(script => script.textContent).join('\n')) : null
+    const rotulos = lida ? lida.documentos.map(doc => doc.rotulo).concat([...arvore.querySelectorAll('a')].map(link => link.textContent)) : []
+    // A árvore precisa ser do processo do item (sem processo: a que tem o primeiro documento).
+    const certa = lida && (item.processo
+      ? (lida.numero ? lida.numero === item.processo : arvore.body.textContent.includes(item.processo))
+      : rotulos.some(rotulo => regras.numeroDoRotulo(rotulo) === item.documento))
+    if (!certa) {
+      if (pedidoPeloUsuario) { aviso = 'Abra o processo deste item ("Abrir de novo") e espere a árvore aparecer.'; desenhar() }
+      return
+    }
+    const novos = regras.expandirIntervalo(item, rotulos, lida.numero)
+    if (!novos.length) {
+      aviso = `Nenhum documento de ${item.documento} a ${item.ate} neste processo. Se houver pastas fechadas na árvore, abra-as e clique em "Conferir de novo".`
+      desenhar()
+      return
+    }
+    estado.itens.splice(estado.posicao, 1, ...novos)
+    irPara(estado.posicao)
+  }
+
   // ---------- Desenho ----------
   function el (tag, atributos = {}, ...filhos) {
     const elemento = document.createElement(tag)
@@ -155,7 +184,7 @@
     painel.className = 'painel'
     const caixa = el('textarea', {
       rows: 8,
-      placeholder: 'Uma linha por item. Exemplos:\n23236.021417/2026-95 - 3383423 dar ciência\n23236.011766/2026-07\n3383812',
+      placeholder: 'Uma linha por item. Exemplos:\n23236.021417/2026-95 - 3383423 dar ciência\n23236.022730/2026-41 - 3383754 a 3383903\n23236.011766/2026-07\n3383812',
       oninput: () => { rascunho = caixa.value }
     })
     caixa.value = rascunho
@@ -214,9 +243,13 @@
           item.ciencia ? el('span', { class: 'etiqueta ciencia' }, 'Só dar ciência') : el('span', { class: 'etiqueta' }, 'Assinar'),
           item.feito ? el('span', { class: 'etiqueta feito' }, '✓ Feito') : null),
         item.processo ? el('div', {}, el('span', { class: 'rotulo' }, 'Processo '), el('strong', {}, item.processo)) : null,
-        item.documento
-          ? el('div', {}, el('span', { class: 'rotulo' }, 'Documento '), el('strong', {}, item.documento))
-          : el('div', { class: 'apoio' }, 'Sem documento: abre o processo.'),
+        item.ate
+          ? [el('div', {}, el('span', { class: 'rotulo' }, 'Documentos '), el('strong', {}, `${item.documento} a ${item.ate}`)),
+              el('div', { class: 'apoio' }, 'Ao abrir o processo, a extensão separa um item para cada documento dele nesse intervalo.')]
+          : item.documento
+            ? el('div', {}, el('span', { class: 'rotulo' }, 'Documento '), el('strong', {}, item.documento),
+              item.doIntervalo ? el('span', { class: 'apoio' }, ` (de ${item.doIntervalo})`) : null)
+            : el('div', { class: 'apoio' }, 'Sem documento: abre o processo.'),
         item.comentario ? el('div', { class: 'comentario' }, item.comentario) : null),
       aviso ? el('div', { class: 'erros' }, aviso) : null,
       el('div', { class: 'acoes' },
@@ -227,7 +260,9 @@
       estado.pendente ? el('div', { class: 'aguardando' }, estado.pendente.tipo === 'ciencia'
         ? 'Aguardando a ciência no SEI (confirme no OK)…'
         : 'Aguardando a assinatura no SEI… Se a senha não aparecer preenchida, digite e aperte Enter.') : null,
-      item.ciencia
+      item.ate
+        ? el('button', { type: 'button', class: 'botao principal', onclick: () => conferirIntervalo(true) }, 'Conferir de novo')
+        : item.ciencia
         ? el('button', { type: 'button', class: 'botao principal', title: 'Clica em "Ciência" no SEI; depois de você confirmar, abre o próximo', onclick: () => agirEAvancar('ciencia') }, 'Dar ciência e próximo')
         : item.documento
           ? el('button', { type: 'button', class: 'botao principal', title: 'Assina com a senha guardada no Firefox e abre o próximo', onclick: () => agirEAvancar('assinar') }, 'Assinar e próximo')
@@ -237,7 +272,7 @@
         el('button', { type: 'button', class: 'link', onclick: () => irPara(estado.posicao) }, 'Abrir de novo'),
         item.feito
           ? el('button', { type: 'button', class: 'link', onclick: desmarcarFeito }, 'Desmarcar feito')
-          : (item.documento || item.ciencia) ? el('button', { type: 'button', class: 'link', onclick: feitoEProximo }, 'Marcar feito e ir ao próximo') : null,
+          : (item.documento || item.ciencia) && !item.ate ? el('button', { type: 'button', class: 'link', onclick: feitoEProximo }, 'Marcar feito e ir ao próximo') : null,
         estado.pendente ? el('button', { type: 'button', class: 'link', onclick: cancelarPendente }, 'Cancelar a espera') : null,
         el('button', { type: 'button', class: 'link', onclick: voltarAoLugarPadrao }, 'Lugar padrão'),
         el('button', { type: 'button', class: 'link perigo', onclick: limpar }, 'Limpar lista')),
@@ -251,7 +286,7 @@
       el('li', { class: [indice === estado.posicao ? 'atual' : '', item.feito ? 'feito' : '', item.ciencia ? 'ciencia' : ''].join(' ').trim() },
         el('button', { type: 'button', title: 'Abrir este item', onclick: () => irPara(indice) },
           el('span', { class: 'situacao' }, item.feito ? '✓' : '•'),
-          el('span', {}, [item.processo, item.documento].filter(Boolean).join(' · ')),
+          el('span', {}, [item.processo, item.ate ? `${item.documento} a ${item.ate}` : item.documento].filter(Boolean).join(' · ')),
           item.comentario ? el('span', { class: 'apoio' }, ' ' + item.comentario) : null))))
     // Deixa o item atual à vista.
     setTimeout(() => { const atual = lista.querySelector('.atual'); if (atual) atual.scrollIntoView({ block: 'nearest' }) }, 0)
@@ -323,7 +358,7 @@
       const quadro = document.getElementById(id)
       if (quadro && !quadro.dataset.extensaoIftoVigiado) {
         quadro.dataset.extensaoIftoVigiado = '1'
-        quadro.addEventListener('load', () => { setTimeout(conferirPendente, 300) })
+        quadro.addEventListener('load', () => { setTimeout(() => { conferirPendente(); if (id === 'ifrArvore') conferirIntervalo(false) }, 300) })
       }
     }
   }
@@ -412,6 +447,7 @@
   // A página principal recarregou depois de assinar (ex.: o SEI abriu o processo de novo): confere já.
   if (estado && estado.pendente && estado.pendente.enviado) conferirPendente()
   desenhar()
+  setTimeout(() => conferirIntervalo(false), 300)
 
   function CSS () {
     return `

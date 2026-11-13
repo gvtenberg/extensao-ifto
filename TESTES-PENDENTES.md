@@ -147,3 +147,13 @@ E: A pergunta é curta: "Este processo já tem Sicaf, Consulta e Anexo sem arqui
 ### T38 – Instalar a atualização direto pela janela (v0.9.1)
 F: Clique no ícone da extensão › "Procurar atualização" › "Instalar a versão …".
 E: O Firefox pede "Permitir" e depois "Adicionar", sem abrir a página do GitHub. Se nada aparecer, comente; o link "abra a página da versão" é a reserva.
+
+## Lista de assinaturas: intervalo de documentos (v0.9.2)
+
+### T39 – Intervalo de documentos na lista (v0.9.2)
+F: Na lista de assinaturas, cole "23236.022730/2026-41 - 3383754-3383903" e clique em "Conferir e começar".
+E: O processo abre e a linha vira um item para cada documento do processo entre 3383754 e 3383903 (o contador aumenta); "Assinar e próximo" passa por eles um a um.
+
+### T40 – Intervalo sem o processo (v0.9.2)
+F: Cole só "3383754 a 3383903" e comece.
+E: Abre o documento 3383754 no processo dele e a linha vira os documentos desse processo no intervalo.
