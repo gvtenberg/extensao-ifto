@@ -206,3 +206,14 @@ E: A janela "Buscar SICAF" abre na página do SEI com esse CNPJ. Comente se o it
 ### T51 – Colar ou digitar o CNPJ (v0.11.0)
 F: Abra a janela (T49), apague o CNPJ e digite um errado (mude o último número); depois cole um certo e clique em "Buscar no SICAF".
 E: Com o errado aparece em vermelho "CNPJ com número errado"; com o certo, "conferido" e, por enquanto, "CNPJ encontrado".
+
+## SICAF automático: conferência da nota com o ateste (v0.12.0)
+### T52 – Conferir nota e ateste iguais (v0.12.0)
+F: Num processo com "1 nota sem SICAF – Buscar" (T47), clique no aviso.
+E: Abre a janela com a nota, o CNPJ do fornecedor tirado do PDF da nota e nenhum aviso vermelho; "Buscar no SICAF" mostra o fornecedor conferido.
+### T53 – Diferença entre nota e ateste (v0.12.0)
+F: Num processo em que o ateste tem um número, valor, empenho ou CNPJ diferente da nota (ou nota para outra unidade do IFTO), clique no aviso e depois em "Buscar no SICAF".
+E: A diferença aparece em vermelho; o primeiro clique troca o botão para "Continuar mesmo assim" e só o segundo continua. Nome da empresa escrito diferente aparece só em amarelo.
+### T54 – Nota escaneada (v0.12.0)
+F: Num processo com uma nota fiscal que é só imagem (escaneada), clique no aviso.
+E: Aparece em amarelo que a nota é uma imagem e a opção de escolher o CNPJ do ateste ou digitar outro.

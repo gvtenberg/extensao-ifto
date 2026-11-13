@@ -91,7 +91,8 @@
     for (const doc of inicial.atestes) atestes[doc.id] = await lerAteste(doc)
     const cnpjsDosSicafs = {}
     for (const doc of inicial.sicafs) cnpjsDosSicafs[doc.id] = await cnpjsDoSicaf(doc)
-    return { lida, situacao: regras.situacaoDoProcesso(lida.documentos, { atestes, cnpjsDosSicafs }) }
+    const cnpjsComSicaf = new Set(Object.values(cnpjsDosSicafs).flat())
+    return { lida, situacao: regras.situacaoDoProcesso(lida.documentos, { atestes, cnpjsDosSicafs }), cnpjsComSicaf }
   }
 
   // ---------- Aviso na barra ----------
@@ -117,11 +118,108 @@
   const atualizarDepois = () => { clearTimeout(espera); espera = setTimeout(atualizar, 400) }
   quadroArvore.addEventListener('load', atualizarDepois)
 
-  // ---------- Clique ----------
+  // ---------- Clique: ler as notas e conferir com o ateste (v0.12.0, decisões D8 e D9) ----------
+  let ocupado = false
   async function clicou () {
-    // Etapa 1: só avisa. A busca no SICAF vem nas próximas etapas.
-    if (!atual) return
-    window.alert(botao.title)
+    if (ocupado) return
+    ocupado = true
+    try {
+      const resultado = await analisar()
+      const pendentes = resultado ? resultado.situacao.pendentes : []
+      if (!pendentes.length) { window.alert('Este processo não tem notas sem SICAF depois da última Folha de Encaminhamento.'); return }
+      const conferidas = []
+      for (let posicao = 0; posicao < pendentes.length; posicao++) {
+        escreverNoBotao(`Lendo notas (${posicao + 1}/${pendentes.length})…`)
+        conferidas.push(await conferir(pendentes[posicao]))
+      }
+      janelaDasNotas(conferidas, resultado)
+    } catch (erro) {
+      window.alert('Não consegui ler as notas do processo: ' + erro.message)
+    } finally {
+      ocupado = false
+      atualizarDepois()
+    }
+  }
+
+  // Texto do PDF da nota (vazio se for imagem ou não abrir) conferido com o ateste.
+  async function conferir (nota) {
+    let texto = ''
+    try { texto = await pdfTexto.textoDoPdf(await seiPedidos.baixar(nota.link)) } catch (erro) { texto = '' }
+    const resultado = regras.conferirNota(texto, nota.ateste)
+    return { ...nota, ...resultado, cnpjEscolhido: resultado.cnpj }
+  }
+
+  // Janela com cada nota: CNPJ (ou escolha), avisos vermelhos e amarelos. Vermelho pede um segundo clique.
+  function janelaDasNotas (notas, resultado) {
+    const cartoes = notas.map(nota => cartaoDaNota(nota, resultado.cnpjsComSicaf))
+    const alerta = criar('p', { className: 'aviso vermelho', hidden: true, textContent: 'Há diferenças em vermelho. Confira a nota e o ateste antes de continuar.' })
+    const temVermelho = notas.some(nota => nota.avisos.some(aviso => aviso.nivel === 'vermelho'))
+    let confirmouVermelho = false
+    janela.abrir({
+      titulo: regras.textoDoAviso(notas.length),
+      conteudo: [criar('p', { className: 'apoio', textContent: 'Notas depois da última Folha de Encaminhamento. A nota fiscal é a referência; o ateste é conferido com ela.' }), ...cartoes, alerta],
+      botoes: [
+        { texto: 'Cancelar', aoClicar: j => j.fechar() },
+        {
+          texto: 'Buscar no SICAF',
+          tipo: 'principal',
+          aoClicar: j => {
+            const semCnpj = notas.filter(nota => !regras.cnpjValido(nota.cnpjEscolhido))
+            if (semCnpj.length) {
+              alerta.hidden = false
+              alerta.textContent = 'Escolha ou digite o CNPJ do fornecedor da nota ' + semCnpj.map(nota => nota.numero || '?').join(', ') + '.'
+              return
+            }
+            if (temVermelho && !confirmouVermelho) {
+              confirmouVermelho = true
+              alerta.hidden = false
+              alerta.textContent = 'Há diferenças em vermelho. Confira a nota e o ateste antes de continuar.'
+              j.botoes[1].textContent = 'Continuar mesmo assim'
+              j.botoes[1].className = 'acao perigo'
+              return
+            }
+            const grupos = regras.agruparPorFornecedor(notas.map(nota => ({ ...nota, cnpj: nota.cnpjEscolhido })))
+            buscarFornecedores(grupos, resultado, j)
+          }
+        }
+      ]
+    })
+  }
+
+  function cartaoDaNota (nota, cnpjsComSicaf) {
+    const titulo = `Nota ${nota.numero || '?'} – ${nota.fornecedor || 'fornecedor'}` + (nota.sei ? ` (SEI ${nota.sei})` : '')
+    const partes = [criar('h2', { textContent: titulo })]
+    if (nota.escolher) {
+      const nome = 'cnpj-' + nota.id
+      const outro = criar('input', { type: 'text', placeholder: 'Outro CNPJ' })
+      const opcoes = nota.opcoes.map((cnpj, posicao) => {
+        const marca = criar('input', { type: 'radio', name: nome, value: cnpj, checked: cnpj === nota.cnpjEscolhido })
+        marca.addEventListener('change', () => { if (marca.checked) { nota.cnpjEscolhido = cnpj; outro.value = '' } })
+        const origem = cnpj === (nota.ateste && nota.ateste.cnpj) && cnpj !== nota.cnpj ? 'do ateste' : 'da nota'
+        return criar('label', { className: 'escolha' }, [marca, `${regras.formatarCnpj(cnpj)} (${origem})`])
+      })
+      outro.addEventListener('input', () => {
+        const achado = regras.cnpjDaSelecao(outro.value)
+        nota.cnpjEscolhido = achado && achado.valido ? achado.cnpj : null
+        for (const marca of opcoes.map(rotulo => rotulo.firstChild)) marca.checked = false
+      })
+      partes.push(criar('p', { textContent: 'Escolha o CNPJ do fornecedor:' }), ...opcoes, criar('label', {}, ['Outro (digite ou cole):', outro]))
+    } else {
+      partes.push(criar('p', { textContent: 'CNPJ do fornecedor: ' + regras.formatarCnpj(nota.cnpj) }))
+    }
+    for (const aviso of nota.avisos) partes.push(criar('p', { className: 'aviso ' + aviso.nivel, textContent: aviso.texto }))
+    if (nota.cnpj && cnpjsComSicaf.has(nota.cnpj)) partes.push(criar('p', { className: 'aviso verde', textContent: 'Este fornecedor já tem Sicaf neste trecho do processo.' }))
+    return criar('div', { className: 'cartao' }, partes)
+  }
+
+  // Etapa 3: mostra os fornecedores conferidos; a busca no SICAF vem na etapa 4.
+  function buscarFornecedores (grupos, resultado, aberta) {
+    aberta.trocarConteudo([
+      criar('p', { textContent: 'Fornecedores conferidos:' }),
+      criar('ul', {}, grupos.map(grupo => criar('li', { textContent: `${regras.formatarCnpj(grupo.cnpj)} – ${grupo.nome} (nota ${grupo.notas.map(nota => nota.numero).join(', ')})` }))),
+      criar('p', { className: 'apoio', textContent: 'A busca no SICAF ainda não está pronta nesta versão.' })
+    ])
+    aberta.trocarBotoes([{ texto: 'Fechar', tipo: 'principal', aoClicar: j => j.fechar() }])
   }
 
   navegador.storage.onChanged.addListener(async (mudancas, area) => {

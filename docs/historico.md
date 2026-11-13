@@ -2,6 +2,7 @@
 
 One or two lines per version, with the date (dd/mm/yyyy). Number 0.STAGE.FIX.
 
+- v0.12.0 (13/11/2026): automatic SICAF, stage 3: "Buscar" reads each pending invoice PDF (supplier CNPJ = first valid non-IFTO CNPJ) and compares it with the ateste (buyer must be Campus Palmas; CNPJ, number, value and empenho in red; company name in yellow); red needs "Continuar mesmo assim"; scanned invoice or different CNPJ: pick or type the CNPJ.
 - v0.11.0 (13/11/2026): automatic SICAF, stage 2: selecting a CNPJ on an SEI page shows a "Buscar SICAF" button; right-click menu "Buscar SICAF deste CNPJ" (also in the browser PDF viewer); window with a CNPJ field (paste or type, check digits). For now it only shows the CNPJ found. New background script `fundo/fundo.js` (Chrome: service worker).
 - v0.10.0 (13/11/2026): automatic SICAF, stage 1: "SICAF da nota fiscal" option in the settings; in the CGOC, with a process open, the bar shows "N notas sem SICAF – Buscar" (invoices after the last Folha de Encaminhamento whose supplier, by the ateste CNPJ, has no Sicaf with that CNPJ in its PDF). PDF text read with pdf.js 6.4.299 (`bibliotecas/pdfjs/`). SEI request helpers moved to `sites/sei/sei-pedidos.js`.
 - v0.9.7 (13/11/2026): icon window: "Procurar atualização" now only offers "Abrir a página da versão" (the direct install link did not work); README updated.

@@ -207,6 +207,96 @@
     }
   }
 
+
+  // ---------- Nota fiscal × ateste (etapa 3; decisões D8 e D9) ----------
+  // v0.12.0: a nota é a referência (ateste e Folha são digitados à mão). Emitente: o primeiro CNPJ válido
+  // que não é do IFTO (o emitente vem antes; transportadora pode vir depois).
+  function cnpjsDaNota (texto) {
+    return acharCnpjs(texto).filter(cnpj => !ehDoIfto(cnpj))
+  }
+  // Nota escaneada (imagem): quase nenhuma letra no texto.
+  const notaSemTexto = texto => (String(texto || '').match(/[A-Za-zÀ-ÿ]/g) || []).length < 30
+
+  // Números da nota com e sem pontos/zeros à esquerda: "000.000.063" e "063" contam como 63.
+  function numerosDoTexto (texto) {
+    const numeros = new Set()
+    for (const achado of String(texto || '').matchAll(/\d[\d.]*/g)) numeros.add(soDigitos(achado[0]).replace(/^0+(?=\d)/, ''))
+    return numeros
+  }
+  // Valores "914,60" e "3.589,00" (sem os pontos de milhar).
+  const valorLimpo = valor => String(valor || '').replace(/\./g, '').trim()
+  function valoresDoTexto (texto) {
+    return new Set([...String(texto || '').matchAll(/\d{1,3}(?:\.\d{3})*,\d{2}|\d+,\d{2}/g)].map(achado => valorLimpo(achado[0])))
+  }
+  // Empenhos "2026NE174", "2026 NE 000174" → "2026NE174".
+  function empenhosDoTexto (texto) {
+    return [...normalizar(texto).matchAll(/\b(\d{4})\s*NE\s*0*(\d+)\b/g)].map(achado => `${achado[1]}NE${achado[2]}`)
+  }
+  // Nome do ateste no texto da nota: as palavras principais (abreviações aceitas).
+  function nomeNoTexto (nome, texto) {
+    const procuradas = palavras(nome)
+    if (!procuradas.length) return true
+    const doTexto = new Set(normalizar(texto).replace(/[^A-Z0-9 ]/g, ' ').split(' ').filter(Boolean))
+    const achadas = procuradas.filter(palavra => [...doTexto].some(outra => outra === palavra || (palavra.length >= 3 && outra.startsWith(palavra)) || (outra.length >= 3 && palavra.startsWith(outra))))
+    return achadas.length / procuradas.length >= 0.6
+  }
+
+  // Confere uma nota. ateste: item de lerAteste (ou null). Devolve o CNPJ do fornecedor pela nota, as
+  // opções para escolher e os avisos: vermelho (precisa de "Continuar mesmo assim") ou amarelo (só aviso).
+  function conferirNota (texto, ateste) {
+    const avisos = []
+    const vermelho = mensagem => avisos.push({ nivel: 'vermelho', texto: mensagem })
+    const amarelo = mensagem => avisos.push({ nivel: 'amarelo', texto: mensagem })
+    const semTexto = notaSemTexto(texto)
+    const daNota = semTexto ? [] : cnpjsDaNota(texto)
+    const cnpj = daNota[0] || null
+    const opcoes = [...new Set([cnpj, ateste && ateste.cnpj].filter(Boolean))]
+    if (semTexto) {
+      amarelo('A nota é uma imagem (sem texto): confira o CNPJ do fornecedor.')
+      return { cnpj: ateste && ateste.cnpj ? ateste.cnpj : null, escolher: true, opcoes, avisos }
+    }
+    // Tomador: Campus Palmas.
+    const doIfto = acharCnpjs(texto).filter(ehDoIfto)
+    if (!doIfto.includes(CNPJ_CAMPUS_PALMAS)) {
+      if (doIfto.length) vermelho(`A nota é para outra unidade do IFTO (CNPJ ${formatarCnpj(doIfto[0])}), não para o Campus Palmas.`)
+      else vermelho('A nota não tem o CNPJ do Campus Palmas (10.742.006/0003-50) como tomador.')
+    }
+    if (!cnpj) vermelho('Não achei o CNPJ do fornecedor na nota.')
+    if (!ateste) {
+      amarelo('Não achei o ateste desta nota (depois da última Folha de Encaminhamento).')
+      return { cnpj, escolher: !cnpj, opcoes, avisos }
+    }
+    let escolher = !cnpj
+    if (ateste.cnpj && cnpj && ateste.cnpj !== cnpj) {
+      vermelho(`CNPJ diferente: nota ${formatarCnpj(cnpj)}, ateste ${formatarCnpj(ateste.cnpj)}.`)
+      escolher = true
+    }
+    if (!ateste.cnpj) amarelo('O ateste não tem o CNPJ da empresa.')
+    const numeros = numerosDoTexto(texto)
+    const faltaNumero = ateste.notas.filter(numero => !numeros.has(numero))
+    if (faltaNumero.length && ateste.notas.length === 1) vermelho(`Número da nota do ateste (${ateste.notas[0]}) não aparece na nota.`)
+    if (ateste.notas.length > 1 && faltaNumero.length === ateste.notas.length) vermelho(`Nenhum número de nota do ateste (${ateste.notas.join(', ')}) aparece na nota.`)
+    const valores = valoresDoTexto(texto)
+    if (ateste.valores.length && !ateste.valores.some(valor => valores.has(valorLimpo(valor)))) vermelho(`Valor do ateste (R$ ${ateste.valores.join(', R$ ')}) não aparece na nota.`)
+    const empenhosDaNota = empenhosDoTexto(texto)
+    if (empenhosDaNota.length && ateste.empenhos.length && !ateste.empenhos.some(empenho => empenhosDaNota.includes(empenho))) {
+      vermelho(`Empenho diferente: nota ${empenhosDaNota[0]}, ateste ${ateste.empenhos.join(', ')}.`)
+    }
+    if (ateste.empresa && !nomeNoTexto(ateste.empresa, texto)) amarelo(`Nome da empresa do ateste ("${ateste.empresa}") não aparece igual na nota.`)
+    return { cnpj, escolher, opcoes, avisos }
+  }
+
+  // Um conjunto por fornecedor (CNPJ), na ordem das notas.
+  function agruparPorFornecedor (notas) {
+    const grupos = new Map()
+    for (const nota of notas) {
+      if (!nota.cnpj) continue
+      if (!grupos.has(nota.cnpj)) grupos.set(nota.cnpj, { cnpj: nota.cnpj, nome: (nota.ateste && nota.ateste.empresa) || nota.fornecedor || '', notas: [] })
+      grupos.get(nota.cnpj).notas.push(nota)
+    }
+    return [...grupos.values()]
+  }
+
   // "1 nota sem SICAF" / "2 notas sem SICAF"
   function textoDoAviso (quantidade) {
     return quantidade === 1 ? '1 nota sem SICAF' : `${quantidade} notas sem SICAF`
@@ -216,7 +306,8 @@
     UNIDADE_CGOC, CNPJ_CAMPUS_PALMAS, funcaoLigada, ehCgoc,
     soDigitos, cnpjValido, formatarCnpj, ehDoIfto, acharCnpjs, cnpjDaSelecao,
     normalizar, mesmoNumero, textoDoHtml, nomesParecidos,
-    tipoNaArvore, numeroSei, lerRotuloDaNota, trechoPendente, lerAteste, situacaoDoProcesso, textoDoAviso
+    tipoNaArvore, numeroSei, lerRotuloDaNota, trechoPendente, lerAteste, situacaoDoProcesso, textoDoAviso,
+    cnpjsDaNota, notaSemTexto, empenhosDoTexto, nomeNoTexto, conferirNota, agruparPorFornecedor
   }
   if (typeof module !== 'undefined' && module.exports) module.exports = api
   else raiz.ExtensaoIFTO = Object.assign(raiz.ExtensaoIFTO || {}, { sicaf: api })
