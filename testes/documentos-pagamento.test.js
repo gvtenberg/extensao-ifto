@@ -26,7 +26,7 @@ const arvore = [
   'Nos[1] = new infraArvoreNo("PASTA","PASTA2","3479546","javascript:abrirFecharPasta(\'PASTA2\')",null,"II","II",null,null,null,true,true,null,null,null);',
   'Nos[2] = new infraArvoreNo("DOCUMENTO","3497441","PASTA2","controlador.php?x","ifrConteudoVisualizacao","Documento CNH (3228999)","Documento CNH (3228999)","svg/documento_pdf.svg?25",null,null,true,true,null,null,null,null);',
   'Nos[3] = new infraArvoreNo("DOCUMENTO","3497536","PASTA2","controlador.php?x","ifrConteudoVisualizacao","Despacho 163 (3229092)","Despacho 163 (3229092)","svg/documento_interno.svg?25",null,null,true,true,null,null,null,null);',
-  'Nos[4] = new infraArvoreNo("DOCUMENTO","3600001","PASTA2","controlador.php?x","ifrConteudoVisualizacao","Sicaf (3400001)","Sicaf (3400001)","svg/documento_generico.svg?25",null,null,true,true,null,null,null,null);',
+  'Nos[4] = new infraArvoreNo("DOCUMENTO","3600001","PASTA2","controlador.php?x","ifrConteudoVisualizacao","Sicaf (3400001)","Sicaf (3400001)","svg/documento_sem_conteudo.svg?25",null,null,true,true,null,null,null,null);',
   'Nos[5] = new infraArvoreNo("DOCUMENTO","3600002","PASTA2","controlador.php?x","ifrConteudoVisualizacao","Sicaf (3300001)","Sicaf (3300001)","svg/documento_generico.svg?25",null,null,true,true,null,null,null,null);',
   'Nos[5].src = \'controlador.php?acao=documento_download_anexo&id_anexo=1\';',
   'Nos[6] = new infraArvoreNo("DOCUMENTO","3600003","PASTA2","controlador.php?x","ifrConteudoVisualizacao","Anexo III (3400003)","Anexo III (3400003)","svg/documento_generico.svg?25",null,null,true,true,null,null,null,null);',
@@ -39,6 +39,7 @@ test('lerArvore: processo, documentos, feito no SEI e com arquivo', () => {
   assert.equal(numero, '23236.012523/2026-88')
   assert.equal(documentos.length, 5)
   assert.deepEqual(documentos.map(doc => [doc.feitoNoSei, doc.temArquivo]), [[false, true], [true, false], [false, false], [false, true], [false, false]])
+  assert.equal(documentos[2].semConteudo, true)
 })
 
 test('documentos em branco: só Sicaf, Consulta ou Anexo externos sem arquivo', () => {
@@ -71,4 +72,14 @@ test('texto da confirmação, com e sem avisos', () => {
   const comAviso = textoDaConfirmacao({ numero: 'X', jaIncluidosHoje: true, emBranco: [{ rotulo: 'Sicaf (1)' }] })
   assert.match(comAviso, /já incluiu estes documentos neste processo hoje/)
   assert.match(comAviso, /sem arquivo: Sicaf \(1\)\./)
+})
+
+test('árvore guardada de um processo de pagamento com Sicaf, Consulta e Anexo em branco (se existir no computador)', () => {
+  const fs = require('node:fs')
+  const caminho = require('node:path').join(__dirname, '../ferramentas-de-teste/paginas-sei/Pagina-Sicaf-em-branco_files/controlador_0_gb.html')
+  if (!fs.existsSync(caminho)) return
+  const { numero, documentos } = lerArvore(fs.readFileSync(caminho, 'latin1'))
+  assert.equal(numero, '23236.023830/2025-11')
+  // "Anexo Instrumento de Cobrança…" tem PDF e não conta.
+  assert.deepEqual(documentosEmBranco(documentos).map(doc => doc.rotulo), ['Sicaf (3385221)', 'Consulta (3385222)', 'Anexo (3385223)'])
 })

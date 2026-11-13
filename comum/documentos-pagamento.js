@@ -13,7 +13,8 @@
 
   // v0.8.0: lê a árvore do processo a partir do script do quadro da árvore (Nos[n] = new infraArvoreNo(...)).
   // Externo com arquivo: tem o link de baixar (documento_download_anexo) ou o ícone de PDF; feito no SEI:
-  // ícone documento_interno. Externo sem nenhum dos dois = em branco (sem arquivo).
+  // ícone documento_interno. Em branco: ícone documento_sem_conteudo (visto no SEI 5.0.4) ou externo sem
+  // nenhum dos sinais acima.
   function lerArgumentos (texto) {
     const valores = []
     const padrao = /"((?:[^"\\]|\\.)*)"|(null|true|false|-?\d+)/g
@@ -38,6 +39,7 @@
       id: no.id,
       rotulo: no.rotulo,
       feitoNoSei: /documento_interno/.test(no.icone),
+      semConteudo: /documento_sem_conteudo/.test(no.icone),
       temArquivo: /documento_download_anexo/.test(no.src) || /documento_pdf/.test(no.icone)
     }))
     return { idProcesso: processo ? processo.id : null, numero: processo ? processo.rotulo : null, documentos }
@@ -50,7 +52,7 @@
     return r === t || r.startsWith(t + ' ') || r.startsWith(t + '(')
   }
   function documentosEmBranco (documentos, tipos = TIPOS) {
-    return (documentos || []).filter(doc => !doc.feitoNoSei && !doc.temArquivo && tipos.some(tipo => ehDoTipo(doc.rotulo, tipo)))
+    return (documentos || []).filter(doc => !doc.temArquivo && (doc.semConteudo || !doc.feitoNoSei) && tipos.some(tipo => ehDoTipo(doc.rotulo, tipo)))
   }
 
   // Opção da lista "Tipo do Documento" pelo nome exato (sem diferença de maiúsculas e espaços).
