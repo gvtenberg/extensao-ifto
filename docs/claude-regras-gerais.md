@@ -2,7 +2,7 @@
 
 **Sections**: Language · Economical reading (tokens) · Project and documentation organization · How we work (small specs) · Chat messages (short) · Tests · Version and git · Reusing code · Improvements that serve several projects · Same rules on every computer
 
-Updated on 13/11/2026 (2). Model: `/home/berg/Desktop/Sistema Gestão Orçamentária/sistema-orcamento-ifto` (CLAUDE.md, docs/, .claude/). New project or one without this organization: propose applying it. The user is not from IT: plain, simple language, commands with the exact text to type and the click path.
+Updated on 13/11/2026 (3). Model: `/home/berg/Desktop/Sistema Gestão Orçamentária/sistema-orcamento-ifto` (CLAUDE.md, docs/, .claude/). New project or one without this organization: propose applying it. The user is not from IT: plain, simple language, commands with the exact text to type and the click path.
 
 ## Language
 
@@ -21,7 +21,7 @@ Updated on 13/11/2026 (2). Model: `/home/berg/Desktop/Sistema Gestão Orçament�
 - `docs/`: `arquitetura.md` (file map) · `regras/` (one file per subject + `LEIA-ME.md`) · `padrao-visual.md` · `melhorias-futuras.md` ("Status" section at the top: done, in progress, pending from the user, planned **[spec]**, not planned; then the ideas, one line each) · `specs/` (`_modelo.md`, one spec per improvement; finished ones in `specs/feitas/`) · `historico.md` (one or two lines per version, with date) · `referencias/`. At the root: `TESTES-PENDENTES.md`.
 - All `.md` files in git (except local or unnecessary ones), so another person or machine can continue. When changing code or a rule, update the right `.md` and the "Status" in the same commit. Do not create a file that repeats what is already in another (point to it).
 - One subject per file; `##` titles that work as search terms; "**Sections**" index on line 3 (update when creating or renaming a section); short texts.
-- Texts shown to people who use the system or the extension: written for that user (not from IT), never for the programmer (no GitHub, Actions, code, file names or technical terms); what is for the programmer goes in `docs/`.
+- Texts shown to people who use the system or the extension: written for that user (not from IT), never for the programmer (no GitHub, Actions, code, file names or technical terms); what is for the programmer goes in `docs/`. (13/11/2026) **Always review them** when touching a screen: short, plain, natural (not AI-sounding), saying exactly what to do and where to click.
 - `ferramentas-de-teste/` in `.gitignore` (local test and reference files); keys and passwords never in git (`.env.local`, GitHub secrets). Never remove lines from `.gitignore` without permission.
 - `.claude/commands/`: `/planejar`, `/etapa`, `/testes`. `.claude/settings.json`: allows the check commands and `git status/diff/log`; blocks reading `.env.local`.
 - GitHub Actions: checks the project on every push; fixed OS version (e.g. `ubuntu-24.04`), `timeout-minutes`, step names in Portuguese.
@@ -45,6 +45,7 @@ Updated on 13/11/2026 (2). Model: `/home/berg/Desktop/Sistema Gestão Orçament�
 
 - Manual tests via GitHub: the user answers on the **cards** (issues) with the "✅ Passou" / "❌ Falhou" boxes and comments; an Action creates one card per new test and closes those that leave the file; `/testes` reads the cards with a summary script and deletes the resolved ones with a script. Model: `extensao-ifto` (`.github/workflows/testes.yml`, `.github/scripts/`). In an existing project, set it up only when the user asks.
 - `TESTES-PENDENTES.md` is **only** the source of the cards (the user does not read it), in Portuguese: compact, no instructions or result lines. Format: "## seção", "> antes de testar" (optional), "### Tnn – título (vX.Y.Z)", "F: o que fazer", "E: o que deve acontecer" (one line each; summarized, only what the user and non-IT colleagues need: where to click and what should appear). The card carries a short "Como responder" footer (a comment counts as an answer for those who cannot click); question: "### Pn – título" and "?: pergunta". Project without cards yet: old detailed format.
+- (13/11/2026) **Tests reported in the chat:** when the user tells the result of a test in the chat, delete from the tests file the ones that passed and the repeated ones or those replaced by new tests (their cards close on the next push); say which were deleted.
 - An uncommented test = it worked. Never delete a test without "Passou" on the card (or `[x]` in the old format); only append at the end; new number, never reused.
 - Several stages: the user tests everything together at the end; only stop earlier for a **critical** test (writes to an official system or decides the direction), marked "(Crítico)". Automated tests at every stage.
 - **Never test with screenshots** without an explicit request.
