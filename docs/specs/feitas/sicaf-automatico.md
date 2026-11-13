@@ -2,7 +2,7 @@
 
 **Sections**: 1. Goal · 2. Out of scope · 3. Decisions to confirm · 4. Decided rules · 5. What changes · 6. Stages · 7. Manual tests
 
-- **Status:** in progress (stages 1–5 done, v0.14.0)
+- **Status:** done (v0.10.0 to v0.15.0, 13/11/2026); rules moved to `docs/regras/sicaf.md`
 - **Requested on:** 13/11/2026 · **Deadline or priority:** high (done for every invoice that arrives for payment)
 - **Planned version:** 0.10.0
 
@@ -63,7 +63,7 @@ Each stage fits in a short conversation (`/etapa sicaf-automatico <n>`) and ends
 - [x] Stage 3 – **CNPJ from the invoice and checks** (v0.12.0; D8, D9): read the invoice PDF text, compare with the ateste, window to pick or type when they differ or the invoice is a scanned image. Samples: `ferramentas-de-teste/notas-fiscais/` (7 models; `2026NE174.pdf` is a commitment note with two CNPJs of the same company).
 - [x] Stage 4 – **Get the PDF from the SICAF** (v0.13.0): permission request, open the SICAF tab, login page help, fill CNPJ, Pesquisar, get the PDF (and supplier name), save it in Downloads and return it to the SEI tab. SICAF PDF sample: `ferramentas-de-teste/pagina-compras/consultarSituacaoFornecedor_14159957000602_2026-11-13.pdf`. **Before:** confirm the SICAF link from the Compras desktop (user menu › SICAF). Critical test (decides whether the SICAF accepts the automatic search).
 - [x] Stage 5 – **Add to the SEI** (v0.14.0): confirmation window; per supplier Sicaf with the PDF and tree name + Consulta + Anexo. Critical test (writes to the SEI).
-- [ ] Stage 6 – **"Incluir SICAF" for any sector** (v0.15.0): with Sempre ligada, button in the bar of any unit: type or paste the CNPJ → SICAF → only the Sicaf with the PDF.
+- [x] Stage 6 – **"Incluir SICAF" for any sector** (v0.15.0): with Sempre ligada, button in the bar of any unit: type or paste the CNPJ → SICAF → only the Sicaf with the PDF.
 
 ## 7. Manual tests
 

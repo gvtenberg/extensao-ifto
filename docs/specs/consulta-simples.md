@@ -2,7 +2,7 @@
 
 **Sections**: 1. Goal · 2. Out of scope · 3. Decisions to confirm · 4. Decided rules · 5. What changes · 6. Stages · 7. Manual tests
 
-- **Status:** ready to code (after `specs/sicaf-automatico.md`)
+- **Status:** ready to code (after `specs/feitas/sicaf-automatico.md`)
 - **Requested on:** 13/11/2026 · **Deadline or priority:** next improvement after the automatic SICAF
 - **Planned version:** 0.16.0
 

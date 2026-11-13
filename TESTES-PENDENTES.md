@@ -239,3 +239,12 @@ E: Aparecem um Sicaf e uma Consulta e dois Anexos, um com o número de cada nota
 ### T60 – "Incluir Sicaf, Consulta e Anexo" continua igual (v0.14.0)
 F: Na CGOC, com um processo aberto, clique no botão "Incluir Sicaf, Consulta e Anexo" > OK.
 E: Os três documentos em branco aparecem na árvore, como antes.
+
+## SICAF automático: botão "Incluir SICAF" em qualquer unidade (v0.15.0)
+> Nas configurações, "SICAF da nota fiscal" em "Sempre ligada".
+### T61 – Incluir SICAF em outra unidade (v0.15.0)
+F: Numa unidade que não é a CGOC, abra um processo, clique em "Incluir SICAF" no alto à direita, cole um CNPJ e clique em "Buscar no SICAF"; depois, "Incluir no processo".
+E: Volta do SICAF com o PDF e a janela mostra só "Sicaf <empresa>"; depois de incluir, a árvore mostra só esse Sicaf com o PDF (sem Consulta nem Anexo).
+### T62 – Desligada (v0.15.0)
+F: Nas configurações, deixe "SICAF da nota fiscal" em "Desligada"; no SEI, selecione um CNPJ e abra um processo com nota sem SICAF na CGOC.
+E: Não aparece o botão "Buscar SICAF", nem o aviso de notas sem SICAF, nem "Incluir SICAF".

@@ -3,6 +3,7 @@
 // "N notas sem SICAF – Buscar". Nada abre antes do clique (decisão D2).
 // v0.11.0: CNPJ selecionado (botão ao lado da seleção ou menu do botão direito) abre a janela do SICAF com
 // o CNPJ, em qualquer página principal do SEI; na janela também dá para colar ou digitar o CNPJ.
+// v0.13.0 a v0.15.0: busca no SICAF, inclusão no SEI e botão "Incluir SICAF" (Sempre ligada).
 (async function () {
   if (window.top !== window) return
   const ExtensaoIFTO = globalThis.ExtensaoIFTO
@@ -224,6 +225,12 @@
   }
 
   if (!quadroArvore) return
+  // v0.15.0: "Sempre ligada": botão "Incluir SICAF" em qualquer unidade, com um processo aberto (digitar ou
+  // colar o CNPJ). Fora da CGOC inclui só o Sicaf com o PDF; na CGOC, também Consulta e Anexo.
+  const ID_INCLUIR = 'incluir-sicaf'
+  barra.botao(ID_INCLUIR, { texto: 'Incluir SICAF', titulo: 'Buscar o SICAF de um CNPJ e incluir o PDF neste processo', ordem: 16, aoClicar: () => janelaDoCnpj('') })
+  const desenharIncluir = () => barra.mostrar(ID_INCLUIR, opcoes.incluirSicaf === 'sempre')
+
   const ID = 'sicaf'
   const botao = barra.botao(ID, { texto: 'Notas sem SICAF', titulo: '', ordem: 15, aoClicar: () => clicou() })
   const escreverNoBotao = texto => { botao.lastChild.textContent = ' ' + texto }
@@ -391,8 +398,10 @@
   navegador.storage.onChanged.addListener(async (mudancas, area) => {
     if (area !== 'local' || !mudancas.configuracoes) return
     opcoes = await configuracoes.lerConfiguracoes()
+    desenharIncluir()
     atualizarDepois()
   })
 
+  desenharIncluir()
   atualizarDepois()
 })()

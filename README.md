@@ -29,6 +29,8 @@ Para unidades específicas (ligadas automaticamente na unidade indicada, e podem
 
 - **Lista de assinaturas (Direção-geral):** permite colar uma lista de processos e documentos (por exemplo, copiada de uma planilha ou de uma mensagem) e abrir um item por vez. O painel mostra o comentário de cada item, destaca em azul os itens que são apenas para dar ciência e tem os botões "Assinar e próximo" e "Dar ciência e próximo". Também aceita um intervalo de números de documentos de um mesmo processo.
 - **Documentos do pagamento (CGOC):** com um processo aberto, o botão "Incluir Sicaf, Consulta e Anexo" inclui no processo os três documentos externos em branco (data de hoje, Nato-digital, Público), depois de uma confirmação.
+- **SICAF da nota fiscal (CGOC):** com um processo de pagamento aberto, avisa "N notas sem SICAF – Buscar" quando há notas fiscais depois da última Folha de Encaminhamento sem o SICAF do fornecedor. Ao clicar, a extensão lê o PDF de cada nota, confere com o ateste (CNPJ, número, valor, empenho e se a nota é para o Campus Palmas) e mostra as diferenças em vermelho. Depois busca o PDF "Situação do Fornecedor" no SICAF (o login no Compras.gov.br com Gov.br é feito pela própria pessoa), salva o PDF na pasta Downloads e, depois de uma confirmação, inclui no processo o Sicaf com o PDF, a Consulta e um Anexo para cada nota.
+- **Buscar SICAF de um CNPJ (todas as unidades):** ao selecionar um CNPJ numa página do SEI aparece o botão "Buscar SICAF"; no PDF de uma nota, use o botão direito > "Buscar SICAF deste CNPJ". Com a opção "Sempre ligada", o botão "Incluir SICAF" permite digitar ou colar o CNPJ; fora da CGOC, inclui só o Sicaf com o PDF.
 
 Os botões da extensão ficam no alto, à direita, nas páginas do SEI.
 
@@ -103,17 +105,19 @@ Cada função abaixo tem três opções: **Automática** (liga só na unidade in
 
 - **Lista de assinaturas:** automática na Direção-geral (PAL/REI/IFTO).
 - **Documentos do pagamento:** automática na CGOC (CGOC/GAC/DAP/PAL/REI/IFTO).
+- **SICAF da nota fiscal:** automática na CGOC (aviso das notas sem SICAF); "Sempre ligada" mostra o botão "Incluir SICAF" em qualquer unidade; "Desligada" também tira o botão que aparece ao selecionar um CNPJ. Na primeira vez, clique em **Permitir acesso ao Compras.gov.br**: o navegador pede permissão para a extensão abrir o Compras.gov.br e salvar o PDF na pasta Downloads (só quem usa o SICAF precisa permitir).
 
 ## Quais dados a extensão lê e guarda
 
-- **O que lê:** somente as páginas do SEI abertas no navegador (unidade atual, árvore do processo, números dos documentos e versão do SEI), para saber onde colocar os botões e qual documento abrir.
-- **O que guarda:** as configurações, a lista de assinaturas colada (até o uso do botão "Limpar lista") e a versão do último SEI aberto. Esses dados ficam apenas no navegador do próprio computador.
+- **O que lê:** somente as páginas do SEI abertas no navegador (unidade atual, árvore do processo, números dos documentos e versão do SEI), para saber onde colocar os botões e qual documento abrir. Para o SICAF, lê também o texto dos atestes e dos PDFs das notas fiscais e do SICAF do processo aberto, e a página do SICAF no Compras.gov.br (só depois da permissão e do clique em "Buscar no SICAF").
+- **O que guarda:** as configurações, a lista de assinaturas colada (até o uso do botão "Limpar lista"), a versão do último SEI aberto e os PDFs do SICAF obtidos no dia (para não buscar de novo; os de outros dias são apagados). Esses dados ficam apenas no navegador do próprio computador.
 - **Senha:** a extensão **não lê nem guarda a senha**. A senha fica no gerenciador de senhas do navegador; a extensão apenas verifica se o campo já está preenchido.
-- **Envio de dados:** a extensão não envia dados do SEI para nenhum outro site. A única consulta externa é a verificação de nova versão (automática no Firefox, ou pelo botão "Procurar atualização"), feita na página de versões indicada em [Onde baixar](#onde-baixar).
-- **O que escreve no SEI:** a extensão só faz alterações no SEI a partir de um clique do usuário, por exemplo em "Assinar e próximo" ou na confirmação de "Incluir Sicaf, Consulta e Anexo".
+- **Envio de dados:** a extensão não envia dados do SEI para nenhum outro site (no SICAF, só digita o CNPJ do fornecedor na pesquisa). A única consulta externa é a verificação de nova versão (automática no Firefox, ou pelo botão "Procurar atualização"), feita na página de versões indicada em [Onde baixar](#onde-baixar).
+- **O que escreve no SEI:** a extensão só faz alterações no SEI a partir de um clique do usuário, por exemplo em "Assinar e próximo" ou na confirmação de "Incluir Sicaf, Consulta e Anexo" e de "Incluir no processo" (SICAF).
 
 ## Cuidados no uso
 
+- **Confira o SICAF antes de incluir.** A janela "Incluir no processo" mostra o PDF de cada fornecedor e os avisos; avisos em vermelho pedem um segundo clique. O login no Compras.gov.br é sempre feito pela própria pessoa.
 - **Confira antes de assinar.** O botão "Assinar e próximo" assina o documento aberto com a senha guardada no navegador. O clique nesse botão vale como confirmação, por isso leia o documento antes de clicar.
 - **Computador compartilhado:** não guarde a senha do SEI no navegador de um computador usado por outras pessoas. Em computador pessoal de trabalho, recomenda-se proteger as senhas guardadas com uma senha principal (no Firefox: menu > **Configurações** > **Privacidade e Segurança** > **Usar uma senha principal**).
 - **Senhas de outros sistemas:** o Firefox pode sugerir no SEI senhas guardadas para outros endereços do IFTO (SUAP, Moodle e outros). Confira se a senha sugerida é a do SEI.
@@ -139,6 +143,6 @@ Não envie senhas nem informações sigilosas de processos.
 
 ## Licença e créditos
 
-Licença GPL-3.0 (arquivo `LICENSE`). Partes do código vêm do **SEI++** (Jonatas Evaristo, https://github.com/jonatasrs/sei, GPL-3.0); o **SEI Pro** (https://github.com/SEI-Pro/sei-pro, AGPL-3.0) é usado como referência, e trechos aproveitados dele mantêm a licença de origem, indicada no próprio arquivo.
+Licença GPL-3.0 (arquivo `LICENSE`). A leitura de PDF usa o **pdf.js** da Mozilla (https://github.com/mozilla/pdf.js, Apache-2.0, pasta `bibliotecas/pdfjs`). Partes do código vêm do **SEI++** (Jonatas Evaristo, https://github.com/jonatasrs/sei, GPL-3.0); o **SEI Pro** (https://github.com/SEI-Pro/sei-pro, AGPL-3.0) é usado como referência, e trechos aproveitados dele mantêm a licença de origem, indicada no próprio arquivo.
 
 Para quem for trabalhar no código da extensão: as orientações estão em `CLAUDE.md` e na pasta `docs/`.
