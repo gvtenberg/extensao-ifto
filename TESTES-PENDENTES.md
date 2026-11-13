@@ -126,3 +126,15 @@ E: O botão da lista fica no mesmo lugar de antes e o painel abre logo abaixo; c
 ### T32 – Configurações por unidade (v0.7.0)
 F: Clique no ícone da extensão > Configurações.
 E: Primeiro "Geral (todas as unidades)"; depois "Por unidade", com Direção-geral (lista de assinaturas) e CGOC (documentos do pagamento), cada uma com Automática, Sempre ligada e Desligada.
+
+## Documentos do pagamento: incluir os três documentos (v0.8.0)
+> Use um processo de teste (ou um processo de pagamento que vá mesmo receber os três), na unidade CGOC.
+### T33 – Incluir Sicaf, Consulta e Anexo (v0.8.0) (Crítico)
+F: Abra o processo e clique em "Incluir Sicaf, Consulta e Anexo" no alto à direita; leia a pergunta e clique em OK. Não mexa no SEI até terminar.
+E: O SEI abre Incluir Documento > Externo três vezes sozinho e salva; o botão mostra "Incluindo… (1/3)"; no fim aparece "Pronto…" e a árvore tem Sicaf, Consulta e Anexo, cada um com a data de hoje, Nato-digital e Público. Se parar no meio, comente a mensagem e o que ficou na árvore.
+### T34 – Aviso de documento sem arquivo ou já incluído hoje (v0.8.0)
+F: No mesmo processo do T33, clique de novo no botão.
+E: A pergunta mostra "ATENÇÃO" (já incluídos hoje e o Sicaf/Consulta/Anexo sem arquivo); clicando em Cancelar nada é incluído.
+### T35 – Parar a inclusão (v0.8.0)
+F: Em outro processo de teste, comece a inclusão e, enquanto o botão mostra "Incluindo…", clique nele e confirme que quer parar.
+E: Aparece qual documento já foi incluído e a extensão não inclui mais nada.
