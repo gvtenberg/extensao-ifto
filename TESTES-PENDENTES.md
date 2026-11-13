@@ -55,10 +55,6 @@ E: Desmarcada, o Firefox não oferece a senha; marcada, oferece.
 ### T11 – Instalar pelo GitHub (v0.1.2)
 F: Depois de "Assinar extensão" ficar verde (aba Actions), no Firefox do trabalho abra Releases > extensao-ifto-X.Y.Z.xpi > Adicionar. Feche e abra o Firefox.
 E: A extensão continua instalada; a janela do ícone mostra a versão.
-### T12 – Botão "Procurar atualização" (v0.1.3)
-F: Depois de uma versão nova ficar pronta no GitHub, clique no ícone da extensão > Procurar atualização > Instalar a versão… > Permitir > Adicionar. Procure de novo.
-E: Aparece "Versão X disponível"; depois de instalar, "Você já tem a versão mais nova".
-
 ## Lista de assinaturas no SEI (v0.2.0 a v0.4.0)
 > Instale a versão nova e entre no SEI com a unidade PAL/REI/IFTO (Direção-geral).
 ### T13 – Colar a lista e abrir os itens (v0.2.0)
@@ -85,12 +81,6 @@ E: Desligada, o painel some; "Sempre ligada", aparece em qualquer unidade; a esc
 ### T20 – Botões do painel conforme o item (v0.4.0; v0.5.0)
 F: Passe por um item com documento, um de "dar ciência" e um só com o processo.
 E: Com documento: "Assinar e próximo"; de ciência: "Dar ciência e próximo"; só processo: "✓ Feito e próximo".
-### T21 – Textos da janela do ícone (v0.4.1)
-F: Clique no ícone da extensão e em "Procurar atualização".
-E: Os textos falam só do que acontece (versão, SEI reconhecido, atualização), sem GitHub, Actions ou código. Comente qualquer texto que ainda pareça de programador.
-### T22 – Instalar a atualização pela página da versão (v0.4.2)
-F: Com uma versão nova pronta, clique no ícone > Procurar atualização > Instalar a versão…; na página que abrir, clique no arquivo que termina em .xpi e em Adicionar. Em outra versão, tente o caminho ☰ > Extensões e temas > ⚙ > Procurar atualizações.
-E: A janela de instalação do Firefox aparece já no primeiro clique, sem recarregar a página; pelo menu, a extensão atualiza sozinha.
 ### T23 – Assinar e próximo (v0.5.0) (Crítico)
 F: Com a senha do SEI guardada no Firefox, num item com documento clique em "Assinar e próximo" e espere.
 E: A janela de assinatura abre, a senha aparece preenchida, o documento é assinado sozinho e o painel abre o próximo item com o anterior marcado ✓. Se a senha não vier preenchida, digite e aperte Enter: depois de assinar, avança. Comente se não avançar.
@@ -106,7 +96,7 @@ E: O Firefox oferece só a senha do sei.ifto.edu.br (sem SUAP, Moodle etc.).
 ### T27 – Instalar no Chrome (v0.5.0)
 > No computador de desenvolvimento (ou com o .zip da Release, depois do git push).
 F: Rode npm run empacotar-chrome, abra chrome://extensions > Modo do desenvolvedor > Carregar sem compactação > pasta web-ext-artifacts/chrome/extensao-ifto-chrome-0.5.0; entre no SEI na unidade PAL/REI/IFTO.
-E: A extensão aparece sem erros, o painel da lista de assinaturas funciona e a janela do ícone não mostra "Procurar atualização".
+E: A extensão aparece sem erros, o painel da lista de assinaturas funciona e a janela do ícone mostra "Abrir a página da versão mais nova".
 
 ## Documentos do pagamento: preenchimento do documento externo (v0.6.0)
 ### T28 – Documento externo novo já preenchido (v0.6.0)
@@ -142,14 +132,6 @@ E: Nenhuma tela do SEI abre; em cerca de 1 a 3 segundos a árvore recarrega com 
 F: No mesmo processo do T36, clique de novo no botão e leia a pergunta; clique em Cancelar.
 E: A pergunta é curta: "Este processo já tem Sicaf, Consulta e Anexo sem arquivo. Incluir mais três?"; nada é incluído.
 
-## Atualização da extensão (v0.9.1)
-> Só depois que a versão 0.9.1 (ou mais nova) estiver instalada no Firefox e uma versão mais nova for publicada.
-### T38 – Instalar a atualização direto pela janela (v0.9.1)
-F: Clique no ícone da extensão › "Procurar atualização" › "Instalar a versão …".
-E: O Firefox pede "Permitir" e depois "Adicionar", sem abrir a página do GitHub. Se nada aparecer, comente; o link "abra a página da versão" é a reserva.
-
-## Lista de assinaturas: intervalo de documentos (v0.9.2)
-
 ### T39 – Intervalo de documentos na lista (v0.9.2)
 F: Na lista de assinaturas, cole "23236.022730/2026-41 - 3383754-3383903" e clique em "Conferir e começar".
 E: O processo abre e a linha vira um item para cada documento do processo entre 3383754 e 3383903 (o contador aumenta); "Assinar e próximo" passa por eles um a um.
@@ -170,8 +152,6 @@ E: Aparece o quadro "Erros e sugestões de melhoria" com a orientação de procu
 F: Depois de atualizar a extensão, olhe o ícone na barra do navegador (Firefox e Chrome), no tema claro e no escuro, e em Extensões (about:addons ou chrome://extensions).
 E: Aparece a marca do Instituto Federal (bolinha vermelha e quadrados verdes), nítida e fácil de reconhecer. Se não ficar bom, comente no cartão para voltar ao ícone anterior.
 
-## Lista de assinaturas: vários documentos na linha (v0.9.6)
-
 ### T44 – Vários documentos separados por vírgula (v0.9.6)
 F: Cole na lista de assinaturas "23236.022824/2026-10 - 3384598, 3384598, 3384645, 3384674" e clique em "Conferir e começar"; depois limpe e cole "23236.022824/2026-10 - 3384598 a 3384674".
 E: Na primeira forma, a lista tem 3 itens (3384598, 3384645, 3384674; o repetido conta uma vez). Na segunda, ao abrir o processo, a linha vira um item para cada documento do processo entre os dois números.
@@ -180,12 +160,9 @@ E: Na primeira forma, a lista tem 3 itens (3384598, 3384645, 3384674; o repetido
 F: Clique no ícone da extensão; se aparecer "Permitir no SEI", clique e confirme. Na Direção-geral, cole uma lista e clique em "Conferir e começar"; depois aperte F5.
 E: O processo abre e o painel da lista continua na tela, também depois de recarregar a página, sem precisar clicar no ícone da extensão.
 
-## Atualização pela página da versão (v0.9.7)
-
 ### T46 – Atualizar pela página da versão (v0.9.7)
 F: Com uma versão nova pronta, clique no ícone da extensão > Procurar atualização > Abrir a página da versão…; na página, clique no arquivo que termina em .xpi > Permitir > Adicionar.
 E: Aparece só o botão "Abrir a página da versão…" (sem "Instalar a versão…"); a página abre numa nova aba e, depois de Adicionar, a janela do ícone mostra a versão nova.
-
 
 ## SICAF automático: notas sem SICAF (v0.10.0)
 > Na CGOC (CGOC/GAC/DAP/PAL/REI/IFTO), com a opção "SICAF da nota fiscal" em Automática (padrão).

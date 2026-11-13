@@ -2,7 +2,7 @@
 
 **Sections**: Language · Economical reading (tokens) · Project and documentation organization · How we work (small specs) · Chat messages (short) · Tests · Version and git · Reusing code · Improvements that serve several projects · Same rules on every computer
 
-Updated on 13/11/2026 (1). Model: `/home/berg/Desktop/Sistema Gestão Orçamentária/sistema-orcamento-ifto` (CLAUDE.md, docs/, .claude/). New project or one without this organization: propose applying it. The user is not from IT: plain, simple language, commands with the exact text to type and the click path.
+Updated on 13/11/2026 (2). Model: `/home/berg/Desktop/Sistema Gestão Orçamentária/sistema-orcamento-ifto` (CLAUDE.md, docs/, .claude/). New project or one without this organization: propose applying it. The user is not from IT: plain, simple language, commands with the exact text to type and the click path.
 
 ## Language
 
@@ -53,6 +53,7 @@ Updated on 13/11/2026 (1). Model: `/home/berg/Desktop/Sistema Gestão Orçament�
 
 - On every code change: bump the version and record it in `historico.md` with the date (dd/mm/yyyy).
 - (13/11/2026) **Which number:** the **middle** one only for a big change (a new feature or a big change in how the system works); all stages of the same feature keep the middle number. The **last** one for everything else: each stage of the same feature, fixes and small changes (e.g. 0.10.0, 0.10.1, 0.10.2…). **Docs only** (`.md`, `docs/`, the tests file): the version does not change; commit "docs: summary".
+- (13/11/2026) **Share until pushed:** while nothing was sent to GitHub, small changes of the same round (fixes, style, adjustments asked during the work) join the version still open instead of getting a new number; a new last number only for a new stage or after a push. Commit as usual ("vX.Y.Z: type: summary" with the open version) and add the change to the same line of `historico.md`.
 - Commit without being asked (before and at the end of each stage or round), in the format **"vX.Y.Z: type: short summary"** (no version: "docs: summary"). Types: `feat`, `fix`, `style`, `refactor`, `docs`, `chore`, `test`, `ci`. Check in `git status` that nothing from tests, keys or packages got in.
 - **Never `git push`** without being asked.
 
