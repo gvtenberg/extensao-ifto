@@ -128,14 +128,99 @@
     return link
   }
 
-  // Etapa 4: mostra os PDFs obtidos (salvos também em Downloads); a inclusão no SEI vem na etapa 5.
-  function mostrarResultadoDoSicaf (fornecedores) {
-    const cartoes = fornecedores.map(fornecedor => criar('div', { className: 'cartao' }, [
-      criar('h2', { textContent: regras.formatarCnpj(fornecedor.cnpj) + (fornecedor.nomeNoSicaf ? ' – ' + fornecedor.nomeNoSicaf : '') }),
-      fornecedor.erro ? criar('p', { className: 'aviso vermelho', textContent: fornecedor.erro }) : criar('p', {}, ['PDF do SICAF obtido e salvo em Downloads. ', linkDoPdf(fornecedor)]),
-      ...fornecedor.avisos.map(aviso => criar('p', { className: 'aviso ' + aviso.nivel, textContent: aviso.texto }))
-    ]))
-    janela.abrir({ titulo: 'SICAF', conteudo: cartoes, botoes: [{ texto: 'Fechar', tipo: 'principal', aoClicar: j => j.fechar() }] })
+  // ---------- Confirmação e inclusão no SEI (v0.14.0) ----------
+  // Na CGOC: por fornecedor Sicaf (com o PDF) e Consulta, por nota um Anexo; nas outras unidades, só o
+  // Sicaf (etapa 6). Nada é escrito no SEI antes do clique em "Incluir no processo".
+  async function mostrarResultadoDoSicaf (fornecedores, pedido) {
+    const cgoc = regras.ehCgoc(unidade)
+    const lida = quadroArvore ? seiPedidos.arvoreAberta() : null
+    // CNPJ escolhido na CGOC: as notas pendentes desse fornecedor ganham o Anexo.
+    if (cgoc && lida && !(pedido && pedido.resultado)) {
+      try {
+        const analise = await analisar()
+        for (const fornecedor of fornecedores) {
+          if (!fornecedor.notas.length && analise) fornecedor.notas = analise.situacao.notas.filter(nota => nota.cnpj === fornecedor.cnpj && !nota.anexoFeito)
+        }
+      } catch (erro) {}
+    }
+    for (const fornecedor of fornecedores) fornecedor.temPdf = Boolean(fornecedor.bytes)
+    const itens = regras.documentosParaIncluir(fornecedores, { soSicaf: !cgoc })
+    for (const item of itens) {
+      if (item.tipo !== 'Sicaf') continue
+      const fornecedor = fornecedores.find(outro => outro.cnpj === item.cnpj)
+      item.arquivo = { bytes: fornecedor.bytes, nome: fornecedor.nomeDoArquivo || regras.nomeDoArquivo(fornecedor.cnpj) }
+    }
+    const nomeDoItem = item => item.tipo + (item.nomeArvore ? ' ' + item.nomeArvore : '')
+    const cartoes = fornecedores.map(fornecedor => {
+      const doFornecedor = itens.filter(item => item.cnpj === fornecedor.cnpj)
+      return criar('div', { className: 'cartao' }, [
+        criar('h2', { textContent: regras.formatarCnpj(fornecedor.cnpj) + (fornecedor.nomeNoSicaf ? ' – ' + fornecedor.nomeNoSicaf : '') }),
+        fornecedor.erro ? criar('p', { className: 'aviso vermelho', textContent: fornecedor.erro }) : criar('p', {}, ['PDF do SICAF obtido (também na pasta Downloads). ', linkDoPdf(fornecedor)]),
+        ...fornecedor.avisos.map(aviso => criar('p', { className: 'aviso ' + aviso.nivel, textContent: aviso.texto })),
+        doFornecedor.length ? criar('p', { className: 'apoio', textContent: 'Será incluído:' }) : null,
+        doFornecedor.length ? criar('ul', {}, doFornecedor.map(item => criar('li', { textContent: nomeDoItem(item) + (item.arquivo ? ' (com o PDF)' : '') }))) : null
+      ])
+    })
+    const botoesDeFechar = [{ texto: 'Fechar', tipo: 'principal', aoClicar: j => j.fechar() }]
+    if (!lida) {
+      janela.abrir({ titulo: 'SICAF', conteudo: [...cartoes, criar('p', { className: 'apoio', textContent: 'Para incluir no SEI, abra o processo e busque de novo (o PDF de hoje já está guardado).' })], botoes: botoesDeFechar })
+      return
+    }
+    if (!itens.length) {
+      janela.abrir({ titulo: 'SICAF', conteudo: cartoes, botoes: botoesDeFechar })
+      return
+    }
+    const temVermelho = fornecedores.some(fornecedor => fornecedor.temPdf && fornecedor.avisos.some(aviso => aviso.nivel === 'vermelho'))
+    const alerta = criar('p', { className: 'aviso vermelho', hidden: true, textContent: 'Há avisos em vermelho. Confira antes de incluir.' })
+    let confirmouVermelho = false
+    janela.abrir({
+      titulo: 'Incluir no processo ' + (lida.numero || ''),
+      conteudo: [...cartoes, alerta],
+      botoes: [
+        { texto: 'Cancelar', aoClicar: j => j.fechar() },
+        {
+          texto: `Incluir no processo (${itens.length})`,
+          tipo: 'principal',
+          aoClicar: j => {
+            if (temVermelho && !confirmouVermelho) {
+              confirmouVermelho = true
+              alerta.hidden = false
+              j.botoes[1].textContent = 'Incluir mesmo assim'
+              j.botoes[1].className = 'acao perigo'
+              return
+            }
+            incluirNoProcesso(itens, j, nomeDoItem)
+          }
+        }
+      ]
+    })
+  }
+
+  async function incluirNoProcesso (itens, aberta, nomeDoItem) {
+    const lida = seiPedidos.arvoreAberta()
+    if (!lida) { aberta.trocarConteudo([criar('p', { className: 'aviso vermelho', textContent: 'Não consegui ler a árvore do processo. Espere o processo abrir e tente de novo.' })]); return }
+    const andamento = { parar: false }
+    const incluidos = []
+    const progresso = criar('p', { textContent: 'Incluindo…' })
+    aberta.trocarConteudo([progresso])
+    aberta.trocarBotoes([{ texto: 'Parar', aoClicar: () => { andamento.parar = true } }])
+    let erro = null
+    try {
+      await seiPedidos.incluirExternos(lida, itens, {
+        incluidos,
+        deveParar: () => andamento.parar,
+        aoAvancar: posicao => { progresso.textContent = `Incluindo ${nomeDoItem(itens[posicao])} (${posicao + 1} de ${itens.length})…` }
+      })
+    } catch (falha) {
+      erro = falha
+    }
+    if (incluidos.length) seiPedidos.recarregarArvore()
+    const feitos = incluidos.length ? 'Incluídos: ' + ExtensaoIFTO.documentosPagamento.listaEmTexto(itens.slice(0, incluidos.length).map(nomeDoItem)) + '.' : 'Nenhum documento foi incluído.'
+    aberta.trocarConteudo([
+      erro || andamento.parar ? criar('p', { className: 'aviso vermelho', textContent: erro ? erro.message : 'Inclusão parada.' }) : criar('p', { className: 'aviso verde', textContent: 'Pronto.' }),
+      criar('p', { textContent: feitos })
+    ])
+    aberta.trocarBotoes([{ texto: 'Fechar', tipo: 'principal', aoClicar: j => j.fechar() }])
   }
 
   if (!quadroArvore) return

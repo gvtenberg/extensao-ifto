@@ -61,6 +61,75 @@
     return pedir(destino, montarCorpo(trocarCampos(camposDoFormulario(formulario), novos)))
   }
 
+  // Inclui documentos externos um a um, enviando os formulários do SEI direto (v0.9.0, decisão D8 da spec
+  // documentos-pagamento): Incluir Documento › Externo, uma vez; depois, para cada item, escolher o tipo
+  // (o SEI devolve o formulário do tipo) e Salvar com data de hoje, Nato-digital e Público.
+  // v0.14.0 (SICAF automático): item { tipo, nomeArvore, arquivo: { bytes, nome } }: "Nome na Árvore" e o
+  // arquivo enviado como no "Anexar Arquivo..." do SEI. aoAvancar(posição) mostra o andamento;
+  // deveParar() vê se a pessoa pediu para parar; incluidos recebe o tipo de cada documento salvo.
+  async function incluirExternos (lida, itens, { aoAvancar = () => {}, deveParar = () => false, incluidos = [] } = {}) {
+    const regras = ExtensaoIFTO.documentosPagamento
+    const sicaf = ExtensaoIFTO.sicaf
+    const formularioDoExterno = pagina => lerHtml(pagina.html).getElementById('frmDocumentoCadastro')
+    if (!lida.linkIncluir) throw new Error('Não achei "Incluir Documento" na árvore do processo.')
+    // Incluir Documento › Externo (escolher(-1) do SEI): devolve o formulário do documento externo novo.
+    let pagina = await pedir(new URL(lida.linkIncluir.replace(/&amp;/g, '&'), location.href).href)
+    const escolherTipo = lerHtml(pagina.html).getElementById('frmDocumentoEscolherTipo')
+    if (!escolherTipo) throw new Error('O SEI não abriu "Incluir Documento". Confira se a sessão do SEI ainda está aberta.')
+    const paginaEmBranco = await enviar(escolherTipo, pagina.endereco, { hdnIdSerie: '-1' })
+    if (!formularioDoExterno(paginaEmBranco)) throw new Error('O SEI não abriu o documento externo.')
+
+    for (let posicao = 0; posicao < itens.length; posicao++) {
+      if (deveParar()) return
+      const { tipo, nomeArvore, arquivo } = itens[posicao]
+      aoAvancar(posicao)
+      // 1º: escolher o tipo (trocarSerie() do SEI), sempre a partir do formulário em branco.
+      const emBranco = formularioDoExterno(paginaEmBranco)
+      const lista = emBranco.querySelector('#selSerie')
+      const opcao = lista && regras.acharOpcao([...lista.options].map(item => ({ valor: item.getAttribute('value'), texto: item.textContent })), tipo)
+      if (!opcao) throw new Error(`O tipo de documento "${tipo}" não aparece na lista do SEI.`)
+      pagina = await enviar(emBranco, paginaEmBranco.endereco, { hdnIdSerie: opcao.valor, selSerie: opcao.valor })
+      const paginaDoTipo = lerHtml(pagina.html)
+      const doTipo = paginaDoTipo.getElementById('frmDocumentoCadastro')
+      // O tipo ficou se o SEI devolve o formulário com ele (no campo escondido ou marcado na lista).
+      const serie = doTipo && doTipo.querySelector('#hdnIdSerie')
+      const marcada = doTipo && doTipo.querySelector('#selSerie option[selected]')
+      if (!doTipo || ((serie && serie.getAttribute('value')) !== opcao.valor && (marcada && marcada.getAttribute('value')) !== opcao.valor)) {
+        throw new Error(`O SEI não aceitou o tipo "${tipo}".`)
+      }
+      // 2º: Salvar (confirmarDados() do SEI) com data de hoje, Nato-digital e Público; nível público limpa
+      // grau de sigilo e hipótese legal (alterarNivelAcesso() do SEI).
+      const novos = { hdnIdSerie: opcao.valor, selSerie: opcao.valor, txtDataElaboracao: ExtensaoIFTO.documentoExterno.dataDeHoje(), rdoFormato: 'N', rdoNivelAcesso: '0', hdnFlagDocumentoCadastro: '2' }
+      for (const nome of ['selGrauSigilo', 'selHipoteseLegal']) {
+        const listaNula = doTipo.querySelector(`select[name="${nome}"]`)
+        if (listaNula && [...listaNula.options].some(item => item.getAttribute('value') === 'null')) novos[nome] = 'null'
+      }
+      if (nomeArvore) novos.txtNomeArvore = nomeArvore
+      if (arquivo) novos.hdnAnexos = await enviarArquivo(paginaDoTipo, pagina, arquivo, sicaf)
+      pagina = await enviar(doTipo, pagina.endereco, novos)
+      // Se o SEI devolve o formulário de novo, não salvou.
+      if (formularioDoExterno(pagina)) throw new Error(regras.mensagemDoSei(pagina.html) || `O SEI não salvou o documento "${tipo}".`)
+      incluidos.push(tipo)
+    }
+  }
+
+  // v0.14.0: arquivo do documento externo, como o "Anexar Arquivo..." do SEI (formulário frmAnexos, que o
+  // SEI envia num quadro escondido). Devolve a linha do campo hdnAnexos para o Salvar.
+  async function enviarArquivo (paginaDoTipo, pagina, arquivo, sicaf) {
+    const formulario = paginaDoTipo.getElementById('frmAnexos')
+    if (!formulario) throw new Error('O SEI não mostrou o campo do arquivo.')
+    const dados = new FormData()
+    const identificador = formulario.querySelector('input[name="UPLOAD_IDENTIFIER"]')
+    if (identificador) dados.append('UPLOAD_IDENTIFIER', identificador.getAttribute('value') || '')
+    dados.append('filArquivo', new Blob([arquivo.bytes], { type: 'application/pdf' }), arquivo.nome)
+    const destino = new URL(formulario.getAttribute('action'), pagina.endereco).href
+    const resposta = await fetch(destino, { method: 'POST', credentials: 'same-origin', body: dados })
+    if (!resposta.ok) throw new Error('O SEI não recebeu o arquivo (erro ' + resposta.status + ').')
+    const upload = sicaf.lerRespostaDoUpload(new TextDecoder('windows-1252').decode(await resposta.arrayBuffer()))
+    if (upload.erro) throw new Error('O SEI não aceitou o arquivo: ' + upload.erro)
+    return sicaf.linhaDoAnexo(upload, sicaf.lerUsuarioDoUpload(pagina.html))
+  }
+
   // Árvore do processo aberto (quadro ifrArvore), com o link "Incluir Documento". null se não carregou.
   function arvoreAberta () {
     let documentoDaArvore
@@ -76,5 +145,5 @@
     try { quadro.contentWindow.location.reload() } catch (erro) { quadro.setAttribute('src', quadro.getAttribute('src')) }
   }
 
-  ExtensaoIFTO.seiPedidos = { pedir, baixar, lerHtml, camposDoFormulario, enviar, arvoreAberta, recarregarArvore }
+  ExtensaoIFTO.seiPedidos = { pedir, baixar, lerHtml, camposDoFormulario, enviar, incluirExternos, arvoreAberta, recarregarArvore }
 })()

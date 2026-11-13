@@ -228,3 +228,14 @@ E: Não abre o SICAF de novo: a janela "SICAF" aparece logo, com o mesmo PDF.
 ### T57 – CNPJ selecionado vai ao SICAF (v0.13.0)
 F: Selecione um CNPJ num documento do SEI > "Buscar SICAF" > "Buscar no SICAF".
 E: O SICAF desse CNPJ é buscado como no T55 e volta para o SEI com o PDF.
+
+## SICAF automático: incluir no SEI (v0.14.0)
+### T58 – Incluir Sicaf, Consulta e Anexo com o PDF (v0.14.0) (Crítico)
+F: Depois do T55, na janela "Incluir no processo…", confira a lista e clique em "Incluir no processo".
+E: A árvore recarrega com "Sicaf <nome da empresa no SICAF>" (abre o PDF do SICAF), "Consulta" e "Anexo Instrumento de Cobrança NF nº <número> <empresa>", com a data de hoje, Nato-digital e Público.
+### T59 – Duas notas da mesma empresa (v0.14.0)
+F: Num processo com duas notas da mesma empresa sem SICAF, faça o T55 e o T58.
+E: Aparecem um Sicaf e uma Consulta e dois Anexos, um com o número de cada nota.
+### T60 – "Incluir Sicaf, Consulta e Anexo" continua igual (v0.14.0)
+F: Na CGOC, com um processo aberto, clique no botão "Incluir Sicaf, Consulta e Anexo" > OK.
+E: Os três documentos em branco aparecem na árvore, como antes.

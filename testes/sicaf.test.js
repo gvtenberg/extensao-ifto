@@ -226,3 +226,40 @@ test('manifest: acesso opcional ao Compras igual às origens das regras', () => 
   assert.deepEqual(manifest.optional_host_permissions, [...sicaf.ORIGENS_COMPRAS])
   assert.deepEqual(manifest.optional_permissions, ['downloads'])
 })
+
+// v0.14.0: etapa 5 (inclusão no SEI).
+test('nomes na árvore: até 50 letras, sem cortar palavra', () => {
+  assert.equal(sicaf.nomeDoSicaf('HM COMERCIO IMPORTACAO E EXPORTACAO LTDA.'), 'HM COMERCIO IMPORTACAO E EXPORTACAO LTDA')
+  assert.equal(sicaf.nomeDoAnexo('63', 'CHC Soluções'), 'Instrumento de Cobrança NF nº 63 CHC Soluções')
+  const longo = sicaf.nomeDoAnexo('63', 'CHC SOLUÇOES EM SERV. E COM. LTDA')
+  assert.equal(longo, 'Instrumento de Cobrança NF nº 63 CHC SOLUÇOES EM')
+  assert.ok(longo.length <= 50)
+  assert.equal(sicaf.nomeNaArvore('x'.repeat(60)).length, 50)
+})
+
+test('documentos: Sicaf e Consulta por fornecedor, Anexo por nota sem Anexo', () => {
+  const fornecedores = [
+    { cnpj: 'A', nomeNoSicaf: 'CHC LTDA.', temPdf: true, notas: [{ numero: '63', fornecedor: 'CHC' }, { numero: '64', fornecedor: 'CHC' }, { numero: '65', anexoFeito: true }] },
+    { cnpj: 'B', nomeNoSicaf: 'SEM PDF', temPdf: false, notas: [{ numero: '1' }] }
+  ]
+  assert.deepEqual(sicaf.documentosParaIncluir(fornecedores).map(d => [d.tipo, d.nomeArvore]), [
+    ['Sicaf', 'CHC LTDA'], ['Consulta', ''], ['Anexo', 'Instrumento de Cobrança NF nº 63 CHC'], ['Anexo', 'Instrumento de Cobrança NF nº 64 CHC']
+  ])
+  assert.deepEqual(sicaf.documentosParaIncluir(fornecedores, { soSicaf: true }).map(d => d.tipo), ['Sicaf'])
+})
+
+test('resposta do envio do arquivo ao SEI e linha da tabela de anexos', () => {
+  const upload = sicaf.lerRespostaDoUpload('<html><body>abc123.tmp#consultarSituacaoFornecedor_1.pdf#application/pdf#105000#13/11/2026 10:00:00#</body></html>')
+  assert.deepEqual(upload, { nomeUpload: 'abc123.tmp', nome: 'consultarSituacaoFornecedor_1.pdf', tipo: 'application/pdf', tamanho: '105000', dataHora: '13/11/2026 10:00:00' })
+  assert.deepEqual(sicaf.lerRespostaDoUpload('ERRO#Arquivo vazio'), { erro: 'Arquivo vazio' })
+  const html = "objTabelaAnexos.adicionar([arr['nome_upload'],arr['nome'],arr['data_hora'],arr['tamanho'],infraFormatarTamanhoBytes(arr['tamanho']),'2382960' ,'CGOC/GAC/DAP/PAL/REI/IFTO']);"
+  const usuario = sicaf.lerUsuarioDoUpload(html)
+  assert.deepEqual(usuario, { idUsuario: '2382960', sigla: 'CGOC/GAC/DAP/PAL/REI/IFTO' })
+  assert.equal(sicaf.linhaDoAnexo(upload, usuario), 'abc123.tmp±consultarSituacaoFornecedor_1.pdf±13/11/2026 10:00:00±105000±103 Kb±2382960±CGOC/GAC/DAP/PAL/REI/IFTO')
+})
+
+test('página guardada do documento externo: usuário da tabela de anexos (se existir no computador)', () => {
+  const caminho = path.join(PASTA, 'paginas-sei/SEI-registrar-documento-externo.html')
+  if (!fs.existsSync(caminho)) return
+  assert.deepEqual(sicaf.lerUsuarioDoUpload(fs.readFileSync(caminho, 'latin1')), { idUsuario: '2382960', sigla: 'CGOC/GAC/DAP/PAL/REI/IFTO' })
+})

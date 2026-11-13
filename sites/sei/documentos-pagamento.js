@@ -44,51 +44,9 @@
     await navegador.storage.local.set({ [CHAVE_FEITOS]: novos })
   }
 
-  // ---------- Conversa com o SEI (formulários enviados direto) ----------
-  const { pedir, lerHtml, enviar } = globalThis.ExtensaoIFTO.seiPedidos
-  function formularioDoExterno (pagina) {
-    return lerHtml(pagina.html).getElementById('frmDocumentoCadastro')
-  }
-
-  // Inclui os tipos um a um. aoAvancar(posição) atualiza o botão; deveParar() vê se a pessoa pediu para parar.
-  async function incluirDireto (lida, tipos, { aoAvancar, deveParar, incluidos }) {
-    if (!lida.linkIncluir) throw new Error('Não achei "Incluir Documento" na árvore do processo.')
-    // Incluir Documento › Externo (escolher(-1) do SEI): devolve o formulário do documento externo novo.
-    let pagina = await pedir(new URL(lida.linkIncluir.replace(/&amp;/g, '&'), location.href).href)
-    const escolherTipo = lerHtml(pagina.html).getElementById('frmDocumentoEscolherTipo')
-    if (!escolherTipo) throw new Error('O SEI não abriu "Incluir Documento". Confira se a sessão do SEI ainda está aberta.')
-    const paginaEmBranco = await enviar(escolherTipo, pagina.endereco, { hdnIdSerie: '-1' })
-    if (!formularioDoExterno(paginaEmBranco)) throw new Error('O SEI não abriu o documento externo.')
-
-    for (let posicao = 0; posicao < tipos.length; posicao++) {
-      if (deveParar()) return
-      const tipo = tipos[posicao]
-      aoAvancar(posicao)
-      // 1º: escolher o tipo (trocarSerie() do SEI), sempre a partir do formulário em branco.
-      const emBranco = formularioDoExterno(paginaEmBranco)
-      const lista = emBranco.querySelector('#selSerie')
-      const opcao = lista && regras.acharOpcao([...lista.options].map(item => ({ valor: item.getAttribute('value'), texto: item.textContent })), tipo)
-      if (!opcao) throw new Error(`O tipo de documento "${tipo}" não aparece na lista do SEI.`)
-      pagina = await enviar(emBranco, paginaEmBranco.endereco, { hdnIdSerie: opcao.valor, selSerie: opcao.valor })
-      const doTipo = formularioDoExterno(pagina)
-      // O tipo ficou se o SEI devolve o formulário com ele (no campo escondido ou marcado na lista).
-      const serie = doTipo && doTipo.querySelector('#hdnIdSerie')
-      const marcada = doTipo && doTipo.querySelector('#selSerie option[selected]')
-      if (!doTipo || ((serie && serie.getAttribute('value')) !== opcao.valor && (marcada && marcada.getAttribute('value')) !== opcao.valor)) {
-        throw new Error(`O SEI não aceitou o tipo "${tipo}".`)
-      }
-      // 2º: Salvar (confirmarDados() do SEI) com data de hoje, Nato-digital e Público; nível público limpa
-      // grau de sigilo e hipótese legal (alterarNivelAcesso() do SEI).
-      const novos = { hdnIdSerie: opcao.valor, selSerie: opcao.valor, txtDataElaboracao: documentoExterno.dataDeHoje(), rdoFormato: 'N', rdoNivelAcesso: '0', hdnFlagDocumentoCadastro: '2' }
-      for (const nome of ['selGrauSigilo', 'selHipoteseLegal']) {
-        const listaNula = doTipo.querySelector(`select[name="${nome}"]`)
-        if (listaNula && [...listaNula.options].some(item => item.getAttribute('value') === 'null')) novos[nome] = 'null'
-      }
-      pagina = await enviar(doTipo, pagina.endereco, novos)
-      // Se o SEI devolve o formulário de novo, não salvou.
-      if (formularioDoExterno(pagina)) throw new Error(regras.mensagemDoSei(pagina.html) || `O SEI não salvou o documento "${tipo}".`)
-      incluidos.push(tipo)
-    }
+  // ---------- Inclusão (sites/sei/sei-pedidos.js desde v0.14.0, também usada pelo SICAF automático) ----------
+  function incluirDireto (lida, tipos, opcoesDaInclusao) {
+    return globalThis.ExtensaoIFTO.seiPedidos.incluirExternos(lida, tipos.map(tipo => ({ tipo })), opcoesDaInclusao)
   }
 
   // ---------- Clique no botão ----------

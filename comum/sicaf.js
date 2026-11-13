@@ -352,6 +352,63 @@
     return lista
   }
 
+  // ---------- Inclusão no SEI (etapa 5) ----------
+  // v0.14.0: "Nome na Árvore" do SEI tem no máximo 50 letras: corta na última palavra inteira.
+  function nomeNaArvore (texto, maximo = 50) {
+    const limpo = String(texto || '').replace(/\s+/g, ' ').trim()
+    if (limpo.length <= maximo) return limpo
+    const cortado = limpo.slice(0, maximo + 1)
+    const espaco = cortado.lastIndexOf(' ')
+    return (espaco > 0 ? cortado.slice(0, espaco) : limpo.slice(0, maximo)).replace(/[\s.,;:-]+$/, '')
+  }
+  // Decisão D3: "Sicaf <razão social do SICAF>" (sem o ponto final de "LTDA.").
+  const nomeDoSicaf = nome => nomeNaArvore(String(nome || '').replace(/\.\s*$/, ''))
+  // Decisão D7: "Anexo Instrumento de Cobrança NF nº 63 CHC SOLUÇOES EM SERV. E COM. LTDA".
+  const nomeDoAnexo = (numero, fornecedor) => nomeNaArvore(`Instrumento de Cobrança NF nº ${numero || '?'} ${fornecedor || ''}`)
+
+  // Documentos a incluir, na ordem: por fornecedor Sicaf (com o PDF) e Consulta; por nota um Anexo.
+  // Só o Sicaf quando "soSicaf" (outras unidades, etapa 6). Notas com Anexo já feito ficam de fora.
+  function documentosParaIncluir (fornecedores, { soSicaf = false } = {}) {
+    const itens = []
+    for (const fornecedor of fornecedores || []) {
+      if (!fornecedor.temPdf) continue
+      itens.push({ tipo: 'Sicaf', nomeArvore: nomeDoSicaf(fornecedor.nomeNoSicaf || fornecedor.nome), cnpj: fornecedor.cnpj })
+      if (soSicaf) continue
+      itens.push({ tipo: 'Consulta', nomeArvore: '', cnpj: fornecedor.cnpj })
+      for (const nota of fornecedor.notas || []) {
+        if (!nota.anexoFeito) itens.push({ tipo: 'Anexo', nomeArvore: nomeDoAnexo(nota.numero, nota.fornecedor), cnpj: fornecedor.cnpj, nota: nota.numero })
+      }
+    }
+    return itens
+  }
+
+  // Envio do arquivo ao SEI ("Anexar Arquivo..."): o SEI responde "nome_upload#nome#tipo#tamanho#data_hora#"
+  // (InfraUpload.js do SEI 5.0.4) ou "ERRO#mensagem".
+  function lerRespostaDoUpload (texto) {
+    const limpo = textoDoHtml(texto).replace(/\n/g, ' ').trim()
+    const partes = limpo.split('#')
+    if (partes[0] === 'ERRO') return { erro: partes[1] || 'O SEI não aceitou o arquivo.' }
+    if (partes.length < 5) return { erro: 'O SEI não aceitou o arquivo.' }
+    return { nomeUpload: partes[0], nome: partes[1], tipo: partes[2], tamanho: partes[3], dataHora: partes[4] }
+  }
+  // Usuário e unidade que a página do documento externo põe na tabela de anexos (funcaoConclusao do SEI).
+  function lerUsuarioDoUpload (html) {
+    const achado = /infraFormatarTamanhoBytes\(arr\['tamanho'\]\)\s*,\s*'([^']*)'\s*,\s*'([^']*)'/.exec(html || '')
+    return achado ? { idUsuario: achado[1], sigla: achado[2] } : { idUsuario: '', sigla: '' }
+  }
+  // Tamanho como o SEI mostra na tabela (só aparece na tela; o SEI usa o nome_upload).
+  function formatarTamanho (bytes) {
+    const n = Number(bytes) || 0
+    if (n < 1024) return n + ' bytes'
+    if (n < 1048576) return Math.round(n / 1024) + ' Kb'
+    return (n / 1048576).toFixed(2).replace('.', ',') + ' Mb'
+  }
+  // Linha do campo escondido hdnAnexos (infraTabelaDinamica: colunas separadas por "±").
+  function linhaDoAnexo (upload, { idUsuario, sigla }) {
+    const escapar = valor => String(valor).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;')
+    return [upload.nomeUpload, upload.nome, upload.dataHora, upload.tamanho, formatarTamanho(upload.tamanho), idUsuario, sigla].map(escapar).join('±')
+  }
+
   // "1 nota sem SICAF" / "2 notas sem SICAF"
   function textoDoAviso (quantidade) {
     return quantidade === 1 ? '1 nota sem SICAF' : `${quantidade} notas sem SICAF`
@@ -363,7 +420,8 @@
     normalizar, mesmoNumero, textoDoHtml, nomesParecidos,
     tipoNaArvore, numeroSei, lerRotuloDaNota, trechoPendente, lerAteste, situacaoDoProcesso, textoDoAviso,
     cnpjsDaNota, notaSemTexto, empenhosDoTexto, nomeNoTexto, conferirNota, agruparPorFornecedor,
-    URL_CONSULTA_SICAF, URL_LOGIN_COMPRAS, ORIGENS_COMPRAS, paginaDoCompras, nomeDoArquivo, lerLinhaDoResultado, lerPdfDoSicaf, paraBase64, deBase64
+    URL_CONSULTA_SICAF, URL_LOGIN_COMPRAS, ORIGENS_COMPRAS, paginaDoCompras, nomeDoArquivo, lerLinhaDoResultado, lerPdfDoSicaf, paraBase64, deBase64,
+    nomeNaArvore, nomeDoSicaf, nomeDoAnexo, documentosParaIncluir, lerRespostaDoUpload, lerUsuarioDoUpload, formatarTamanho, linhaDoAnexo
   }
   if (typeof module !== 'undefined' && module.exports) module.exports = api
   else raiz.ExtensaoIFTO = Object.assign(raiz.ExtensaoIFTO || {}, { sicaf: api })
