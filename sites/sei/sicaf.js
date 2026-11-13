@@ -15,10 +15,19 @@
   const { criar } = janela
 
   let opcoes = await configuracoes.lerConfiguracoes()
+  // v0.13.0: busca em andamento (fornecedores pedidos e situação do processo) e a janela que espera o SICAF.
+  let pedidoAtual = null
+  let janelaDaBusca = null
 
   // ---------- CNPJ escolhido (seleção, menu do botão direito ou campo da janela) ----------
   navegador.runtime.onMessage.addListener((recado, remetente, responder) => {
-    if (!recado || recado.tipo !== 'sicafCnpj') return
+    if (!recado) return
+    if (recado.tipo === 'sicafPronto') {
+      responder({ recebido: true })
+      aoChegarDoSicaf(recado.resultados || [])
+      return
+    }
+    if (recado.tipo !== 'sicafCnpj') return
     if (opcoes.incluirSicaf === 'desligada') { responder({ recebido: false }); return }
     responder({ recebido: true })
     janelaDoCnpj(recado.cnpj ? regras.formatarCnpj(recado.cnpj) : recado.texto || '')
@@ -52,10 +61,81 @@
     return aberta
   }
 
-  // Etapa 2: mostra o CNPJ achado; a busca no SICAF vem na etapa 4.
+  // v0.13.0: CNPJ escolhido vai direto para o SICAF.
   function buscarCnpj (cnpj, aberta) {
-    aberta.trocarConteudo([criar('p', { textContent: 'CNPJ encontrado: ' + regras.formatarCnpj(cnpj) + '.' }), criar('p', { className: 'apoio', textContent: 'A busca no SICAF ainda não está pronta nesta versão.' })])
-    aberta.trocarBotoes([{ texto: 'Fechar', tipo: 'principal', aoClicar: j => j.fechar() }])
+    buscarNoSicaf([{ cnpj, nome: '', notas: [] }], null, aberta)
+  }
+
+  // ---------- Busca no SICAF (v0.13.0) ----------
+  // Pede ao fundo da extensão: abre a aba do SICAF, pesquisa cada CNPJ e devolve os PDFs (sicafPronto).
+  async function buscarNoSicaf (grupos, resultado, aberta) {
+    const permissao = await navegador.runtime.sendMessage({ tipo: 'sicafPermissao' })
+    if (!permissao || !permissao.permitido) {
+      aberta.trocarConteudo([
+        criar('p', { textContent: 'Para buscar no SICAF, a extensão precisa de permissão para abrir o Compras.gov.br e salvar o PDF na pasta Downloads. O navegador pede uma vez só.' }),
+        criar('p', { className: 'apoio', textContent: 'Clique em "Abrir configurações" e depois em "Permitir acesso ao Compras.gov.br". Volte a esta aba e clique em "Buscar no SICAF".' })
+      ])
+      aberta.trocarBotoes([
+        { texto: 'Cancelar', aoClicar: j => j.fechar() },
+        { texto: 'Abrir configurações', aoClicar: () => navegador.runtime.sendMessage({ tipo: 'abrirConfiguracoes' }) },
+        { texto: 'Buscar no SICAF', tipo: 'principal', aoClicar: j => buscarNoSicaf(grupos, resultado, j) }
+      ])
+      return
+    }
+    pedidoAtual = { grupos, resultado }
+    janelaDaBusca = aberta
+    aberta.trocarConteudo([
+      criar('p', { textContent: 'Buscando no SICAF:' }),
+      criar('ul', {}, grupos.map(grupo => criar('li', { textContent: regras.formatarCnpj(grupo.cnpj) + (grupo.nome ? ' – ' + grupo.nome : '') }))),
+      criar('p', { className: 'apoio', textContent: 'Uma aba do Compras.gov.br foi aberta. Se ele pedir, entre com Gov.br (perfil Governo): a extensão continua sozinha e volta para esta aba com o PDF.' })
+    ])
+    aberta.trocarBotoes([{ texto: 'Parar a busca', aoClicar: j => { navegador.runtime.sendMessage({ tipo: 'sicafCancelar' }); pedidoAtual = null; j.fechar() } }])
+    const resposta = await navegador.runtime.sendMessage({ tipo: 'sicafBuscar', cnpjs: grupos.map(grupo => grupo.cnpj) })
+    if (resposta && resposta.erro) {
+      aberta.trocarConteudo([criar('p', { className: 'aviso vermelho', textContent: 'Não consegui abrir o SICAF: ' + resposta.erro })])
+      aberta.trocarBotoes([{ texto: 'Fechar', tipo: 'principal', aoClicar: j => j.fechar() }])
+    }
+  }
+
+  // PDFs que voltaram do SICAF: confere o CNPJ dentro do PDF e mostra cada fornecedor.
+  async function aoChegarDoSicaf (resultados) {
+    const pedido = pedidoAtual
+    pedidoAtual = null
+    if (janelaDaBusca) janelaDaBusca.fechar()
+    janelaDaBusca = null
+    const fornecedores = []
+    for (const item of resultados) {
+      const grupo = (pedido && pedido.grupos.find(outro => outro.cnpj === item.cnpj)) || { cnpj: item.cnpj, nome: '', notas: [] }
+      const fornecedor = { ...grupo, nomeNoSicaf: item.nome || '', erro: item.erro || null, bytes: null, nomeDoArquivo: item.nomeDoArquivo, avisos: [] }
+      if (item.arquivo) {
+        fornecedor.bytes = regras.deBase64(item.arquivo)
+        try {
+          const lido = regras.lerPdfDoSicaf(await pdfTexto.textoDoPdf(fornecedor.bytes))
+          if (lido.cnpj && lido.cnpj !== item.cnpj) fornecedor.avisos.push({ nivel: 'vermelho', texto: `O PDF do SICAF é de outro CNPJ (${regras.formatarCnpj(lido.cnpj)}).` })
+          if (!fornecedor.nomeNoSicaf) fornecedor.nomeNoSicaf = lido.razaoSocial
+        } catch (erro) {
+          fornecedor.avisos.push({ nivel: 'amarelo', texto: 'Não consegui ler o PDF do SICAF para conferir o CNPJ.' })
+        }
+      }
+      fornecedores.push(fornecedor)
+    }
+    mostrarResultadoDoSicaf(fornecedores, pedido)
+  }
+
+  function linkDoPdf (fornecedor) {
+    const link = criar('a', { textContent: 'Ver o PDF', target: '_blank', rel: 'noopener' })
+    link.href = URL.createObjectURL(new Blob([fornecedor.bytes], { type: 'application/pdf' }))
+    return link
+  }
+
+  // Etapa 4: mostra os PDFs obtidos (salvos também em Downloads); a inclusão no SEI vem na etapa 5.
+  function mostrarResultadoDoSicaf (fornecedores) {
+    const cartoes = fornecedores.map(fornecedor => criar('div', { className: 'cartao' }, [
+      criar('h2', { textContent: regras.formatarCnpj(fornecedor.cnpj) + (fornecedor.nomeNoSicaf ? ' – ' + fornecedor.nomeNoSicaf : '') }),
+      fornecedor.erro ? criar('p', { className: 'aviso vermelho', textContent: fornecedor.erro }) : criar('p', {}, ['PDF do SICAF obtido e salvo em Downloads. ', linkDoPdf(fornecedor)]),
+      ...fornecedor.avisos.map(aviso => criar('p', { className: 'aviso ' + aviso.nivel, textContent: aviso.texto }))
+    ]))
+    janela.abrir({ titulo: 'SICAF', conteudo: cartoes, botoes: [{ texto: 'Fechar', tipo: 'principal', aoClicar: j => j.fechar() }] })
   }
 
   if (!quadroArvore) return
@@ -212,14 +292,15 @@
     return criar('div', { className: 'cartao' }, partes)
   }
 
-  // Etapa 3: mostra os fornecedores conferidos; a busca no SICAF vem na etapa 4.
+  // v0.13.0: fornecedores conferidos vão para o SICAF (os que já têm Sicaf neste trecho ficam de fora).
   function buscarFornecedores (grupos, resultado, aberta) {
-    aberta.trocarConteudo([
-      criar('p', { textContent: 'Fornecedores conferidos:' }),
-      criar('ul', {}, grupos.map(grupo => criar('li', { textContent: `${regras.formatarCnpj(grupo.cnpj)} – ${grupo.nome} (nota ${grupo.notas.map(nota => nota.numero).join(', ')})` }))),
-      criar('p', { className: 'apoio', textContent: 'A busca no SICAF ainda não está pronta nesta versão.' })
-    ])
-    aberta.trocarBotoes([{ texto: 'Fechar', tipo: 'principal', aoClicar: j => j.fechar() }])
+    const faltam = grupos.filter(grupo => !resultado.cnpjsComSicaf.has(grupo.cnpj))
+    if (!faltam.length) {
+      aberta.trocarConteudo([criar('p', { textContent: 'Todos esses fornecedores já têm Sicaf neste trecho do processo.' })])
+      aberta.trocarBotoes([{ texto: 'Fechar', tipo: 'principal', aoClicar: j => j.fechar() }])
+      return
+    }
+    buscarNoSicaf(faltam, resultado, aberta)
   }
 
   navegador.storage.onChanged.addListener(async (mudancas, area) => {

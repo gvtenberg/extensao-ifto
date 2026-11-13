@@ -217,3 +217,14 @@ E: A diferença aparece em vermelho; o primeiro clique troca o botão para "Cont
 ### T54 – Nota escaneada (v0.12.0)
 F: Num processo com uma nota fiscal que é só imagem (escaneada), clique no aviso.
 E: Aparece em amarelo que a nota é uma imagem e a opção de escolher o CNPJ do ateste ou digitar outro.
+
+## SICAF automático: PDF do SICAF (v0.13.0)
+### T55 – Buscar o PDF no SICAF (v0.13.0) (Crítico)
+F: Na CGOC, num processo com "1 nota sem SICAF – Buscar", clique no aviso > "Buscar no SICAF". Se pedir permissão, clique em "Abrir configurações" > "Permitir acesso ao Compras.gov.br" > Permitir, volte e clique de novo. Se o Compras pedir login, entre com Gov.br (perfil Governo).
+E: Abre uma aba do SICAF, a pesquisa do CNPJ é feita sozinha, o PDF "consultarSituacaoFornecedor_…" aparece na pasta Downloads e o SEI volta para a frente com a janela "SICAF" mostrando o nome do fornecedor e "Ver o PDF". Comente em que página parou, se parar.
+### T56 – Pedir SICAF de novo no mesmo dia (v0.13.0)
+F: Depois do T55, clique de novo em "Buscar" e "Buscar no SICAF" no mesmo processo.
+E: Não abre o SICAF de novo: a janela "SICAF" aparece logo, com o mesmo PDF.
+### T57 – CNPJ selecionado vai ao SICAF (v0.13.0)
+F: Selecione um CNPJ num documento do SEI > "Buscar SICAF" > "Buscar no SICAF".
+E: O SICAF desse CNPJ é buscado como no T55 e volta para o SEI com o PDF.

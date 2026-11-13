@@ -188,3 +188,41 @@ test('notas fiscais de exemplo: CNPJ do emitente e Campus Palmas como tomador (s
     assert.deepEqual(resultado.avisos.filter(aviso => aviso.nivel === 'vermelho'), [], arquivo)
   }
 })
+
+// v0.13.0: etapa 4 (SICAF).
+test('paginaDoCompras pelo endereço', () => {
+  assert.equal(sicaf.paginaDoCompras('https://www3.comprasnet.gov.br/sicaf-web/private/geral/consultarSituacaoFornecedor.jsf'), 'consulta')
+  assert.equal(sicaf.paginaDoCompras('https://www3.comprasnet.gov.br/sicaf-web/private/index.jsf'), 'sicaf')
+  assert.equal(sicaf.paginaDoCompras('https://www3.comprasnet.gov.br/sicaf-web/public/pages/acessoNegado.jsf'), 'acessoNegado')
+  assert.equal(sicaf.paginaDoCompras('https://comprasnet.gov.br/seguro/loginPortalUASG.asp'), 'login')
+  assert.equal(sicaf.paginaDoCompras('https://cnetmobile.estaleiro.serpro.gov.br/comprasnet-area-trabalho-web/seguro/governo/area-trabalho'), 'areaDeTrabalho')
+  assert.equal(sicaf.paginaDoCompras('https://sso.acesso.gov.br/login'), null)
+  assert.equal(sicaf.paginaDoCompras('não é endereço'), null)
+})
+
+test('nome do arquivo, linha do resultado e PDF do SICAF', () => {
+  assert.equal(sicaf.nomeDoArquivo('14.159.957/0006-02', new Date(2026, 10, 3)), 'consultarSituacaoFornecedor_14159957000602_2026-11-03.pdf')
+  assert.deepEqual(sicaf.lerLinhaDoResultado(' 14.159.957/0006-02 - HM COMERCIO IMPORTACAO E EXPORTACAO LTDA. '), { cnpj: '14159957000602', nome: 'HM COMERCIO IMPORTACAO E EXPORTACAO LTDA.' })
+  assert.equal(sicaf.lerLinhaDoResultado('Fornecedor'), null)
+  const texto = 'Dados do Fornecedor\nCNPJ: 14.159.957/0006-02 DUNS®: 893438672\nRazão Social: HM COMERCIO IMPORTACAO E EXPORTACAO LTDA.\nNome Fantasia:'
+  assert.deepEqual(sicaf.lerPdfDoSicaf(texto), { cnpj: '14159957000602', razaoSocial: 'HM COMERCIO IMPORTACAO E EXPORTACAO LTDA.' })
+})
+
+test('base64 vai e volta', () => {
+  const bytes = new Uint8Array(70000).map((_, i) => (i * 7) % 256)
+  assert.deepEqual(sicaf.deBase64(sicaf.paraBase64(bytes)), bytes)
+})
+
+test('resultado guardado do SICAF: linha do fornecedor (se existir no computador)', () => {
+  const caminho = path.join(PASTA, 'pagina-compras/SICAF - Sistema de Cadastramento Unificado de Fornecedores3.html')
+  if (!fs.existsSync(caminho)) return
+  const html = fs.readFileSync(caminho, 'utf8')
+  const rotulo = /id="form:fornecedores:0:j_idt202"[^>]*>([^<]*)</.exec(html)[1]
+  assert.deepEqual(sicaf.lerLinhaDoResultado(rotulo), { cnpj: '14159957000602', nome: 'HM COMERCIO IMPORTACAO E EXPORTACAO LTDA.' })
+})
+
+test('manifest: acesso opcional ao Compras igual às origens das regras', () => {
+  const manifest = JSON.parse(fs.readFileSync(path.join(__dirname, '../manifest.json'), 'utf8'))
+  assert.deepEqual(manifest.optional_host_permissions, [...sicaf.ORIGENS_COMPRAS])
+  assert.deepEqual(manifest.optional_permissions, ['downloads'])
+})

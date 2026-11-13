@@ -15,6 +15,22 @@
     })
   }
 
+  // v0.13.0: permissão do SICAF (Compras.gov.br e Downloads). O pedido tem de sair direto do clique.
+  const navegador = globalThis.browser || globalThis.chrome
+  const pedidoSicaf = { origins: [...globalThis.ExtensaoIFTO.sicaf.ORIGENS_COMPRAS], permissions: ['downloads'] }
+  const botaoSicaf = document.getElementById('permitirSicaf')
+  const permitido = document.getElementById('sicafPermitido')
+  const mostrarPermissao = sim => { botaoSicaf.hidden = sim; permitido.hidden = !sim }
+  navegador.permissions.contains(pedidoSicaf).then(mostrarPermissao)
+  botaoSicaf.addEventListener('click', () => {
+    navegador.permissions.request(pedidoSicaf).then(mostrarPermissao)
+  })
+  if (location.hash === '#sicaf') {
+    const cartao = document.getElementById('sicaf')
+    cartao.scrollIntoView({ block: 'center' })
+    cartao.style.outline = '3px solid var(--marca)'
+  }
+
   for (const caixa of document.querySelectorAll('input[type="checkbox"]')) {
     caixa.checked = Boolean(configuracoes[caixa.id])
     caixa.addEventListener('change', async () => {

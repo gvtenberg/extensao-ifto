@@ -297,6 +297,61 @@
     return [...grupos.values()]
   }
 
+  // ---------- SICAF no Compras.gov.br (etapa 4) ----------
+  // v0.13.0: endereços do SICAF e do Compras (acesso pedido só quando a opção é usada: permissão opcional).
+  const URL_CONSULTA_SICAF = 'https://www3.comprasnet.gov.br/sicaf-web/private/geral/consultarSituacaoFornecedor.jsf'
+  const URL_LOGIN_COMPRAS = 'https://comprasnet.gov.br/seguro/loginPortalUASG.asp'
+  const ORIGENS_COMPRAS = Object.freeze(['*://www3.comprasnet.gov.br/*', '*://comprasnet.gov.br/*', '*://www.comprasnet.gov.br/*', '*://cnetmobile.estaleiro.serpro.gov.br/*'])
+
+  // Que página do Compras/SICAF está aberta (pelo endereço).
+  function paginaDoCompras (endereco) {
+    let url
+    try { url = new URL(endereco) } catch (erro) { return null }
+    const caminho = url.pathname.toLowerCase()
+    if (url.hostname === 'www3.comprasnet.gov.br' && caminho.startsWith('/sicaf-web/')) {
+      if (/acessonegado/.test(caminho)) return 'acessoNegado'
+      if (/consultarsituacaofornecedor/.test(caminho)) return 'consulta'
+      if (caminho.startsWith('/sicaf-web/private/')) return 'sicaf'
+      return 'sicafPublico'
+    }
+    if (/(^|\.)comprasnet\.gov\.br$/.test(url.hostname) && /loginportaluasg/.test(caminho)) return 'login'
+    if (url.hostname === 'cnetmobile.estaleiro.serpro.gov.br' && /area-trabalho/.test(caminho)) return 'areaDeTrabalho'
+    return null
+  }
+
+  // Nome do PDF como o SICAF dá (decisão D5): consultarSituacaoFornecedor_<CNPJ>_<aaaa-mm-dd>.pdf
+  function nomeDoArquivo (cnpj, agora = new Date()) {
+    const dois = n => String(n).padStart(2, '0')
+    return `consultarSituacaoFornecedor_${soDigitos(cnpj)}_${agora.getFullYear()}-${dois(agora.getMonth() + 1)}-${dois(agora.getDate())}.pdf`
+  }
+
+  // Linha do resultado da pesquisa: "14.159.957/0006-02 - HM COMERCIO … LTDA." → { cnpj, nome }
+  function lerLinhaDoResultado (texto) {
+    const achado = /(\d{2}\.\d{3}\.\d{3}\/\d{4}-\d{2})\s*-\s*(.+)/.exec(String(texto || '').replace(/\s+/g, ' ').trim())
+    if (!achado) return null
+    return { cnpj: soDigitos(achado[1]), nome: achado[2].trim() }
+  }
+  // PDF "Situação do Fornecedor": CNPJ e razão social.
+  function lerPdfDoSicaf (texto) {
+    const cnpj = (/CNPJ:\s*(\d{2}\.\d{3}\.\d{3}\/\d{4}-\d{2})/.exec(texto || '') || [])[1]
+    const razao = (/Raz[aã]o Social:\s*(.+?)\s*(?:\n|Nome Fantasia|$)/.exec(texto || '') || [])[1]
+    return { cnpj: cnpj ? soDigitos(cnpj) : null, razaoSocial: razao ? razao.trim() : '' }
+  }
+
+  // Arquivo entre a página do SICAF, a extensão e o SEI: em texto (base64).
+  function paraBase64 (bytes) {
+    const lista = bytes instanceof Uint8Array ? bytes : new Uint8Array(bytes)
+    let binario = ''
+    for (let i = 0; i < lista.length; i += 0x8000) binario += String.fromCharCode.apply(null, lista.subarray(i, i + 0x8000))
+    return btoa(binario)
+  }
+  function deBase64 (texto) {
+    const binario = atob(texto || '')
+    const lista = new Uint8Array(binario.length)
+    for (let i = 0; i < binario.length; i++) lista[i] = binario.charCodeAt(i)
+    return lista
+  }
+
   // "1 nota sem SICAF" / "2 notas sem SICAF"
   function textoDoAviso (quantidade) {
     return quantidade === 1 ? '1 nota sem SICAF' : `${quantidade} notas sem SICAF`
@@ -307,7 +362,8 @@
     soDigitos, cnpjValido, formatarCnpj, ehDoIfto, acharCnpjs, cnpjDaSelecao,
     normalizar, mesmoNumero, textoDoHtml, nomesParecidos,
     tipoNaArvore, numeroSei, lerRotuloDaNota, trechoPendente, lerAteste, situacaoDoProcesso, textoDoAviso,
-    cnpjsDaNota, notaSemTexto, empenhosDoTexto, nomeNoTexto, conferirNota, agruparPorFornecedor
+    cnpjsDaNota, notaSemTexto, empenhosDoTexto, nomeNoTexto, conferirNota, agruparPorFornecedor,
+    URL_CONSULTA_SICAF, URL_LOGIN_COMPRAS, ORIGENS_COMPRAS, paginaDoCompras, nomeDoArquivo, lerLinhaDoResultado, lerPdfDoSicaf, paraBase64, deBase64
   }
   if (typeof module !== 'undefined' && module.exports) module.exports = api
   else raiz.ExtensaoIFTO = Object.assign(raiz.ExtensaoIFTO || {}, { sicaf: api })
