@@ -262,3 +262,8 @@ E: O botão "Buscar SICAF" não aparece; o menu abre uma janela dizendo para esc
 ### T65 – PDF da consulta com texto (v0.17.0)
 F: Abra o arquivo "exemplo-ConsultaOptantes_14159957000190_2026-11-13.pdf" e procure (Ctrl+F) "14.159.957/0001-90" e "optante".
 E: O PDF mostra os mesmos dados da página do Simples Nacional (com acentos) e a linha "Consulta feita em …"; a busca encontra o CNPJ e a palavra.
+
+## Janela do ícone: página da versão (v0.17.1)
+### T66 – Abrir a página da versão mais nova (v0.17.1)
+F: Clique no ícone da extensão e em "Abrir a página da versão mais nova".
+E: A janela não tem mais "Procurar atualização" nem link embaixo; abre uma aba com a página da versão mais nova, com o arquivo .xpi (Firefox) e .zip (Chrome).

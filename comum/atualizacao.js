@@ -5,6 +5,8 @@
 (function (raiz) {
   const REPOSITORIO = 'gvtenberg/extensao-ifto'
   const ENDERECO_ULTIMA_RELEASE = `https://api.github.com/repos/${REPOSITORIO}/releases/latest`
+  // v0.17.0: página da versão mais nova (botão da janela do ícone).
+  const ENDERECO_PAGINA_ULTIMA_VERSAO = `https://github.com/${REPOSITORIO}/releases/latest`
   const ENDERECO_ANDAMENTO = `https://github.com/${REPOSITORIO}/actions`
 
   // Compara "0.1.10" com "0.1.9" número a número: positivo se a for mais nova.
@@ -32,7 +34,7 @@
     }
   }
 
-  const api = { REPOSITORIO, ENDERECO_ULTIMA_RELEASE, ENDERECO_ANDAMENTO, compararVersoes, lerRelease }
+  const api = { REPOSITORIO, ENDERECO_ULTIMA_RELEASE, ENDERECO_PAGINA_ULTIMA_VERSAO, ENDERECO_ANDAMENTO, compararVersoes, lerRelease }
   if (typeof module !== 'undefined' && module.exports) module.exports = api
   else raiz.ExtensaoIFTO = Object.assign(raiz.ExtensaoIFTO || {}, { atualizacao: api })
 })(globalThis)

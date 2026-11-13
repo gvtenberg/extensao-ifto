@@ -33,9 +33,9 @@ Firefox only installs an extension permanently if Mozilla has signed it. We use 
 2. Firefox asks whether to add the extension: click **Adicionar** (Add).
 3. Only the first time. After that Firefox updates by itself (it checks once a day). To update right away:
    - **Firefox menu (most reliable):** menu ☰ > **Extensões e temas** (Add-ons and themes) > gear ⚙ > **Procurar atualizações** (Check for updates).
-   - **Extension window (v0.9.7):** extension icon > **Procurar atualização** > **Abrir a página da versão …** > click `extensao-ifto-X.Y.Z.xpi` > **Permitir** > **Adicionar**. The direct link of v0.9.1 and the automatic update did not work for the user (13/11/2026), although `updates.json` and the signed `.xpi` were correct online. Old (v0.9.1): extension icon > **Procurar atualização** > **Instalar a versão …** (a direct link to the `.xpi`) > **Permitir** (Allow, for GitHub) > **Adicionar**; a small link opens the version page as a backup. Before v0.9.1 it opened the version page and the user clicked `extensao-ifto-X.Y.Z.xpi` there (v0.4.2: opening the file directly did not show the install prompt, because Firefox requires the person's own click; Firefox has no `runtime.requestUpdateCheck`).
+   - **Extension window (v0.17.0):** extension icon > **Abrir a página da versão mais nova** (opens `releases/latest`, no search in the window: the search and its link were removed at the user's request on 13/11/2026) > click `extensao-ifto-X.Y.Z.xpi` > **Permitir** > **Adicionar**. Before (v0.9.7): **Procurar atualização** > **Abrir a página da versão …** > click `extensao-ifto-X.Y.Z.xpi` > **Permitir** > **Adicionar**. The direct link of v0.9.1 and the automatic update did not work for the user (13/11/2026), although `updates.json` and the signed `.xpi` were correct online. Old (v0.9.1): extension icon > **Procurar atualização** > **Instalar a versão …** (a direct link to the `.xpi`) > **Permitir** (Allow, for GitHub) > **Adicionar**; a small link opens the version page as a backup. Before v0.9.1 it opened the version page and the user clicked `extensao-ifto-X.Y.Z.xpi` there (v0.4.2: opening the file directly did not show the install prompt, because Firefox requires the person's own click; Firefox has no `runtime.requestUpdateCheck`).
    - Settings and the signature list are kept.
-- The "Procurar atualização" button is useful while the extension is in development; when it is ready, the user decides whether it leaves the window.
+- The version-page button is useful while the extension is in development; when it is ready, the user decides whether it leaves the window.
 
 ## Chrome version
 
@@ -50,7 +50,7 @@ Free, without the Chrome Web Store (the store charges a one-time US$ 5 developer
   5. Click **Carregar sem compactação** (Load unpacked) and choose the unzipped folder (the one that contains `manifest.json`).
   6. Optional: puzzle-piece icon 🧩 next to the address bar > pin "Extensão IFTO Palmas".
 - **Update:** download the new `.zip`, unzip it **over the same folder** (replace the files), then in `chrome://extensions` click the circular arrow ↻ on the extension card. Settings and the list are kept.
-- In Chrome the "Procurar atualização" button is hidden (it would look for the Firefox version).
+- In Chrome the version-page button also shows (v0.17.0): the same page has the Chrome `.zip`.
 - Chrome may show a "Desativar extensões no modo do desenvolvedor" (disable developer-mode extensions) warning at startup: click to keep them.
 
 ## Saved passwords in the SEI

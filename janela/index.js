@@ -36,47 +36,10 @@
     window.close()
   })
 
-  // v0.1.3: procurar atualização na hora, na última Release do GitHub (ver comum/atualizacao.js).
-  const { atualizacao } = globalThis.ExtensaoIFTO
-  const versaoInstalada = navegador.runtime.getManifest().version
-  const botaoProcurar = document.getElementById('procurar-atualizacao')
-  // v0.5.0: no Chrome (sem "browser"), a atualização é trocar a pasta pela do pacote novo; o botão
-  // procuraria a versão do Firefox, então fica escondido.
-  if (!globalThis.browser) {
-    botaoProcurar.hidden = true
-    return
-  }
-  const avisoAtualizacao = document.getElementById('atualizacao')
-  const linkPagina = document.getElementById('pagina-atualizacao')
-
-  function avisar (tipo, texto) {
-    avisoAtualizacao.hidden = false
-    avisoAtualizacao.className = 'aviso ' + tipo
-    avisoAtualizacao.textContent = texto
-  }
-
-  botaoProcurar.addEventListener('click', async () => {
-    botaoProcurar.disabled = true
-    linkPagina.hidden = true
-    avisar('pendencia', 'Procurando atualização…')
-    try {
-      const resposta = await fetch(atualizacao.ENDERECO_ULTIMA_RELEASE, { cache: 'no-store' })
-      const release = resposta.ok ? atualizacao.lerRelease(await resposta.json()) : null
-      if (!release) {
-        avisar('pendencia', 'Ainda não há versão para instalar. Tente de novo mais tarde.')
-      } else if (atualizacao.compararVersoes(release.versao, versaoInstalada) > 0) {
-        // v0.9.7: o link direto para o arquivo (v0.9.1) não instalava; fica só a página da versão, onde a
-        // pessoa clica no arquivo .xpi. As configurações e a lista de assinaturas são mantidas.
-        linkPagina.textContent = `Abrir a página da versão ${release.versao}`
-        linkPagina.href = release.pagina
-        linkPagina.hidden = false
-        avisar('sucesso', `Versão ${release.versao} disponível (você tem a ${versaoInstalada}). Clique em "Abrir a página da versão ${release.versao}"; na página, clique no arquivo que termina em .xpi, depois em "Permitir" e em "Adicionar".`)
-      } else {
-        avisar('sucesso', `Você já tem a versão mais nova (${versaoInstalada}).`)
-      }
-    } catch (erro) {
-      avisar('pendencia', 'Não foi possível procurar atualização. Confira a internet e tente de novo.')
-    }
-    botaoProcurar.disabled = false
+  // v0.17.0 (pedido de 13/11/2026): procurar e instalar pela janela não funcionava; o botão só abre a
+  // página da versão mais nova, onde a pessoa clica no arquivo (.xpi no Firefox, .zip no Chrome).
+  document.getElementById('pagina-atualizacao').addEventListener('click', () => {
+    navegador.tabs.create({ url: globalThis.ExtensaoIFTO.atualizacao.ENDERECO_PAGINA_ULTIMA_VERSAO })
+    window.close()
   })
 })()

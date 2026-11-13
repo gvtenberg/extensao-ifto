@@ -8,7 +8,7 @@ Decided on 25/10/2026.
 
 - **Firefox** first; then **Chrome** (free package without the store, v0.5.0: `../publicacao.md`, "Chrome version").
 - For tests on the user's browser: **temporary install** (`about:debugging#/runtime/this-firefox` > Carregar extensão temporária…), which disappears when Firefox closes.
-- To install permanently: Mozilla **unlisted** signing (free, not in the store). Requested by the user on 12/11/2026: done **on GitHub**, to install on the work computer without going through the development one (`../publicacao.md`). **Public** repository, with automatic update via GitHub (v0.1.2) and the "Procurar atualização" button in the icon window (v0.1.3, while in development; v0.4.2 opens the version page because Firefox requires the person's click to install).
+- To install permanently: Mozilla **unlisted** signing (free, not in the store). Requested by the user on 12/11/2026: done **on GitHub**, to install on the work computer without going through the development one (`../publicacao.md`). **Public** repository, with automatic update via GitHub (v0.1.2) and the "Procurar atualização" button in the icon window (v0.1.3, while in development; v0.4.2 opens the version page because Firefox requires the person's click to install; v0.17.0, at the user's request: only the button "Abrir a página da versão mais nova", no search in the window).
 
 ## Login and data
 

@@ -2,6 +2,7 @@
 
 One or two lines per version, with the date (dd/mm/yyyy). Number 0.STAGE.FIX.
 
+- v0.17.1 (13/11/2026): icon window: "Procurar atualização" and the link below it removed (did not work for the user); only the button "Abrir a página da versão mais nova", which opens the latest version page (also in Chrome).
 - v0.17.0 (13/11/2026): Simples Nacional lookup, stage 1: reads the "Consulta Optantes" result page (`comum/simples-nacional.js`) and makes the extension's own searchable text PDF (`comum/pdf-texto.js`, A4, Helvetica, accents); file and tree names; head-office CNPJ of a branch (`cnpjMatriz`); `nomeNaArvore` (50 letters) moved to `comum/sei.js`. Nothing visible to users yet.
 - v0.16.0 (13/11/2026): SICAF, two decisions of 13/11/2026: (1) with "Automática" the selected-CNPJ button and menu work only in the CGOC (other units need "Sempre ligada"); (2) blank Sicaf, Consulta and Anexo after the last Folha (made by "Incluir Sicaf, Consulta e Anexo", no tree name yet) are filled through "Alterar Documento Externo" (Sicaf: PDF + name; Anexo: name; Consulta: left as is) instead of creating new ones.
 - v0.15.0 (13/11/2026): automatic SICAF, stage 6: with "Sempre ligada", "Incluir SICAF" button in any unit with a process open (type or paste the CNPJ; outside the CGOC only the Sicaf with the PDF). Spec closed: rules in `regras/sicaf.md`; README updated (feature, setting, permission, data read, pdf.js credit).
