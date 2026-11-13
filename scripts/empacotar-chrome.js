@@ -7,7 +7,8 @@ const { execFileSync } = require('node:child_process')
 
 const raiz = path.join(__dirname, '..')
 const manifest = JSON.parse(fs.readFileSync(path.join(raiz, 'manifest.json'), 'utf8'))
-const nome = `extensao-ifto-chrome-${manifest.version}`
+// v0.18.1: nome diz em quais navegadores o pacote funciona (Chrome e Edge).
+const nome = `extensao-ifto-chrome-edge-${manifest.version}`
 const saida = path.join(raiz, 'web-ext-artifacts', 'chrome')
 const pasta = path.join(saida, nome)
 

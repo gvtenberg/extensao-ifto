@@ -53,8 +53,8 @@ Todas as versões ficam na página de versões da extensão:
 
 Essa página fica no GitHub, um site onde o código da extensão é guardado. Não é preciso criar conta para baixar. Ao abrir o link, procure a parte "Assets" (arquivos), no fim da versão mais recente. Há três arquivos:
 
-- `extensao-ifto-X.Y.Z.xpi`: arquivo para o **Firefox** (X.Y.Z é o número da versão, por exemplo 0.9.3).
-- `extensao-ifto-chrome-X.Y.Z.zip`: arquivo para o **Chrome** e o **Edge**.
+- `extensao-ifto-firefox-X.Y.Z.xpi`: arquivo para o **Firefox** (X.Y.Z é o número da versão, por exemplo 0.9.3).
+- `extensao-ifto-chrome-edge-X.Y.Z.zip`: arquivo para o **Chrome** e o **Edge**.
 - `updates.json`: arquivo usado pelo Firefox para a atualização automática. Não é preciso baixá-lo.
 
 Baixe a extensão somente por esse endereço. Arquivos recebidos por e-mail, aplicativos de mensagem ou outros sites podem ter sido alterados.
@@ -62,7 +62,7 @@ Baixe a extensão somente por esse endereço. Arquivos recebidos por e-mail, apl
 ## Como instalar no Firefox
 
 1. Abra o Firefox e acesse o endereço da seção [Onde baixar](#onde-baixar).
-2. Clique no arquivo `extensao-ifto-X.Y.Z.xpi`.
+2. Clique no arquivo `extensao-ifto-firefox-X.Y.Z.xpi`.
 3. Se aparecer o aviso "O Firefox impediu que este site pedisse para instalar software", clique em **Permitir**.
 4. Na janela seguinte, clique em **Adicionar**.
 5. Para deixar o ícone da extensão sempre visível: clique no ícone de peça de quebra-cabeça, ao lado da barra de endereços, depois na engrenagem ao lado de "Extensão IFTO Palmas" e em **Fixar na barra de ferramentas**.
@@ -72,7 +72,7 @@ A instalação é feita uma única vez. Depois disso, o Firefox atualiza a exten
 
 ## Como instalar no Chrome ou no Edge
 
-1. Na página da seção [Onde baixar](#onde-baixar), clique no arquivo `extensao-ifto-chrome-X.Y.Z.zip` para baixá-lo.
+1. Na página da seção [Onde baixar](#onde-baixar), clique no arquivo `extensao-ifto-chrome-edge-X.Y.Z.zip` para baixá-lo.
 2. Descompacte o arquivo em uma pasta que não será apagada nem movida, por exemplo `Documentos\extensao-ifto-chrome`. No Windows: clique com o botão direito no arquivo baixado, escolha **Extrair tudo** e indique a pasta.
 3. No Chrome, digite `chrome://extensions` na barra de endereços e pressione Enter. No Edge, digite `edge://extensions`.
 4. Ative o **Modo do desenvolvedor** (no Chrome, no canto superior direito; no Edge, no menu à esquerda).

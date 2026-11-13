@@ -295,3 +295,7 @@ E: na CGOC aparece "Incluir SICAF, Simples e Anexo"; na outra unidade aparecem "
 ### T82 – Equipe de licitação: "Sempre ligada" (v0.18.0)
 F: Configurações > "SICAF e Simples Nacional" > "Sempre ligada"; abra qualquer processo (também na CGOC), clique em "Incluir SICAF" e digite um CNPJ.
 E: a barra mostra só "Incluir SICAF" (sem aviso de notas); no fim, só o Sicaf com o PDF é incluído, sem Consulta nem Anexo. Depois, volte a opção para "Automática".
+
+### T83 – Nomes dos arquivos para baixar (v0.18.1)
+F: Abra a página da versão 0.18.1 no GitHub (ícone da extensão > Procurar atualização > Abrir a página da versão).
+E: Aparecem extensao-ifto-firefox-0.18.1.xpi e extensao-ifto-chrome-edge-0.18.1.zip; clicar no do Firefox instala normalmente.

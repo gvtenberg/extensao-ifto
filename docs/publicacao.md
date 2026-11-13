@@ -7,7 +7,7 @@ Firefox only installs an extension permanently if Mozilla has signed it. We use 
 ## How it works
 
 - File `.github/workflows/assinar.yml`. It runs when a commit that changes `manifest.json` reaches GitHub (or from the **Run workflow** button on the **Actions** tab).
-- It runs `npm test` and `npm run conferir`, signs with `web-ext sign --channel unlisted`, and creates the `vX.Y.Z` version in **Releases** with `extensao-ifto-X.Y.Z.xpi` (Firefox) and `extensao-ifto-chrome-X.Y.Z.zip` (Chrome, v0.5.0).
+- It runs `npm test` and `npm run conferir`, signs with `web-ext sign --channel unlisted`, and creates the `vX.Y.Z` version in **Releases** with `extensao-ifto-firefox-X.Y.Z.xpi` (Firefox) and `extensao-ifto-chrome-edge-X.Y.Z.zip` (Chrome, v0.5.0).
 - The Release also carries `updates.json`. `manifest.json` points to the one in the latest Release (`update_url`), so Firefox installs each new version by itself (the repository is **public**).
 - If the `manifest.json` version already has a Release, it does nothing: Mozilla does not sign the same version twice (that is why the version goes up with every change).
 
@@ -29,11 +29,11 @@ Firefox only installs an extension permanently if Mozilla has signed it. We use 
 
 ## Install on a computer (Firefox)
 
-1. In the work Firefox, open the repository **Releases** page and click `extensao-ifto-X.Y.Z.xpi`.
+1. In the work Firefox, open the repository **Releases** page and click `extensao-ifto-firefox-X.Y.Z.xpi`.
 2. Firefox asks whether to add the extension: click **Adicionar** (Add).
 3. Only the first time. After that Firefox updates by itself (it checks once a day). To update right away:
    - **Firefox menu (most reliable):** menu ☰ > **Extensões e temas** (Add-ons and themes) > gear ⚙ > **Procurar atualizações** (Check for updates).
-   - **Extension window (v0.17.0):** extension icon > **Procurar atualização** > (only when there is a new version) **Abrir a página da versão …** (user request of 13/11/2026: no install from the window, no extra link) > click `extensao-ifto-X.Y.Z.xpi` > **Permitir** > **Adicionar**. Before (v0.9.7): **Procurar atualização** > **Abrir a página da versão …** > click `extensao-ifto-X.Y.Z.xpi` > **Permitir** > **Adicionar**. The direct link of v0.9.1 and the automatic update did not work for the user (13/11/2026), although `updates.json` and the signed `.xpi` were correct online. Old (v0.9.1): extension icon > **Procurar atualização** > **Instalar a versão …** (a direct link to the `.xpi`) > **Permitir** (Allow, for GitHub) > **Adicionar**; a small link opens the version page as a backup. Before v0.9.1 it opened the version page and the user clicked `extensao-ifto-X.Y.Z.xpi` there (v0.4.2: opening the file directly did not show the install prompt, because Firefox requires the person's own click; Firefox has no `runtime.requestUpdateCheck`).
+   - **Extension window (v0.17.0):** extension icon > **Procurar atualização** > (only when there is a new version) **Abrir a página da versão …** (user request of 13/11/2026: no install from the window, no extra link) > click `extensao-ifto-firefox-X.Y.Z.xpi` > **Permitir** > **Adicionar**. Before (v0.9.7): **Procurar atualização** > **Abrir a página da versão …** > click `extensao-ifto-firefox-X.Y.Z.xpi` > **Permitir** > **Adicionar**. The direct link of v0.9.1 and the automatic update did not work for the user (13/11/2026), although `updates.json` and the signed `.xpi` were correct online. Old (v0.9.1): extension icon > **Procurar atualização** > **Instalar a versão …** (a direct link to the `.xpi`) > **Permitir** (Allow, for GitHub) > **Adicionar**; a small link opens the version page as a backup. Before v0.9.1 it opened the version page and the user clicked `extensao-ifto-firefox-X.Y.Z.xpi` there (v0.4.2: opening the file directly did not show the install prompt, because Firefox requires the person's own click; Firefox has no `runtime.requestUpdateCheck`).
    - Settings and the signature list are kept.
 - The version-page button is useful while the extension is in development; when it is ready, the user decides whether it leaves the window.
 
@@ -43,7 +43,7 @@ Free, without the Chrome Web Store (the store charges a one-time US$ 5 developer
 
 - **Build (development computer):** in the terminal, inside `extensao-ifto`, type `npm run empacotar-chrome`. It creates the folder and the `.zip` in `web-ext-artifacts/chrome/` (outside git). The script (`scripts/empacotar-chrome.js`) swaps the SVG icon for PNGs (`icones/icone-16/32/48/128.png`) and removes the Firefox-only keys. GitHub also attaches the `.zip` to each Release.
 - **Install (first time):**
-  1. Download `extensao-ifto-chrome-X.Y.Z.zip` from the repository **Releases** page.
+  1. Download `extensao-ifto-chrome-edge-X.Y.Z.zip` from the repository **Releases** page.
   2. Unzip it into a folder that will stay put (e.g. `Documentos\extensao-ifto-chrome`): right-click the file > **Extrair tudo** (Extract all).
   3. In Chrome, type `chrome://extensions` in the address bar and press Enter (in Edge: `edge://extensions`).
   4. Turn on **Modo do desenvolvedor** (Developer mode), top right (in Edge: bottom left).

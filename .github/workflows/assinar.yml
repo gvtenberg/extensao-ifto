@@ -109,15 +109,16 @@ jobs:
         run: |
           VERSAO=${{ steps.versao.outputs.versao }}
           XPI=$(ls -t web-ext-artifacts/*.xpi | head -1)
-          cp "$XPI" "extensao-ifto-$VERSAO.xpi"
+          # v0.18.1: nome com o navegador (firefox), como o do Chrome, para o usuário saber onde clicar.
+          cp "$XPI" "extensao-ifto-firefox-$VERSAO.xpi"
           # v0.1.2: updates.json diz ao Firefox qual é a versão mais nova (atualização automática;
           # o manifest.json aponta para o updates.json da última Release).
           ID=$(node -p "require('./manifest.json').browser_specific_settings.gecko.id")
-          LINK="https://github.com/${{ github.repository }}/releases/download/v$VERSAO/extensao-ifto-$VERSAO.xpi"
+          LINK="https://github.com/${{ github.repository }}/releases/download/v$VERSAO/extensao-ifto-firefox-$VERSAO.xpi"
           node -e "console.log(JSON.stringify({addons:{[process.argv[1]]:{updates:[{version:process.argv[2],update_link:process.argv[3]}]}}},null,2))" "$ID" "$VERSAO" "$LINK" > updates.json
           # v0.5.0: pacote do Chrome (grátis, sem a loja) na mesma Release.
           npm run empacotar-chrome
-          cp "web-ext-artifacts/chrome/extensao-ifto-chrome-$VERSAO.zip" .
-          gh release create "v$VERSAO" "extensao-ifto-$VERSAO.xpi" "extensao-ifto-chrome-$VERSAO.zip" updates.json \
+          cp "web-ext-artifacts/chrome/extensao-ifto-chrome-edge-$VERSAO.zip" .
+          gh release create "v$VERSAO" "extensao-ifto-firefox-$VERSAO.xpi" "extensao-ifto-chrome-edge-$VERSAO.zip" updates.json \
             --title "Versão $VERSAO" \
-            --notes "Firefox: clique no arquivo .xpi e em Adicionar. Chrome: baixe o .zip, descompacte e carregue a pasta em chrome://extensions (Modo do desenvolvedor > Carregar sem compactação)."
+            --notes "Firefox: clique no arquivo extensao-ifto-firefox e em Adicionar. Chrome ou Edge: baixe o arquivo extensao-ifto-chrome-edge, descompacte e carregue a pasta em chrome://extensions ou edge://extensions (Modo do desenvolvedor > Carregar sem compactação)."
