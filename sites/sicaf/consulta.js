@@ -47,7 +47,9 @@
   // Linha do resultado com o CNPJ pedido: "14.159.957/0006-02 - NOME" e o link "Situação do Fornecedor".
   function linhaDoCnpj () {
     for (const tr of document.querySelectorAll('[id$="fornecedores_data"] tr')) {
-      const lida = regras.lerLinhaDoResultado(tr.textContent)
+      // v0.17.5: só a primeira coluna (CNPJ - Razão Social); a linha inteira trazia "Relatórios" e o script do SICAF no nome.
+      const rotulo = tr.querySelector('label.informacao') || tr.querySelector('td')
+      const lida = rotulo && regras.lerLinhaDoResultado(rotulo.textContent)
       const link = tr.querySelector('a[id$=":detalharLink"]')
       if (lida && lida.cnpj === cnpj && link) return { ...lida, link }
     }

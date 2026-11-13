@@ -356,7 +356,8 @@
   function lerLinhaDoResultado (texto) {
     const achado = /(\d{2}\.\d{3}\.\d{3}\/\d{4}-\d{2})\s*-\s*(.+)/.exec(String(texto || '').replace(/\s+/g, ' ').trim())
     if (!achado) return null
-    return { cnpj: soDigitos(achado[1]), nome: achado[2].trim() }
+    // v0.17.5: segurança se vier a linha inteira: o nome para antes da coluna "Relatórios".
+    return { cnpj: soDigitos(achado[1]), nome: achado[2].split(/\s*Relatórios\b/)[0].trim() }
   }
   // PDF "Situação do Fornecedor": CNPJ e razão social.
   function lerPdfDoSicaf (texto) {

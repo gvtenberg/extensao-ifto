@@ -55,6 +55,8 @@ function tratarRecado (recado, remetente) {
     case 'simplesQualCnpj': return simplesQualCnpj(aba)
     case 'simplesPesquisei': return simplesPesquisei(recado.cnpj)
     case 'simplesResultado': return receberSimples(recado, aba)
+    // v0.17.5: texto de um PDF pedido pela página do SEI (no Firefox o pdf.js só funciona aqui).
+    case 'lerPdf': return globalThis.ExtensaoIFTO.pdfTexto ? globalThis.ExtensaoIFTO.pdfTexto.textoDoPdf(recado.bytes).then(texto => ({ texto })) : Promise.resolve({ erro: 'Leitura de PDF indisponível.' })
   }
 }
 

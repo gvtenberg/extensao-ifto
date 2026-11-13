@@ -18,7 +18,8 @@
     .fechar { border: 0; background: none; font-size: 20px; cursor: pointer; color: #5B6660; padding: 0 4px; }
     .linha { display: flex; gap: 8px; align-items: center; justify-content: space-between; }
     button.pequeno { flex: none; min-height: 28px; padding: 0 10px; border-radius: 6px; border: 1px solid #1E5E33; background: #fff; color: #1E5E33; font: inherit; font-size: 13px; cursor: pointer; }
-    .corpo { padding: 4px 20px 12px; overflow: auto; display: grid; gap: 10px; }
+    /* v0.17.5: texto comprido quebra a linha; nunca barra de rolagem para o lado */
+    .corpo { padding: 4px 20px 12px; overflow-y: auto; overflow-x: hidden; display: grid; grid-template-columns: minmax(0, 1fr); gap: 10px; overflow-wrap: anywhere; }
     .botoes { display: flex; gap: 8px; justify-content: flex-end; flex-wrap: wrap; padding: 12px 20px 16px; border-top: 1px solid #E2E6E3; }
     button.acao { min-height: 36px; padding: 0 14px; border-radius: 8px; border: 1px solid #D5DBD7; background: #fff; color: #1B2420; font: inherit; cursor: pointer; }
     button.acao.principal { background: #1E5E33; border-color: #1E5E33; color: #fff; }
@@ -26,8 +27,8 @@
     button.acao:disabled { opacity: .55; cursor: default; }
     p { margin: 0; }
     .apoio { color: #5B6660; font-size: 13px; }
-    .cartao { border: 1px solid #E2E6E3; border-radius: 8px; padding: 10px 12px; display: grid; gap: 6px; }
-    .cartao h2 { font-size: 15px; margin: 0; font-weight: 600; }
+    .cartao { border: 1px solid #E2E6E3; border-radius: 8px; padding: 10px 12px; display: grid; grid-template-columns: minmax(0, 1fr); gap: 6px; }
+    .cartao h2 { font-size: 15px; margin: 0; font-weight: 600; min-width: 0; }
     .aviso { border-radius: 8px; padding: 8px 10px; font-size: 13px; }
     .aviso.vermelho { background: #FDE7E4; color: #8A1F14; }
     .aviso.amarelo { background: #FFF1D6; color: #7A4B00; }

@@ -260,3 +260,11 @@ E: A árvore recarrega com "Sicaf <nome da empresa>" (abre o PDF do SICAF), "Con
 ### T74 – Botões da extensão juntos numa caixa só (v0.17.4)
 F: no SEI da CGOC, abra um processo com nota sem SICAF.
 E: no alto à direita aparece uma caixa pequena com "IFTO" e os botões um embaixo do outro ("1 nota sem SICAF – Buscar" e "Incluir Sicaf, Consulta e Anexo"), sem cobrir os links do SEI; cada botão funciona como antes.
+
+### T75 – Nota e PDF do SICAF lidos (v0.17.5)
+F: no SEI da CGOC, abra um processo com nota sem SICAF, clique em "1 nota sem SICAF – Buscar" e faça a busca até voltar ao SEI.
+E: o cartão da nota mostra o CNPJ lido da nota (sem "não consegui ler"); depois da busca, não aparece "Não consegui ler o PDF do SICAF para conferir o CNPJ".
+
+### T76 – Nome do fornecedor limpo e janela sem rolagem para o lado (v0.17.5)
+F: no fim da busca do T75, olhe a janela "Incluir Sicaf, Consulta e Anexo".
+E: o título mostra só "CNPJ – NOME DA EMPRESA" (sem "Relatórios" nem texto estranho) e a janela não tem barra de rolagem para o lado.

@@ -204,6 +204,8 @@ test('nome do arquivo, linha do resultado e PDF do SICAF', () => {
   assert.equal(sicaf.nomeDoArquivo('14.159.957/0006-02', new Date(2026, 10, 3)), 'consultarSituacaoFornecedor_14159957000602_2026-11-03.pdf')
   assert.deepEqual(sicaf.lerLinhaDoResultado(' 14.159.957/0006-02 - HM COMERCIO IMPORTACAO E EXPORTACAO LTDA. '), { cnpj: '14159957000602', nome: 'HM COMERCIO IMPORTACAO E EXPORTACAO LTDA.' })
   assert.equal(sicaf.lerLinhaDoResultado('Fornecedor'), null)
+  // v0.17.5: linha inteira com o script do SICAF não suja o nome
+  assert.equal(sicaf.lerLinhaDoResultado('14.159.957/0006-02 - HM COMERCIO LTDA.Relatórios Situação do FornecedorproximoPasso = function() {PrimeFaces.ab({})}').nome, 'HM COMERCIO LTDA.')
   const texto = 'Dados do Fornecedor\nCNPJ: 14.159.957/0006-02 DUNS®: 893438672\nRazão Social: HM COMERCIO IMPORTACAO E EXPORTACAO LTDA.\nNome Fantasia:'
   assert.deepEqual(sicaf.lerPdfDoSicaf(texto), { cnpj: '14159957000602', razaoSocial: 'HM COMERCIO IMPORTACAO E EXPORTACAO LTDA.' })
 })
