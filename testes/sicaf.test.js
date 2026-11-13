@@ -263,3 +263,26 @@ test('página guardada do documento externo: usuário da tabela de anexos (se ex
   if (!fs.existsSync(caminho)) return
   assert.deepEqual(sicaf.lerUsuarioDoUpload(fs.readFileSync(caminho, 'latin1')), { idUsuario: '2382960', sigla: 'CGOC/GAC/DAP/PAL/REI/IFTO' })
 })
+
+// v0.16.0: aproveitar Sicaf, Consulta e Anexo em branco.
+test('aproveitarEmBranco: só os sem nome, depois da última Folha, na ordem', () => {
+  const documentos = [
+    { id: '1', rotulo: 'Sicaf (3300001)', linkAlterar: 'a1' },
+    { id: '2', rotulo: 'Folha de Encaminhamento 269 (3376800)', feitoNoSei: true },
+    { id: '3', rotulo: 'Sicaf (3385629)', semConteudo: true, linkAlterar: 'a3' },
+    { id: '4', rotulo: 'Consulta (3385630)', semConteudo: true, linkAlterar: 'a4' },
+    { id: '5', rotulo: 'Anexo Instrumento de Cobrança NF nº 9 X (3385631)', linkAlterar: 'a5' },
+    { id: '6', rotulo: 'Anexo (3385632)', semConteudo: true, linkAlterar: 'a6' }
+  ]
+  const itens = [{ tipo: 'Sicaf' }, { tipo: 'Consulta' }, { tipo: 'Anexo', nota: '63' }, { tipo: 'Anexo', nota: '64' }]
+  assert.deepEqual(sicaf.aproveitarEmBranco(itens, documentos).map(item => item.emBranco ? item.emBranco.sei + ':' + item.emBranco.linkAlterar : null), ['3385629:a3', '3385630:a4', '3385632:a6', null])
+})
+
+test('árvore guardada: link para alterar o Sicaf em branco (se existir no computador)', () => {
+  const caminho = path.join(PASTA, 'paginas-sei/SEI - Árvore Montar.html')
+  if (!fs.existsSync(caminho)) return
+  const { documentos } = lerArvore(fs.readFileSync(caminho, 'latin1'))
+  const itens = sicaf.aproveitarEmBranco([{ tipo: 'Sicaf' }, { tipo: 'Consulta' }, { tipo: 'Anexo' }], documentos)
+  assert.deepEqual(itens.map(item => item.emBranco.sei), ['3385629', '3385630', '3385631'])
+  assert.match(itens[0].emBranco.linkAlterar, /^controlador\.php\?acao=documento_alterar_recebido&.*id_documento=3663596&.*infra_hash=/)
+})

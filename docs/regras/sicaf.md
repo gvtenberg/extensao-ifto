@@ -12,7 +12,7 @@ Decided on 13/11/2026 (spec `specs/feitas/sicaf-automatico.md`, v0.10.0 to v0.15
 
 ## Settings and units
 
-- Option "SICAF da nota fiscal" (D4), same pattern as the signature list: **Automática** (default) = notice of invoices without SICAF only in the CGOC (CGOC/GAC/DAP/PAL/REI/IFTO); **Sempre ligada** = also the "Incluir SICAF" button (type or paste the CNPJ) in any unit with a process open; **Desligada** = nothing, not even the button next to a selected CNPJ.
+- Option "SICAF da nota fiscal" (D4), same pattern as the signature list: **Automática** (default) = notice of invoices without SICAF only in the CGOC (CGOC/GAC/DAP/PAL/REI/IFTO); **Sempre ligada** = the selected-CNPJ button and the "Incluir SICAF" button (type or paste the CNPJ) in any unit with a process open; **Desligada** = nothing. With Automática, the selected-CNPJ button and menu also work only in the CGOC (decided 13/11/2026, v0.16.0; elsewhere the menu says to choose "Sempre ligada").
 - In the CGOC the extension adds Sicaf, Consulta and Anexo; in other units only the Sicaf with the PDF.
 - Access to Compras.gov.br (`www3.comprasnet.gov.br`, `comprasnet.gov.br`, `www.comprasnet.gov.br`, `cnetmobile.estaleiro.serpro.gov.br`) and to Downloads is an **optional permission**, asked once from the settings ("Permitir acesso ao Compras.gov.br"), so colleagues who do not use it are never asked.
 
@@ -41,8 +41,9 @@ Decided on 13/11/2026 (spec `specs/feitas/sicaf-automatico.md`, v0.10.0 to v0.15
 
 - One confirmation window lists each supplier, CNPJ, the PDF obtained and the documents to create; nothing is written to the SEI before the click (`CLAUDE.md`, Conventions). Red warnings need a second click.
 - Order: per supplier Sicaf (PDF, "Nome na Árvore" = SICAF company name without the final dot, D3) and Consulta (plain); per invoice one Anexo "Instrumento de Cobrança NF nº <number without leading zeros> <supplier as in the invoice tree name>" (D7). Example: CHC invoices 63 and 64 → Sicaf, Consulta, Anexo 63, Anexo 64.
+- **Blank documents are reused** (decided 13/11/2026, v0.16.0): blank Sicaf, Consulta and Anexo after the last Folha that still have no tree name ("Sicaf (3385629)") are filled through "Alterar Documento Externo", in tree order: Sicaf gets the PDF and name, Anexo the name, Consulta stays as is. Only the missing ones are created.
 - Same fields as the one-click payment documents (`specs/documentos-pagamento.md`): today's date, Nato-digital, Público. "Nome na Árvore" takes at most **50 letters**: cut at the last whole word.
 
 ## Selected CNPJ
 
-- D6: selecting only a CNPJ (14 digits, with or without dots; check digits valid) on an SEI page shows a "Buscar SICAF" button next to it; in the browser PDF viewer (where extensions cannot act on the page) the right-click menu "Buscar SICAF deste CNPJ"; fallback: type or paste in the window. It acts right away on that CNPJ (no list): CGOC adds Sicaf, Consulta and the Anexos of that supplier's pending invoices; other units only the Sicaf.
+- D6: selecting only a CNPJ (14 digits, with or without dots; check digits valid) on an SEI page shows a "Buscar SICAF" button next to it; in the browser PDF viewer (where extensions cannot act on the page) the right-click menu "Buscar SICAF deste CNPJ"; fallback: type or paste in the window. It acts right away on that CNPJ (no list), only where the option is on (see Settings and units): CGOC adds Sicaf, Consulta and the Anexos of that supplier's pending invoices; other units only the Sicaf.

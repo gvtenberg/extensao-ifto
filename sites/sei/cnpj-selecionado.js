@@ -1,6 +1,7 @@
 // v0.11.0: CNPJ selecionado numa página do SEI (decisão D6): aparece um botão "Buscar SICAF" ao lado da
 // seleção. Roda em todos os quadros do SEI (documento aberto, árvore…); o clique avisa a página principal
-// pela extensão (fundo/fundo.js), que abre a janela do SICAF.
+// pela extensão (fundo/fundo.js), que abre a janela do SICAF. v0.16.0: com "Automática", só na CGOC; nas
+// outras unidades, com "Sempre ligada".
 (async function () {
   const ExtensaoIFTO = globalThis.ExtensaoIFTO
   const { sicaf: regras, configuracoes } = ExtensaoIFTO
@@ -46,8 +47,18 @@
     document.documentElement.append(hospedeiro)
   }
 
+  // v0.16.0: unidade aberta no SEI (quadro principal, mesmo site). "Automática" = botão só na CGOC.
+  function unidadeAberta () {
+    try {
+      const campo = window.top.document.getElementById('lnkInfraUnidade')
+      return campo ? campo.textContent.trim() : ''
+    } catch (erro) {
+      return ''
+    }
+  }
+
   function conferir () {
-    if (opcoes.incluirSicaf === 'desligada') { esconder(); return }
+    if (!regras.funcaoLigada(opcoes.incluirSicaf, unidadeAberta())) { esconder(); return }
     const selecao = window.getSelection()
     const texto = selecao && selecao.rangeCount ? selecao.toString() : ''
     const achado = texto.length <= 40 ? regras.cnpjDaSelecao(texto) : null

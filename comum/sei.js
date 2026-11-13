@@ -52,6 +52,9 @@
     }
     const padraoSrc = /Nos\[(\d+)\]\.src\s*=\s*'([^']*)'/g
     while ((achado = padraoSrc.exec(texto))) if (nos[achado[1]]) nos[achado[1]].src = achado[2]
+    // v0.16.0: ícones de ação do documento (link "Consultar/Alterar Documento Externo").
+    const padraoAcoes = /Nos\[(\d+)\]\.acoes\s*=\s*'((?:[^'\\]|\\.)*)'/g
+    while ((achado = padraoAcoes.exec(texto))) if (nos[achado[1]]) nos[achado[1]].acoes = achado[2]
     const lista = Object.values(nos)
     const processo = lista.find(no => no.tipo === 'PROCESSO')
     const documentos = lista.filter(no => no.tipo === 'DOCUMENTO').map(no => ({
@@ -61,7 +64,9 @@
       semConteudo: /documento_sem_conteudo/.test(no.icone),
       temArquivo: /documento_download_anexo/.test(no.src) || /documento_pdf/.test(no.icone),
       // v0.10.0: endereço do documento (ver o texto ou baixar o arquivo), para o SICAF automático.
-      link: no.src.replace(/&amp;/g, '&')
+      link: no.src.replace(/&amp;/g, '&'),
+      // v0.16.0: alterar o documento externo (preencher Sicaf e Anexo em branco).
+      linkAlterar: ((/href="(controlador\.php\?acao=documento_alterar_recebido[^"]*)"/.exec(no.acoes || '') || [])[1] || '').replace(/&amp;/g, '&')
     }))
     return { idProcesso: processo ? processo.id : null, numero: processo ? processo.rotulo : null, documentos }
   }

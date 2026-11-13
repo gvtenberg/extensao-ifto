@@ -30,7 +30,8 @@ Para unidades específicas (ligadas automaticamente na unidade indicada, e podem
 - **Lista de assinaturas (Direção-geral):** permite colar uma lista de processos e documentos (por exemplo, copiada de uma planilha ou de uma mensagem) e abrir um item por vez. O painel mostra o comentário de cada item, destaca em azul os itens que são apenas para dar ciência e tem os botões "Assinar e próximo" e "Dar ciência e próximo". Também aceita um intervalo de números de documentos de um mesmo processo.
 - **Documentos do pagamento (CGOC):** com um processo aberto, o botão "Incluir Sicaf, Consulta e Anexo" inclui no processo os três documentos externos em branco (data de hoje, Nato-digital, Público), depois de uma confirmação.
 - **SICAF da nota fiscal (CGOC):** com um processo de pagamento aberto, avisa "N notas sem SICAF – Buscar" quando há notas fiscais depois da última Folha de Encaminhamento sem o SICAF do fornecedor. Ao clicar, a extensão lê o PDF de cada nota, confere com o ateste (CNPJ, número, valor, empenho e se a nota é para o Campus Palmas) e mostra as diferenças em vermelho. Depois busca o PDF "Situação do Fornecedor" no SICAF (o login no Compras.gov.br com Gov.br é feito pela própria pessoa), salva o PDF na pasta Downloads e, depois de uma confirmação, inclui no processo o Sicaf com o PDF, a Consulta e um Anexo para cada nota.
-- **Buscar SICAF de um CNPJ (todas as unidades):** ao selecionar um CNPJ numa página do SEI aparece o botão "Buscar SICAF"; no PDF de uma nota, use o botão direito > "Buscar SICAF deste CNPJ". Com a opção "Sempre ligada", o botão "Incluir SICAF" permite digitar ou colar o CNPJ; fora da CGOC, inclui só o Sicaf com o PDF.
+- **Buscar SICAF de um CNPJ (CGOC; outras unidades com "Sempre ligada"):** ao selecionar um CNPJ numa página do SEI aparece o botão "Buscar SICAF"; no PDF de uma nota, use o botão direito > "Buscar SICAF deste CNPJ". Com a opção "Sempre ligada", o botão "Incluir SICAF" permite digitar ou colar o CNPJ; fora da CGOC, inclui só o Sicaf com o PDF.
+- Se o processo já tem Sicaf, Consulta e Anexo **em branco** (feitos pelo botão "Incluir Sicaf, Consulta e Anexo"), a extensão preenche esses documentos (o Sicaf recebe o PDF e o nome; o Anexo, o nome) em vez de criar outros.
 
 Os botões da extensão ficam no alto, à direita, nas páginas do SEI.
 
@@ -105,7 +106,7 @@ Cada função abaixo tem três opções: **Automática** (liga só na unidade in
 
 - **Lista de assinaturas:** automática na Direção-geral (PAL/REI/IFTO).
 - **Documentos do pagamento:** automática na CGOC (CGOC/GAC/DAP/PAL/REI/IFTO).
-- **SICAF da nota fiscal:** automática na CGOC (aviso das notas sem SICAF); "Sempre ligada" mostra o botão "Incluir SICAF" em qualquer unidade; "Desligada" também tira o botão que aparece ao selecionar um CNPJ. Na primeira vez, clique em **Permitir acesso ao Compras.gov.br**: o navegador pede permissão para a extensão abrir o Compras.gov.br e salvar o PDF na pasta Downloads (só quem usa o SICAF precisa permitir).
+- **SICAF da nota fiscal:** automática na CGOC (aviso das notas sem SICAF); "Sempre ligada" mostra os botões "Buscar SICAF" (CNPJ selecionado) e "Incluir SICAF" em qualquer unidade; "Desligada" tira tudo. Na primeira vez, clique em **Permitir acesso ao Compras.gov.br**: o navegador pede permissão para a extensão abrir o Compras.gov.br e salvar o PDF na pasta Downloads (só quem usa o SICAF precisa permitir).
 
 ## Quais dados a extensão lê e guarda
 

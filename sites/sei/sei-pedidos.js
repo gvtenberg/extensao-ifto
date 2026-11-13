@@ -71,18 +71,30 @@
     const regras = ExtensaoIFTO.documentosPagamento
     const sicaf = ExtensaoIFTO.sicaf
     const formularioDoExterno = pagina => lerHtml(pagina.html).getElementById('frmDocumentoCadastro')
-    if (!lida.linkIncluir) throw new Error('Não achei "Incluir Documento" na árvore do processo.')
     // Incluir Documento › Externo (escolher(-1) do SEI): devolve o formulário do documento externo novo.
-    let pagina = await pedir(new URL(lida.linkIncluir.replace(/&amp;/g, '&'), location.href).href)
-    const escolherTipo = lerHtml(pagina.html).getElementById('frmDocumentoEscolherTipo')
-    if (!escolherTipo) throw new Error('O SEI não abriu "Incluir Documento". Confira se a sessão do SEI ainda está aberta.')
-    const paginaEmBranco = await enviar(escolherTipo, pagina.endereco, { hdnIdSerie: '-1' })
-    if (!formularioDoExterno(paginaEmBranco)) throw new Error('O SEI não abriu o documento externo.')
+    // Só é pedido se algum item for novo (v0.16.0: os em branco são alterados).
+    let pagina = null
+    let paginaEmBranco = null
+    async function abrirExternoNovo () {
+      if (!lida.linkIncluir) throw new Error('Não achei "Incluir Documento" na árvore do processo.')
+      const inicio = await pedir(new URL(lida.linkIncluir.replace(/&amp;/g, '&'), location.href).href)
+      const escolherTipo = lerHtml(inicio.html).getElementById('frmDocumentoEscolherTipo')
+      if (!escolherTipo) throw new Error('O SEI não abriu "Incluir Documento". Confira se a sessão do SEI ainda está aberta.')
+      const emBranco = await enviar(escolherTipo, inicio.endereco, { hdnIdSerie: '-1' })
+      if (!formularioDoExterno(emBranco)) throw new Error('O SEI não abriu o documento externo.')
+      return emBranco
+    }
 
     for (let posicao = 0; posicao < itens.length; posicao++) {
       if (deveParar()) return
-      const { tipo, nomeArvore, arquivo } = itens[posicao]
+      const { tipo, nomeArvore, arquivo, emBranco: existente } = itens[posicao]
       aoAvancar(posicao)
+      if (existente) {
+        await alterarExterno(existente, { tipo, nomeArvore, arquivo }, formularioDoExterno, regras, sicaf)
+        incluidos.push(tipo)
+        continue
+      }
+      if (!paginaEmBranco) paginaEmBranco = await abrirExternoNovo()
       // 1º: escolher o tipo (trocarSerie() do SEI), sempre a partir do formulário em branco.
       const emBranco = formularioDoExterno(paginaEmBranco)
       const lista = emBranco.querySelector('#selSerie')
@@ -111,6 +123,27 @@
       if (formularioDoExterno(pagina)) throw new Error(regras.mensagemDoSei(pagina.html) || `O SEI não salvou o documento "${tipo}".`)
       incluidos.push(tipo)
     }
+  }
+
+  // v0.16.0: documento externo em branco que já está na árvore (Sicaf, Consulta, Anexo): abre "Alterar
+  // Documento Externo" e salva só com o nome na árvore e o arquivo; o resto fica como está. Consulta em
+  // branco sem nome nem arquivo: nada a mudar.
+  async function alterarExterno (existente, { tipo, nomeArvore, arquivo }, formularioDoExterno, regras, sicaf) {
+    if (!nomeArvore && !arquivo) return
+    const pagina = await pedir(existente.linkAlterar)
+    const paginaLida = lerHtml(pagina.html)
+    const formulario = paginaLida.getElementById('frmDocumentoCadastro')
+    if (!formulario) throw new Error(`O SEI não abriu o ${tipo} em branco (${existente.sei}) para alterar.`)
+    const novos = { hdnFlagDocumentoCadastro: '2' }
+    if (nomeArvore) novos.txtNomeArvore = nomeArvore
+    if (arquivo) {
+      const linha = await enviarArquivo(paginaLida, pagina, arquivo, sicaf)
+      const campo = formulario.querySelector('#hdnAnexos')
+      const atual = campo ? campo.getAttribute('value') || '' : ''
+      novos.hdnAnexos = atual ? atual + '¥' + linha : linha
+    }
+    const resposta = await enviar(formulario, pagina.endereco, novos)
+    if (formularioDoExterno(resposta)) throw new Error(regras.mensagemDoSei(resposta.html) || `O SEI não salvou o ${tipo} ${existente.sei}.`)
   }
 
   // v0.14.0: arquivo do documento externo, como o "Anexar Arquivo..." do SEI (formulário frmAnexos, que o

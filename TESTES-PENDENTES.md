@@ -248,3 +248,11 @@ E: Volta do SICAF com o PDF e a janela mostra só "Sicaf <empresa>"; depois de i
 ### T62 – Desligada (v0.15.0)
 F: Nas configurações, deixe "SICAF da nota fiscal" em "Desligada"; no SEI, selecione um CNPJ e abra um processo com nota sem SICAF na CGOC.
 E: Não aparece o botão "Buscar SICAF", nem o aviso de notas sem SICAF, nem "Incluir SICAF".
+
+## SICAF automático: só na CGOC e documentos em branco (v0.16.0)
+### T63 – Preencher Sicaf, Consulta e Anexo em branco (v0.16.0) (Crítico)
+F: Num processo com nota sem SICAF, clique antes em "Incluir Sicaf, Consulta e Anexo" (cria os três em branco); depois faça o T55 e, na janela, clique em "Incluir no processo".
+E: A janela diz "no Sicaf em branco …", "já existe em branco" e "no Anexo em branco …"; depois, a árvore mostra os mesmos três documentos (sem novos), o Sicaf com o nome da empresa e o PDF, o Anexo com o nome da nota.
+### T64 – Buscar SICAF fora da CGOC com Automática (v0.16.0)
+F: Com "SICAF da nota fiscal" em Automática, numa unidade que não é a CGOC, selecione um CNPJ num documento; depois clique com o botão direito > "Buscar SICAF deste CNPJ".
+E: O botão "Buscar SICAF" não aparece; o menu abre uma janela dizendo para escolher "Sempre ligada" nas configurações.

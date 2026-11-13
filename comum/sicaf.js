@@ -382,6 +382,19 @@
     return itens
   }
 
+  // v0.16.0 (decidido em 13/11/2026): Sicaf, Consulta e Anexo em branco depois da última Folha (criados pelo
+  // botão "Incluir Sicaf, Consulta e Anexo") são aproveitados, na ordem da árvore, em vez de criar outros.
+  // Só os que ainda não têm nome ("Sicaf (3385629)"): um em branco já nomeado é de outra nota.
+  function aproveitarEmBranco (itens, documentos) {
+    const livres = trechoPendente(documentos).filter(doc => !doc.temArquivo && !doc.feitoNoSei && doc.linkAlterar && /^(Sicaf|Consulta|Anexo)\s*\(?\d+\)?$/i.test(String(doc.rotulo || '').trim()))
+    return itens.map(item => {
+      const posicao = livres.findIndex(doc => tipoNaArvore(doc.rotulo) === item.tipo.toLowerCase())
+      if (posicao < 0) return item
+      const [doc] = livres.splice(posicao, 1)
+      return { ...item, emBranco: { id: doc.id, sei: numeroSei(doc.rotulo), linkAlterar: doc.linkAlterar } }
+    })
+  }
+
   // Envio do arquivo ao SEI ("Anexar Arquivo..."): o SEI responde "nome_upload#nome#tipo#tamanho#data_hora#"
   // (InfraUpload.js do SEI 5.0.4) ou "ERRO#mensagem".
   function lerRespostaDoUpload (texto) {
@@ -421,7 +434,7 @@
     tipoNaArvore, numeroSei, lerRotuloDaNota, trechoPendente, lerAteste, situacaoDoProcesso, textoDoAviso,
     cnpjsDaNota, notaSemTexto, empenhosDoTexto, nomeNoTexto, conferirNota, agruparPorFornecedor,
     URL_CONSULTA_SICAF, URL_LOGIN_COMPRAS, ORIGENS_COMPRAS, paginaDoCompras, nomeDoArquivo, lerLinhaDoResultado, lerPdfDoSicaf, paraBase64, deBase64,
-    nomeNaArvore, nomeDoSicaf, nomeDoAnexo, documentosParaIncluir, lerRespostaDoUpload, lerUsuarioDoUpload, formatarTamanho, linhaDoAnexo
+    nomeNaArvore, nomeDoSicaf, nomeDoAnexo, documentosParaIncluir, aproveitarEmBranco, lerRespostaDoUpload, lerUsuarioDoUpload, formatarTamanho, linhaDoAnexo
   }
   if (typeof module !== 'undefined' && module.exports) module.exports = api
   else raiz.ExtensaoIFTO = Object.assign(raiz.ExtensaoIFTO || {}, { sicaf: api })

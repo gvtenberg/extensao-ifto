@@ -29,8 +29,16 @@
       return
     }
     if (recado.tipo !== 'sicafCnpj') return
-    if (opcoes.incluirSicaf === 'desligada') { responder({ recebido: false }); return }
     responder({ recebido: true })
+    // v0.16.0 (decidido em 13/11/2026): "Automática" = só na CGOC; nas outras unidades, "Sempre ligada".
+    if (!regras.funcaoLigada(opcoes.incluirSicaf, unidade)) {
+      janela.abrir({
+        titulo: 'Buscar SICAF',
+        conteudo: [criar('p', { textContent: 'Nesta unidade a busca do SICAF está desligada. Para usar, abra as configurações da extensão e, em "SICAF da nota fiscal", escolha "Sempre ligada".' })],
+        botoes: [{ texto: 'Fechar', tipo: 'principal', aoClicar: j => j.fechar() }]
+      })
+      return
+    }
     janelaDoCnpj(recado.cnpj ? regras.formatarCnpj(recado.cnpj) : recado.texto || '')
   })
 
@@ -145,7 +153,8 @@
       } catch (erro) {}
     }
     for (const fornecedor of fornecedores) fornecedor.temPdf = Boolean(fornecedor.bytes)
-    const itens = regras.documentosParaIncluir(fornecedores, { soSicaf: !cgoc })
+    // v0.16.0: Sicaf, Consulta e Anexo em branco depois da última Folha são preenchidos em vez de criar outros.
+    const itens = regras.aproveitarEmBranco(regras.documentosParaIncluir(fornecedores, { soSicaf: !cgoc }), lida ? lida.documentos : [])
     for (const item of itens) {
       if (item.tipo !== 'Sicaf') continue
       const fornecedor = fornecedores.find(outro => outro.cnpj === item.cnpj)
@@ -159,7 +168,7 @@
         fornecedor.erro ? criar('p', { className: 'aviso vermelho', textContent: fornecedor.erro }) : criar('p', {}, ['PDF do SICAF obtido (também na pasta Downloads). ', linkDoPdf(fornecedor)]),
         ...fornecedor.avisos.map(aviso => criar('p', { className: 'aviso ' + aviso.nivel, textContent: aviso.texto })),
         doFornecedor.length ? criar('p', { className: 'apoio', textContent: 'Será incluído:' }) : null,
-        doFornecedor.length ? criar('ul', {}, doFornecedor.map(item => criar('li', { textContent: nomeDoItem(item) + (item.arquivo ? ' (com o PDF)' : '') }))) : null
+        doFornecedor.length ? criar('ul', {}, doFornecedor.map(item => criar('li', { textContent: nomeDoItem(item) + (item.arquivo ? ' (com o PDF)' : '') + (item.emBranco ? (item.nomeArvore || item.arquivo ? ` – no ${item.tipo} em branco ${item.emBranco.sei}` : ` – já existe em branco (${item.emBranco.sei})`) : '') }))) : null
       ])
     })
     const botoesDeFechar = [{ texto: 'Fechar', tipo: 'principal', aoClicar: j => j.fechar() }]
