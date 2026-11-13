@@ -42,6 +42,9 @@ h1 { font-size: 17px; font-weight: 600; margin: 0 0 4px; }
   cursor: pointer;
 }
 .botao.principal { background: var(--marca); border-color: var(--marca); color: #fff; }
+/* v0.9.1: link com cara de botão (instalar a atualização) e link pequeno de apoio. */
+a.botao:not([hidden]) { display: flex; align-items: center; justify-content: center; text-decoration: none; }
+.link-discreto { font-size: 0.85em; color: var(--texto); text-align: center; }
 
 .opcao { display: flex; gap: 12px; align-items: flex-start; min-height: 44px; padding: 8px 0; cursor: pointer; }
 .opcao input { width: 18px; height: 18px; margin-top: 2px; accent-color: var(--marca); }

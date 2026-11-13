@@ -31,6 +31,7 @@
   }
   const avisoAtualizacao = document.getElementById('atualizacao')
   const botaoInstalar = document.getElementById('instalar-atualizacao')
+  const linkPagina = document.getElementById('pagina-atualizacao')
 
   function avisar (tipo, texto) {
     avisoAtualizacao.hidden = false
@@ -41,6 +42,7 @@
   botaoProcurar.addEventListener('click', async () => {
     botaoProcurar.disabled = true
     botaoInstalar.hidden = true
+    linkPagina.hidden = true
     avisar('pendencia', 'Procurando atualização…')
     try {
       const resposta = await fetch(atualizacao.ENDERECO_ULTIMA_RELEASE, { cache: 'no-store' })
@@ -48,15 +50,16 @@
       if (!release) {
         avisar('pendencia', 'Ainda não há versão para instalar. Tente de novo mais tarde.')
       } else if (atualizacao.compararVersoes(release.versao, versaoInstalada) > 0) {
-        botaoInstalar.textContent = `Instalar a versão ${release.versao}`
-        botaoInstalar.hidden = false
-        // v0.4.2: abre a página da versão; o clique da pessoa no arquivo faz o Firefox mostrar a instalação.
+        // v0.9.1: o botão é um link direto para o arquivo da versão: o clique da própria pessoa faz o Firefox
+        // pedir "Permitir" e "Adicionar", sem passar pela página do GitHub. A página fica como reserva.
+        // O Firefox também procura sozinho cerca de uma vez por dia e instala sem perguntar.
         // As configurações e a lista de assinaturas são mantidas.
-        botaoInstalar.onclick = () => {
-          navegador.tabs.create({ url: release.pagina })
-          window.close()
-        }
-        avisar('sucesso', `Versão ${release.versao} disponível (instalada: ${versaoInstalada}). Clique em "Instalar", depois, na página que abrir, clique em "${release.arquivo}" e em "Adicionar". Outro jeito: menu do Firefox ☰ > Extensões e temas > engrenagem ⚙ > Procurar atualizações.`)
+        botaoInstalar.textContent = `Instalar a versão ${release.versao}`
+        botaoInstalar.href = release.link
+        botaoInstalar.hidden = false
+        linkPagina.href = release.pagina
+        linkPagina.hidden = false
+        avisar('sucesso', `Versão ${release.versao} disponível (você tem a ${versaoInstalada}). O Firefox instala sozinho em até um dia. Para instalar agora: clique em "Instalar a versão ${release.versao}", depois em "Permitir" e em "Adicionar".`)
       } else {
         avisar('sucesso', `Você já tem a versão mais nova (${versaoInstalada}).`)
       }
