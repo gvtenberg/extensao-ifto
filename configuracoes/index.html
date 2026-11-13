@@ -79,10 +79,10 @@
         <input type="radio" name="incluirSicaf" value="desligada">
         <span>Desligada</span>
       </label>
-      <!-- v0.13.0: acesso ao Compras.gov.br e a Downloads, pedido só a quem usa o SICAF. -->
-      <p class="apoio">Para buscar no SICAF, a extensão precisa abrir o Compras.gov.br e salvar o PDF na pasta Downloads. O navegador pede essa permissão uma vez.</p>
-      <button type="button" class="botao principal" id="permitirSicaf">Permitir acesso ao Compras.gov.br</button>
-      <div class="aviso sucesso" id="sicafPermitido" hidden>Acesso ao Compras.gov.br permitido.</div>
+      <!-- v0.13.0: acesso ao Compras.gov.br e a Downloads, pedido só a quem usa o SICAF. v0.17.2: e ao Simples Nacional. -->
+      <p class="apoio">Para buscar no SICAF e consultar o Simples Nacional, a extensão precisa abrir o Compras.gov.br e o site do Simples Nacional e salvar os PDFs na pasta Downloads. O navegador pede essa permissão uma vez.</p>
+      <button type="button" class="botao principal" id="permitirSicaf">Permitir acesso ao Compras.gov.br e ao Simples Nacional</button>
+      <div class="aviso sucesso" id="sicafPermitido" hidden>Acesso ao Compras.gov.br e ao Simples Nacional permitido.</div>
     </section>
     <div class="aviso sucesso" id="gravado" hidden>Configuração gravada.</div>
     <!-- v0.9.4: onde informar erros e pedir melhorias (o mesmo texto do README). -->
@@ -96,6 +96,7 @@
   <script src="../comum/configuracoes.js"></script>
   <script src="../comum/sei.js"></script>
   <script src="../comum/sicaf.js"></script>
+  <script src="../comum/simples-nacional.js"></script>
   <script src="index.js"></script>
 </body>
 </html>

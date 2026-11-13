@@ -267,3 +267,12 @@ E: O PDF mostra os mesmos dados da página do Simples Nacional (com acentos) e a
 ### T66 – Abrir a página da versão mais nova (v0.17.1)
 F: Clique no ícone da extensão e em "Abrir a página da versão mais nova".
 E: A janela não tem mais "Procurar atualização" nem link embaixo; abre uma aba com a página da versão mais nova, com o arquivo .xpi (Firefox) e .zip (Chrome).
+
+## Consulta do Simples Nacional no site (v0.17.2)
+> Nas configurações, clique de novo em "Permitir acesso ao Compras.gov.br e ao Simples Nacional" e confirme.
+### T67 – Consulta automática no Simples Nacional (v0.17.2) (Crítico)
+F: Num processo com nota sem SICAF (de preferência duas empresas, uma delas filial), clique em "Buscar" e siga até o fim do SICAF; deixe a aba seguir para o Simples Nacional e, se pedir a verificação de imagens, resolva.
+E: A aba consulta cada CNPJ sozinha, abre "Mais informações" e volta ao SEI no fim; na pasta Downloads aparece um "ConsultaOptantes_<CNPJ>_<data>.pdf" por empresa, com o texto da consulta. Comente: quantas vezes a verificação apareceu e se a filial deu certo.
+### T68 – Consulta com SICAF já buscado hoje (v0.17.2)
+F: Repita o "Buscar" no mesmo processo no mesmo dia.
+E: Não abre o SICAF nem o Simples Nacional de novo (os PDFs de hoje já servem).

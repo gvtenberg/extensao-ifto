@@ -8,6 +8,10 @@
   // Formulário da consulta (a extensão abre direto, sem o quadro do Portal do Simples Nacional).
   const URL_CONSULTA_SIMPLES = 'https://consopt.www8.receita.fazenda.gov.br/consultaoptantes'
   const ORIGENS_SIMPLES = Object.freeze(['*://consopt.www8.receita.fazenda.gov.br/*'])
+  // v0.17.2: página do site da consulta (formulário ou resultado).
+  function ehSiteDoSimples (endereco) {
+    try { return new URL(endereco).hostname === 'consopt.www8.receita.fazenda.gov.br' } catch (erro) { return false }
+  }
 
   // Marcas do negrito no meio do texto (o valor em verde e o <strong> da página).
   const INICIO_NEGRITO = '\u0001'
@@ -109,7 +113,7 @@
   // Decisão D6: "Consulta Simples Nacional <Nome Empresarial>" (o tipo "Consulta" não entra nas 50 letras).
   const nomeDaConsulta = nome => nomeNaArvore(`Simples Nacional ${String(nome || '').replace(/\.\s*$/, '')}`)
 
-  const api = { URL_CONSULTA_SIMPLES, ORIGENS_SIMPLES, lerLinhas, lerResultado, maisInformacoesCarregadas, linhaDaFonte, paragrafosDoPdf, nomeDoArquivo, nomeDaConsulta }
+  const api = { URL_CONSULTA_SIMPLES, ORIGENS_SIMPLES, ehSiteDoSimples, lerLinhas, lerResultado, maisInformacoesCarregadas, linhaDaFonte, paragrafosDoPdf, nomeDoArquivo, nomeDaConsulta }
   if (ehNode) module.exports = api
   else raiz.ExtensaoIFTO = Object.assign(raiz.ExtensaoIFTO || {}, { simplesNacional: api })
 })(globalThis)

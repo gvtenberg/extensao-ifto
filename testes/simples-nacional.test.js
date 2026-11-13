@@ -135,3 +135,11 @@ test('página guardada do Simples Nacional: PDF de exemplo (se existir no comput
   fs.writeFileSync(path.join(PASTA, 'exemplo-' + simples.nomeDoArquivo(r.cnpj, new Date(2026, 10, 13))), bytes)
   assert.ok((await textoDoPdf(bytes)).saida.includes('14.159.957/0001-90'))
 })
+
+// v0.17.2: etapa 2 (consulta no site).
+test('ehSiteDoSimples: só o site da consulta', () => {
+  assert.equal(simples.ehSiteDoSimples('https://consopt.www8.receita.fazenda.gov.br/consultaoptantes'), true)
+  assert.equal(simples.ehSiteDoSimples('https://consopt.www8.receita.fazenda.gov.br/consultaoptantes/Home/ConsultarCnpj'), true)
+  assert.equal(simples.ehSiteDoSimples('https://www8.receita.fazenda.gov.br/simplesnacional/aplicacoes.aspx?id=21'), false)
+  assert.equal(simples.ehSiteDoSimples('não é endereço'), false)
+})

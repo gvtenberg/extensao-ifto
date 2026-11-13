@@ -3,12 +3,14 @@
 // navegador, onde a extensão não entra na página) e recado do CNPJ escolhido para a página do SEI.
 // v0.13.0: busca no SICAF: abre a aba do SICAF, ajuda no login do Compras.gov.br, pesquisa cada CNPJ,
 // guarda o PDF (Downloads e memória do dia) e devolve os PDFs para a aba do SEI.
+// v0.17.2: depois do SICAF, a mesma aba consulta o Simples Nacional de cada fornecedor (spec consulta-simples).
 /* global importScripts */
-if (typeof importScripts === 'function' && !(globalThis.ExtensaoIFTO && globalThis.ExtensaoIFTO.sicaf)) {
-  importScripts('/comum/sei.js', '/comum/sicaf.js')
+if (typeof importScripts === 'function' && !(globalThis.ExtensaoIFTO && globalThis.ExtensaoIFTO.simplesNacional)) {
+  importScripts('/comum/sei.js', '/comum/sicaf.js', '/comum/simples-nacional.js')
 }
 const navegador = globalThis.browser || globalThis.chrome
 const regras = globalThis.ExtensaoIFTO.sicaf
+const simples = globalThis.ExtensaoIFTO.simplesNacional
 const MENU = 'buscar-sicaf'
 const SEI = '*://sei.ifto.edu.br/*'
 // Páginas do SEI onde a extensão entra (as outras não respondem).
@@ -50,6 +52,9 @@ function tratarRecado (recado, remetente) {
     case 'sicafQualCnpj': return qualCnpj(aba)
     case 'sicafPesquisei': return marcarPesquisa(recado.cnpj)
     case 'sicafPdf': return receberPdf(recado, aba)
+    case 'simplesQualCnpj': return simplesQualCnpj(aba)
+    case 'simplesPesquisei': return simplesPesquisei(recado.cnpj)
+    case 'simplesResultado': return receberSimples(recado, aba)
   }
 }
 
@@ -80,7 +85,8 @@ async function entregar (idDaAba, recado) {
 // ---------- Busca no SICAF (v0.13.0) ----------
 const CHAVE_TAREFA = 'sicafTarefa'
 const CHAVE_PDFS = 'sicafPdfs'
-const temPermissao = () => navegador.permissions.contains({ origins: [...regras.ORIGENS_COMPRAS], permissions: ['downloads'] })
+const CHAVE_SIMPLES = 'simplesPdfs'
+const temPermissao = () => navegador.permissions.contains({ origins: [...regras.ORIGENS_COMPRAS, ...simples.ORIGENS_SIMPLES], permissions: ['downloads'] })
 const hoje = () => new Date().toLocaleDateString('sv-SE')
 
 async function lerTarefa () {
@@ -102,21 +108,35 @@ async function iniciarBusca (cnpjs, abaSei) {
   const pedidos = [...new Set(cnpjs.filter(regras.cnpjValido))]
   const pdfs = await lerPdfsDeHoje()
   const faltam = pedidos.filter(cnpj => !pdfs[cnpj])
-  const tarefa = { idAbaSei: abaSei.id, pedidos, faltam, posicao: 0, pesquisado: false, erros: {}, idAbaSicaf: null, voltasDoLogin: 0 }
-  if (!faltam.length) { await terminar(tarefa); return { ok: true, jaTinha: true } }
-  const aba = await navegador.tabs.create({ url: regras.URL_CONSULTA_SICAF, windowId: abaSei.windowId, index: abaSei.index + 1, active: true })
+  const consultas = await lerSimplesDeHoje()
+  const simplesFaltam = pedidos.filter(cnpj => !consultas[cnpj])
+  const tarefa = {
+    idAbaSei: abaSei.id, pedidos, faltam, posicao: 0, pesquisado: false, erros: {}, idAbaSicaf: null, voltasDoLogin: 0,
+    // v0.17.2: Simples Nacional depois do SICAF ("fase"), com a matriz quando o site recusa a filial (D7).
+    fase: faltam.length ? 'sicaf' : 'simples', simplesFaltam, simplesPosicao: 0, simplesPesquisado: false, simplesMatriz: false, simplesErros: {}
+  }
+  if (!faltam.length && !simplesFaltam.length) { await terminar(tarefa); return { ok: true, jaTinha: true } }
+  const endereco = tarefa.fase === 'sicaf' ? regras.URL_CONSULTA_SICAF : simples.URL_CONSULTA_SIMPLES
+  const aba = await navegador.tabs.create({ url: endereco, windowId: abaSei.windowId, index: abaSei.index + 1, active: true })
   tarefa.idAbaSicaf = aba.id
   await gravarTarefa(tarefa)
-  return { ok: true, faltam: faltam.length }
+  return { ok: true, faltam: faltam.length + simplesFaltam.length }
 }
 
 // Cada página do Compras/SICAF que termina de abrir na aba da busca (ou SICAF aberto pelo menu).
 navegador.tabs.onUpdated.addListener(async (idDaAba, mudanca, aba) => {
   if (mudanca.status !== 'complete' || !aba.url) return
+  if (simples.ehSiteDoSimples(aba.url)) {
+    const tarefa = await lerTarefa()
+    if (tarefa && tarefa.fase === 'simples' && idDaAba === tarefa.idAbaSicaf) {
+      await injetar(idDaAba, ['comum/sei.js', 'comum/sicaf.js', 'comum/simples-nacional.js', 'comum/pdf-texto.js', 'sites/simples-nacional/consulta.js'])
+    }
+    return
+  }
   const pagina = regras.paginaDoCompras(aba.url)
   if (!pagina) return
   const tarefa = await lerTarefa()
-  if (!tarefa) return
+  if (!tarefa || tarefa.fase === 'simples') return
   if (idDaAba !== tarefa.idAbaSicaf) {
     if (pagina !== 'consulta' && pagina !== 'sicaf') return
     tarefa.idAbaSicaf = idDaAba
@@ -185,6 +205,68 @@ async function receberPdf (recado, aba) {
     await gravarTarefa(tarefa)
     return { proximo: true }
   }
+  await irParaOSimples(tarefa, aba.id)
+  return { fim: true }
+}
+
+// ---------- Consulta do Simples Nacional (v0.17.2) ----------
+async function lerSimplesDeHoje () {
+  const { [CHAVE_SIMPLES]: consultas = {} } = await navegador.storage.local.get(CHAVE_SIMPLES)
+  return Object.fromEntries(Object.entries(consultas).filter(([, consulta]) => consulta.data === hoje()))
+}
+// Fim do SICAF: a mesma aba abre a consulta do Simples Nacional (ou termina, se não falta nenhuma).
+async function irParaOSimples (tarefa, idDaAba) {
+  if (!tarefa.simplesFaltam || !tarefa.simplesFaltam.length) return terminar(tarefa)
+  tarefa.fase = 'simples'
+  await gravarTarefa(tarefa)
+  try { await navegador.tabs.update(idDaAba, { url: simples.URL_CONSULTA_SIMPLES }) } catch (erro) { await terminar(tarefa) }
+}
+// A página do Simples Nacional pergunta qual CNPJ digitar: o da nota ou, se o site recusou, o da matriz.
+async function simplesQualCnpj (aba) {
+  const tarefa = await lerTarefa()
+  if (!tarefa || tarefa.fase !== 'simples' || !aba || aba.id !== tarefa.idAbaSicaf || tarefa.simplesPosicao >= tarefa.simplesFaltam.length) return { fim: true }
+  const fornecedor = tarefa.simplesFaltam[tarefa.simplesPosicao]
+  return {
+    cnpj: tarefa.simplesMatriz ? regras.cnpjMatriz(fornecedor) : fornecedor,
+    fornecedor,
+    pesquisado: tarefa.simplesPesquisado,
+    posicao: tarefa.simplesPosicao,
+    total: tarefa.simplesFaltam.length
+  }
+}
+async function simplesPesquisei (cnpj) {
+  const tarefa = await lerTarefa()
+  if (!tarefa || tarefa.fase !== 'simples') return { ok: false }
+  tarefa.simplesPesquisado = true
+  await gravarTarefa(tarefa)
+  return { ok: true }
+}
+// PDF (ou erro) de um fornecedor. Filial recusada: tenta a matriz uma vez (D7).
+async function receberSimples (recado, aba) {
+  const tarefa = await lerTarefa()
+  if (!tarefa || tarefa.fase !== 'simples' || !aba || aba.id !== tarefa.idAbaSicaf || tarefa.simplesFaltam[tarefa.simplesPosicao] !== recado.fornecedor) return { fim: true }
+  tarefa.simplesPesquisado = false
+  const matriz = regras.cnpjMatriz(recado.fornecedor)
+  if (recado.recusado && !tarefa.simplesMatriz && matriz !== recado.fornecedor) {
+    tarefa.simplesMatriz = true
+    await gravarTarefa(tarefa)
+    return { repetir: true }
+  }
+  if (recado.arquivo) {
+    const consultas = await lerSimplesDeHoje()
+    const nomeDoArquivo = simples.nomeDoArquivo(recado.fornecedor)
+    consultas[recado.fornecedor] = { data: hoje(), nome: recado.nome || '', situacao: recado.situacao || '', cnpjConsultado: recado.cnpj, arquivo: recado.arquivo, nomeDoArquivo }
+    await navegador.storage.local.set({ [CHAVE_SIMPLES]: consultas })
+    await salvarEmDownloads(recado.arquivo, nomeDoArquivo)
+  } else {
+    tarefa.simplesErros[recado.fornecedor] = recado.erro || 'O Simples Nacional não respondeu.'
+  }
+  tarefa.simplesPosicao++
+  tarefa.simplesMatriz = false
+  if (tarefa.simplesPosicao < tarefa.simplesFaltam.length) {
+    await gravarTarefa(tarefa)
+    return { proximo: true }
+  }
   await terminar(tarefa)
   return { fim: true }
 }
@@ -205,9 +287,17 @@ async function salvarEmDownloads (base64, nomeDoArquivo) {
 async function terminar (tarefa) {
   await gravarTarefa(null)
   const pdfs = await lerPdfsDeHoje()
-  const resultados = tarefa.pedidos.map(cnpj => pdfs[cnpj]
-    ? { cnpj, nome: pdfs[cnpj].nome, arquivo: pdfs[cnpj].arquivo, nomeDoArquivo: pdfs[cnpj].nomeDoArquivo }
-    : { cnpj, erro: tarefa.erros[cnpj] || 'O SICAF não devolveu o PDF.' })
+  const consultas = await lerSimplesDeHoje()
+  const errosDoSimples = tarefa.simplesErros || {}
+  // v0.17.2: cada resultado leva também a consulta do Simples Nacional (usada no SEI na etapa 3).
+  const resultados = tarefa.pedidos.map(cnpj => ({
+    ...(pdfs[cnpj]
+      ? { cnpj, nome: pdfs[cnpj].nome, arquivo: pdfs[cnpj].arquivo, nomeDoArquivo: pdfs[cnpj].nomeDoArquivo }
+      : { cnpj, erro: tarefa.erros[cnpj] || 'O SICAF não devolveu o PDF.' }),
+    simples: consultas[cnpj]
+      ? { nome: consultas[cnpj].nome, situacao: consultas[cnpj].situacao, arquivo: consultas[cnpj].arquivo, nomeDoArquivo: consultas[cnpj].nomeDoArquivo }
+      : { erro: errosDoSimples[cnpj] || 'A consulta do Simples Nacional não foi feita.' }
+  }))
   if (!await entregar(tarefa.idAbaSei, { tipo: 'sicafPronto', resultados })) return
   try {
     const aba = await navegador.tabs.update(tarefa.idAbaSei, { active: true })
