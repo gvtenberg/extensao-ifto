@@ -23,3 +23,21 @@ test('chave de acesso da Mozilla (JWT HS256) válida por 60 s', () => {
   assert.equal(dados.exp - dados.iat, 60)
   assert.equal(assinatura, crypto.createHmac('sha256', 'segredo').update(cabecalho + '.' + corpo).digest('base64url'))
 })
+
+// v0.9.4: queda de conexão ("fetch failed") ou Mozilla ocupada não derruba a publicação: tenta de novo.
+test('tenta de novo quando a conexão cai ou a Mozilla está ocupada', async () => {
+  const original = globalThis.fetch
+  const respostas = [() => { throw new TypeError('fetch failed') }, () => ({ ok: false, status: 503 }), () => ({ ok: true, status: 200 })]
+  globalThis.fetch = async () => respostas.shift()()
+  const chaves = { emissor: 'user:1', segredo: 's' }
+  try {
+    const { pedir } = require('../.github/scripts/baixar-assinada.js')
+    assert.equal((await pedir('https://x', chaves, 5, 0)).status, 200)
+    globalThis.fetch = async () => ({ ok: false, status: 401 })
+    await assert.rejects(pedir('https://x', chaves, 5, 0), /respondeu 401/)
+    globalThis.fetch = async () => { throw new TypeError('fetch failed') }
+    await assert.rejects(pedir('https://x', chaves, 3, 0), /3 tentativas/)
+  } finally {
+    globalThis.fetch = original
+  }
+})

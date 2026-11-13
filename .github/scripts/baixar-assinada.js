@@ -1,6 +1,7 @@
-// Para o GitHub Actions (assinar.yml): quando a Mozilla responde "Version X already exists" (a versão já foi
-// enviada antes, por exemplo numa execução cancelada), baixa da Mozilla o .xpi já assinado dessa versão, em vez
-// de falhar. Se a Mozilla ainda estiver assinando, espera (até 30 minutos).
+// Para o GitHub Actions (assinar.yml): quando o web-ext sign falha depois de enviar a versão ("Version X already
+// exists", execução cancelada ou, v0.9.4, queda de conexão "fetch failed" enquanto esperava a aprovação), baixa da
+// Mozilla o .xpi já assinado dessa versão, em vez de falhar. Se a Mozilla ainda estiver assinando, espera (até 30 min).
+// Saída 2: a Mozilla não tem a versão (o envio não chegou lá); o assinar.yml então tenta enviar de novo.
 //   node .github/scripts/baixar-assinada.js 0.9.1
 // Chaves: WEB_EXT_API_KEY e WEB_EXT_API_SECRET (as mesmas do web-ext sign).
 const crypto = require('node:crypto')
@@ -26,10 +27,27 @@ function acharVersao (lista, versao) {
   return { assinada: arquivo.status === 'public', status: arquivo.status || 'desconhecido', link: arquivo.url || null }
 }
 
-async function pedir (endereco, chaves) {
-  const resposta = await fetch(endereco, { headers: { Authorization: 'JWT ' + criarJwt(chaves.emissor, chaves.segredo) } })
-  if (!resposta.ok) throw new Error(`Mozilla respondeu ${resposta.status} em ${endereco}`)
-  return resposta
+// v0.9.4: queda de conexão ou Mozilla ocupada (429, 5xx) é passageira: tenta de novo antes de desistir.
+function valeRepetir (status) {
+  return status === 429 || status >= 500
+}
+
+async function pedir (endereco, chaves, tentativas = 5, pausa = 15 * 1000) {
+  for (let tentativa = 1; ; tentativa++) {
+    let motivo
+    try {
+      const resposta = await fetch(endereco, { headers: { Authorization: 'JWT ' + criarJwt(chaves.emissor, chaves.segredo) } })
+      if (resposta.ok) return resposta
+      if (!valeRepetir(resposta.status)) throw new Error(`Mozilla respondeu ${resposta.status} em ${endereco}`)
+      motivo = `resposta ${resposta.status}`
+    } catch (erro) {
+      if (erro.message.startsWith('Mozilla respondeu')) throw erro
+      motivo = erro.message
+    }
+    if (tentativa >= tentativas) throw new Error(`Sem resposta da Mozilla depois de ${tentativas} tentativas (${motivo}).`)
+    console.log(`Falha passageira ao falar com a Mozilla (${motivo}); nova tentativa em ${pausa / 1000} s.`)
+    await new Promise(resolve => setTimeout(resolve, pausa))
+  }
 }
 
 async function procurar (id, versao, chaves) {
@@ -51,7 +69,10 @@ async function principal () {
   const inicio = Date.now()
   for (;;) {
     const achada = await procurar(id, versao, chaves)
-    if (!achada) throw new Error(`A Mozilla diz que a versão ${versao} existe, mas ela não aparece na lista.`)
+    if (!achada) {
+      console.error(`A Mozilla não tem a versão ${versao}: o envio não chegou lá.`)
+      process.exit(2)
+    }
     if (achada.assinada && achada.link) {
       const destino = path.join('web-ext-artifacts', `extensao-ifto-${versao}.xpi`)
       fs.mkdirSync('web-ext-artifacts', { recursive: true })
@@ -67,4 +88,4 @@ async function principal () {
 }
 
 if (require.main === module) principal().catch(erro => { console.error(erro.message); process.exit(1) })
-module.exports = { criarJwt, acharVersao }
+module.exports = { criarJwt, acharVersao, pedir }

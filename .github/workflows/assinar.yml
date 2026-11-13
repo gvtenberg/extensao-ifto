@@ -30,7 +30,7 @@ jobs:
   assinar:
     # Versão fixa do Ubuntu: a troca do ubuntu-latest não muda nada sem aviso
     runs-on: ubuntu-24.04
-    timeout-minutes: 45
+    timeout-minutes: 90 # v0.9.4: espera da aprovação (até 30 min) + download da versão já assinada (até 30 min)
     steps:
       - name: Baixar o código
         uses: actions/checkout@v5
@@ -64,28 +64,32 @@ jobs:
             echo "ja_existe=sim" >> "$GITHUB_OUTPUT"
           fi
 
-      # "Version X already exists": a versão já foi enviada antes (por exemplo, numa execução cancelada
-      # enquanto a Mozilla assinava). Em vez de falhar, baixa da Mozilla o .xpi já assinado dessa versão.
+      # Se o envio falhar por qualquer motivo (v0.9.4: "fetch failed" = queda de conexão enquanto esperava a
+      # aprovação; "Version X already exists" = execução anterior cancelada), não desiste: se a Mozilla já tem a
+      # versão, baixa de lá o .xpi assinado (esperando a assinatura, com novas tentativas se a conexão cair);
+      # se não tem (saída 2), envia de novo, até 3 vezes.
       - name: Assinar na Mozilla (não listada)
         if: github.event_name != 'pull_request' && steps.versao.outputs.ja_existe != 'sim'
         env:
           WEB_EXT_API_KEY: ${{ secrets.AMO_JWT_ISSUER }}
           WEB_EXT_API_SECRET: ${{ secrets.AMO_JWT_SECRET }}
+          VERSAO: ${{ steps.versao.outputs.versao }}
         run: |
           set +e
-          npx web-ext sign --channel unlisted --approval-timeout 1800000 \
-            --ignore-files "testes/**" "docs/**" "ferramentas-de-teste/**" ".github/**" "scripts/**" \
-            package.json package-lock.json CLAUDE.md TESTES-PENDENTES.md 2>&1 | tee "$RUNNER_TEMP/assinar.log"
-          RESULTADO=${PIPESTATUS[0]}
-          set -e
-          if [ "$RESULTADO" -ne 0 ]; then
-            if grep -q "already exists" "$RUNNER_TEMP/assinar.log"; then
-              echo "A Mozilla já tem esta versão: baixando o arquivo já assinado."
-              node .github/scripts/baixar-assinada.js "${{ steps.versao.outputs.versao }}"
-            else
-              exit "$RESULTADO"
-            fi
-          fi
+          for TENTATIVA in 1 2 3; do
+            echo "Envio à Mozilla: tentativa $TENTATIVA de 3."
+            npx web-ext sign --channel unlisted --approval-timeout 1800000 \
+              --ignore-files "testes/**" "docs/**" "ferramentas-de-teste/**" ".github/**" "scripts/**" \
+              package.json package-lock.json CLAUDE.md TESTES-PENDENTES.md
+            [ $? -eq 0 ] && exit 0
+            echo "O envio falhou; vendo se a Mozilla já recebeu a versão $VERSAO."
+            node .github/scripts/baixar-assinada.js "$VERSAO"
+            RESULTADO=$?
+            [ $RESULTADO -eq 0 ] && exit 0
+            [ $RESULTADO -ne 2 ] && exit $RESULTADO
+            sleep 60
+          done
+          exit 1
 
       - name: Publicar o .xpi em Releases
         if: github.event_name != 'pull_request' && steps.versao.outputs.ja_existe != 'sim'
