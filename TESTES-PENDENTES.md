@@ -180,3 +180,9 @@ E: Na primeira forma, a lista tem 3 itens (3384598, 3384645, 3384674; o repetido
 F: Clique no ícone da extensão; se aparecer "Permitir no SEI", clique e confirme. Na Direção-geral, cole uma lista e clique em "Conferir e começar"; depois aperte F5.
 E: O processo abre e o painel da lista continua na tela, também depois de recarregar a página, sem precisar clicar no ícone da extensão.
 
+## Atualização pela página da versão (v0.9.7)
+
+### T46 – Atualizar pela página da versão (v0.9.7)
+F: Com uma versão nova pronta, clique no ícone da extensão > Procurar atualização > Abrir a página da versão…; na página, clique no arquivo que termina em .xpi > Permitir > Adicionar.
+E: Aparece só o botão "Abrir a página da versão…" (sem "Instalar a versão…"); a página abre numa nova aba e, depois de Adicionar, a janela do ícone mostra a versão nova.
+

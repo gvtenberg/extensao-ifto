@@ -82,10 +82,7 @@ Não apague a pasta descompactada: o navegador usa os arquivos dela enquanto a e
 
 ## Como atualizar
 
-**Firefox:** a atualização é automática (o Firefox verifica uma vez por dia). Para atualizar na hora, use um dos caminhos:
-
-- clique no ícone da extensão, em **Procurar atualização** e depois em **Instalar a versão …**; ou
-- no menu do Firefox (três traços, no canto superior direito), clique em **Extensões e temas**, na engrenagem e em **Procurar atualizações**.
+**Firefox:** clique no ícone da extensão e em **Procurar atualização**. Se houver versão nova, clique em **Abrir a página da versão …**; na página, clique no arquivo que termina em `.xpi`, depois em **Permitir** e em **Adicionar**.
 
 **Chrome e Edge:** baixe o novo arquivo `.zip`, descompacte-o **na mesma pasta** usada na instalação (substituindo os arquivos), abra `chrome://extensions` (ou `edge://extensions`) e clique na seta circular do cartão "Extensão IFTO Palmas".
 

@@ -47,7 +47,6 @@
     return
   }
   const avisoAtualizacao = document.getElementById('atualizacao')
-  const botaoInstalar = document.getElementById('instalar-atualizacao')
   const linkPagina = document.getElementById('pagina-atualizacao')
 
   function avisar (tipo, texto) {
@@ -58,7 +57,6 @@
 
   botaoProcurar.addEventListener('click', async () => {
     botaoProcurar.disabled = true
-    botaoInstalar.hidden = true
     linkPagina.hidden = true
     avisar('pendencia', 'Procurando atualização…')
     try {
@@ -67,16 +65,12 @@
       if (!release) {
         avisar('pendencia', 'Ainda não há versão para instalar. Tente de novo mais tarde.')
       } else if (atualizacao.compararVersoes(release.versao, versaoInstalada) > 0) {
-        // v0.9.1: o botão é um link direto para o arquivo da versão: o clique da própria pessoa faz o Firefox
-        // pedir "Permitir" e "Adicionar", sem passar pela página do GitHub. A página fica como reserva.
-        // O Firefox também procura sozinho cerca de uma vez por dia e instala sem perguntar.
-        // As configurações e a lista de assinaturas são mantidas.
-        botaoInstalar.textContent = `Instalar a versão ${release.versao}`
-        botaoInstalar.href = release.link
-        botaoInstalar.hidden = false
+        // v0.9.7: o link direto para o arquivo (v0.9.1) não instalava; fica só a página da versão, onde a
+        // pessoa clica no arquivo .xpi. As configurações e a lista de assinaturas são mantidas.
+        linkPagina.textContent = `Abrir a página da versão ${release.versao}`
         linkPagina.href = release.pagina
         linkPagina.hidden = false
-        avisar('sucesso', `Versão ${release.versao} disponível (você tem a ${versaoInstalada}). O Firefox instala sozinho em até um dia. Para instalar agora: clique em "Instalar a versão ${release.versao}", depois em "Permitir" e em "Adicionar".`)
+        avisar('sucesso', `Versão ${release.versao} disponível (você tem a ${versaoInstalada}). Clique em "Abrir a página da versão ${release.versao}"; na página, clique no arquivo que termina em .xpi, depois em "Permitir" e em "Adicionar".`)
       } else {
         avisar('sucesso', `Você já tem a versão mais nova (${versaoInstalada}).`)
       }
