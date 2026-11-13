@@ -96,7 +96,7 @@ E: O Firefox oferece só a senha do sei.ifto.edu.br (sem SUAP, Moodle etc.).
 ### T27 – Instalar no Chrome (v0.5.0)
 > No computador de desenvolvimento (ou com o .zip da Release, depois do git push).
 F: Rode npm run empacotar-chrome, abra chrome://extensions > Modo do desenvolvedor > Carregar sem compactação > pasta web-ext-artifacts/chrome/extensao-ifto-chrome-0.5.0; entre no SEI na unidade PAL/REI/IFTO.
-E: A extensão aparece sem erros, o painel da lista de assinaturas funciona e a janela do ícone mostra "Abrir a página da versão mais nova".
+E: A extensão aparece sem erros, o painel da lista de assinaturas funciona e a janela do ícone mostra "Procurar atualização".
 
 ## Documentos do pagamento: preenchimento do documento externo (v0.6.0)
 ### T28 – Documento externo novo já preenchido (v0.6.0)
@@ -241,9 +241,9 @@ F: Abra o arquivo "exemplo-ConsultaOptantes_14159957000190_2026-11-13.pdf" e pro
 E: O PDF mostra os mesmos dados da página do Simples Nacional (com acentos) e a linha "Consulta feita em …"; a busca encontra o CNPJ e a palavra.
 
 ## Janela do ícone: página da versão (v0.17.1)
-### T66 – Abrir a página da versão mais nova (v0.17.1)
-F: Clique no ícone da extensão e em "Abrir a página da versão mais nova".
-E: A janela não tem mais "Procurar atualização" nem link embaixo; abre uma aba com a página da versão mais nova, com o arquivo .xpi (Firefox) e .zip (Chrome).
+### T66 – Procurar atualização (v0.17.2)
+F: Clique no ícone da extensão e em "Procurar atualização".
+E: Aparece "Você já tem a versão mais nova" ou, se houver versão nova, "Versão X disponível" e o botão "Abrir a página da versão X", que abre a página com o arquivo .xpi (Firefox) e .zip (Chrome).
 
 ## Consulta do Simples Nacional no site (v0.17.2)
 > Nas configurações, clique de novo em "Permitir acesso ao Compras.gov.br e ao Simples Nacional" e confirme.

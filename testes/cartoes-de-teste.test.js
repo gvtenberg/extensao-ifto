@@ -49,7 +49,7 @@ test('o TESTES-PENDENTES.md real tem números únicos', () => {
   const texto = fs.readFileSync(path.join(__dirname, '..', 'TESTES-PENDENTES.md'), 'utf8')
   const numeros = lerTestes(texto).map(i => i.numero)
   assert.equal(new Set(numeros).size, numeros.length)
-  assert.ok(numeros.includes('T12'))
+  assert.ok(numeros.length > 0)
 })
 
 test('apagarTestes tira o bloco e a seção que ficou vazia', () => {

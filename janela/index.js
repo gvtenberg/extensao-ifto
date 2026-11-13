@@ -36,10 +36,47 @@
     window.close()
   })
 
-  // v0.17.0 (pedido de 13/11/2026): procurar e instalar pela janela não funcionava; o botão só abre a
-  // página da versão mais nova, onde a pessoa clica no arquivo (.xpi no Firefox, .zip no Chrome).
-  document.getElementById('pagina-atualizacao').addEventListener('click', () => {
-    navegador.tabs.create({ url: globalThis.ExtensaoIFTO.atualizacao.ENDERECO_PAGINA_ULTIMA_VERSAO })
+  // v0.1.3: procurar atualização na hora, na última versão publicada (ver comum/atualizacao.js).
+  // v0.17.2 (pedido de 13/11/2026): instalar pela janela não funcionava; havendo versão nova, só aparece o
+  // botão que abre a página da versão (lá a pessoa clica no arquivo). Também no Chrome (mesma página).
+  const { atualizacao } = globalThis.ExtensaoIFTO
+  const versaoInstalada = navegador.runtime.getManifest().version
+  const botaoProcurar = document.getElementById('procurar-atualizacao')
+  const avisoAtualizacao = document.getElementById('atualizacao')
+  const botaoPagina = document.getElementById('pagina-atualizacao')
+  let paginaDaVersao = ''
+
+  function avisar (tipo, texto) {
+    avisoAtualizacao.hidden = false
+    avisoAtualizacao.className = 'aviso ' + tipo
+    avisoAtualizacao.textContent = texto
+  }
+
+  botaoProcurar.addEventListener('click', async () => {
+    botaoProcurar.disabled = true
+    botaoPagina.hidden = true
+    avisar('pendencia', 'Procurando atualização…')
+    try {
+      const resposta = await fetch(atualizacao.ENDERECO_ULTIMA_RELEASE, { cache: 'no-store' })
+      const release = resposta.ok ? atualizacao.lerRelease(await resposta.json()) : null
+      if (!release) {
+        avisar('pendencia', 'Ainda não há versão para instalar. Tente de novo mais tarde.')
+      } else if (atualizacao.compararVersoes(release.versao, versaoInstalada) > 0) {
+        paginaDaVersao = release.pagina || atualizacao.ENDERECO_PAGINA_ULTIMA_VERSAO
+        botaoPagina.textContent = `Abrir a página da versão ${release.versao}`
+        botaoPagina.hidden = false
+        avisar('sucesso', `Versão ${release.versao} disponível (você tem a ${versaoInstalada}).`)
+      } else {
+        avisar('sucesso', `Você já tem a versão mais nova (${versaoInstalada}).`)
+      }
+    } catch (erro) {
+      avisar('pendencia', 'Não foi possível procurar atualização. Confira a internet e tente de novo.')
+    }
+    botaoProcurar.disabled = false
+  })
+
+  botaoPagina.addEventListener('click', () => {
+    navegador.tabs.create({ url: paginaDaVersao || atualizacao.ENDERECO_PAGINA_ULTIMA_VERSAO })
     window.close()
   })
 })()

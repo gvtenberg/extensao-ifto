@@ -73,7 +73,7 @@ Extension for **Firefox** and Chrome (free package, v0.5.0) that goes with the c
 
 - **With login** (Google account @ifto.edu.br) the extension reads the system's Google Spreadsheet. **Without login**, only the SEI improvements. **No costs:** no paid services.
 - **IFTO SEI:** every feature must work on the version used at IFTO (currently SEI 5.0.4; see `docs/regras/sei.md`). The extension acts only on `sei.ifto.edu.br`.
-- **Installation:** signed by Mozilla as "unlisted" (free, outside the store), via GitHub; public repository, automatic update and "Abrir a página da versão mais nova" button in the icon window (v0.17.0). Chrome: free package loaded in developer mode (no store, no automatic update).
+- **Installation:** signed by Mozilla as "unlisted" (free, outside the store), via GitHub; public repository, automatic update and "Procurar atualização" button in the icon window (checks; if there is a new version, opens its page; v0.17.2). Chrome: free package loaded in developer mode (no store, no automatic update).
 
 ## Conventions
 

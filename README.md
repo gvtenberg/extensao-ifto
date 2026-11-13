@@ -85,7 +85,7 @@ Não apague a pasta descompactada: o navegador usa os arquivos dela enquanto a e
 
 ## Como atualizar
 
-**Firefox:** clique no ícone da extensão e em **Abrir a página da versão mais nova**; na página, clique no arquivo que termina em `.xpi`, depois em **Permitir** e em **Adicionar**. Se o número da versão for o mesmo que aparece na janela do ícone, você já está com a mais nova.
+**Firefox:** clique no ícone da extensão e em **Procurar atualização**. Se houver versão nova, clique em **Abrir a página da versão …**; na página, clique no arquivo que termina em `.xpi`, depois em **Permitir** e em **Adicionar**.
 
 **Chrome e Edge:** baixe o novo arquivo `.zip`, descompacte-o **na mesma pasta** usada na instalação (substituindo os arquivos), abra `chrome://extensions` (ou `edge://extensions`) e clique na seta circular do cartão "Extensão IFTO Palmas".
 
@@ -113,7 +113,7 @@ Cada função abaixo tem três opções: **Automática** (liga só na unidade in
 - **O que lê:** somente as páginas do SEI abertas no navegador (unidade atual, árvore do processo, números dos documentos e versão do SEI), para saber onde colocar os botões e qual documento abrir. Para o SICAF, lê também o texto dos atestes e dos PDFs das notas fiscais e do SICAF do processo aberto, a página do SICAF no Compras.gov.br e o resultado da consulta do Simples Nacional (só depois da permissão e do clique em "Buscar no SICAF").
 - **O que guarda:** as configurações, a lista de assinaturas colada (até o uso do botão "Limpar lista"), a versão do último SEI aberto e os PDFs do SICAF obtidos no dia (para não buscar de novo; os de outros dias são apagados). Esses dados ficam apenas no navegador do próprio computador.
 - **Senha:** a extensão **não lê nem guarda a senha**. A senha fica no gerenciador de senhas do navegador; a extensão apenas verifica se o campo já está preenchido.
-- **Envio de dados:** a extensão não envia dados do SEI para nenhum outro site (no SICAF, só digita o CNPJ do fornecedor na pesquisa). A única consulta externa é a verificação de nova versão (automática no Firefox); o botão "Abrir a página da versão mais nova" só abre essa página, feita na página de versões indicada em [Onde baixar](#onde-baixar).
+- **Envio de dados:** a extensão não envia dados do SEI para nenhum outro site (no SICAF, só digita o CNPJ do fornecedor na pesquisa). A única consulta externa é a verificação de nova versão (automática no Firefox, ou pelo botão "Procurar atualização"), feita na página de versões indicada em [Onde baixar](#onde-baixar).
 - **O que escreve no SEI:** a extensão só faz alterações no SEI a partir de um clique do usuário, por exemplo em "Assinar e próximo" ou na confirmação de "Incluir Sicaf, Consulta e Anexo" e de "Incluir no processo" (SICAF).
 
 ## Cuidados no uso
