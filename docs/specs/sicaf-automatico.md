@@ -8,7 +8,7 @@
 
 ## 1. Goal (what for)
 
-For every invoice, CGOC today logs in to Compras.gov.br (gov.br + SerproID + code), opens the SICAF, searches the CNPJ, downloads the "Situação do Fornecedor" PDF and attaches it to the SEI by hand. The extension finds the invoices that still need a SICAF, gets the PDF from the SICAF and, after one confirmation, adds Sicaf (with the PDF), Consulta and Anexo to the process. Any other sector (e.g. Licitação) can turn on a simple "Incluir SICAF" button.
+For every invoice, CGOC today logs in to Compras.gov.br (gov.br + SerproID + code), opens the SICAF, searches the CNPJ, downloads the "Situação do Fornecedor" PDF and attaches it to the SEI by hand. The extension finds the invoices that still need a SICAF, gets the PDF from the SICAF and, after one confirmation, adds Sicaf (with the PDF), Consulta and Anexo to the process. Any other sector (e.g. Licitação) can turn on a simple "Incluir SICAF" button. Selecting a CNPJ (or right-clicking it in the invoice PDF) also starts it.
 
 ## 2. Out of scope
 
@@ -22,6 +22,7 @@ For every invoice, CGOC today logs in to Compras.gov.br (gov.br + SerproID + cod
 - [x] D2 – Start: **notice + one click** (13/11/2026): the extension bar shows "N notas sem SICAF – Buscar"; nothing opens before the click.
 - [x] D3 – Tree name: **Sicaf with the supplier name** (13/11/2026), e.g. "Sicaf Empresa X Ltda" (name from the SICAF result). Consulta and Anexo keep the plain name (13/11/2026).
 - [x] D4 – Other sectors (13/11/2026): option "Incluir SICAF" in the settings, same pattern as the signature list (Automática / Sempre ligada / Desligada). Automática = on only in the CGOC unit (with invoice detection and the three documents). Sempre ligada = any unit gets the "Incluir SICAF" button (type or paste the CNPJ; adds only the Sicaf).
+- [x] D6 – Selected CNPJ (13/11/2026): **also** a manual way, besides the automatic reading (D1). Selecting a CNPJ on an SEI page shows a small button next to it; in the invoice PDF (browser PDF viewer, where extensions cannot run) the right-click menu "Buscar SICAF deste CNPJ"; fallback: paste the CNPJ in the "Incluir SICAF" field. **No list**: it acts right away on that CNPJ — CGOC: "Incluir Sicaf, Consulta e Anexo"; other units: "Incluir SICAF".
 - [x] D5 – PDF copy (13/11/2026): the SICAF PDF goes into the SEI **and** is saved in Downloads with the SICAF's usual name (`consultarSituacaoFornecedor_<CNPJ>_<yyyy-mm-dd>.pdf`).
 
 ## 4. Decided rules
@@ -30,6 +31,7 @@ For every invoice, CGOC today logs in to Compras.gov.br (gov.br + SerproID + cod
 - **Supplier already done:** a Sicaf with a file named with that supplier's name after the last Folha de encaminhamento → skip that supplier.
 - **Per supplier:** Sicaf (with the PDF, tree name "Sicaf <supplier name>"), Consulta and Anexo (blank, plain names), same fields as the existing one-click creation (`specs/documentos-pagamento.md`).
 - **Confirmation:** one window lists each supplier, CNPJ and the PDF obtained; nothing is written to the SEI before the user confirms (`CLAUDE.md`, Conventions).
+- **Selected CNPJ:** only text matching a CNPJ (14 digits, with or without dots) triggers the button or menu; the CNPJ is checked (verification digits) before use.
 - **Login:** if the SICAF sends to `acessoNegado.jsf`, the extension opens the Compras login page (`comprasnet.gov.br/seguro/loginPortalUASG.asp`), highlights "Entrar com gov.br" (Governo) and waits; after the login it goes to the SICAF by itself and continues.
 - **Access to other sites:** asked only when the option is on (optional permission), so colleagues who do not use it are never asked.
 
@@ -37,18 +39,19 @@ For every invoice, CGOC today logs in to Compras.gov.br (gov.br + SerproID + cod
 
 - Sites: `sei.ifto.edu.br` (as today); new: `www3.comprasnet.gov.br/sicaf-web/*` and the Compras login page (`comprasnet.gov.br/seguro/*`, and the Compras desktop if needed to reach the SICAF).
 - Data read: process tree, ateste text, invoice PDF (text), SICAF result and PDF. Written: SEI external documents (after confirmation); PDF in Downloads.
-- Screens: extension bar notice and "Buscar" button (CGOC); "Incluir SICAF" button (any unit with Sempre ligada); confirmation window; CNPJ window when invoice and ateste differ; option in the settings; a small notice on the Compras login page.
-- Likely code: `comum/sicaf.js` (CNPJ rules, tree rules, file name), `sites/sei/sicaf.js`, `sites/sicaf/*.js`, `sites/compras/login.js`, a background script to pass the PDF between tabs, a PDF text reader (pdf.js, loaded only when needed), `manifest.json` (optional host permissions, `downloads`). Reuse `comum/documentos-pagamento.js` and `comum/documento-externo.js`.
+- Screens: button next to a selected CNPJ and right-click menu item; extension bar notice and "Buscar" button (CGOC); "Incluir SICAF" button (any unit with Sempre ligada); confirmation window; CNPJ window when invoice and ateste differ; option in the settings; a small notice on the Compras login page.
+- Likely code: `comum/sicaf.js` (CNPJ rules, tree rules, file name), `sites/sei/sicaf.js`, `sites/sicaf/*.js`, `sites/compras/login.js`, a background script to pass the PDF between tabs, a PDF text reader (pdf.js, loaded only when needed), `manifest.json` (optional host permissions, `downloads`, `menus`/`contextMenus`). Reuse `comum/documentos-pagamento.js` and `comum/documento-externo.js`.
 
 ## 6. Stages
 
 Each stage fits in a short conversation (`/etapa sicaf-automatico <n>`) and ends with tests, version and commit. Prerequisite: T36 (creating the three payment documents) passed.
 
 - [ ] Stage 1 – **Find pending invoices** (v0.10.0): option "Incluir SICAF" in the settings; in the CGOC unit, read the tree (invoices, atestes, Folha de encaminhamento, existing Sicafs) and the ateste CNPJ; notice "N notas sem SICAF – Buscar" in the bar (button does nothing yet). **Before:** save (Ctrl+S on the tree frame) a process with invoices + atestes without a Folha de encaminhamento, and one with a Folha after them, in `ferramentas-de-teste/paginas-sei/`; tell which document types the invoice and the ateste have in the SEI.
-- [ ] Stage 2 – **CNPJ from the invoice** (v0.11.0): read the invoice PDF text, compare with the ateste, window to pick or type when they differ or the invoice is a scanned image. **Before:** 2 or 3 invoice PDFs (NF-e, NFS-e, one scanned if any) in `ferramentas-de-teste/arquivos-sei/`.
-- [ ] Stage 3 – **Get the PDF from the SICAF** (v0.12.0): permission request, open the SICAF tab, login page help, fill CNPJ, Pesquisar, get the PDF (and supplier name), save it in Downloads and return it to the SEI tab. **Before:** one SICAF PDF in `ferramentas-de-teste/pagina-compras/`; confirm the SICAF link from the Compras desktop (user menu › SICAF). Critical test (decides whether the SICAF accepts the automatic search).
-- [ ] Stage 4 – **Add to the SEI** (v0.13.0): confirmation window; per supplier Sicaf with the PDF and tree name + Consulta + Anexo. Critical test (writes to the SEI).
-- [ ] Stage 5 – **"Incluir SICAF" for any sector** (v0.14.0): with Sempre ligada, button in the bar of any unit: type or paste the CNPJ → SICAF → only the Sicaf with the PDF.
+- [ ] Stage 2 – **Selected CNPJ** (v0.11.0): button next to a CNPJ selected on SEI pages, right-click menu "Buscar SICAF deste CNPJ" (check it works in the Firefox and Chrome PDF viewers), paste field; CNPJ check digits. Until stage 4 the action only shows the CNPJ found.
+- [ ] Stage 3 – **CNPJ from the invoice** (v0.12.0): read the invoice PDF text, compare with the ateste, window to pick or type when they differ or the invoice is a scanned image. **Before:** 2 or 3 invoice PDFs (NF-e, NFS-e, one scanned if any) in `ferramentas-de-teste/arquivos-sei/`.
+- [ ] Stage 4 – **Get the PDF from the SICAF** (v0.13.0): permission request, open the SICAF tab, login page help, fill CNPJ, Pesquisar, get the PDF (and supplier name), save it in Downloads and return it to the SEI tab. **Before:** one SICAF PDF in `ferramentas-de-teste/pagina-compras/`; confirm the SICAF link from the Compras desktop (user menu › SICAF). Critical test (decides whether the SICAF accepts the automatic search).
+- [ ] Stage 5 – **Add to the SEI** (v0.14.0): confirmation window; per supplier Sicaf with the PDF and tree name + Consulta + Anexo. Critical test (writes to the SEI).
+- [ ] Stage 6 – **"Incluir SICAF" for any sector** (v0.15.0): with Sempre ligada, button in the bar of any unit: type or paste the CNPJ → SICAF → only the Sicaf with the PDF.
 
 ## 7. Manual tests
 
