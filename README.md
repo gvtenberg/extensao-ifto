@@ -63,6 +63,7 @@ Baixe a extensão somente por esse endereço. Arquivos recebidos por e-mail, apl
 3. Se aparecer o aviso "O Firefox impediu que este site pedisse para instalar software", clique em **Permitir**.
 4. Na janela seguinte, clique em **Adicionar**.
 5. Para deixar o ícone da extensão sempre visível: clique no ícone de peça de quebra-cabeça, ao lado da barra de endereços, depois na engrenagem ao lado de "Extensão IFTO Palmas" e em **Fixar na barra de ferramentas**.
+6. Clique no ícone da extensão. Se aparecer o botão **Permitir no SEI**, clique nele e confirme. Sem isso, a extensão só funciona na página do SEI em que você clicou no ícone e some ao abrir outra página.
 
 A instalação é feita uma única vez. Depois disso, o Firefox atualiza a extensão sozinho.
 

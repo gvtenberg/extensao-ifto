@@ -14,6 +14,23 @@
     caixa.textContent = 'Abra o SEI do IFTO para a extensão reconhecê-lo.'
   }
 
+  // v0.9.6: no Firefox, sem a licença permanente para o SEI, a extensão só age na página aberta quando a
+  // pessoa clica no ícone, e some ao trocar de página (ex.: a lista de assinaturas ao abrir o processo).
+  // Aqui confere a licença e, se faltar, oferece o botão que a pede (o clique da pessoa é obrigatório).
+  const enderecosSei = navegador.runtime.getManifest().host_permissions || []
+  const avisoAcesso = document.getElementById('acesso')
+  const botaoPermitir = document.getElementById('permitir-sei')
+  async function conferirAcesso () {
+    let temAcesso = true
+    try { temAcesso = await navegador.permissions.contains({ origins: enderecosSei }) } catch (erro) { temAcesso = true }
+    avisoAcesso.hidden = temAcesso
+    botaoPermitir.hidden = temAcesso
+  }
+  botaoPermitir.addEventListener('click', () => {
+    navegador.permissions.request({ origins: enderecosSei }).then(conferirAcesso, conferirAcesso)
+  })
+  conferirAcesso()
+
   document.getElementById('abrir-configuracoes').addEventListener('click', () => {
     navegador.runtime.openOptionsPage()
     window.close()

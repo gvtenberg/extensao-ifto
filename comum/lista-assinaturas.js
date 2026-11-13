@@ -10,40 +10,71 @@
   const MARCADORES = /^[\s•*·]+/
   // v0.9.2: intervalo de documentos: "3383754-3383903", "3383754 - 3383903" ou "3383754 a 3383903".
   const FIM_DO_INTERVALO = /^\s*(?:[-–—]|a|até|ate)\s*(\d{6,9})(?!\d)/i
+  // v0.9.6: vários documentos na mesma linha: "3384598, 3384645, 3384674", "3384598; 3384645",
+  // "3384598 e 3384645" ou só espaço entre eles. Cada um pode ser também um intervalo.
+  const OUTRO_DOCUMENTO = /^(?:\s*[,;]\s*|\s+e\s+|\s+)(\d{6,9})(?!\d)/i
 
   function ehCiencia (comentario) {
     const texto = String(comentario || '').normalize('NFD').replace(/[̀-ͯ]/g, '').toLowerCase()
     return texto.includes('ciencia')
   }
 
-  // Uma linha: "processo - documento comentário", só o processo, ou só o documento (com ou sem comentário).
-  function lerLinha (linha) {
+  // Lê o fim de um intervalo logo depois do documento. Devolve { documento, ate, resto }.
+  function lerIntervalo (documento, resto) {
+    const achouFim = FIM_DO_INTERVALO.exec(resto)
+    if (!achouFim) return { documento, ate: '', resto }
+    resto = resto.slice(achouFim[0].length)
+    // Números invertidos ("3383903 a 3383754") valem do menor ao maior; iguais são um documento só.
+    if (Number(achouFim[1]) < Number(documento)) return { documento: achouFim[1], ate: documento, resto }
+    return { documento, ate: achouFim[1] !== documento ? achouFim[1] : '', resto }
+  }
+
+  // Uma linha: "processo - documento(s) comentário", só o processo, ou só o(s) documento(s).
+  // v0.9.6: devolve um item por documento (ou intervalo) da linha, todos com o mesmo processo e comentário.
+  function lerItensDaLinha (linha) {
     let resto = String(linha || '').replace(MARCADORES, '').trim()
     if (!resto) return null
     let processo = ''
-    let documento = ''
     const achouProcesso = PROCESSO.exec(resto)
     if (achouProcesso) {
       processo = achouProcesso[1]
       resto = resto.slice(processo.length).replace(SEPARADORES, '')
     }
+    const partes = []
     const achouDocumento = DOCUMENTO.exec(resto)
     if (achouDocumento) {
-      documento = achouDocumento[1]
-      resto = resto.slice(documento.length)
+      let parte = lerIntervalo(achouDocumento[1], resto.slice(achouDocumento[1].length))
+      partes.push(parte)
+      resto = parte.resto
+      let outro
+      while ((outro = OUTRO_DOCUMENTO.exec(resto))) {
+        parte = lerIntervalo(outro[1], resto.slice(outro[0].length))
+        partes.push(parte)
+        resto = parte.resto
+      }
     }
-    if (!processo && !documento) return { erro: true }
-    let ate = ''
-    const achouFim = documento && FIM_DO_INTERVALO.exec(resto)
-    if (achouFim) {
-      resto = resto.slice(achouFim[0].length)
-      // Números invertidos ("3383903 a 3383754") valem do menor ao maior; iguais são um documento só.
-      if (Number(achouFim[1]) < Number(documento)) { ate = documento; documento = achouFim[1] } else if (achouFim[1] !== documento) ate = achouFim[1]
-    }
+    if (!processo && !partes.length) return { erro: true }
     const comentario = resto.replace(SEPARADORES, '').trim()
-    const item = { processo, documento, comentario, ciencia: ehCiencia(comentario), feito: false }
-    if (ate) item.ate = ate
-    return item
+    const novo = (documento, ate) => {
+      const item = { processo, documento, comentario, ciencia: ehCiencia(comentario), feito: false }
+      if (ate) item.ate = ate
+      return item
+    }
+    if (!partes.length) return [novo('', '')]
+    // Número repetido na mesma linha vale uma vez só.
+    const vistos = new Set()
+    return partes.filter(parte => {
+      const chave = parte.documento + '-' + parte.ate
+      if (vistos.has(chave)) return false
+      vistos.add(chave)
+      return true
+    }).map(parte => novo(parte.documento, parte.ate))
+  }
+
+  // Só o primeiro item da linha (ou { erro: true } / null).
+  function lerLinha (linha) {
+    const itens = lerItensDaLinha(linha)
+    return Array.isArray(itens) ? itens[0] : itens
   }
 
   // v0.9.2: números SEI que aparecem nos nomes da árvore do processo: "Despacho 163 (3229092)".
@@ -78,10 +109,10 @@
     const itens = []
     const erros = []
     String(texto || '').split(/\r?\n/).forEach((linha, indice) => {
-      const item = lerLinha(linha)
-      if (!item) return
-      if (item.erro) erros.push({ numero: indice + 1, texto: linha.trim() })
-      else itens.push(item)
+      const lidos = lerItensDaLinha(linha)
+      if (!lidos) return
+      if (lidos.erro) erros.push({ numero: indice + 1, texto: linha.trim() })
+      else itens.push(...lidos)
     })
     return { itens, erros }
   }
@@ -126,6 +157,7 @@
   const api = {
     ehCiencia,
     lerLinha,
+    lerItensDaLinha,
     lerLista,
     numeroDoRotulo,
     expandirIntervalo,

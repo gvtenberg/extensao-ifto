@@ -144,3 +144,27 @@ test('intervalo: documentos externos ficam de fora, menos para dar ciência', ()
   const ciencia = lista.lerLinha('23236.022730/2026-41 - 3383754-3383903 dar ciência')
   assert.equal(lista.expandirIntervalo(ciencia, rotulos, '', ['3383760']).length, 3)
 })
+
+test('v0.9.6: vários documentos na mesma linha, separados por vírgula, ponto e vírgula, "e" ou espaço', () => {
+  const { itens, erros } = lista.lerLista('23236.022824/2026-10 - 3384598, 3384598, 3384645, 3384674')
+  assert.equal(erros.length, 0)
+  assert.deepEqual(itens.map(i => i.documento), ['3384598', '3384645', '3384674'])
+  assert.ok(itens.every(i => i.processo === '23236.022824/2026-10' && i.comentario === '' && !i.ate))
+  for (const linha of ['3384598; 3384645 e 3384674 dar ciência', '3384598 3384645 3384674 dar ciência']) {
+    const lidos = lista.lerLista(linha).itens
+    assert.deepEqual(lidos.map(i => i.documento), ['3384598', '3384645', '3384674'])
+    assert.ok(lidos.every(i => i.ciencia && i.comentario === 'dar ciência'))
+  }
+  // Mistura de documento e intervalo; o primeiro item da linha continua em lerLinha.
+  const mistura = lista.lerLista('23236.022824/2026-10 - 3384598, 3384600 a 3384674 edital').itens
+  assert.deepEqual(mistura.map(i => [i.documento, i.ate || '']), [['3384598', ''], ['3384600', '3384674']])
+  assert.equal(mistura[1].comentario, 'edital')
+  assert.equal(lista.lerLinha('23236.022824/2026-10 - 3384598, 3384645').documento, '3384598')
+})
+
+test('v0.9.6: a mesma linha escrita como intervalo', () => {
+  const item = lista.lerLinha('23236.022824/2026-10 - 3384598 a 3384674')
+  assert.equal(item.processo, '23236.022824/2026-10')
+  assert.equal(item.documento, '3384598')
+  assert.equal(item.ate, '3384674')
+})

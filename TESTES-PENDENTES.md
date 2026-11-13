@@ -169,3 +169,14 @@ E: Aparece o quadro "Erros e sugestões de melhoria" com a orientação de procu
 ### T43 – Novo ícone com a marca do IF (v0.9.5)
 F: Depois de atualizar a extensão, olhe o ícone na barra do navegador (Firefox e Chrome), no tema claro e no escuro, e em Extensões (about:addons ou chrome://extensions).
 E: Aparece a marca do Instituto Federal (bolinha vermelha e quadrados verdes), nítida e fácil de reconhecer. Se não ficar bom, comente no cartão para voltar ao ícone anterior.
+
+## Lista de assinaturas: vários documentos na linha (v0.9.6)
+
+### T44 – Vários documentos separados por vírgula (v0.9.6)
+F: Cole na lista de assinaturas "23236.022824/2026-10 - 3384598, 3384598, 3384645, 3384674" e clique em "Conferir e começar"; depois limpe e cole "23236.022824/2026-10 - 3384598 a 3384674".
+E: Na primeira forma, a lista tem 3 itens (3384598, 3384645, 3384674; o repetido conta uma vez). Na segunda, ao abrir o processo, a linha vira um item para cada documento do processo entre os dois números.
+
+### T45 – Painel continua na tela ao abrir o processo (v0.9.6)
+F: Clique no ícone da extensão; se aparecer "Permitir no SEI", clique e confirme. Na Direção-geral, cole uma lista e clique em "Conferir e começar"; depois aperte F5.
+E: O processo abre e o painel da lista continua na tela, também depois de recarregar a página, sem precisar clicar no ícone da extensão.
+

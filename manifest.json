@@ -2,7 +2,7 @@
   "manifest_version": 3,
   "name": "Extensão IFTO Palmas",
   "short_name": "IFTO Palmas",
-  "version": "0.9.5",
+  "version": "0.9.6",
   "description": "Melhorias no SEI e apoio ao Sistema de Gestão Orçamentária do IFTO Campus Palmas.",
   "icons": { "48": "icones/icone.svg", "96": "icones/icone.svg" },
   "permissions": ["storage"],
