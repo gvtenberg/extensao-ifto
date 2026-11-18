@@ -8,7 +8,7 @@
 // v0.17.2: depois do SICAF, a mesma aba consulta o Simples Nacional de cada fornecedor (spec consulta-simples).
 /* global importScripts */
 if (typeof importScripts === 'function' && !(globalThis.ExtensaoIFTO && globalThis.ExtensaoIFTO.simplesNacional)) {
-  importScripts('/comum/sei.js', '/comum/configuracoes.js', '/comum/sicaf.js', '/comum/simples-nacional.js', '/comum/compras-ifto.js', '/sites/sei/editor-preencher.js')
+  importScripts('/comum/sei.js', '/comum/minuta-edital.js', '/comum/configuracoes.js', '/comum/sicaf.js', '/comum/simples-nacional.js', '/comum/compras-ifto.js', '/sites/sei/editor-preencher.js', '/sites/sei/editor-minuta.js')
 }
 const navegador = globalThis.browser || globalThis.chrome
 const regras = globalThis.ExtensaoIFTO.sicaf
@@ -63,6 +63,9 @@ function tratarRecado (recado, remetente) {
     case 'comprasPeca': return receberPeca(recado.peca, remetente)
     case 'comprasPreencher': return abrirEditor(recado, aba)
     case 'comprasConfiguracoes': return navegador.tabs.create({ url: navegador.runtime.getURL('configuracoes/index.html#compras') }).then(() => ({ ok: true }))
+    // v0.22.0 (spec minuta-edital): marca MINUTA dos editais, no editor do SEI de onde veio o recado.
+    case 'minutaVerificar': return minutaNoEditor(remetente, false)
+    case 'minutaRemover': return minutaNoEditor(remetente, true)
     // v0.17.5: texto de um PDF pedido pela página do SEI (no Firefox o pdf.js só funciona aqui).
     case 'lerPdf': return globalThis.ExtensaoIFTO.pdfTexto ? globalThis.ExtensaoIFTO.pdfTexto.textoDoPdf(recado.bytes).then(texto => ({ texto })) : Promise.resolve({ erro: 'Leitura de PDF indisponível.' })
   }
@@ -472,3 +475,35 @@ async function concluirEditor (resultado, fecharJanela) {
   } catch (erro) {}
 }
 navegador.runtime.onStartup.addListener(() => navegador.storage.local.remove(CHAVE_EDITOR))
+
+// v0.22.0 (spec minuta-edital): lê o texto do editor; com "remover", tira a marca MINUTA das seções editáveis
+// e confere de novo. Nunca salva: a pessoa confere e clica em Salvar.
+// Devolve { ok, erro, marcas, removidas, restou, trechos }.
+async function minutaNoEditor (remetente, remover) {
+  const regrasMinuta = globalThis.ExtensaoIFTO.minutaEdital
+  const alvo = { tabId: remetente.tab.id, frameIds: [remetente.frameId || 0] }
+  const rodar = async (func, args = []) => {
+    const [execucao] = await navegador.scripting.executeScript({ target: alvo, world: 'MAIN', func, args })
+    return (execucao && execucao.result) || { ok: false, erro: 'O editor do SEI não respondeu.' }
+  }
+  const contar = secoes => secoes.filter(secao => regrasMinuta.temMarcaMinuta(secao.html)).length
+  const lido = await rodar(globalThis.ExtensaoIFTO.editorLer)
+  if (!lido.ok) return { ok: false, erro: lido.erro }
+  const marcas = contar(lido.secoes)
+  if (!remover || !marcas) return { ok: true, marcas, removidas: 0, restou: marcas, trechos: [] }
+  const mudancas = {}
+  let removidas = 0
+  for (const secao of lido.secoes) {
+    if (!secao.editavel || !regrasMinuta.temMarcaMinuta(secao.html)) continue
+    const limpo = regrasMinuta.tirarMarcaMinuta(secao.html)
+    mudancas[secao.nome] = limpo.html
+    removidas += limpo.removidas
+  }
+  if (!removidas) return { ok: false, erro: 'A marca está numa parte do documento que não dá para editar.', marcas }
+  const gravado = await rodar(globalThis.ExtensaoIFTO.editorGravar, [mudancas])
+  if (!gravado.ok) return { ok: false, erro: gravado.erro, marcas }
+  const depois = await rodar(globalThis.ExtensaoIFTO.editorLer)
+  const secoes = depois.ok ? depois.secoes : []
+  const trechos = secoes.flatMap(secao => regrasMinuta.minutaNoTexto(secao.html)).slice(0, 3)
+  return { ok: true, marcas, removidas, restou: depois.ok ? contar(secoes) : 0, trechos }
+}

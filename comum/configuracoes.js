@@ -17,7 +17,10 @@
     comprasIfto: 'automatica',
     // v0.21.3: clicar sozinho em SerproID na entrada do Gov.br (SICAF sem login). Desligada: precisa do
     // acesso opcional à página de login do Gov.br, que a pessoa dá ao ligar a opção.
-    entrarComSerproId: false
+    entrarComSerproId: false,
+    // v0.22.0: botão "Remover marca MINUTA" no editor dos editais: "automatica" (só na Direção-geral),
+    // "sempre" ou "desligada".
+    minutaEdital: 'automatica'
   })
 
   // Junta o que o usuário gravou com os padrões; opções que não existem mais são ignoradas.

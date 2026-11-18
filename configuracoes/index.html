@@ -48,6 +48,23 @@
         <span>Desligada</span>
       </label>
     </section>
+    <!-- v0.22.0: marca MINUTA dos editais (spec minuta-edital). -->
+    <section class="cartao" id="minuta">
+      <h1>Direção-geral (PAL/REI/IFTO): marca MINUTA nos editais</h1>
+      <p class="apoio">Ao abrir no editor do SEI um documento do tipo Edital que ainda tem a marca d'água "MINUTA" (que veio da minuta), aparece no canto de baixo o botão "Remover marca MINUTA". A extensão tira a marca do texto; você confere e clica em Salvar no editor.</p>
+      <label class="opcao">
+        <input type="radio" name="minutaEdital" value="automatica">
+        <span>Automática (só na Direção-geral)</span>
+      </label>
+      <label class="opcao">
+        <input type="radio" name="minutaEdital" value="sempre">
+        <span>Sempre ligada, em qualquer unidade</span>
+      </label>
+      <label class="opcao">
+        <input type="radio" name="minutaEdital" value="desligada">
+        <span>Desligada</span>
+      </label>
+    </section>
     <section class="cartao" id="sicaf">
       <h1>SICAF e Simples Nacional</h1>
       <!-- v0.18.0: um botão só na CGOC; "Sempre ligada" é a da equipe de licitação (só o Sicaf). -->

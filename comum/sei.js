@@ -97,7 +97,16 @@
     return (espaco > 0 ? cortado.slice(0, espaco) : limpo.slice(0, maximo)).replace(/[\s.,;:-]+$/, '')
   }
 
-  const api = { versaoDoSei, VERSAO_SEI_TESTADA, seiTestado, atributosDoCampoDeSenha, lerArvore, ligadaNaUnidade, nomeNaArvore }
+  // v0.22.0: unidade do SEI pelo número dela (infra_unidade_atual), lido no endereço ou no link da unidade.
+  function numeroDaUnidade (texto) {
+    const achado = /[?&;]infra_unidade_atual=(\d+)/.exec(String(texto || ''))
+    return achado ? achado[1] : ''
+  }
+
+  // v0.22.0: Direção-geral (Gabinete) em um lugar só: lista de assinaturas e marca MINUTA dos editais.
+  const UNIDADE_DIRECAO_GERAL = 'PAL/REI/IFTO'
+
+  const api = { versaoDoSei, VERSAO_SEI_TESTADA, seiTestado, atributosDoCampoDeSenha, lerArvore, ligadaNaUnidade, nomeNaArvore, numeroDaUnidade, UNIDADE_DIRECAO_GERAL }
   if (typeof module !== 'undefined' && module.exports) module.exports = api
   else raiz.ExtensaoIFTO = Object.assign(raiz.ExtensaoIFTO || {}, { sei: api })
 })(globalThis)

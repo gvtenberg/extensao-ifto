@@ -125,9 +125,8 @@
   }
 
   // Opção das configurações: "automatica" (só na Direção-geral), "sempre" ou "desligada".
-  const UNIDADE_DIRECAO_GERAL = 'PAL/REI/IFTO'
   function funcaoLigada (opcao, unidade) {
-    return sei.ligadaNaUnidade(opcao, unidade, UNIDADE_DIRECAO_GERAL)
+    return sei.ligadaNaUnidade(opcao, unidade, sei.UNIDADE_DIRECAO_GERAL)
   }
 
   function quantidadeFeitos (itens) {
@@ -162,7 +161,7 @@
     numeroDoRotulo,
     expandirIntervalo,
     textoDaPesquisa,
-    UNIDADE_DIRECAO_GERAL,
+    UNIDADE_DIRECAO_GERAL: sei.UNIDADE_DIRECAO_GERAL,
     funcaoLigada,
     quantidadeFeitos,
     textoDoContador,

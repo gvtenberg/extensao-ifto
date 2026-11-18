@@ -338,3 +338,15 @@ E: Na Área de Trabalho do Compras, a mesma aba vai sozinha para o SICAF e a bus
 ### T109 – Abas do SICAF e do Simples fecham ao terminar (v0.21.6)
 F: No SEI, use o botão que busca SICAF e Simples Nacional de uma nota e espere até o fim.
 E: Quando os PDFs chegam ao SEI, a aba da busca (SICAF e depois Simples Nacional) fecha sozinha e o SEI volta a aparecer.
+
+## Marca MINUTA nos editais
+
+> antes de testar: SEI na unidade PAL/REI/IFTO (Direção-geral), com a extensão atualizada.
+
+### T110 – Remover a marca MINUTA de um edital e salvar (v0.22.0) (Crítico)
+F: Abra no editor um Edital criado a partir de uma minuta (ex.: 3390039), clique em "Remover marca MINUTA" no canto de baixo, confira o texto e clique em Salvar.
+E: O MINUTA some do fundo do editor; depois de salvar, ao abrir o documento e gerar o PDF, não há MINUTA no fundo. Se o texto tiver "minuta de EDITAL", o aviso mostra onde corrigir.
+
+### T111 – Botão só aparece onde deve (v0.22.0)
+F: Abra no editor uma Minuta de Edital; depois, troque para outra unidade (ex.: CGOC) e abra o mesmo Edital no editor.
+E: Na Minuta de Edital não aparece o botão. Na outra unidade também não (com a opção em "Automática").
