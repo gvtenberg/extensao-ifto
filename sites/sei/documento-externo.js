@@ -1,10 +1,22 @@
 // v0.6.0: documento externo novo (Incluir Documento › Externo): marca a data de hoje, o formato
 // Nato-digital e o nível de acesso Público, só nos campos ainda vazios. Nunca clica em Salvar aqui.
+// v0.22.2: documento interno novo (Incluir Documento › Edital, Despacho…): marca o nível Público, se nenhum
+// nível estiver marcado (o Edital Gabinete vinha sem nível marcado).
 (async function () {
   const { documentoExterno: regras, configuracoes } = globalThis.ExtensaoIFTO
-  if (!regras.ehDocumentoExternoNovo(location.href)) return
+  const interno = regras.ehDocumentoInternoNovo(location.href)
+  if (!interno && !regras.ehDocumentoExternoNovo(location.href)) return
   const { preencherDocumentoExterno } = await configuracoes.lerConfiguracoes()
   if (!preencherDocumentoExterno) return
+
+  if (interno) {
+    const publico = document.getElementById('optPublico')
+    const niveis = ['optPublico', 'optRestrito', 'optSigiloso'].map(id => document.getElementById(id)).filter(Boolean)
+    if (!publico || publico.disabled || niveis.some(opcao => opcao.checked)) return
+    publico.click()
+    avisar('Nível de acesso Público marcado pela extensão: confira antes de salvar.')
+    return
+  }
 
   const campoData = document.getElementById('txtDataElaboracao')
   const nato = document.getElementById('optNato')
@@ -29,12 +41,18 @@
   if (falta.formato) nato.click()
   if (falta.nivel) publico.click()
 
-  const nota = document.createElement('div')
-  nota.dataset.extensaoIfto = 'documento-externo'
-  nota.textContent = 'Preenchido pela extensão: confira a data, o formato e o nível de acesso.'
-  Object.assign(nota.style, {
-    margin: '6px 0', padding: '6px 10px', borderRadius: '4px',
-    background: '#E8F5EC', color: '#1E5631', border: '1px solid #B7DCC3', fontWeight: '600', width: 'fit-content'
-  })
-  formulario.prepend(nota)
+  avisar('Preenchido pela extensão: confira a data, o formato e o nível de acesso.')
+
+  function avisar (texto) {
+    const formulario = document.getElementById('frmDocumentoCadastro')
+    if (!formulario) return
+    const nota = document.createElement('div')
+    nota.dataset.extensaoIfto = 'documento-externo'
+    nota.textContent = texto
+    Object.assign(nota.style, {
+      margin: '6px 0', padding: '6px 10px', borderRadius: '4px',
+      background: '#E8F5EC', color: '#1E5631', border: '1px solid #B7DCC3', fontWeight: '600', width: 'fit-content'
+    })
+    formulario.prepend(nota)
+  }
 })()

@@ -354,3 +354,7 @@ E: Na Minuta de Edital não aparece o botão. Na outra unidade também não (com
 ### T112 – Remover também as linhas "* MINUTA DE DOCUMENTO" (v0.22.1)
 F: Abra no editor um Edital que ainda tem as linhas "* MINUTA DE DOCUMENTO" (mesmo sem o MINUTA no fundo), clique em "Remover marca MINUTA" e depois em Salvar.
 E: Todas as linhas "* MINUTA DE DOCUMENTO" somem de uma vez, sem deixar linhas em branco, e o resto do texto fica igual.
+
+### T113 – Documento interno novo já vem com Público marcado (v0.22.2)
+F: Num processo, clique em Incluir Documento e escolha Edital Gabinete (ou outro documento interno, como Despacho).
+E: O nível de acesso Público já aparece marcado, com o aviso verde "Preenchido pela extensão"; nada é salvo até você clicar em Salvar.

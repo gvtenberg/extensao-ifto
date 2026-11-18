@@ -8,6 +8,14 @@
     return acao === 'documento_receber'
   }
 
+  // v0.22.2: documento interno NOVO (Edital, Despacho…): página "documento_gerar". Só o nível Público é
+  // marcado (documento interno não tem data nem formato para preencher); o que já existe abre em "documento_alterar".
+  function ehDocumentoInternoNovo (endereco) {
+    let acao
+    try { acao = new URL(endereco, 'https://sei.ifto.edu.br/').searchParams.get('acao') } catch (erro) { return false }
+    return acao === 'documento_gerar'
+  }
+
   // Data no formato do SEI: dd/mm/aaaa.
   function dataDeHoje (agora = new Date()) {
     const dois = n => String(n).padStart(2, '0')
@@ -23,7 +31,7 @@
     }
   }
 
-  const api = { ehDocumentoExternoNovo, dataDeHoje, oQuePreencher }
+  const api = { ehDocumentoExternoNovo, ehDocumentoInternoNovo, dataDeHoje, oQuePreencher }
   if (typeof module !== 'undefined' && module.exports) module.exports = api
   else raiz.ExtensaoIFTO = Object.assign(raiz.ExtensaoIFTO || {}, { documentoExterno: api })
 })(globalThis)
