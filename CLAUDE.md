@@ -64,6 +64,15 @@ Extension for **Firefox** and Chrome (free package, v0.5.0) that goes with the c
 - Commit without waiting to be asked: before each stage or round (if there are pending changes) and when finished, in the format **"vX.Y.Z: type: short summary"** (e.g. "v0.1.3: feat: procurar atualização na janela"; without a version change: "docs: summary"). Types: `feat`, `fix`, `style`, `refactor`, `docs`, `chore`, `test`, `ci`. Check in `git status` that nothing from `ferramentas-de-teste/`, keys or `.xpi` got in.
 - **Never `git push`** without being asked: the push triggers Mozilla signing (and GitHub Actions has usage limits). Say the commit was not pushed.
 
+## Colleague's fork and pull requests (18/11/2026)
+
+A colleague works in the fork `dcarvalho89/extensao-ifto` and sends pull requests. Two branches made in parallel reuse the same test numbers and versions, and that breaks the merge (v0.21.1: T87 to T94 repeated and a `=======` line left behind). So, **in the fork, before opening or updating a pull request** (and again if GitHub says "This branch has conflicts"):
+1. `git fetch https://github.com/gvtenberg/extensao-ifto.git master` and `git merge FETCH_HEAD`.
+2. Own new tests renumbered to after the last `T`/`P` number of master's `TESTES-PENDENTES.md` and moved to the end of the file; own version after the last one in master's `docs/historico.md` (bump `manifest.json` again if needed).
+3. Conflicts: keep both sides' text, then delete every `<<<<<<<`, `=======` and `>>>>>>>` line (`npm test` fails if one is left).
+4. `npm test` and `npm run conferir` must pass; commit and push to the fork.
+- **Owner (gvtenberg):** merge only when the pull request shows the green check ✓ ("All checks have passed"). With a red ✗, do not merge: ask Claude to fix it.
+
 ## Commands
 
 - `npm test` (rules in `testes/*.test.js`, Node runner; create a test for each new rule in `comum/`) · `npm run conferir` (Mozilla check, `web-ext lint --self-hosted`; at the end of each stage) · `npm run empacotar` (package in `web-ext-artifacts/`, outside git) · `npm run empacotar-chrome` (Chrome/Edge folder and `.zip` `extensao-ifto-chrome-edge-X.Y.Z` in `web-ext-artifacts/chrome/`; Firefox file in Releases: `extensao-ifto-firefox-X.Y.Z.xpi`, v0.18.1) · `npm run rodar` (test Firefox, clean profile without passwords; for the SEI, prefer the temporary install).
