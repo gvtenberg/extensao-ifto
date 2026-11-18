@@ -4,25 +4,12 @@
 // Opção "automatica": só na Direção-geral.
 (async function () {
   if (window.top !== window) return
-  const { minutaEdital: regras, configuracoes, sei } = globalThis.ExtensaoIFTO
-  const navegador = globalThis.browser || globalThis.chrome
+  const { minutaEdital: regras, configuracoes } = globalThis.ExtensaoIFTO
   if (!regras.ehEdital(document.title)) return
 
   const opcoes = await configuracoes.lerConfiguracoes()
-  if (!regras.funcaoLigada(opcoes.minutaEdital, await unidadeAberta())) return
+  if (!regras.funcaoLigada(opcoes.minutaEdital, await globalThis.ExtensaoIFTO.caixaEditor.unidadeAberta())) return
 
-  // O editor não mostra a unidade: vem do número no endereço (gravado pelas páginas do SEI) ou da janela
-  // do SEI que abriu o editor.
-  async function unidadeAberta () {
-    const numero = sei.numeroDaUnidade(location.href)
-    const { unidadesSei = {} } = await navegador.storage.local.get('unidadesSei')
-    if (numero && unidadesSei[numero]) return unidadesSei[numero]
-    try {
-      const campo = window.opener && window.opener.top.document.getElementById('lnkInfraUnidade')
-      if (campo) return campo.textContent.trim()
-    } catch (erro) {}
-    return ''
-  }
 
   const { criarCaixa, pedirAoFundo: pedir, criar } = globalThis.ExtensaoIFTO.caixaEditor
   const verificado = await pedir('minutaVerificar')

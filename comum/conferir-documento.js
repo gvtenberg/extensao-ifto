@@ -130,6 +130,149 @@
     return `O número do processo está errado (documento no processo ${conferido.processo}, texto diz ${conferido.escrito}). Assinar mesmo assim?`
   }
 
+  // ---- v0.26.5: timbre e rodapé (unidades do Campus Palmas; D3, D4, D11, D12, D14) ----
+  const TIMBRE_FIXO = Object.freeze(['Ministério da Educação', 'Secretaria de Educação Profissional e Tecnológica', 'Instituto Federal de Educação, Ciência e Tecnologia do Tocantins', 'Campus Palmas'])
+  // D14: Gabinete (PAL/REI/IFTO) sem cadastro em "Minhas unidades".
+  const LINHAS_DO_GABINETE = Object.freeze(['Gabinete da Direção-Geral'])
+  const TELEFONE_PADRAO = '6332364000'
+  const EMAIL_PADRAO = 'palmas@ifto.edu.br'
+  const comparavel = texto => sohTexto(texto).replace(/[\u200b-\u200d\u2060\ufeff]/g, '').toLowerCase()
+  const mesmaLinha = (a, b) => comparavel(a) === comparavel(b)
+  const ehReitoria = linha => comparavel(linha) === 'reitoria'
+  const paragrafos = html => [...String(html || '').matchAll(/<p\b([^>]*)>([\s\S]*?)<\/p>/gi)]
+  const classeDe = atributos => (/class\s*=\s*"([^"]*)"/i.exec(atributos) || [])[1] || ''
+  const ehDoTimbre = classe => /^IFTO_Cabe(ç|&ccedil;)alho/i.test(classe)
+  const ehDoRodape = classe => /rodape/i.test(classe)
+
+  // Linhas do timbre (texto), na ordem; a do brasão (sem texto) fica de fora.
+  function linhasDoTimbre (secoes) {
+    const linhas = []
+    for (const secao of secoes || []) {
+      for (const [, atributos, dentro] of paragrafos(secao.html)) {
+        if (!ehDoTimbre(classeDe(atributos))) continue
+        const texto = textoDoHtml(dentro)
+        if (texto) linhas.push(texto)
+      }
+    }
+    return linhas
+  }
+
+  // Seção (do editor) que tem o timbre ou o rodapé.
+  function secaoCom (secoes, eh) {
+    return (secoes || []).find(secao => paragrafos(secao.html).some(([, atributos]) => eh(classeDe(atributos)))) || null
+  }
+
+  // Linhas que o timbre deve ter: as fixas e as do setor da unidade. Unidade sem cadastro: as fixas e as
+  // outras linhas que já estão lá (sem "Reitoria", D12), porque não dá para saber as do setor.
+  function timbreEsperado (linhas, unidade, sigla) {
+    if (unidade && unidade.linhas && unidade.linhas.length) return [...TIMBRE_FIXO, ...unidade.linhas]
+    if (siglaDaUnidade(sigla) === 'PAL/REI/IFTO') return [...TIMBRE_FIXO, ...LINHAS_DO_GABINETE]
+    const outras = (linhas || []).filter(linha => !ehReitoria(linha) && !TIMBRE_FIXO.some(fixa => mesmaLinha(fixa, linha)))
+    return [...TIMBRE_FIXO, ...outras]
+  }
+
+  // Confere o timbre: null se o documento não tem timbre. Devolve { certo, faltam, sobram, foraDeOrdem, esperado }.
+  function conferirTimbre (secoes, unidade, sigla) {
+    const linhas = linhasDoTimbre(secoes)
+    if (!linhas.length) return null
+    const esperado = timbreEsperado(linhas, unidade, sigla)
+    const faltam = esperado.filter(linha => !linhas.some(outra => mesmaLinha(outra, linha)))
+    const sobram = linhas.filter(linha => !esperado.some(outra => mesmaLinha(outra, linha)))
+    const igual = linhas.length === esperado.length && linhas.every((linha, i) => mesmaLinha(linha, esperado[i]))
+    return { certo: igual, faltam, sobram, foraDeOrdem: !igual && !faltam.length && !sobram.length, esperado }
+  }
+
+  function avisosDoTimbre (conferido) {
+    const avisos = []
+    for (const linha of conferido.faltam) avisos.push(`Falta a linha "${linha}".`)
+    for (const linha of conferido.sobram) avisos.push(`A linha "${linha}" não é desta unidade.`)
+    if (conferido.foraDeOrdem) avisos.push('As linhas estão fora de ordem.')
+    return avisos
+  }
+
+  const escaparHtml = texto => String(texto).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;')
+
+  // Timbre corrigido: o parágrafo do brasão fica; as linhas de texto viram as esperadas, com a mesma classe.
+  function corrigirTimbre (html, esperado) {
+    const lista = paragrafos(html).filter(([, atributos]) => ehDoTimbre(classeDe(atributos)))
+    const comTexto = lista.filter(([, , dentro]) => textoDoHtml(dentro))
+    if (!comTexto.length) return null
+    const atributos = comTexto[0][1]
+    const novas = esperado.map(linha => `<p${atributos}>${escaparHtml(linha)}</p>`).join('')
+    let posto = false
+    const novo = String(html).replace(/<p\b([^>]*)>([\s\S]*?)<\/p>/gi, (tudo, attrs, dentro) => {
+      if (!ehDoTimbre(classeDe(attrs)) || !textoDoHtml(dentro)) return tudo
+      if (posto) return ''
+      posto = true
+      return novas
+    })
+    return novo
+  }
+
+  // Telefone: só os dígitos, sem o 55 do país.
+  const digitosDoTelefone = texto => soDigitos(texto).replace(/^55(?=\d{10,11}$)/, '')
+  function formatarTelefone (texto) {
+    const d = digitosDoTelefone(texto)
+    return d.length === 10 ? `${d.slice(0, 2)} ${d.slice(2, 6)}-${d.slice(6)}` : d.length === 11 ? `${d.slice(0, 2)} ${d.slice(2, 7)}-${d.slice(7)}` : sohTexto(texto)
+  }
+  function dadosDoRodape (unidade) {
+    const telefone = digitosDoTelefone(unidade && unidade.telefone) || TELEFONE_PADRAO
+    const email = (unidade && unidade.email) || EMAIL_PADRAO
+    return { telefone, email: email.toLowerCase(), cep: '77021090' }
+  }
+  const PARTES_DO_ENDERECO = Object.freeze(['Quadra 310 Sul', 'Lo 5', 'Avenida NS 10', 'Plano Diretor Sul', 'Palmas/TO'])
+
+  // Confere o rodapé só pelos dados (D11): endereço, CEP, telefone e e-mail; pontos, parênteses, "esquina
+  // com a" e o site antigo não contam. null se o documento não tem rodapé.
+  function conferirRodape (secoes, unidade) {
+    const secao = secaoCom(secoes, ehDoRodape)
+    if (!secao) return null
+    const texto = paragrafos(secao.html).filter(([, atributos]) => ehDoRodape(classeDe(atributos))).map(([, , dentro]) => textoDoHtml(dentro)).join(' ')
+    const esperado = dadosDoRodape(unidade)
+    const avisos = []
+    for (const parte of PARTES_DO_ENDERECO) {
+      if (!comparavel(texto).includes(comparavel(parte))) avisos.push(`Falta "${parte}" no endereço.`)
+    }
+    const cep = texto.match(/CEP\s*([\d.\-\s]{8,11})/i)
+    if (!cep || soDigitos(cep[1]) !== esperado.cep) avisos.push('O CEP deve ser 77021-090.')
+    const telefones = [...texto.matchAll(/(?:\+?55\s*)?\(?\d{2}\)?\s*\d{4,5}\s*-?\s*\d{4}/g)].map(achado => digitosDoTelefone(achado[0]))
+    if (!telefones.length) avisos.push(`Falta o telefone ${formatarTelefone(esperado.telefone)}.`)
+    for (const telefone of new Set(telefones)) {
+      if (telefone !== esperado.telefone) avisos.push(`Telefone ${formatarTelefone(telefone)}: o certo é ${formatarTelefone(esperado.telefone)}.`)
+    }
+    const emails = [...texto.matchAll(/[\w.+-]+@[\w-]+(?:\.[\w-]+)+/g)].map(achado => achado[0].toLowerCase())
+    if (!emails.length) avisos.push(`Falta o e-mail ${esperado.email}.`)
+    for (const email of new Set(emails)) {
+      if (email !== esperado.email) avisos.push(`E-mail ${email}: o certo é ${esperado.email}.`)
+    }
+    return { certo: !avisos.length, avisos, secao: secao.nome, editavel: secao.editavel !== false }
+  }
+
+  // Rodapé no texto do D4, com os links (e-mail, site e telefone). Mantém a classe e o estilo do parágrafo.
+  function rodapeEsperado (unidade, atributos = ' class="IFTO_Centralizado_rodape"') {
+    const { telefone, email } = dadosDoRodape(unidade)
+    return `<p${atributos}>Quadra 310 Sul, Lo 5, s/n, esquina com a Avenida NS 10 - Plano Diretor Sul — CEP 77021-090<br>` +
+      `Palmas/TO — <a href="tel:+55${telefone}">${formatarTelefone(telefone)}</a><br>` +
+      `<a href="https://palmas.ifto.edu.br">palmas.ifto.edu.br</a> — <a href="mailto:${escaparHtml(email)}">${escaparHtml(email)}</a></p>`
+  }
+  function corrigirRodape (html, unidade) {
+    const lista = paragrafos(html).filter(([, atributos]) => ehDoRodape(classeDe(atributos)))
+    if (!lista.length) return null
+    let posto = false
+    return String(html).replace(/<p\b([^>]*)>([\s\S]*?)<\/p>/gi, (tudo, attrs) => {
+      if (!ehDoRodape(classeDe(attrs))) return tudo
+      if (posto) return ''
+      posto = true
+      return rodapeEsperado(unidade, attrs)
+    })
+  }
+
+  // "Usar este timbre como padrão da unidade" (D3): linhas do setor = as do timbre depois das fixas (sem
+  // "Reitoria").
+  function linhasDoSetor (secoes) {
+    return linhasDoTimbre(secoes).filter(linha => !ehReitoria(linha) && !TIMBRE_FIXO.some(fixa => mesmaLinha(fixa, linha)))
+  }
+
   // v0.26.4: número SEI do documento ("SEI nº 3390347", na linha da referência).
   function numeroSeiDoDocumento (html) {
     const achado = textoDoHtml(html).match(/SEI\s*n\s*[º°o]?\s*(\d{5,})/i)
@@ -160,7 +303,7 @@
   // Documento já assinado: a página do documento mostra "Documento assinado eletronicamente por".
   const estaAssinado = html => /assinado\s+eletronicamente\s+por/i.test(textoDoHtml(html))
 
-  const api = { siglaDaUnidade, ehUnidadePalmas, limparUnidade, limparUnidades, acharUnidade, textoDoHtml, formatarProcesso, mesmoProcesso, processoDaReferencia, linhaDoProcesso, conferirProcesso, avisoDoProcesso, perguntaAntesDeAssinar, corrigirProcesso, estaAssinado, numeroSeiDoDocumento, aceitar, foiAceito }
+  const api = { siglaDaUnidade, ehUnidadePalmas, limparUnidade, limparUnidades, acharUnidade, textoDoHtml, formatarProcesso, mesmoProcesso, processoDaReferencia, linhaDoProcesso, conferirProcesso, avisoDoProcesso, perguntaAntesDeAssinar, corrigirProcesso, estaAssinado, numeroSeiDoDocumento, aceitar, foiAceito, TIMBRE_FIXO, linhasDoTimbre, timbreEsperado, conferirTimbre, avisosDoTimbre, corrigirTimbre, secaoCom, ehDoTimbre, ehDoRodape, formatarTelefone, conferirRodape, rodapeEsperado, corrigirRodape, linhasDoSetor }
   if (typeof module !== 'undefined' && module.exports) module.exports = api
   else raiz.ExtensaoIFTO = Object.assign(raiz.ExtensaoIFTO || {}, { conferirDocumento: api })
 })(globalThis)

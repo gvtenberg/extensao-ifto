@@ -83,3 +83,52 @@ test('v0.26.4: número SEI do documento e "Assinar mesmo assim" só no dia', () 
   assert.equal(c.foiAceito(guardado, '2', new Date(2026, 10, 19)), false)
   assert.deepEqual(c.aceitar(guardado, ['9'], new Date(2026, 10, 19)).numeros, ['9'])
 })
+
+// v0.26.5: timbre e rodapé, como nas páginas salvas (Despacho 67/2026/CGOC, Folha de encaminhamento).
+const cab = linhas => '<p class="IFTO_Cabe&ccedil;alho_"><img src="x"></p>' + linhas.map(l => '<p class="IFTO_Cabe&ccedil;alho_Novo">' + l + '</p>').join('')
+const FIXO = ['Minist&eacute;rio da Educa&ccedil;&atilde;o', 'Secretaria de Educa&ccedil;&atilde;o Profissional e Tecnol&oacute;gica', 'Instituto Federal de Educa&ccedil;&atilde;o, Ci&ecirc;ncia e Tecnologia do Tocantins']
+const cgoc = { sigla: 'CGOC/PAL/REI/IFTO', telefone: '63 3236-4012', email: 'contratos.palmas@ifto.edu.br', linhas: ['Diretoria de Administração e Planejamento', 'Coordenação de Gestão Orçamentária e Contratos'] }
+
+test('v0.26.5: timbre certo, com espaço duro e caracteres invisíveis', () => {
+  const r = c.conferirTimbre([{ nome: 'a', html: cab([...FIXO, 'Campus&nbsp;Palmas', 'Diretoria de Administração e Planejamento⁠', 'Coordenação de Gestão Orçamentária e Contratos ']) }], cgoc, cgoc.sigla)
+  assert.equal(r.certo, true)
+  assert.equal(c.conferirTimbre([{ nome: 'a', html: '<p>sem timbre</p>' }], cgoc, cgoc.sigla), null)
+})
+
+test('v0.26.5: timbre com "Reitoria" e sem as linhas do setor (D12)', () => {
+  const r = c.conferirTimbre([{ nome: 'a', html: cab([...FIXO, 'Reitoria']) }], cgoc, cgoc.sigla)
+  assert.equal(r.certo, false)
+  assert.deepEqual(c.avisosDoTimbre(r), ['Falta a linha "Campus Palmas".', 'Falta a linha "Diretoria de Administração e Planejamento".', 'Falta a linha "Coordenação de Gestão Orçamentária e Contratos".', 'A linha "Reitoria" não é desta unidade.'])
+  // unidade sem cadastro: só as fixas e "Reitoria" contam
+  const sem = c.conferirTimbre([{ nome: 'a', html: cab([...FIXO, 'Campus Palmas', 'Gerência X']) }], null, 'X/PAL/REI/IFTO')
+  assert.equal(sem.certo, true)
+  // D14: Gabinete sem cadastro
+  const gab = c.conferirTimbre([{ nome: 'a', html: cab([...FIXO, 'Campus Palmas']) }], null, 'PAL/REI/IFTO')
+  assert.deepEqual(gab.faltam, ['Gabinete da Direção-Geral'])
+})
+
+test('v0.26.5: corrigir o timbre mantém o brasão e a classe', () => {
+  const r = c.conferirTimbre([{ nome: 'a', html: cab([...FIXO, 'Reitoria']) }], cgoc, cgoc.sigla)
+  const novo = c.corrigirTimbre(cab([...FIXO, 'Reitoria']), r.esperado)
+  assert.ok(novo.startsWith('<p class="IFTO_Cabe&ccedil;alho_"><img src="x"></p><p class="IFTO_Cabe&ccedil;alho_Novo">Ministério da Educação</p>'))
+  assert.equal(c.conferirTimbre([{ nome: 'a', html: novo }], cgoc, cgoc.sigla).certo, true)
+  assert.deepEqual(c.linhasDoSetor([{ html: cab([...FIXO, 'Reitoria', 'Campus Palmas', 'Gerência X']) }]), ['Gerência X'])
+})
+
+const rodape = texto => '<p class="IFTO_Centralizado_rodape" style="margin: 0px">' + texto + '</p>'
+test('v0.26.5: rodapé conferido só pelos dados (D11)', () => {
+  const certo = rodape('Quadra 310 Sul, Lo 5, s/n, Avenida NS 10 - Plano Diretor Sul&nbsp;&mdash; CEP 77.021-090<br>Palmas/TO &mdash; (63) 3236-4012<br>portal.ifto.edu.br/palmas &mdash; contratos.palmas@ifto.edu.br')
+  assert.equal(c.conferirRodape([{ nome: 'r', html: certo }], cgoc).certo, true)
+  const reitoria = rodape('Quadra 310 Sul, Lo 5, s/n, esquina com a Avenida NS 10 - Plano Diretor Sul — CEP Palmas/TO — (63) 3236-4000<br>portal.ifto.edu.br — reitoria@ifto.edu.br')
+  assert.deepEqual(c.conferirRodape([{ nome: 'r', html: reitoria }], cgoc).avisos, ['O CEP deve ser 77021-090.', 'Telefone 63 3236-4000: o certo é 63 3236-4012.', 'E-mail reitoria@ifto.edu.br: o certo é contratos.palmas@ifto.edu.br.'])
+  // sem cadastro: telefone e e-mail gerais do campus
+  assert.deepEqual(c.conferirRodape([{ nome: 'r', html: reitoria }], null).avisos, ['O CEP deve ser 77021-090.', 'E-mail reitoria@ifto.edu.br: o certo é palmas@ifto.edu.br.'])
+  assert.equal(c.conferirRodape([{ nome: 'r', html: '<p>x</p>' }], null), null)
+})
+
+test('v0.26.5: rodapé corrigido com o texto do D4 e os links', () => {
+  const novo = c.corrigirRodape(rodape('velho') + rodape('segunda linha'), cgoc)
+  assert.equal(novo, '<p class="IFTO_Centralizado_rodape" style="margin: 0px">Quadra 310 Sul, Lo 5, s/n, esquina com a Avenida NS 10 - Plano Diretor Sul — CEP 77021-090<br>Palmas/TO — <a href="tel:+556332364012">63 3236-4012</a><br><a href="https://palmas.ifto.edu.br">palmas.ifto.edu.br</a> — <a href="mailto:contratos.palmas@ifto.edu.br">contratos.palmas@ifto.edu.br</a></p>')
+  assert.equal(c.conferirRodape([{ nome: 'r', html: novo }], cgoc).certo, true)
+  assert.equal(c.formatarTelefone('+55 (63) 3236-4000'), '63 3236-4000')
+})

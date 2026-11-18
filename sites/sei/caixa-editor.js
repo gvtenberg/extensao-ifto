@@ -49,5 +49,21 @@
     return Promise.race([navegador.runtime.sendMessage({ ...extras, tipo }).catch(erro => ({ ok: false, erro: erro.message })), limite])
   }
 
-  raiz.ExtensaoIFTO = Object.assign(raiz.ExtensaoIFTO || {}, { caixaEditor: { criarCaixa, pedirAoFundo, criar } })
+  // O editor não mostra a unidade: vem do número no endereço (gravado pelas páginas do SEI) ou da janela
+  // do SEI que abriu o editor (v0.22.0, em minuta-edital.js; v0.26.5 aqui, também na página do documento).
+  async function unidadeAberta () {
+    const sei = raiz.ExtensaoIFTO.sei
+    const numero = sei.numeroDaUnidade(location.href)
+    const { unidadesSei = {} } = await navegador.storage.local.get('unidadesSei')
+    if (numero && unidadesSei[numero]) return unidadesSei[numero]
+    for (const janela of [window.opener, window.top]) {
+      try {
+        const campo = janela && janela.top.document.getElementById('lnkInfraUnidade')
+        if (campo) return campo.textContent.trim()
+      } catch (erro) {}
+    }
+    return ''
+  }
+
+  raiz.ExtensaoIFTO = Object.assign(raiz.ExtensaoIFTO || {}, { caixaEditor: { criarCaixa, pedirAoFundo, criar, unidadeAberta } })
 })(globalThis)

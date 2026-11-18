@@ -2,6 +2,7 @@
 
 One or two lines per version, with the date (dd/mm/yyyy). Number 0.STAGE.FIX.
 
+- v0.26.5 (18/11/2026): timbre and footer check in Campus Palmas units (data from "Minhas unidades"; footer compared by data only, D11; "Reitoria" always warned, D12; Gabinete line, D14): warning on the document page (unsigned) and in the editor with "Corrigir timbre", "Corrigir rodapé" (D4 text with links) and "Usar este timbre como padrão da unidade" (stage 6).
 - v0.26.4 (18/11/2026): signature list: "Não, corrigir antes" stops the "Assinar e próximo" wait; a document range is checked once and the wrong ones shown in one window ("Assinar mesmo assim" holds for the day); Bloco de assinatura left for later (D16) (stage 5).
 - v0.26.3 (18/11/2026): window "Assinar mesmo assim?" before signing a document with a wrong process number, from "Assinar Documento" in the tree and "Assinar" (or Ctrl+Shift+A) in the editor; if the check cannot read the document, the SEI signs normally (stage 4).
 - v0.26.2 (18/11/2026): process number check: the "Processo nº:" line (and the Edital title line) compared with the process the document is in; warning on the document page (unsigned only) with a button that opens the editor, and in the editor with "Corrigir o número do processo" (Edital SEI link: warning only, D17) (stage 3).

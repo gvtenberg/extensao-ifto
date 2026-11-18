@@ -75,8 +75,10 @@ function tratarRecado (recado, remetente) {
     case 'numeracaoPreparar': return numeracaoNoEditor(remetente, false)
     case 'numeracaoCorrigir': return numeracaoNoEditor(remetente, true)
     // v0.26.2 (spec conferir-documento): conferir o documento no editor (número do processo).
-    case 'conferirVerificar': return conferirNoEditor(remetente, '')
-    case 'conferirCorrigir': return conferirNoEditor(remetente, recado.qual)
+    case 'conferirVerificar': return conferirNoEditor(remetente, { sigla: recado.sigla })
+    case 'conferirCorrigir': return conferirNoEditor(remetente, recado)
+    // v0.26.5 (D3): linhas do setor do timbre aberto no editor, para "Usar este timbre como padrão da unidade".
+    case 'conferirLinhasDoSetor': return rodarNoEditor(remetente)(globalThis.ExtensaoIFTO.editorLer).then(lido => lido.ok ? { ok: true, linhas: globalThis.ExtensaoIFTO.conferirDocumento.linhasDoSetor(lido.secoes) } : lido)
     // v0.17.5: texto de um PDF pedido pela página do SEI (no Firefox o pdf.js só funciona aqui).
     case 'lerPdf': return globalThis.ExtensaoIFTO.pdfTexto ? globalThis.ExtensaoIFTO.pdfTexto.textoDoPdf(recado.bytes).then(texto => ({ texto })) : Promise.resolve({ erro: 'Leitura de PDF indisponível.' })
   }
@@ -540,26 +542,46 @@ async function minutaNoEditor (remetente, remover) {
   return { ok: true, marcas, removidas, restou: depois.ok ? contar(secoes) : 0, trechos }
 }
 
-// v0.26.2 (spec conferir-documento): confere o número do processo do texto do editor; com "qual" =
-// 'processo', troca o número só na linha "Processo nº:" e confere de novo. Nunca salva.
-// Devolve { ok, erro, processo: { certo, processo, escrito, editavel, link } | null }.
-async function conferirNoEditor (remetente, qual) {
+// v0.26.2 (spec conferir-documento): confere o texto do editor; com "qual" corrige só aquela parte e confere
+// de novo. Nunca salva. 'processo': troca o número só na linha "Processo nº:". v0.26.5: 'timbre' e 'rodape'
+// (só em unidades do Campus Palmas; dados da unidade em "Minhas unidades").
+// Devolve { ok, erro, processo, timbre, rodape } (cada um null quando não há o que conferir).
+async function conferirNoEditor (remetente, recado) {
   const regras = globalThis.ExtensaoIFTO.conferirDocumento
+  const opcoes = await globalThis.ExtensaoIFTO.configuracoes.lerConfiguracoes()
+  const sigla = regras.siglaDaUnidade(recado.sigla)
+  const palmas = regras.ehUnidadePalmas(sigla)
+  const unidade = regras.acharUnidade(opcoes.unidades, sigla)
   const rodar = rodarNoEditor(remetente)
+  const conferir = secoes => ({
+    processo: opcoes.conferirProcesso ? regras.conferirProcesso(secoes) : null,
+    timbre: palmas && opcoes.conferirTimbre ? regras.conferirTimbre(secoes, unidade, sigla) : null,
+    rodape: palmas && opcoes.conferirRodape ? regras.conferirRodape(secoes, unidade) : null
+  })
   const lido = await rodar(globalThis.ExtensaoIFTO.editorLer)
   if (!lido.ok) return { ok: false, erro: lido.erro }
-  const processo = regras.conferirProcesso(lido.secoes)
-  if (qual !== 'processo') return { ok: true, processo }
-  if (!processo || processo.certo) return { ok: true, processo }
-  const secao = lido.secoes.find(outra => outra.nome === processo.secao)
-  const novo = secao && secao.editavel && !processo.link && regras.corrigirProcesso(secao.html, processo.processo)
-  if (!novo) return { ok: false, erro: 'Essa parte do documento não dá para mudar.' }
+  const antes = conferir(lido.secoes)
+  const qual = recado.qual
+  if (!qual || !antes[qual] || antes[qual].certo) return { ok: true, ...antes }
+  let secao = null
+  let novo = null
+  if (qual === 'processo') {
+    secao = lido.secoes.find(outra => outra.nome === antes.processo.secao)
+    novo = secao && !antes.processo.link && regras.corrigirProcesso(secao.html, antes.processo.processo)
+  } else if (qual === 'timbre') {
+    secao = regras.secaoCom(lido.secoes, regras.ehDoTimbre)
+    novo = secao && regras.corrigirTimbre(secao.html, antes.timbre.esperado)
+  } else if (qual === 'rodape') {
+    secao = regras.secaoCom(lido.secoes, regras.ehDoRodape)
+    novo = secao && regras.corrigirRodape(secao.html, unidade)
+  }
+  if (!secao || !secao.editavel || !novo) return { ok: false, erro: 'Essa parte do documento não dá para mudar no editor.' }
   const gravado = await rodar(globalThis.ExtensaoIFTO.editorGravar, [{ [secao.nome]: novo }])
   if (!gravado.ok) return { ok: false, erro: gravado.erro }
   const depois = await rodar(globalThis.ExtensaoIFTO.editorLer)
-  const conferido = depois.ok && regras.conferirProcesso(depois.secoes)
-  if (!conferido || !conferido.certo) return { ok: false, erro: 'O editor não ficou com o número novo.' }
-  return { ok: true, processo: conferido }
+  const conferido = depois.ok ? conferir(depois.secoes) : null
+  if (!conferido || !conferido[qual] || !conferido[qual].certo) return { ok: false, erro: 'O editor não ficou com o texto novo.' }
+  return { ok: true, ...conferido }
 }
 
 // v0.23.0 (spec data-documento): acha a data do Ofício ou da Portaria; com "trocar", põe a de hoje só nessa

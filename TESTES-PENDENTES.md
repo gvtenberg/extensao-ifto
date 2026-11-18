@@ -454,3 +454,25 @@ E: A janela "Assinar mesmo assim?" aparece antes da assinatura; com "Não" o doc
 ### T139 – Intervalo de documentos com números errados (v0.26.4) (Crítico)
 F: Cole na lista um intervalo ("3383754 a 3383903") de um processo em que um ou mais documentos têm o número do processo errado e abra o processo.
 E: Aparece uma janela só com a lista dos documentos errados (número e os dois processos); com "Assinar mesmo assim", "Assinar e próximo" assina esses documentos sem perguntar de novo; com "Não", a pergunta aparece em cada um.
+
+> antes de testar: cadastre a sua unidade em Configurações > Minhas unidades (sigla, telefone, e-mail e linhas do setor).
+
+### T140 – Aviso de timbre e rodapé na página do documento (v0.26.5)
+F: Numa unidade do Campus Palmas, abra na árvore um documento ainda não assinado com "Reitoria" no timbre ou com o e-mail reitoria@ifto.edu.br no rodapé.
+E: Embaixo, à esquerda, aparece "Confira o timbre e o rodapé desta unidade" com a lista do que está errado e o botão "Abrir o editor para corrigir"; num documento certo ou já assinado nada aparece.
+
+### T141 – Corrigir timbre no editor (v0.26.5)
+F: Abra no editor esse documento e clique em "Corrigir timbre"; confira e clique em Salvar.
+E: O brasão fica; as linhas ficam "Ministério da Educação … Campus Palmas" e as linhas do setor cadastradas, sem "Reitoria"; Ctrl+Z desfaz antes de salvar.
+
+### T142 – Corrigir rodapé no editor (v0.26.5)
+F: No mesmo editor, clique em "Corrigir rodapé"; confira, clique em Salvar e gere o PDF.
+E: O rodapé fica com o endereço, CEP 77021-090, "Palmas/TO —" e o telefone e o e-mail da unidade; e-mail, site e telefone são links; formatação diferente (pontos, parênteses) num rodapé com os dados certos não gera aviso.
+
+### T143 – Usar este timbre como padrão da unidade (v0.26.5)
+F: Num documento com o timbre certo do seu setor, mas com a unidade sem as linhas cadastradas (ou com outras), clique em "Usar este timbre como padrão da unidade" e confirme.
+E: A janela mostra as linhas do setor; depois de confirmar, elas aparecem em Configurações > Minhas unidades na sua unidade.
+
+### T144 – Unidade fora do Campus Palmas (v0.26.5)
+F: Numa unidade sem "/PAL/" na sigla (por exemplo, da Reitoria), abra um documento no editor.
+E: Não aparece aviso de timbre nem de rodapé (o do número do processo continua funcionando).
