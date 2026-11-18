@@ -26,7 +26,15 @@
     moverTabelas: true,
     margensTabela: true,
     // v0.25.0: aviso "Corrigir a numeração" quando um item de edital tem o número longo demais ("10.10.").
-    numeracaoEdital: true
+    numeracaoEdital: true,
+    // v0.26.0 (spec conferir-documento): conferir número do processo, timbre e rodapé e dar espaço entre as
+    // partes do documento (todas ligadas, D10). "unidades": "Minhas unidades" (sigla, telefone, e-mail e
+    // linhas do setor no timbre), só neste navegador.
+    conferirProcesso: true,
+    conferirTimbre: true,
+    conferirRodape: true,
+    espacamentoDocumento: true,
+    unidades: Object.freeze([])
   })
 
   // Junta o que o usuário gravou com os padrões; opções que não existem mais são ignoradas.
@@ -34,6 +42,8 @@
     const resultado = { ...PADROES }
     for (const chave of Object.keys(PADROES)) {
       if (gravadas && chave in gravadas) resultado[chave] = gravadas[chave]
+      // v0.26.0: listas são copiadas, para não mexer no padrão.
+      if (Array.isArray(resultado[chave])) resultado[chave] = [...resultado[chave]]
     }
     return resultado
   }

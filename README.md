@@ -97,12 +97,21 @@ Nos dois casos, as configurações e a lista de assinaturas são mantidas.
 
 ## Configurações
 
-Para abrir: clique no ícone da extensão e em **Configurações**. Cada escolha é gravada na hora, sem botão de salvar.
+Para abrir: clique no ícone da extensão e em **Configurações**. Cada escolha é gravada na hora, sem botão de salvar. O menu à esquerda mostra um grupo de cada vez: Geral, Documentos do SEI, Minhas unidades, Direção-geral, SICAF e Simples, Licitação, Dicas e Ajuda.
 
 **Geral (todas as unidades)**
 
 - **Preencher documento externo novo** (ligada de início): data de hoje, Nato-digital e Público ao incluir um documento externo.
 - **Navegador reconhece o campo de senha** (ligada de início): faz o navegador voltar a oferecer a senha guardada no SEI.
+
+**Documentos do SEI (todas as unidades)**
+
+- **Conferir o documento** (quatro opções, ligadas de início): número do processo, timbre e rodapé (unidades do Campus Palmas) e espaço entre as partes do documento.
+- **Editor do SEI:** tabelas inteiras ao recortar e colar, margens da tabela e números longos nos itens de edital.
+
+**Minhas unidades**
+
+Cadastre as unidades em que você trabalha no SEI (sigla, telefone, e-mail e as linhas do setor que ficam abaixo de "Campus Palmas" no timbre). A extensão usa esses dados para conferir o timbre e o rodapé. Ficam guardados só no navegador.
 
 **Por unidade**
 
@@ -123,7 +132,7 @@ Cada função abaixo tem três opções: **Automática** (liga só na unidade in
 ## Quais dados a extensão lê e guarda
 
 - **O que lê:** somente as páginas do SEI abertas no navegador (unidade atual, árvore do processo, números dos documentos e versão do SEI), para saber onde colocar os botões e qual documento abrir. Para o SICAF, lê também o texto dos atestes e dos PDFs das notas fiscais e do SICAF do processo aberto, a página do SICAF no Compras.gov.br e o resultado da consulta do Simples Nacional (só depois da permissão e do clique em "Buscar"). No Compras IFTO (com a permissão), recebe só as peças que a pessoa envia com "Enviar ao SEI".
-- **O que guarda:** as configurações, a lista de assinaturas colada (até o uso do botão "Limpar lista"), a versão do último SEI aberto e os PDFs do SICAF e do Simples Nacional obtidos no dia (para não buscar de novo; os de outros dias são apagados), as peças do Compras IFTO que esperam para ir ao SEI (cada uma sai da lista quando é incluída ou com "Tirar da lista") e os tipos de documento criados no dia a partir delas (para o aviso de documento repetido). Esses dados ficam apenas no navegador do próprio computador.
+- **O que guarda:** as configurações (com a lista "Minhas unidades"), a lista de assinaturas colada (até o uso do botão "Limpar lista"), a versão do último SEI aberto e os PDFs do SICAF e do Simples Nacional obtidos no dia (para não buscar de novo; os de outros dias são apagados), as peças do Compras IFTO que esperam para ir ao SEI (cada uma sai da lista quando é incluída ou com "Tirar da lista") e os tipos de documento criados no dia a partir delas (para o aviso de documento repetido). Esses dados ficam apenas no navegador do próprio computador.
 - **Senha:** a extensão **não lê nem guarda a senha**. A senha fica no gerenciador de senhas do navegador; a extensão apenas verifica se o campo já está preenchido.
 - **Envio de dados:** a extensão não envia dados do SEI para nenhum outro site (no SICAF e no Simples Nacional, só digita o CNPJ do fornecedor na pesquisa). A única consulta externa é a verificação de nova versão (automática no Firefox, ou pelo botão "Procurar atualização"), feita na página de versões indicada em [Onde baixar](#onde-baixar).
 - **O que escreve no SEI:** a extensão só faz alterações no SEI a partir de um clique do usuário, por exemplo em "Assinar e próximo" ou na confirmação de "Incluir no processo" (SICAF e Simples Nacional) e de "Criar e salvar" (peças do Compras IFTO; a extensão abre a janela do editor do SEI, salva e a fecha). Em "Remover marca MINUTA", a extensão só muda o texto no editor; quem salva é você.

@@ -412,3 +412,13 @@ E: Em cada clique só o botão clicado fica marcado (nunca dois ao mesmo tempo);
 ### T129 – Trocar o estilo sem perder o fundo da célula (v0.25.3)
 F: Numa tabela com uma célula de fundo cinza, clique no texto dessa célula e troque o estilo (ex.: de "Tabela Texto Justificado" para "Tabela Texto Centralizado").
 E: O texto muda de alinhamento e a célula continua cinza (bordas também); um Ctrl+Z volta ao estilo anterior, ainda com o fundo cinza.
+
+## Conferir o documento do SEI (v0.26.0 a v0.26.5)
+
+### T130 – Configurações com menu ao lado (v0.26.0)
+F: Abra as Configurações da extensão e clique em cada item do menu à esquerda (Geral, Documentos do SEI, Minhas unidades…).
+E: Cada clique mostra só aquele grupo; as escolhas que você já tinha continuam marcadas; em "Documentos do SEI" as quatro opções de "Conferir o documento" vêm ligadas.
+
+### T131 – Cadastrar duas unidades (v0.26.0)
+F: Em "Minhas unidades", clique em "Adicionar unidade" duas vezes, preencha sigla, telefone, e-mail e linhas do setor de cada uma, feche a página e abra as Configurações de novo.
+E: As duas unidades continuam lá com os dados digitados; "Remover unidade" pede confirmação e tira a unidade.

@@ -33,6 +33,7 @@ People copy an old document and forget to fix the "Processo nº:" line, the sect
 - [x] D13 – Edital/Minuta title line "(Processo Administrativo n° …)" (an SEI link) is **also checked**, same warning and fix.
 - [x] D14 – Gabinete (PAL/REI/IFTO): fixed lines + "Gabinete da Direção-Geral"; a "Reitoria" line is an error.
 - [x] D15 – Copy signer names (18/11/2026, user): in SEI 5 the box "Documento assinado eletronicamente por …" cannot be selected; the extension makes it selectable on the document page (own switch, on by default). Nothing written to the SEI; the SEI's PDF is not changed.
+- [x] D16 – Order of work (18/11/2026, user): stages 1–6 now; stage 7 only after T123 is answered. Stage 5: only the extension's signature list; the Bloco de assinatura waits for a saved page of that SEI screen.
 - [x] D10 – The four new switches (process number, timbre, footer, spacing) start **on**.
 
 ## 4. Decided rules
@@ -66,7 +67,7 @@ People copy an old document and forget to fix the "Processo nº:" line, the sect
 
 ## 6. Stages
 
-- [ ] Stage 1 – Settings page reorganized (side menu: Geral, Documentos do SEI, Minhas unidades, Direção-geral, SICAF e Simples, Licitação, Dicas, Ajuda) + "Minhas unidades" list + the 4 switches (v0.26.0). Test: open the settings, add two units, reload, data kept.
+- [x] Stage 1 – Settings page reorganized (side menu: Geral, Documentos do SEI, Minhas unidades, Direção-geral, SICAF e Simples, Licitação, Dicas, Ajuda) + "Minhas unidades" list + the 4 switches (v0.26.0). Test: open the settings, add two units, reload, data kept.
 - [ ] Stage 2 – Copy signer names: the signature box on the document page becomes selectable (switch) (v0.26.1). Test: select and copy a name in a signed document.
 - [ ] Stage 3 – Process number: warning on the document page (unsigned) and in the editor, "Corrigir" button in the editor, pure rule + Node tests (v0.26.2).
 - [ ] Stage 4 – Pre-sign window: "Assinar Documento" in the tree and "Assinar" in the editor (v0.26.3). Critical test (signs in the SEI).
