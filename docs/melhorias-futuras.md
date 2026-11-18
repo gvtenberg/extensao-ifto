@@ -21,6 +21,7 @@ Summary to resume work (on another machine or by another person) without reading
 - **Done, waiting for tests (v0.18.4):** password recognized by Firefox also when signing from inside the document editor (user report, 17/11/2026). Test T87.
 - **Done, waiting for tests (v0.18.5):** choose which invoices are searched (cancelled ones unchecked); SICAF/Simples down: warning after 45 s, skip the site, cancel and go back to the invoices. Tests T88 to T91.
 - **Done, waiting for tests (v0.18.6):** blank Sicaf/Consulta without PDF keep the tree order (`specs/feitas/sicaf-em-branco.md`). Tests T92 to T95 (T92, T94 critical: write to the SEI).
+- **In progress (18/11/2026):** `specs/data-documento.md` (button "date to today" in the Ofício/Portaria editor, v0.23.0): decisions D1 to D3 answered; waiting for the saved Ofício editor page and D4 (setting). Chrome Web Store: user chose a personal Google account, "unlisted" (US$5 once); steps not started.
 - **Planned (with spec):** lines marked **[spec]** below. **Not planned:** the other lines (ideas).
 
 ## Ideas
