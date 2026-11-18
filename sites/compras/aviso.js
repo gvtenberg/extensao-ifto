@@ -74,9 +74,23 @@
     // v0.21.2: página de login do Gov.br › botão SerproID (fica na janela "Provedores de Certificados em
     // Nuvem"; o clique funciona mesmo com a janela fechada e passa pela verificação hCaptcha do Gov.br).
     escrever(dados.clicar ? 'loginGovBr' : 'loginGovBrManual')
-    tentar(() => document.getElementById('login-external-authentication-neoid')).then(serpro => {
+    // v0.21.4 (T104 falhou): o clique só vale depois que a verificação hCaptcha do Gov.br carregou (o quadro
+    // "data-hcaptcha-widget-id" aparece); antes disso o Gov.br ignora o clique e a página fica parada.
+    const serproPronto = () => {
+      const botao = document.getElementById('login-external-authentication-neoid')
+      return botao && document.querySelector('iframe[data-hcaptcha-widget-id]') ? botao : null
+    }
+    tentar(serproPronto, 30).then(async serpro => {
+      serpro = serpro || document.getElementById('login-external-authentication-neoid')
       if (!serpro) { escrever('loginGovBrManual'); return }
-      if (dados.clicar) { serpro.click(); return }
+      if (dados.clicar) {
+        serpro.click()
+        // Se o Gov.br mostrar o erro da verificação ("Tente novamente"), o aviso diz onde clicar.
+        await esperar(3000)
+        const erro = document.getElementById('hcaptcha-error')
+        if (erro && erro.style.display === 'flex') escrever('loginGovBrManual')
+        return
+      }
       const abrir = document.querySelector('#cert-digital-cloud button')
       if (abrir) { abrir.style.outline = '4px solid #1E5E33'; abrir.style.outlineOffset = '3px'; abrir.scrollIntoView({ block: 'center' }) }
     })
