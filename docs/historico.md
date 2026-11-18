@@ -2,6 +2,7 @@
 
 One or two lines per version, with the date (dd/mm/yyyy). Number 0.STAGE.FIX.
 
+- v0.26.3 (18/11/2026): window "Assinar mesmo assim?" before signing a document with a wrong process number, from "Assinar Documento" in the tree and "Assinar" (or Ctrl+Shift+A) in the editor; if the check cannot read the document, the SEI signs normally (stage 4).
 - v0.26.2 (18/11/2026): process number check: the "Processo nº:" line (and the Edital title line) compared with the process the document is in; warning on the document page (unsigned only) with a button that opens the editor, and in the editor with "Corrigir o número do processo" (Edital SEI link: warning only, D17) (stage 3).
 - v0.26.1 (18/11/2026): signer names in the box "Documento assinado eletronicamente por…" can be selected and copied on the document page (own switch, on; nothing written to the SEI) (stage 2).
 - v0.26.0 (18/11/2026): settings page with a side menu (one group at a time), shorter hints, "Minhas unidades" (SEI sigla, phone, e-mail, sector lines; only in this browser) and the four "Conferir o documento" switches, on by default (`specs/conferir-documento.md`, stage 1).

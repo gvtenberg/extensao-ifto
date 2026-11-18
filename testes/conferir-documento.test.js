@@ -66,3 +66,8 @@ test('v0.26.2: documento assinado', () => {
   assert.equal(c.estaAssinado('<p>Documento assinado eletronicamente por <b>Fulano</b></p>'), true)
   assert.equal(c.estaAssinado(linha('1')), false)
 })
+
+test('v0.26.3: pergunta antes de assinar com os dois números', () => {
+  assert.equal(c.perguntaAntesDeAssinar({ processo: '23236.018761/2026-05', escrito: '23236.000001/2025-11' }),
+    'O número do processo está errado (documento no processo 23236.018761/2026-05, texto diz 23236.000001/2025-11). Assinar mesmo assim?')
+})

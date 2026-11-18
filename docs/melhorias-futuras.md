@@ -24,7 +24,7 @@ Summary to resume work (on another machine or by another person) without reading
 - **Done, waiting for tests (v0.24.0):** tables in the SEI editor: cut and paste keeps the formatting, "Margens" box and "Alinhar com o texto" in "Propriedades da tabela" (`specs/feitas/tabelas-editor.md`, rules in `regras/sei.md`). Tests T118 to T121; v0.25.1–v0.25.3 fixes: T126 to T129.
 - **Done, waiting for tests (v0.25.0):** "Corrigir a numeração" for long edital numbers ("10.10.") (`specs/feitas/numeracao-edital.md`, rules in `regras/sei.md`). Tests T122 to T124 (T123 critical: the saved document and the PDF).
 - **In progress (18/11/2026):** `specs/data-documento.md` (button "Mudar a data para hoje" in the Ofício/Portaria editor): stage 1 coded (v0.23.0); waiting for D4 (setting) and the critical test T114 (does the SEI keep the date after Salvar?); tests T114 to T117.
-- **In progress (18/11/2026):** `specs/conferir-documento.md`: stages 1–3 done (v0.26.0–v0.26.2); stages 4–6 next; stage 7 (spacing) waits for T123; Bloco de assinatura waits for a saved page (D16).
+- **In progress (18/11/2026):** `specs/conferir-documento.md`: stages 1–4 done (v0.26.0–v0.26.3); stages 5–6 next; critical tests T136, T137; stage 7 (spacing) waits for T123; Bloco de assinatura waits for a saved page (D16).
 - **Planned (with spec):** lines marked **[spec]** below. **Not planned:** the other lines (ideas).
 
 ## Ideas

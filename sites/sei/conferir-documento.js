@@ -8,6 +8,38 @@
   const opcoes = await configuracoes.lerConfiguracoes()
   if (!opcoes.conferirProcesso) return
 
+  // v0.26.3 (D2): "Assinar" do editor (botão e Ctrl+Shift+A). A conferência é pedida à parte de fundo (lê o
+  // texto atual do editor); demorou ou falhou: o SEI assina normalmente (nunca trava a assinatura).
+  const { janelaAssinar } = globalThis.ExtensaoIFTO
+  const botaoAssinar = () => document.querySelector('button[data-cke-tooltip-text^="Assinar"]')
+  let liberado = false
+  let conferindo = false
+  async function antesDeAssinar (evento) {
+    if (liberado) return
+    const botao = botaoAssinar()
+    if (!botao) return
+    evento.preventDefault()
+    evento.stopImmediatePropagation()
+    if (conferindo) return
+    conferindo = true
+    const limite = new Promise(resolve => setTimeout(() => resolve(null), 10000))
+    const agora = await Promise.race([caixaEditor.pedirAoFundo('conferirVerificar'), limite])
+    conferindo = false
+    const errado = agora && agora.ok && agora.processo && !agora.processo.certo ? agora.processo : null
+    if (errado) {
+      const resposta = await janelaAssinar.perguntar(regras.perguntaAntesDeAssinar(errado), [], 'Não, corrigir antes')
+      if (resposta !== 'assinar') return
+    }
+    liberado = true
+    try { botao.click() } finally { liberado = false }
+  }
+  document.addEventListener('click', evento => {
+    if (evento.target && evento.target.closest && evento.target.closest('button[data-cke-tooltip-text^="Assinar"]')) antesDeAssinar(evento)
+  }, true)
+  window.addEventListener('keydown', evento => {
+    if (evento.ctrlKey && evento.shiftKey && !evento.altKey && (evento.key === 'A' || evento.key === 'a')) antesDeAssinar(evento)
+  }, true)
+
   const verificado = await caixaEditor.pedirAoFundo('conferirVerificar')
   const processo = verificado && verificado.ok && verificado.processo
   if (!processo || processo.certo) return

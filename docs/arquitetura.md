@@ -46,7 +46,9 @@ Plain JavaScript, no build step, Manifest V3 (D4 in `specs/base-e-sei.md`). Pure
 | `sites/sei/editor-numeracao.js` | (v0.25.0) Inside the editor page (world MAIN): finds items whose text went to the next line, watches changes (`postMessage` to the box), puts the style block (`corrigir`) |
 | `sites/sei/numeracao-edital.js` | (v0.25.0) Editor window: box "Corrigir a numeração" shown only while there are broken items |
 | `sites/sei/documento-visualizar.js` | (v0.26.1) Document page in the tree (`acao=documento_visualizar` frame): signer names selectable (D15); v0.26.2: wrong process number warning (unsigned) with a button that opens the editor |
-| `sites/sei/conferir-documento.js` | (v0.26.2) Editor window: "Corrigir o número do processo" box (asks the background `conferirVerificar` / `conferirCorrigir`) |
+| `sites/sei/conferir-documento.js` | (v0.26.2) Editor window: "Corrigir o número do processo" box (asks the background `conferirVerificar` / `conferirCorrigir`); v0.26.3: stops "Assinar" / Ctrl+Shift+A with a wrong number |
+| `sites/sei/janela-assinar.js` | (v0.26.3) "Assinar mesmo assim?" window (`perguntar`), shared by tree, editor and signature list |
+| `sites/sei/assinar-conferir.js` | (v0.26.3) Every SEI frame: catches "Assinar Documento" in the tree bar (also the one the signature list clicks) and reads the open document first |
 | `sites/sei/editor-preencher.js` | Function run by the background inside the SEI editor window (world MAIN, v0.21.0): finds the editor (CKEditor 5 multi-root or 4) and the body section, puts the text, clicks Salvar (never Assinar) and reports the editor and sections |
 | `sites/sei/lista-assinaturas.js` | Signature list floating panel (SEI main page): paste, navigate, open via quick search, "Assinar e próximo" / "Dar ciência e próximo" (waits for the SEI to reload the tree, then advances) |
 | `sites/sei/lista-assinaturas-teclas.js` | Alt+→ and Alt+← shortcuts with focus inside SEI frames (notifies the main page) |

@@ -106,7 +106,7 @@ Para abrir: clique no ícone da extensão e em **Configurações**. Cada escolha
 
 **Documentos do SEI (todas as unidades)**
 
-- **Conferir o documento** (quatro opções, ligadas de início): número do processo, timbre e rodapé (unidades do Campus Palmas) e espaço entre as partes do documento. Número do processo: quando a linha "Processo nº:" (ou o título do Edital) não é a do processo em que o documento está, aparece um aviso na página do documento (só antes de assinar) e, no editor, o botão "Corrigir o número do processo". Nada é salvo sem você clicar em Salvar.
+- **Conferir o documento** (quatro opções, ligadas de início): número do processo, timbre e rodapé (unidades do Campus Palmas) e espaço entre as partes do documento. Número do processo: quando a linha "Processo nº:" (ou o título do Edital) não é a do processo em que o documento está, aparece um aviso na página do documento (só antes de assinar) e, no editor, o botão "Corrigir o número do processo". Ao assinar (pela árvore ou no editor) um documento com o número errado, a extensão pergunta antes "Assinar mesmo assim?". Nada é salvo sem você clicar em Salvar.
 - **Copiar o nome de quem assinou** (ligada de início): na página do documento, os nomes da caixa "Documento assinado eletronicamente por…" podem ser selecionados e copiados.
 - **Editor do SEI:** tabelas inteiras ao recortar e colar, margens da tabela e números longos nos itens de edital.
 

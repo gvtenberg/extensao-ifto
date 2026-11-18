@@ -438,3 +438,11 @@ E: Só o número da linha "Processo nº:" muda para o do processo; o resto do te
 ### T135 – Edital com o processo errado no título (v0.26.2)
 F: Abra no editor um Edital ou Minuta copiado de outro processo, com o título "(Processo Administrativo n° …)" de outro processo.
 E: Aparece o aviso com os dois números, sem botão de correção, dizendo para apagar o número e colocar o link do processo certo.
+
+### T136 – Parar antes de assinar pela árvore (v0.26.3) (Crítico)
+F: Com o Despacho de número errado aberto na árvore, clique em "Assinar Documento" na barra do SEI; clique em "Não, corrigir antes"; depois clique de novo em "Assinar Documento" e em "Assinar mesmo assim".
+E: Aparece a janela "O número do processo está errado (documento no processo X, texto diz Y). Assinar mesmo assim?"; "Não" abre o editor sem assinar; "Assinar mesmo assim" abre a assinatura normal do SEI. Num documento com o número certo a assinatura abre direto, sem janela.
+
+### T137 – Parar antes de assinar no editor (v0.26.3) (Crítico)
+F: No editor de um documento com o número do processo errado, clique em "Assinar" (e, noutra vez, tecle Ctrl+Shift+A).
+E: Aparece a mesma janela antes da assinatura; "Não, corrigir antes" volta ao editor sem assinar; "Assinar mesmo assim" segue para a assinatura do SEI. Com o número certo, assina direto.
