@@ -413,7 +413,7 @@ E: Em cada clique só o botão clicado fica marcado (nunca dois ao mesmo tempo);
 F: Numa tabela com uma célula de fundo cinza, clique no texto dessa célula e troque o estilo (ex.: de "Tabela Texto Justificado" para "Tabela Texto Centralizado").
 E: O texto muda de alinhamento e a célula continua cinza (bordas também); um Ctrl+Z volta ao estilo anterior, ainda com o fundo cinza.
 
-## Conferir o documento do SEI (v0.26.0 a v0.26.5)
+## Conferir o documento do SEI (v0.26.0 a v0.26.4)
 
 ### T130 – Configurações com menu ao lado (v0.26.0)
 F: Abra as Configurações da extensão e clique em cada item do menu à esquerda (Geral, Documentos do SEI, Minhas unidades…).
@@ -455,6 +455,7 @@ E: A janela "Assinar mesmo assim?" aparece antes da assinatura; com "Não" o doc
 F: Cole na lista um intervalo ("3383754 a 3383903") de um processo em que um ou mais documentos têm o número do processo errado e abra o processo.
 E: Aparece uma janela só com a lista dos documentos errados (número e os dois processos); com "Assinar mesmo assim", "Assinar e próximo" assina esses documentos sem perguntar de novo; com "Não", a pergunta aparece em cada um.
 
+## Timbre e rodapé do documento (v0.26.5)
 > antes de testar: cadastre a sua unidade em Configurações > Minhas unidades (sigla, telefone, e-mail e linhas do setor).
 
 ### T140 – Aviso de timbre e rodapé na página do documento (v0.26.5)
