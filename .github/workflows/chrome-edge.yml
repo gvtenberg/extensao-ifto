@@ -1,0 +1,78 @@
+# Pacote do Chrome e do Edge (GitHub Actions), só no fork dcarvalho89/extensao-ifto (16/11/2026).
+# Não precisa de chave nenhuma (o Chrome e o Edge carregam o pacote sem assinatura, no Modo do desenvolvedor).
+# A cada envio (push) de qualquer branch: testes, conferência e o pacote, guardado como "artefato" da execução
+# (aba Actions > a execução > Artifacts; quem baixa precisa estar logado no GitHub; fica 30 dias).
+# No branch master, ou pelo botão "Run workflow": também publica o .zip em Releases (link público), uma vez por
+# versão do manifest.json, com o nome chrome-edge-vX.Y.Z (não mexe nas Releases vX.Y.Z do Firefox).
+name: Pacote Chrome e Edge
+
+on:
+  push:
+    paths-ignore: ['**.md', 'docs/**', 'LICENSE', '.claude/**', '.github/workflows/testes.yml', '.github/scripts/**']
+  workflow_dispatch: # permite rodar à mão na aba Actions
+
+permissions:
+  contents: write
+
+concurrency:
+  group: chrome-edge-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  pacote:
+    # Só no fork: no repositório original o pacote já sai junto com a assinatura (assinar.yml).
+    if: github.repository == 'dcarvalho89/extensao-ifto'
+    runs-on: ubuntu-24.04
+    timeout-minutes: 15
+    steps:
+      - name: Baixar o código
+        uses: actions/checkout@v5
+
+      - name: Instalar o Node.js
+        uses: actions/setup-node@v5
+        with:
+          node-version: 22
+          cache: npm
+
+      - name: Instalar as dependências
+        run: npm ci
+
+      - name: Testes automáticos
+        run: npm test
+
+      - name: Conferência da Mozilla
+        run: npm run conferir
+
+      - name: Montar o pacote do Chrome e do Edge
+        id: pacote
+        run: |
+          npm run empacotar-chrome
+          VERSAO=$(node -p "require('./manifest.json').version")
+          echo "versao=$VERSAO" >> "$GITHUB_OUTPUT"
+          echo "nome=extensao-ifto-chrome-edge-$VERSAO" >> "$GITHUB_OUTPUT"
+
+      # O artefato baixa como .zip; dentro dele está a pasta pronta para "Carregar sem compactação".
+      - name: Guardar o pacote na execução (Artifacts)
+        uses: actions/upload-artifact@v4
+        with:
+          name: ${{ steps.pacote.outputs.nome }}-${{ github.ref_name }}
+          path: web-ext-artifacts/chrome/${{ steps.pacote.outputs.nome }}/
+          retention-days: 30
+
+      - name: Publicar o .zip em Releases
+        if: github.ref_name == 'master' || github.event_name == 'workflow_dispatch'
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          VERSAO=${{ steps.pacote.outputs.versao }}
+          TAG="chrome-edge-v$VERSAO"
+          if gh release view "$TAG" > /dev/null 2>&1; then
+            echo "A versão $VERSAO do Chrome e Edge já foi publicada; nada a fazer (aumente a versão no manifest.json para publicar de novo)."
+            exit 0
+          fi
+          cp "web-ext-artifacts/chrome/${{ steps.pacote.outputs.nome }}.zip" .
+          gh release create "$TAG" "${{ steps.pacote.outputs.nome }}.zip" \
+            --target "${{ github.sha }}" \
+            --latest=false \
+            --title "Chrome e Edge – versão $VERSAO" \
+            --notes "Baixe o arquivo extensao-ifto-chrome-edge, descompacte numa pasta que não será apagada e carregue a pasta em chrome://extensions ou edge://extensions (Modo do desenvolvedor > Carregar sem compactação). Para atualizar, baixe a versão nova, descompacte por cima da mesma pasta e clique em Recarregar na página de extensões."

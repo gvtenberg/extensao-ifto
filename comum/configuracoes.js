@@ -12,7 +12,9 @@
     incluirSicaf: 'automatica',
     // v0.18.2: cópia de cada PDF buscado na pasta Downloads (o PDF vai para o SEI de qualquer jeito).
     copiaSicaf: true,
-    copiaConsulta: true
+    copiaConsulta: true,
+    // v0.19.0: peças do Compras IFTO no SEI: "automatica" (só na CCL), "sempre" ou "desligada".
+    comprasIfto: 'automatica'
   })
 
   // Junta o que o usuário gravou com os padrões; opções que não existem mais são ignoradas.

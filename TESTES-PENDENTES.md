@@ -268,6 +268,34 @@ E: Depois do F5, o botão "notas sem SICAF ou Simples" não aparece para essa no
 ### T86 – Dicas nas configurações (v0.18.3)
 F: Clique no ícone da extensão > Configurações e desça até o quadro "Dicas".
 E: Aparecem a dica de deixar só a senha do SEI no Firefox e a de diminuir PDF com links para o ilovepdf.com e o pdf24.org (abrem em outra aba).
+
+## Peças do Compras IFTO no SEI (v0.19.0 a v0.22.0)
+> Entre no SEI na CCL/GAC/DAP/PAL/REI/IFTO. O Compras IFTO do Render precisa estar com a versão que tem o botão "Enviar ao SEI". Use um processo de teste.
+### T87 – Permitir no Compras IFTO e botão "Enviar ao SEI" (v0.19.0)
+F: Ícone da extensão > Configurações > quadro "Licitação (CCL)" > "Permitir no Compras IFTO" e confirme. Abra o Compras IFTO, um processo e a fase Termo de Referência; aperte F5.
+E: Ao lado de "Copiar para o SEI" aparece "Enviar ao SEI". Sem a permissão (ou com a extensão desligada), o botão não aparece.
+### T88 – Peça chega à lista do SEI (v0.19.0)
+F: No Compras IFTO, clique em "Enviar ao SEI" em duas fases (ex.: DFD e Termo de Referência). No SEI, abra o processo de teste.
+E: O Compras IFTO diz "Peça enviada à extensão"; no SEI aparece no alto à direita "2 peças do Compras IFTO", que abre a lista com as duas; "Tirar da lista" tira uma. Enviar a mesma fase de novo não duplica.
+### T89 – Janela de confirmação (v0.19.0)
+F: Na lista, clique em "Incluir neste processo" no Termo de Referência. Troque o tipo, marque Restrito e veja a prévia. Feche sem criar.
+E: O tipo "Termo de Referência" (ou o mais parecido) já vem escolhido; Restrito mostra a lista de hipóteses legais do SEI; a prévia mostra o texto da peça; se o NUP do Compras for de outro processo, aparece um aviso vermelho. Comente se o tipo sugerido estava errado.
+### T90 – Criar o documento no processo (v0.20.0) (Crítico)
+F: Na lista de peças, "Incluir neste processo" no Termo de Referência, confira o tipo, deixe Público e clique em "Criar e salvar".
+E: Aparece "Documento criado: Termo de Referência …" e o documento novo aparece na árvore, com o cabeçalho do modelo e sem assinatura. Comente a mensagem se der erro.
+### T91 – Texto no corpo e salvo, sem assinar (v0.21.0) (Crítico)
+F: Repita o T90 com outra peça (ex.: DFD). Espere a janela do editor abrir e fechar sozinha.
+E: A janela diz "Pronto: … criado com o texto da peça e salvo. Ele não foi assinado."; o documento na árvore tem o texto do Compras IFTO no corpo, com o cabeçalho e o rodapé do modelo; a peça sai da lista. Copie aqui a linha "Editor do SEI: …" que aparece na janela.
+### T92 – Documento restrito (v0.21.0)
+F: Inclua uma peça escolhendo Restrito e uma hipótese legal.
+E: O documento é criado restrito (ícone de chave na árvore), com a hipótese legal escolhida e o texto salvo.
+### T93 – Aviso de documento repetido (v0.21.0)
+F: Envie de novo pelo Compras IFTO a mesma peça já incluída no T91 e clique em "Incluir neste processo".
+E: A janela avisa em amarelo que o processo já tem um documento desse tipo e só cria depois de marcar "Criar mesmo assim".
+### T94 – Fora da CCL (v0.21.0)
+F: Com peças na lista, troque o SEI para outra unidade e abra um processo.
+E: O botão "peças do Compras IFTO" não aparece. Com "Sempre ligada" nas configurações, aparece.
+=======
 ### T87 – Senha reconhecida na assinatura feita dentro do editor (v0.18.4)
 F: Abra um documento seu para editar (ex.: um ateste), clique em "Assinar" na barra do editor e clique no campo Senha.
 E: O Firefox oferece a senha do SEI guardada (ou ela já aparece preenchida); depois de assinar com uma senha nova, o Firefox pergunta se quer guardá-la.

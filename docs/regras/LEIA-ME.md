@@ -9,4 +9,5 @@ Budget business rules (demands, commitments, contracts, commitment requests) liv
 | `geral.md` | Browsers, login and spreadsheet access, installation, costs |
 | `sei.md` | IFTO SEI: version, what the extension does there, reuse of SEI++ |
 | `sicaf.md` | Automatic SICAF: invoices without SICAF, invoice × ateste check, SICAF search, Sicaf/Consulta/Anexo in the SEI, selected CNPJ |
+| `compras-ifto.md` | Compras IFTO pieces into the SEI (CCL): site and permission, message format, list of pieces, type, access level, create, fill and save (never sign) |
 | `lista-assinaturas.md` | Signature list in the SEI (Director-General): accepted formats, panel, sign and next, unit, settings |

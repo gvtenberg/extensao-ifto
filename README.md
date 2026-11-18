@@ -2,7 +2,7 @@
 
 Extensão de navegador que facilita o trabalho no SEI do IFTO para os servidores do Campus Palmas. Ela acrescenta botões e atalhos às páginas do SEI, para reduzir tarefas repetitivas, como assinar uma lista de documentos ou incluir documentos externos em processos de pagamento.
 
-A extensão funciona apenas no endereço `sei.ifto.edu.br`. Nos demais sites ela não faz nada.
+A extensão funciona apenas no endereço `sei.ifto.edu.br` e, para quem der a permissão, no Compras IFTO (`compras-ifto-teste-v1-mbro.onrender.com`). Nos demais sites ela não faz nada.
 
 ## Sumário
 
@@ -30,6 +30,7 @@ Para unidades específicas (ligadas automaticamente na unidade indicada, e podem
 - **Lista de assinaturas (Direção-geral):** permite colar uma lista de processos e documentos (por exemplo, copiada de uma planilha ou de uma mensagem) e abrir um item por vez. O painel mostra o comentário de cada item, destaca em azul os itens que são apenas para dar ciência e tem os botões "Assinar e próximo" e "Dar ciência e próximo". Também aceita um intervalo de números de documentos de um mesmo processo.
 - **SICAF e Simples Nacional da nota fiscal (CGOC):** com um processo de pagamento aberto, mostra o botão "N notas sem SICAF ou Simples – Buscar" quando há notas fiscais depois da última Folha de Encaminhamento sem o SICAF ou a consulta do Simples Nacional do fornecedor. Ao clicar, a extensão lê o PDF de cada nota, confere com o ateste (CNPJ, número, valor, empenho e se a nota é para o Campus Palmas) e mostra as diferenças em vermelho. Depois busca o PDF "Situação do Fornecedor" no SICAF (o login no Compras.gov.br com Gov.br é feito pela própria pessoa), salva o PDF na pasta Downloads; na mesma aba, consulta o fornecedor no Simples Nacional (se o site pedir a verificação de imagens, a própria pessoa resolve) e salva também esse PDF em Downloads. Depois de uma confirmação, inclui no processo o Sicaf com o PDF, a Consulta Simples Nacional com o PDF e um Anexo em branco para cada nota.
 - **CNPJ selecionado (CGOC; outras unidades com "Sempre ligada"):** ao selecionar um CNPJ numa página do SEI aparece, na CGOC, o botão "Incluir SICAF, Simples e Anexo"; nas outras unidades, "Incluir SICAF" e "Incluir Simples Nacional". No PDF de uma nota, use o botão direito > "Buscar SICAF deste CNPJ".
+- **Peças do Compras IFTO (CCL):** no Compras IFTO, o botão "Enviar ao SEI" de cada fase manda a peça (DFD, ETP, Termo de Referência, Edital etc.) para a extensão. No SEI, com o processo aberto, aparece o botão "N peças do Compras IFTO". Escolha a peça e, na janela, confira o tipo de documento sugerido, o nível de acesso (Público ou Restrito, com a hipótese legal), o número do processo e a prévia do texto. Ao clicar em "Criar e salvar", a extensão cria o documento, coloca o texto no corpo (o cabeçalho e o rodapé vêm do modelo do SEI) e salva. **Ela nunca assina.** Se o processo já tiver um documento do mesmo tipo, a janela avisa e pede confirmação.
 - **Equipe de licitação ("Sempre ligada"):** o botão "Incluir SICAF" permite digitar ou colar o CNPJ, sem precisar de nota fiscal no processo, e inclui só o Sicaf com o PDF.
 - Se o processo já tem Sicaf, Consulta ou Anexo **em branco**, a extensão preenche esses documentos (Sicaf e Consulta recebem o PDF e o nome; o Anexo, o nome) em vez de criar outros.
 
@@ -107,6 +108,7 @@ Cada função abaixo tem três opções: **Automática** (liga só na unidade in
 - **Lista de assinaturas:** automática na Direção-geral (PAL/REI/IFTO).
 - **Documentos do pagamento:** automática na CGOC (CGOC/GAC/DAP/PAL/REI/IFTO).
 - **SICAF e Simples Nacional:** "Automática" para o pagamento de notas fiscais na CGOC; "Sempre ligada" (equipe de licitação) mostra só o botão "Incluir SICAF", em qualquer unidade; "Desligada" tira tudo. Na primeira vez, clique em **Permitir acesso ao Compras.gov.br e ao Simples Nacional**: o navegador pede permissão para a extensão abrir esses dois sites e salvar os PDFs na pasta Downloads (só quem usa o SICAF precisa permitir).
+- **Licitação (CCL): peças do Compras IFTO:** automática na CCL (CCL/GAC/DAP/PAL/REI/IFTO). Na primeira vez, clique em **Permitir no Compras IFTO** e, depois, recarregue a página do Compras IFTO (F5): só então aparece o botão "Enviar ao SEI" lá (só quem usa o Compras IFTO precisa permitir).
 
 **Dicas**
 
@@ -115,15 +117,16 @@ Cada função abaixo tem três opções: **Automática** (liga só na unidade in
 
 ## Quais dados a extensão lê e guarda
 
-- **O que lê:** somente as páginas do SEI abertas no navegador (unidade atual, árvore do processo, números dos documentos e versão do SEI), para saber onde colocar os botões e qual documento abrir. Para o SICAF, lê também o texto dos atestes e dos PDFs das notas fiscais e do SICAF do processo aberto, a página do SICAF no Compras.gov.br e o resultado da consulta do Simples Nacional (só depois da permissão e do clique em "Buscar").
-- **O que guarda:** as configurações, a lista de assinaturas colada (até o uso do botão "Limpar lista"), a versão do último SEI aberto e os PDFs do SICAF e do Simples Nacional obtidos no dia (para não buscar de novo; os de outros dias são apagados). Esses dados ficam apenas no navegador do próprio computador.
+- **O que lê:** somente as páginas do SEI abertas no navegador (unidade atual, árvore do processo, números dos documentos e versão do SEI), para saber onde colocar os botões e qual documento abrir. Para o SICAF, lê também o texto dos atestes e dos PDFs das notas fiscais e do SICAF do processo aberto, a página do SICAF no Compras.gov.br e o resultado da consulta do Simples Nacional (só depois da permissão e do clique em "Buscar"). No Compras IFTO (com a permissão), recebe só as peças que a pessoa envia com "Enviar ao SEI".
+- **O que guarda:** as configurações, a lista de assinaturas colada (até o uso do botão "Limpar lista"), a versão do último SEI aberto e os PDFs do SICAF e do Simples Nacional obtidos no dia (para não buscar de novo; os de outros dias são apagados), as peças do Compras IFTO que esperam para ir ao SEI (cada uma sai da lista quando é incluída ou com "Tirar da lista") e os tipos de documento criados no dia a partir delas (para o aviso de documento repetido). Esses dados ficam apenas no navegador do próprio computador.
 - **Senha:** a extensão **não lê nem guarda a senha**. A senha fica no gerenciador de senhas do navegador; a extensão apenas verifica se o campo já está preenchido.
 - **Envio de dados:** a extensão não envia dados do SEI para nenhum outro site (no SICAF e no Simples Nacional, só digita o CNPJ do fornecedor na pesquisa). A única consulta externa é a verificação de nova versão (automática no Firefox, ou pelo botão "Procurar atualização"), feita na página de versões indicada em [Onde baixar](#onde-baixar).
-- **O que escreve no SEI:** a extensão só faz alterações no SEI a partir de um clique do usuário, por exemplo em "Assinar e próximo" ou na confirmação de "Incluir no processo" (SICAF e Simples Nacional).
+- **O que escreve no SEI:** a extensão só faz alterações no SEI a partir de um clique do usuário, por exemplo em "Assinar e próximo" ou na confirmação de "Incluir no processo" (SICAF e Simples Nacional) e de "Criar e salvar" (peças do Compras IFTO; a extensão abre a janela do editor do SEI, salva e a fecha).
 
 ## Cuidados no uso
 
 - **Confira o SICAF antes de incluir.** A janela "Incluir no processo" mostra os PDFs de cada fornecedor e os avisos; avisos em vermelho pedem um segundo clique. O login no Compras.gov.br é sempre feito pela própria pessoa.
+- **Confira a peça do Compras IFTO antes de assinar.** A extensão cria e salva o documento, mas não assina: abra-o na árvore, revise o texto e assine. Se aparecer um aviso amarelo, a peça continua na lista e o documento pode ter ficado sem texto: confira-o na árvore.
 - **Confira antes de assinar.** O botão "Assinar e próximo" assina o documento aberto com a senha guardada no navegador. O clique nesse botão vale como confirmação, por isso leia o documento antes de clicar.
 - **Computador compartilhado:** não guarde a senha do SEI no navegador de um computador usado por outras pessoas. Em computador pessoal de trabalho, recomenda-se proteger as senhas guardadas com uma senha principal (no Firefox: menu > **Configurações** > **Privacidade e Segurança** > **Usar uma senha principal**).
 - **Senhas de outros sistemas:** o Firefox pode sugerir no SEI senhas guardadas para outros endereços do IFTO (SUAP, Moodle e outros). Confira se a senha sugerida é a do SEI.

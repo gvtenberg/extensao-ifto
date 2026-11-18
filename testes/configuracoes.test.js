@@ -39,3 +39,8 @@ test('v0.18.2: cópia em Downloads de cada PDF ligada por padrão', () => {
   assert.equal(PADROES.copiaConsulta, true)
   assert.equal(comPadroes({ copiaSicaf: false }).copiaSicaf, false)
 })
+
+test('peças do Compras IFTO começam automáticas (só na CCL) (v0.19.0)', () => {
+  assert.equal(PADROES.comprasIfto, 'automatica')
+  assert.equal(comPadroes({ comprasIfto: 'desligada' }).comprasIfto, 'desligada')
+})

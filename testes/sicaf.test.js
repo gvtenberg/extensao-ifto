@@ -224,9 +224,9 @@ test('resultado guardado do SICAF: linha do fornecedor (se existir no computador
   assert.deepEqual(sicaf.lerLinhaDoResultado(rotulo), { cnpj: '14159957000602', nome: 'HM COMERCIO IMPORTACAO E EXPORTACAO LTDA.' })
 })
 
-test('manifest: acesso opcional ao Compras e ao Simples Nacional igual às origens das regras', () => {
+test('manifest: acesso opcional ao Compras, ao Simples Nacional e ao Compras IFTO (v0.19.0) igual às origens das regras', () => {
   const manifest = JSON.parse(fs.readFileSync(path.join(__dirname, '../manifest.json'), 'utf8'))
-  assert.deepEqual(manifest.optional_host_permissions, [...sicaf.ORIGENS_COMPRAS, ...require('../comum/simples-nacional.js').ORIGENS_SIMPLES])
+  assert.deepEqual(manifest.optional_host_permissions, [...sicaf.ORIGENS_COMPRAS, ...require('../comum/simples-nacional.js').ORIGENS_SIMPLES, ...require('../comum/compras-ifto.js').ORIGENS_COMPRAS])
   assert.deepEqual(manifest.optional_permissions, ['downloads'])
 })
 

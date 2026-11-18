@@ -53,8 +53,8 @@
     const padraoNo = /Nos\[(\d+)\]\s*=\s*new infraArvoreNo\((.*?)\);?\s*\n/g
     let achado
     while ((achado = padraoNo.exec(texto))) {
-      const [tipo, id, pai, , , rotulo, , icone] = lerArgumentos(achado[2])
-      nos[achado[1]] = { tipo, id, pai, rotulo: rotulo || '', icone: icone || '', src: '' }
+      const [tipo, id, pai, linkArvore, , rotulo, , icone] = lerArgumentos(achado[2])
+      nos[achado[1]] = { tipo, id, pai, linkArvore: linkArvore || '', rotulo: rotulo || '', icone: icone || '', src: '' }
     }
     const padraoSrc = /Nos\[(\d+)\]\.src\s*=\s*'([^']*)'/g
     while ((achado = padraoSrc.exec(texto))) if (nos[achado[1]]) nos[achado[1]].src = achado[2]
@@ -71,6 +71,8 @@
       temArquivo: /documento_download_anexo/.test(no.src) || /documento_pdf/.test(no.icone),
       // v0.10.0: endereço do documento (ver o texto ou baixar o arquivo), para o SICAF automático.
       link: no.src.replace(/&amp;/g, '&'),
+      // v0.20.0: página do documento na árvore (com os botões dele, como "Editar Conteúdo"), para o Compras IFTO.
+      linkArvore: no.linkArvore.replace(/&amp;/g, '&'),
       // v0.16.0: alterar o documento externo (preencher Sicaf e Anexo em branco).
       linkAlterar: ((/href="(controlador\.php\?acao=documento_alterar_recebido[^"]*)"/.exec(no.acoes || '') || [])[1] || '').replace(/&amp;/g, '&')
     }))

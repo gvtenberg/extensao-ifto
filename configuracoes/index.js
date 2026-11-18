@@ -26,8 +26,17 @@
   botaoSicaf.addEventListener('click', () => {
     navegador.permissions.request(pedidoSicaf).then(mostrarPermissao)
   })
-  if (location.hash === '#sicaf') {
-    const cartao = document.getElementById('sicaf')
+  // v0.19.0: permissão do Compras IFTO (só quem usa o Compras IFTO pede; D2 da spec compras-ifto-no-sei).
+  const pedidoCompras = { origins: globalThis.ExtensaoIFTO.comprasIfto.ORIGENS_COMPRAS }
+  const botaoCompras = document.getElementById('permitirCompras')
+  const comprasPermitido = document.getElementById('comprasPermitido')
+  const mostrarCompras = sim => { botaoCompras.hidden = sim; comprasPermitido.hidden = !sim }
+  navegador.permissions.contains(pedidoCompras).then(mostrarCompras)
+  botaoCompras.addEventListener('click', () => {
+    navegador.permissions.request(pedidoCompras).then(mostrarCompras)
+  })
+  if (location.hash === '#sicaf' || location.hash === '#compras') {
+    const cartao = document.getElementById(location.hash.slice(1))
     cartao.scrollIntoView({ block: 'center' })
     cartao.style.outline = '3px solid var(--marca)'
   }
