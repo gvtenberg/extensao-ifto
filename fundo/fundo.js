@@ -8,7 +8,7 @@
 // v0.17.2: depois do SICAF, a mesma aba consulta o Simples Nacional de cada fornecedor (spec consulta-simples).
 /* global importScripts */
 if (typeof importScripts === 'function' && !(globalThis.ExtensaoIFTO && globalThis.ExtensaoIFTO.simplesNacional)) {
-  importScripts('/comum/sei.js', '/comum/minuta-edital.js', '/comum/data-documento.js', '/comum/configuracoes.js', '/comum/sicaf.js', '/comum/simples-nacional.js', '/comum/compras-ifto.js', '/sites/sei/editor-preencher.js', '/sites/sei/editor-minuta.js')
+  importScripts('/comum/sei.js', '/comum/minuta-edital.js', '/comum/conferir-documento.js', '/comum/data-documento.js', '/comum/configuracoes.js', '/comum/sicaf.js', '/comum/simples-nacional.js', '/comum/compras-ifto.js', '/sites/sei/editor-preencher.js', '/sites/sei/editor-minuta.js')
 }
 const navegador = globalThis.browser || globalThis.chrome
 const regras = globalThis.ExtensaoIFTO.sicaf
@@ -74,6 +74,9 @@ function tratarRecado (recado, remetente) {
     // v0.25.0 (spec numeracao-edital): números longos dos itens de edital.
     case 'numeracaoPreparar': return numeracaoNoEditor(remetente, false)
     case 'numeracaoCorrigir': return numeracaoNoEditor(remetente, true)
+    // v0.26.2 (spec conferir-documento): conferir o documento no editor (número do processo).
+    case 'conferirVerificar': return conferirNoEditor(remetente, '')
+    case 'conferirCorrigir': return conferirNoEditor(remetente, recado.qual)
     // v0.17.5: texto de um PDF pedido pela página do SEI (no Firefox o pdf.js só funciona aqui).
     case 'lerPdf': return globalThis.ExtensaoIFTO.pdfTexto ? globalThis.ExtensaoIFTO.pdfTexto.textoDoPdf(recado.bytes).then(texto => ({ texto })) : Promise.resolve({ erro: 'Leitura de PDF indisponível.' })
   }
@@ -535,6 +538,28 @@ async function minutaNoEditor (remetente, remover) {
   const secoes = depois.ok ? depois.secoes : []
   const trechos = secoes.flatMap(secao => regrasMinuta.minutaNoTexto(secao.html)).slice(0, 3)
   return { ok: true, marcas, removidas, restou: depois.ok ? contar(secoes) : 0, trechos }
+}
+
+// v0.26.2 (spec conferir-documento): confere o número do processo do texto do editor; com "qual" =
+// 'processo', troca o número só na linha "Processo nº:" e confere de novo. Nunca salva.
+// Devolve { ok, erro, processo: { certo, processo, escrito, editavel, link } | null }.
+async function conferirNoEditor (remetente, qual) {
+  const regras = globalThis.ExtensaoIFTO.conferirDocumento
+  const rodar = rodarNoEditor(remetente)
+  const lido = await rodar(globalThis.ExtensaoIFTO.editorLer)
+  if (!lido.ok) return { ok: false, erro: lido.erro }
+  const processo = regras.conferirProcesso(lido.secoes)
+  if (qual !== 'processo') return { ok: true, processo }
+  if (!processo || processo.certo) return { ok: true, processo }
+  const secao = lido.secoes.find(outra => outra.nome === processo.secao)
+  const novo = secao && secao.editavel && !processo.link && regras.corrigirProcesso(secao.html, processo.processo)
+  if (!novo) return { ok: false, erro: 'Essa parte do documento não dá para mudar.' }
+  const gravado = await rodar(globalThis.ExtensaoIFTO.editorGravar, [{ [secao.nome]: novo }])
+  if (!gravado.ok) return { ok: false, erro: gravado.erro }
+  const depois = await rodar(globalThis.ExtensaoIFTO.editorLer)
+  const conferido = depois.ok && regras.conferirProcesso(depois.secoes)
+  if (!conferido || !conferido.certo) return { ok: false, erro: 'O editor não ficou com o número novo.' }
+  return { ok: true, processo: conferido }
 }
 
 // v0.23.0 (spec data-documento): acha a data do Ofício ou da Portaria; com "trocar", põe a de hoje só nessa

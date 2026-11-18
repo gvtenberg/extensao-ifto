@@ -43,9 +43,10 @@
   }
 
   // Recado para a parte de fundo, com limite de tempo (o editor pode demorar ou travar).
-  function pedirAoFundo (tipo) {
+  // v0.26.2: "extras" vai junto no recado (ex.: o que corrigir).
+  function pedirAoFundo (tipo, extras = {}) {
     const limite = new Promise(resolve => setTimeout(() => resolve({ ok: false, erro: 'O editor do SEI demorou demais para responder. Feche e abra o editor de novo.' }), 45000))
-    return Promise.race([navegador.runtime.sendMessage({ tipo }).catch(erro => ({ ok: false, erro: erro.message })), limite])
+    return Promise.race([navegador.runtime.sendMessage({ ...extras, tipo }).catch(erro => ({ ok: false, erro: erro.message })), limite])
   }
 
   raiz.ExtensaoIFTO = Object.assign(raiz.ExtensaoIFTO || {}, { caixaEditor: { criarCaixa, pedirAoFundo, criar } })

@@ -426,3 +426,15 @@ E: As duas unidades continuam lá com os dados digitados; "Remover unidade" pede
 ### T132 – Copiar o nome de quem assinou (v0.26.1)
 F: Abra um documento já assinado na árvore do processo, selecione com o mouse o nome na caixa "Documento assinado eletronicamente por…" e tecle Ctrl+C; cole num documento de texto.
 E: O nome fica selecionado (azul) e é colado certo; com a opção "Copiar o nome de quem assinou" desligada, volta a não dar para selecionar.
+
+### T133 – Aviso de processo errado na página do documento (v0.26.2)
+F: Num processo, crie um Despacho e, no editor, troque o número da linha "Processo nº:" por outro; salve, feche o editor e clique no documento na árvore.
+E: No alto do documento aparece "O documento está no processo X, mas o texto diz Y" e o botão "Abrir o editor para corrigir", que abre o editor; num documento já assinado nada aparece.
+
+### T134 – Corrigir o número do processo no editor (v0.26.2)
+F: Abra no editor o Despacho do teste anterior e clique em "Corrigir o número do processo"; confira e clique em Salvar.
+E: Só o número da linha "Processo nº:" muda para o do processo; o resto do texto fica igual; Ctrl+Z desfaz antes de salvar.
+
+### T135 – Edital com o processo errado no título (v0.26.2)
+F: Abra no editor um Edital ou Minuta copiado de outro processo, com o título "(Processo Administrativo n° …)" de outro processo.
+E: Aparece o aviso com os dois números, sem botão de correção, dizendo para apagar o número e colocar o link do processo certo.
