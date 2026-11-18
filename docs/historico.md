@@ -2,6 +2,7 @@
 
 One or two lines per version, with the date (dd/mm/yyyy). Number 0.STAGE.FIX.
 
+- v0.25.2 (18/11/2026): table margin fields with the name above each field, all four inside the window (the layout fix pushed under 0.25.1 was not signed: Mozilla signs each number once).
 - v0.25.1 (18/11/2026): table margins in the SEI editor as four fields in px filled with the current margins; "Alinhar com o texto" became the 4th button in Alinhamento (it looked blank before).
 - v0.25.0 (18/11/2026): "Corrigir a numeração" in the SEI editor, every unit, only when an edital item (levels 2, 3, 4) has its text pushed to the next line by a long number ("10.10."); one click adds a hidden style block to the text, short numbers stay the same (`specs/feitas/numeracao-edital.md`).
 - v0.24.0 (18/11/2026): tables in the SEI editor, every unit and document type: cut/copy and paste a part with a table in the same editor window keeps the table as it was (width, columns, margins); "Margens" box (old format, margins only) and "Alinhar com o texto" button in "Propriedades da tabela"; one switch for each in the settings (`specs/feitas/tabelas-editor.md`).
