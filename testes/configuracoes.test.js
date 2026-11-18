@@ -44,3 +44,8 @@ test('peças do Compras IFTO começam automáticas (só na CCL) (v0.19.0)', () =
   assert.equal(PADROES.comprasIfto, 'automatica')
   assert.equal(comPadroes({ comprasIfto: 'desligada' }).comprasIfto, 'desligada')
 })
+
+test('entrada com SerproID no Gov.br começa desligada (v0.21.3)', () => {
+  assert.equal(PADROES.entrarComSerproId, false)
+  assert.equal(comPadroes({ entrarComSerproId: true }).entrarComSerproId, true)
+})

@@ -41,7 +41,22 @@
     cartao.style.outline = '3px solid var(--marca)'
   }
 
-  for (const caixa of document.querySelectorAll('input[type="checkbox"]')) {
+  // v0.21.3: entrada com SerproID no Gov.br. Ligar pede o acesso à página de entrada do Gov.br (o pedido sai
+  // direto do clique); sem a permissão a opção não liga. Desligar retira o acesso.
+  const pedidoGovBr = { origins: globalThis.ExtensaoIFTO.sicaf.ORIGENS_GOVBR }
+  const caixaSerpro = document.getElementById('entrarComSerproId')
+  caixaSerpro.checked = Boolean(configuracoes.entrarComSerproId) && await navegador.permissions.contains(pedidoGovBr)
+  caixaSerpro.addEventListener('change', async () => {
+    let ligar = caixaSerpro.checked
+    if (ligar) ligar = await navegador.permissions.request(pedidoGovBr).catch(() => false)
+    else await navegador.permissions.remove(pedidoGovBr).catch(() => {})
+    caixaSerpro.checked = ligar
+    configuracoes.entrarComSerproId = ligar
+    await gravarConfiguracoes(configuracoes)
+    aviso.hidden = false
+  })
+
+  for (const caixa of document.querySelectorAll('input[type="checkbox"]:not(#entrarComSerproId)')) {
     caixa.checked = Boolean(configuracoes[caixa.id])
     caixa.addEventListener('change', async () => {
       configuracoes[caixa.id] = caixa.checked

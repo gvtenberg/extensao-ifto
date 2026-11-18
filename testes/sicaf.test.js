@@ -227,7 +227,7 @@ test('resultado guardado do SICAF: linha do fornecedor (se existir no computador
 
 test('manifest: acesso opcional ao Compras, ao Simples Nacional e ao Compras IFTO (v0.19.0) igual às origens das regras', () => {
   const manifest = JSON.parse(fs.readFileSync(path.join(__dirname, '../manifest.json'), 'utf8'))
-  assert.deepEqual(manifest.optional_host_permissions, [...sicaf.ORIGENS_COMPRAS, ...require('../comum/simples-nacional.js').ORIGENS_SIMPLES, ...require('../comum/compras-ifto.js').ORIGENS_COMPRAS])
+  assert.deepEqual(manifest.optional_host_permissions, [...sicaf.ORIGENS_COMPRAS, ...require('../comum/simples-nacional.js').ORIGENS_SIMPLES, ...require('../comum/compras-ifto.js').ORIGENS_COMPRAS, ...sicaf.ORIGENS_GOVBR])
   assert.deepEqual(manifest.optional_permissions, ['downloads'])
 })
 

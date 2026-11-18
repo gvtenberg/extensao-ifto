@@ -79,6 +79,19 @@
       <p class="apoio">Para buscar no SICAF e consultar o Simples Nacional, a extensão precisa abrir o Compras.gov.br e o site do Simples Nacional e poder salvar as cópias na pasta Downloads. O navegador pede essa permissão uma vez.</p>
       <button type="button" class="botao principal" id="permitirSicaf">Permitir acesso ao Compras.gov.br e ao Simples Nacional</button>
       <div class="aviso sucesso" id="sicafPermitido" hidden>Acesso ao Compras.gov.br e ao Simples Nacional permitido.</div>
+      <!-- v0.21.3: entrada no Gov.br com SerproID, desligada por padrão; acesso à página de login pedido só ao ligar. -->
+      <p class="apoio"><strong>Entrar no Gov.br com o certificado SerproID (opcional, desligada no início)</strong></p>
+      <p class="apoio">Quando a busca do SICAF encontra você sem login, a extensão já abre a entrada do Compras.gov.br e clica em "Entrar com Gov.br". Com esta opção ligada, ela também clica em "SerproID" na página de entrada do Gov.br, e a página do Serpro abre direto (sem você clicar em "Seu certificado digital em nuvem" e depois em "SerproID").</p>
+      <ul class="apoio">
+        <li><strong>O que a extensão acessa:</strong> só a página de entrada do Gov.br (sso.acesso.gov.br), e só quando ela mesma levou você até lá durante a busca do SICAF. Lá, ela apenas clica no botão "SerproID".</li>
+        <li><strong>O que ela não faz:</strong> não lê nem guarda seu CPF, senha, certificado, QR code ou código de verificação; ler o QR code e digitar o código continuam sendo com você. Se o Gov.br pedir uma verificação de imagens, você também a resolve.</li>
+        <li><strong>Ao ligar:</strong> o navegador pede sua permissão para a extensão acessar a página de entrada do Gov.br. Se você permitir, ganha o clique automático em "SerproID".</li>
+        <li><strong>Se não permitir ou desligar:</strong> a opção fica desligada e o acesso é retirado. Você perde só esse clique automático: a busca do SICAF continua funcionando, e na página do Gov.br você clica em "Seu certificado digital em nuvem" e depois em "SerproID".</li>
+      </ul>
+      <label class="opcao">
+        <input type="checkbox" id="entrarComSerproId">
+        <span>Clicar sozinha em "SerproID" na entrada do Gov.br durante a busca do SICAF</span>
+      </label>
     </section>
     <!-- v0.19.0: peças do Compras IFTO no SEI (spec compras-ifto-no-sei). -->
     <section class="cartao" id="compras">

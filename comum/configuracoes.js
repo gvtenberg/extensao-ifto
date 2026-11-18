@@ -14,7 +14,10 @@
     copiaSicaf: true,
     copiaConsulta: true,
     // v0.19.0: peças do Compras IFTO no SEI: "automatica" (só na CCL), "sempre" ou "desligada".
-    comprasIfto: 'automatica'
+    comprasIfto: 'automatica',
+    // v0.21.3: clicar sozinho em SerproID na entrada do Gov.br (SICAF sem login). Desligada: precisa do
+    // acesso opcional à página de login do Gov.br, que a pessoa dá ao ligar a opção.
+    entrarComSerproId: false
   })
 
   // Junta o que o usuário gravou com os padrões; opções que não existem mais são ignoradas.

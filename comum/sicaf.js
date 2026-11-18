@@ -341,8 +341,10 @@
   // v0.17.3: o SICAF só aceita quem chega pela Área de Trabalho (menu do usuário › SICAF); ir direto ao
   // endereço do SICAF logo depois do login dá "Sessão expirada".
   const URL_AREA_DE_TRABALHO = 'https://cnetmobile.estaleiro.serpro.gov.br/comprasnet-area-trabalho-web/seguro/governo/area-trabalho'
-  // v0.21.2: e a página de login do Gov.br (para clicar em SerproID).
-  const ORIGENS_COMPRAS = Object.freeze(['*://www3.comprasnet.gov.br/*', '*://comprasnet.gov.br/*', '*://www.comprasnet.gov.br/*', '*://cnetmobile.estaleiro.serpro.gov.br/*', 'https://sso.acesso.gov.br/*'])
+  const ORIGENS_COMPRAS = Object.freeze(['*://www3.comprasnet.gov.br/*', '*://comprasnet.gov.br/*', '*://www.comprasnet.gov.br/*', '*://cnetmobile.estaleiro.serpro.gov.br/*'])
+  // v0.21.3: página de entrada do Gov.br (clique em SerproID), pedida à parte e só por quem liga a opção
+  // "entrarComSerproId" (desligada por padrão: acesso a uma página de login pode assustar quem usa).
+  const ORIGENS_GOVBR = Object.freeze(['https://sso.acesso.gov.br/*'])
 
   // Que página do Compras/SICAF está aberta (pelo endereço).
   function paginaDoCompras (endereco) {
@@ -571,7 +573,7 @@
     normalizar, mesmoNumero, textoDoHtml, nomesParecidos,
     tipoNaArvore, numeroSei, lerRotuloDaNota, trechoPendente, lerAteste, situacaoDoProcesso, textoDoAviso,
     cnpjsDaNota, notaSemTexto, empenhosDoTexto, nomeNoTexto, conferirNota, agruparPorFornecedor,
-    URL_CONSULTA_SICAF, URL_LOGIN_COMPRAS, URL_AREA_DE_TRABALHO, ORIGENS_COMPRAS, paginaDoCompras, nomeDoArquivo, lerLinhaDoResultado, lerPdfDoSicaf, paraBase64, deBase64,
+    URL_CONSULTA_SICAF, URL_LOGIN_COMPRAS, URL_AREA_DE_TRABALHO, ORIGENS_COMPRAS, ORIGENS_GOVBR, paginaDoCompras, nomeDoArquivo, lerLinhaDoResultado, lerPdfDoSicaf, paraBase64, deBase64,
     nomeNaArvore, nomeDoSicaf, nomeDoAnexo, documentosParaIncluir, semPdfNomeados, doFornecedor, aproveitarEmBranco, lerRespostaDoUpload, enderecoDoUpload, lerUsuarioDoUpload, formatarTamanho, linhaDoAnexo,
     SEM_RESPOSTA_MS, andamentoDaBusca, pularFase, buscaComErro
   }
