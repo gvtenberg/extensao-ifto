@@ -155,9 +155,12 @@
       linha.dataset.extensaoIfto = 'margens'
       linha.style.cssText = 'display:block;padding:0 var(--ck-spacing-large, 10px)'
       linha.innerHTML = '<label class="ck ck-label" style="display:block;margin-bottom:4px">Margens, em pixels (px) <small>(extensão IFTO)</small></label>' +
-        '<div style="display:flex;gap:6px">' + regras().LADOS.map(lado =>
-          '<label style="flex:1;min-width:0;font-size:.9em">' + NOMES[lado] +
-          '<input type="text" inputmode="decimal" data-lado="' + lado + '" class="ck ck-input ck-input-text" style="width:100%;min-width:0;box-sizing:border-box" spellcheck="false" title="' + NOMES[lado] + ', em pixels. Padrão: ' + PADRAO[lado] + '"></label>').join('') +
+        // v0.25.1: nome em cima e campo embaixo, quatro colunas iguais que cabem na janela (o editor dá aos
+        // campos uma largura mínima grande, por isso min-width:0).
+        '<div style="display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:6px">' + regras().LADOS.map(lado =>
+          '<label style="display:flex;flex-direction:column;min-width:0;font-size:.9em">' +
+          '<span style="display:block;margin-bottom:2px">' + NOMES[lado] + '</span>' +
+          '<input type="text" inputmode="decimal" data-lado="' + lado + '" class="ck ck-input ck-input-text" style="display:block;width:100%;min-width:0;box-sizing:border-box" spellcheck="false" title="' + NOMES[lado] + ', em pixels. Padrão: ' + PADRAO[lado] + '"></label>').join('') +
         '</div>' +
         '<div style="margin-top:4px;color:#555;white-space:normal;font-size:.9em">Padrão: acima 10, direita 0, abaixo 10 e esquerda 28 (o último botão de Alinhamento preenche assim). Vale ao clicar em OK.</div>' +
         '<div data-erro style="display:none;margin-top:4px;color:#B3261E;white-space:normal"></div>'
