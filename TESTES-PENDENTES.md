@@ -408,3 +408,7 @@ E: Os campos ficam 10, 0, 10 e 28; a borda esquerda da tabela fica alinhada com 
 ### T128 – Só um botão de Alinhamento marcado (v0.25.3)
 F: Em "Propriedades da tabela", clique em "à esquerda", depois em "Alinhar com o texto", depois em "Centralizar" e por fim em "à esquerda"; clique em OK.
 E: Em cada clique só o botão clicado fica marcado (nunca dois ao mesmo tempo); no fim a tabela fica alinhada à esquerda.
+
+### T129 – Trocar o estilo sem perder o fundo da célula (v0.25.3)
+F: Numa tabela com uma célula de fundo cinza, clique no texto dessa célula e troque o estilo (ex.: de "Tabela Texto Justificado" para "Tabela Texto Centralizado").
+E: O texto muda de alinhamento e a célula continua cinza (bordas também); um Ctrl+Z volta ao estilo anterior, ainda com o fundo cinza.

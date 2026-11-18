@@ -5,6 +5,7 @@
 //    área de transferência, e a tabela fica igual (largura, colunas, margens). Ctrl+Z desfaz.
 // 2. Janela "Propriedades da tabela": quatro campos de margem em pixels e, em Alinhamento, o quarto botão
 //    "Alinhar com o texto" (v0.25.1).
+// 3. Trocar o estilo do texto de uma célula não apaga mais a cor de fundo nem as bordas da célula (v0.25.3).
 (function (raiz) {
   const TIPO = 'application/x-extensao-ifto-trecho'
   const esperar = ms => new Promise(resolve => setTimeout(resolve, ms))
@@ -251,13 +252,43 @@
     })
   }
 
+  // v0.25.3: ao trocar o "Estilo" de um texto que está sozinho numa célula, o SEI chama a sua limpeza de
+  // formatação (removerFormatacaoAprimorado, com keepFormatting), que apaga também a cor de fundo, as bordas e
+  // os tamanhos da CÉLULA. Guarda o que a célula tinha e devolve logo depois, na mesma alteração (um Ctrl+Z).
+  // O botão "Remover formatação" do SEI não passa keepFormatting e continua limpando tudo.
+  function celulaDoTexto (opcoes) {
+    const texto = opcoes && opcoes.keepFormatting && opcoes.value
+    const celula = texto && texto.name === 'paragraph' && texto.parent
+    return celula && celula.name === 'tableCell' ? celula : null
+  }
+
+  function prepararEstilo (editor) {
+    const limpar = editor.commands.get('removerFormatacaoAprimorado')
+    if (!limpar) return
+    let guardado = null
+    limpar.on('execute', (evento, [opcoes]) => {
+      const celula = celulaDoTexto(opcoes)
+      guardado = celula ? { celula, atributos: Array.from(celula.getAttributes()) } : null
+    }, { priority: 'highest' })
+    limpar.on('execute', () => {
+      const antes = guardado
+      guardado = null
+      if (!antes || !antes.atributos.length) return
+      editor.model.change(escritor => {
+        for (const [chave, valor] of antes.atributos) {
+          if (antes.celula.getAttribute(chave) !== valor) escritor.setAttribute(chave, valor, antes.celula)
+        }
+      })
+    }, { priority: 'lowest' })
+  }
+
   async function preparar (opcoes) {
     try {
       const editor = await acharEditor()
       if (!editor) return { ok: false, erro: 'O editor do SEI não abriu a tempo.' }
       const feito = editor.__extensaoIftoTabelas || (editor.__extensaoIftoTabelas = {})
       if (opcoes.mover && !feito.mover && editor.plugins.has('ClipboardPipeline')) { prepararMover(editor); feito.mover = true }
-      if (opcoes.margens && !feito.margens) { prepararMargens(editor); feito.margens = true }
+      if (opcoes.margens && !feito.margens) { prepararMargens(editor); prepararEstilo(editor); feito.margens = true }
       return { ok: true, erro: '' }
     } catch (erro) {
       return { ok: false, erro: erro.message }
