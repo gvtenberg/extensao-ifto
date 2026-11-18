@@ -31,7 +31,7 @@ Summary to resume work (on another machine or by another person) without reading
 
 One line per idea. When an idea is planned, it gets a spec in `docs/specs/` and the line points to it. When finished, the line leaves here and goes to `docs/historico.md`.
 
-- **Check SEI documents: process number, timbre, footer, spacing** (18/11/2026): warn about a wrong "Processo nº", sector lines and footer (Campus Palmas), stop before signing with a wrong process number, automatic spacing in the Despacho, settings page reorganized with "Minhas unidades" **[spec]** → `specs/conferir-documento.md`
+- **Check SEI documents: process number, timbre, footer, spacing** (18/11/2026): warn about a wrong "Processo nº", sector lines and footer (Campus Palmas), stop before signing with a wrong process number, automatic spacing where sections are too close (every type), settings page reorganized with "Minhas unidades" **[spec]** → `specs/conferir-documento.md`
 - **Check "Interessado" and "Assunto"** (18/11/2026): like the process number, warn when they do not match the process (after `specs/conferir-documento.md`).
 - **Settings page smaller and clearer** (18/11/2026): today it is long with little information spread out; first round is stage 1 of `specs/conferir-documento.md`; later rounds as needed.
 - **All text styles in any document** (18/11/2026): the Edital has twice the styles of a Despacho; the user would like every style in every type. Check first: the editor removes a style the type does not allow (`permitidoEm`), and the final document only has the CSS of its own type, so an extra style may print without formatting.
