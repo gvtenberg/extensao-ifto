@@ -2,6 +2,7 @@
 
 One or two lines per version, with the date (dd/mm/yyyy). Number 0.STAGE.FIX.
 
+- v0.21.5 (18/11/2026): fix (T106 failed): Firefox's background part did not load the settings file, so the SerproID option (and the Downloads copy setting) was never read; new automatic test keeps the Firefox and Chrome background lists equal.
 - v0.21.4 (18/11/2026): fix (T104 failed): the SerproID click waits until the Gov.br hidden check (hCaptcha) has loaded; if Gov.br still shows its error, the notice says where to click.
 - v0.21.3 (18/11/2026): the SerproID click became an option in Settings › SICAF, off by default, with its own permission for the Gov.br login page (asked when ticked, removed when unticked) and a plain explanation of what it accesses and what is gained or lost.
 - v0.21.2 (18/11/2026): SICAF search without login: on the Gov.br login page opened by the extension, it clicks "SerproID" by itself (new optional access to `sso.acesso.gov.br`, asked once).

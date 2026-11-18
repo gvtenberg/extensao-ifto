@@ -331,6 +331,6 @@ E: O botão "peças do Compras IFTO" não aparece. Com "Sempre ligada" nas confi
 F: Em Configurações › SICAF, leia a explicação do SerproID; marque a opção e clique em "Não permitir". Depois busque um SICAF sem estar logado.
 E: A explicação diz o que a extensão acessa e o que se perde; a opção volta a ficar desmarcada e, no Gov.br, nada é clicado (você clica em "Seu certificado digital em nuvem" e "SerproID").
 
-### T106 – SICAF sem login abre direto o SerproID, de novo (v0.21.4)
+### T107 – SICAF sem login abre direto o SerproID, terceira tentativa (v0.21.5)
 F: Em Configurações › SICAF, deixe marcada a opção do SerproID. Saia do Compras.gov.br e, no SEI, use "Adicionar Sicaf". Se não funcionar, conte se apareceu o aviso verde "IFTO" no alto da página do Gov.br e o que ele dizia.
 E: Na página do Gov.br aparece o aviso "Entrando com o certificado SerproID…" e, em poucos segundos, abre a página do Serpro com o QR code.

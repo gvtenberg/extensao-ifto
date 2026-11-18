@@ -29,3 +29,12 @@ test('campo de senha não roda em página que só voltou da assinatura', () => {
   const js = scriptsDo('https://sei.ifto.edu.br/sei/controlador.php?acao=arvore_visualizar&acao_origem=documento_assinar')
   assert.ok(!js.includes('sites/sei/campo-senha.js'))
 })
+
+// v0.21.5 (T106 falhou): no Firefox o fundo carrega só a lista "background.scripts"; no Chrome, o importScripts
+// do fundo.js. Um arquivo que falte na lista do Firefox quebra o fundo só lá (foi o caso de configuracoes.js).
+test('fundo do Firefox carrega tudo o que o fundo do Chrome carrega', () => {
+  const fs = require('node:fs')
+  const fundo = fs.readFileSync(require.resolve('../fundo/fundo.js'), 'utf8')
+  const importados = (fundo.match(/importScripts\(([^)]*)\)/) || [])[1].match(/'\/([^']+)'/g).map(s => s.slice(2, -1))
+  for (const arquivo of importados) assert.ok(manifesto.background.scripts.includes(arquivo), arquivo)
+})
