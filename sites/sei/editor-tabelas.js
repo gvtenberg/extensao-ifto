@@ -3,7 +3,8 @@
 // window.infraEditor.editor) só é alcançável pelo JavaScript da própria página. Nunca salva nem assina.
 // 1. Recortar/copiar e colar trecho com tabela na mesma janela: o trecho vai direto, sem passar pelo HTML da
 //    área de transferência, e a tabela fica igual (largura, colunas, margens). Ctrl+Z desfaz.
-// 2. Janela "Propriedades da tabela": caixa "Margens" (formato antigo) e botão "Alinhar com o texto".
+// 2. Janela "Propriedades da tabela": quatro campos de margem em pixels e, em Alinhamento, o quarto botão
+//    "Alinhar com o texto" (v0.25.1).
 (function (raiz) {
   const TIPO = 'application/x-extensao-ifto-trecho'
   const esperar = ms => new Promise(resolve => setTimeout(resolve, ms))
@@ -106,6 +107,45 @@
     editor.editing.reconvertItem(tabela)
   }
 
+  // v0.25.1: margens que a tabela mostra hoje no editor, em pixels (o que o editor desenha: a margem do quadro
+  // em volta da tabela mais a da própria tabela). Direita: só a guardada (a medida de "auto" seria o espaço
+  // que sobra, e confunde); sem ela, 0. Se não der para medir, usa o que está guardado na tabela.
+  function margensNaTela (editor, tabela) {
+    const guardadas = margensAtuais(tabela)
+    try {
+      const quadro = editor.editing.view.domConverter.mapViewToDom(editor.editing.mapper.toViewElement(tabela))
+      const dentro = quadro && quadro.querySelector('table')
+      if (quadro) {
+        const medir = (elemento, chave) => elemento ? parseFloat(getComputedStyle(elemento)[chave]) || 0 : 0
+        const lado = chave => Math.round(medir(quadro, chave) + medir(dentro, chave)) + 'px'
+        const direita = guardadas.direita && guardadas.direita !== 'auto' ? guardadas.direita : '0'
+        return { acima: lado('marginTop'), direita, abaixo: lado('marginBottom'), esquerda: lado('marginLeft') }
+      }
+    } catch (erro) {}
+    return guardadas
+  }
+
+  const NOMES = { acima: 'Acima', direita: 'Direita', abaixo: 'Abaixo', esquerda: 'Esquerda' }
+  const PADRAO = { acima: '10', direita: '0', abaixo: '10', esquerda: '28' }
+  // Desenho do botão: linhas de texto e tabela com o mesmo recuo à esquerda.
+  const ICONE = '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20"><path d="M6 2h12v1.5H6zM6 16.5h12V18H6zM1.5 7.5 4 10l-2.5 2.5z"/><path fill-rule="evenodd" d="M6 5.5h12v9H6zm1.5 1.5v2.5h4V7zm5.5 0v2.5h3.5V7zm-5.5 4v2h4v-2zm5.5 0v2h3.5v-2z"/></svg>'
+
+  // Quarto botão em "Alinhamento": deixa a tabela à esquerda e preenche as margens padrão (vale no OK).
+  function botaoAlinhar (editor, formulario, preencher) {
+    const barra = formulario.alignmentToolbar
+    if (!barra || !barra.items || !barra.items.first || formulario.__extensaoIftoBotao) return false
+    const Botao = barra.items.first.constructor
+    const botao = new Botao(editor.locale)
+    botao.set({ label: 'Alinhar com o texto (margens 10, 0, 10 e 28 px)', icon: ICONE, tooltip: true, isToggleable: true })
+    botao.on('execute', () => {
+      formulario.alignment = 'left'
+      preencher(PADRAO)
+    })
+    barra.items.add(botao)
+    formulario.__extensaoIftoBotao = botao
+    return true
+  }
+
   function montarCaixa (editor, formulario) {
     const elemento = formulario.element
     let linha = elemento.querySelector('[data-extensao-ifto="margens"]')
@@ -114,40 +154,77 @@
       linha.className = 'ck ck-form__row'
       linha.dataset.extensaoIfto = 'margens'
       linha.style.cssText = 'display:block;padding:0 var(--ck-spacing-large, 10px)'
-      linha.innerHTML = '<label class="ck ck-label" style="display:block;margin-bottom:4px">Margens <small>(extensão IFTO)</small></label>' +
-        '<input type="text" class="ck ck-input ck-input-text" style="width:100%;box-sizing:border-box" placeholder="margin:10px auto 10px 28px" spellcheck="false">' +
-        '<div style="margin-top:4px;color:#555;white-space:normal;font-size:.9em">Acima, direita, abaixo e esquerda, como no SEI antigo. A largura fica no campo Largura.</div>' +
-        '<div data-erro style="display:none;margin-top:4px;color:#B3261E;white-space:normal"></div>' +
-        '<button type="button" class="ck ck-button" style="margin-top:6px"><span class="ck ck-button__label">Alinhar com o texto</span></button>'
+      linha.innerHTML = '<label class="ck ck-label" style="display:block;margin-bottom:4px">Margens, em pixels (px) <small>(extensão IFTO)</small></label>' +
+        '<div style="display:flex;gap:6px">' + regras().LADOS.map(lado =>
+          '<label style="flex:1;min-width:0;font-size:.9em">' + NOMES[lado] +
+          '<input type="text" inputmode="decimal" data-lado="' + lado + '" class="ck ck-input ck-input-text" style="width:100%;min-width:0;box-sizing:border-box" spellcheck="false" title="' + NOMES[lado] + ', em pixels. Padrão: ' + PADRAO[lado] + '"></label>').join('') +
+        '</div>' +
+        '<div style="margin-top:4px;color:#555;white-space:normal;font-size:.9em">Padrão: acima 10, direita 0, abaixo 10 e esquerda 28 (o último botão de Alinhamento preenche assim). Vale ao clicar em OK.</div>' +
+        '<div data-erro style="display:none;margin-top:4px;color:#B3261E;white-space:normal"></div>'
       const linhaDosBotoes = elemento.querySelector('.ck-table-form__action-row')
       elemento.insertBefore(linha, linhaDosBotoes)
-      const campo = linha.querySelector('input')
-      linha.querySelector('button').addEventListener('click', () => {
-        campo.value = regras().escreverMargens(regras().ALINHADA_AO_TEXTO)
-        campo.dispatchEvent(new Event('input'))
-      })
-      campo.addEventListener('input', () => { linha.querySelector('[data-erro]').style.display = 'none' })
-      // OK da janela: aplica as margens se a caixa mudou. Texto que não deu para entender segura a janela.
+      const campos = [...linha.querySelectorAll('input[data-lado]')]
+      const erro = linha.querySelector('[data-erro]')
+      const marcarBotao = () => {
+        const botao = formulario.__extensaoIftoBotao
+        if (botao) botao.isOn = campos.every(campo => regras().lerPixels(campo.value) === regras().lerPixels(PADRAO[campo.dataset.lado]))
+      }
+      const preencher = valores => {
+        for (const campo of campos) if (valores[campo.dataset.lado] !== undefined) campo.value = regras().mostrarPixels(valores[campo.dataset.lado])
+        erro.style.display = 'none'
+        marcarBotao()
+      }
+      linha.__preencher = preencher
+      linha.__marcar = marcarBotao
+      // Sem a barra de Alinhamento (outra versão do SEI): o botão fica abaixo dos campos, com o nome escrito.
+      if (!botaoAlinhar(editor, formulario, preencher)) {
+        const reserva = document.createElement('button')
+        reserva.type = 'button'
+        reserva.className = 'ck ck-button ck-button_with-text'
+        reserva.style.marginTop = '6px'
+        reserva.innerHTML = '<span class="ck ck-button__label">Alinhar com o texto</span>'
+        reserva.addEventListener('click', () => { formulario.alignment = 'left'; preencher(PADRAO) })
+        linha.appendChild(reserva)
+      }
+      for (const campo of campos) {
+        campo.addEventListener('input', () => {
+          erro.style.display = 'none'
+          // Quem colar o formato antigo ("margin:10px auto 10px 28px") num campo tem os quatro preenchidos.
+          if (/margin|\s/.test(campo.value.trim())) {
+            const coladas = regras().lerMargens(campo.value)
+            if (coladas) preencher(coladas)
+          }
+          marcarBotao()
+        })
+      }
+      // OK da janela: aplica só os lados que mudaram. Valor que não é número segura a janela.
       formulario.on('submit', evento => {
         const tabela = tabelaSelecionada(editor)
-        const texto = campo.value.trim()
-        if (!tabela || texto === linha.dataset.inicial) return
-        const margens = regras().lerMargens(texto)
-        if (!margens) {
-          const erro = linha.querySelector('[data-erro]')
-          erro.textContent = 'Não entendi as margens. Exemplo: margin:10px auto 10px 28px'
-          erro.style.display = 'block'
-          evento.stop()
-          return
+        if (!tabela) return
+        const margens = {}
+        for (const campo of campos) {
+          if (campo.value.trim() === campo.dataset.inicial) continue
+          const valor = regras().lerPixels(campo.value)
+          if (valor === null) {
+            erro.textContent = 'Use só números nas margens (em pixels). Exemplo: 28'
+            erro.style.display = 'block'
+            campo.focus()
+            evento.stop()
+            return
+          }
+          margens[campo.dataset.lado] = valor
         }
-        aplicarMargens(editor, tabela, margens)
+        if (Object.keys(margens).length) aplicarMargens(editor, tabela, margens)
       }, { priority: 'highest' })
     }
     const tabela = tabelaSelecionada(editor)
-    const campo = linha.querySelector('input')
-    campo.value = tabela ? regras().escreverMargens(margensAtuais(tabela)) : ''
-    linha.dataset.inicial = campo.value
+    const atuais = tabela ? margensNaTela(editor, tabela) : {}
+    for (const campo of linha.querySelectorAll('input[data-lado]')) {
+      campo.value = regras().mostrarPixels(atuais[campo.dataset.lado])
+      campo.dataset.inicial = campo.value
+    }
     linha.querySelector('[data-erro]').style.display = 'none'
+    linha.__marcar()
   }
 
   function prepararMargens (editor) {

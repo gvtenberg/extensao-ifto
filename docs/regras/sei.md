@@ -21,7 +21,7 @@
 
 - Every unit, every document type; one switch for each part in the settings (`moverTabelas`, `margensTabela`, on by default).
 - Cut/copy and paste in the **same editor window**: when the copied part has a table, the paste puts back the editor's own copy (model), not the clipboard HTML, so width, column widths and margins stay. Ctrl+Shift+V, drag and drop, pasting in another window and parts without a table stay with the SEI. Ctrl+Z undoes it.
-- SEI 5 keeps the left margin of a table in its own `recuo` setting (only with the table aligned to the left) and the other margins in the HTML styles; saved as `margin:10px auto 10px 28px` like the old SEI. The "Margens" box in "Propriedades da tabela" accepts the old format and applies on OK; width is ignored (the SEI has the Largura field). "Alinhar com o texto" = `margin:10px auto 10px 28px` (text styles use margin-left .75cm).
+- SEI 5 keeps the left margin of a table in its own `recuo` setting (only with the table aligned to the left) and the other margins in the HTML styles; saved as `margin:10px auto 10px 28px` like the old SEI. v0.25.1: "Propriedades da tabela" has four fields in px (Acima, Direita, Abaixo, Esquerda) filled with what the editor shows now (Direita: the saved value, else 0); on OK only the changed fields apply; pasting the old `margin:` format in a field fills all four. A 4th button in "Alinhamento" ("Alinhar com o texto") aligns left and fills 10, 0, 10, 28 px (text styles use margin-left .75cm). Button text inside CKEditor buttons only shows with `ck-button_with-text` (why the v0.24.0 button looked blank).
 
 ## Long numbers in edital items (v0.25.0)
 

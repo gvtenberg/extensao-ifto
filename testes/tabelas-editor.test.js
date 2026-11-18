@@ -1,6 +1,6 @@
 const { test } = require('node:test')
 const assert = require('node:assert/strict')
-const { lerMargens, escreverMargens, ALINHADA_AO_TEXTO } = require('../comum/tabelas-editor.js')
+const { lerMargens, lerPixels, mostrarPixels, ALINHADA_AO_TEXTO } = require('../comum/tabelas-editor.js')
 
 test('margens no formato antigo do SEI (a largura é ignorada)', () => {
   assert.deepEqual(lerMargens('margin:10px auto 10px 28px;widith:604px;max-widith:608px'), { acima: '10px', direita: 'auto', abaixo: '10px', esquerda: '28px' })
@@ -25,9 +25,17 @@ test('texto que não é margem', () => {
   assert.equal(lerMargens('margin-left:28'), null)
 })
 
-test('escreve no formato antigo', () => {
-  assert.equal(escreverMargens(ALINHADA_AO_TEXTO), 'margin:10px auto 10px 28px')
-  assert.equal(escreverMargens({ esquerda: '28px' }), 'margin:0 auto 0 28px')
-  assert.equal(escreverMargens({}), '')
-  assert.deepEqual(lerMargens(escreverMargens(ALINHADA_AO_TEXTO)), ALINHADA_AO_TEXTO)
+test('campos de margem em pixels (v0.25.1)', () => {
+  assert.equal(lerPixels('28'), '28px')
+  assert.equal(lerPixels(' 28 px '), '28px')
+  assert.equal(lerPixels('10,5'), '10.5px')
+  assert.equal(lerPixels(''), '0')
+  assert.equal(lerPixels('0'), '0')
+  assert.equal(lerPixels('dez'), null)
+  assert.equal(lerPixels('28cm'), null)
+  assert.equal(mostrarPixels('28px'), '28')
+  assert.equal(mostrarPixels('10.04px'), '10')
+  assert.equal(mostrarPixels('0'), '0')
+  assert.equal(mostrarPixels(undefined), '0')
+  assert.deepEqual(ALINHADA_AO_TEXTO, { acima: '10px', direita: '0', abaixo: '10px', esquerda: '28px' })
 })

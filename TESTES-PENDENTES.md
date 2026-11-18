@@ -339,8 +339,6 @@ E: Na Área de Trabalho do Compras, a mesma aba vai sozinha para o SICAF e a bus
 F: No SEI, use o botão que busca SICAF e Simples Nacional de uma nota e espere até o fim.
 E: Quando os PDFs chegam ao SEI, a aba da busca (SICAF e depois Simples Nacional) fecha sozinha e o SEI volta a aparecer.
 
-## Marca MINUTA nos editais
-
 > antes de testar: SEI na unidade PAL/REI/IFTO (Direção-geral), com a extensão atualizada.
 
 ### T110 – Remover a marca MINUTA de um edital e salvar (v0.22.0) (Crítico)
@@ -359,9 +357,6 @@ E: Todas as linhas "* MINUTA DE DOCUMENTO" somem de uma vez, sem deixar linhas e
 F: Num processo, clique em Incluir Documento e escolha Edital Gabinete (ou outro documento interno, como Despacho).
 E: O nível de acesso Público já aparece marcado, com o aviso verde "Preenchido pela extensão"; nada é salvo até você clicar em Salvar.
 
-## Data de hoje no Ofício e na Portaria
-> antes de testar: use um Ofício ou uma Portaria ainda sem assinatura, criado em outro dia.
-
 ### T114 – Mudar a data de um Ofício para hoje e salvar (v0.23.0) (Crítico)
 F: Abra no editor um Ofício com data antiga, clique em "Mudar a data para hoje", confira e clique em Salvar; feche e abra o documento de novo.
 E: A data passa a ser a de hoje e continua a de hoje depois de salvar e abrir de novo; o resto do texto fica igual.
@@ -378,9 +373,6 @@ E: Nos dois não aparece o aviso "Mudar a data para hoje".
 F: Abra no editor um Edital que ainda tem a marca MINUTA e clique em "Remover marca MINUTA".
 E: O aviso aparece e funciona como antes (mesma aparência, a marca some do texto).
 
-## Tabelas no editor do SEI
-> Use um documento de teste (ou feche o editor sem salvar se algo sair errado).
-
 ### T118 – Recortar e colar trecho com tabela (v0.24.0)
 F: No editor, selecione um trecho com texto e uma tabela, Ctrl+X, clique em outro lugar do mesmo documento e Ctrl+V.
 E: A tabela aparece no lugar novo com a mesma largura, as mesmas colunas e as mesmas margens; Ctrl+Z desfaz.
@@ -388,17 +380,6 @@ E: A tabela aparece no lugar novo com a mesma largura, as mesmas colunas e as me
 ### T119 – Copiar trecho com tabela e colar duas vezes (v0.24.0)
 F: Selecione um trecho com tabela, Ctrl+C e cole (Ctrl+V) em dois lugares diferentes do mesmo documento; depois clique em Salvar e abra o documento de novo.
 E: As duas cópias ficam iguais à original, também depois de salvar e reabrir.
-
-### T120 – Margens da tabela no formato antigo (v0.24.0)
-F: Clique numa tabela, abra "Propriedades da tabela", escreva na caixa "Margens" margin:10px auto 10px 28px;width:604px e clique em OK.
-E: A tabela fica com 28 px de recuo à esquerda e 10 px acima e abaixo; a largura não muda; ao reabrir a janela, a caixa mostra as margens.
-
-### T121 – Botão "Alinhar com o texto" (v0.24.0)
-F: Numa tabela centralizada, abra "Propriedades da tabela", clique em "Alinhar com o texto", depois em OK, e clique em Salvar.
-E: A borda esquerda da tabela fica alinhada com o texto dos parágrafos; no documento salvo continua igual.
-
-## Números longos nos itens de edital
-> Use a minuta ou um edital de teste com item "10.10." (ou feche o editor sem salvar).
 
 ### T122 – Aviso só quando o número não cabe (v0.25.0)
 F: Abra no editor um edital com itens até "9.9." e depois um com "10.10." em "Item nível 2 Edital".
@@ -411,3 +392,15 @@ E: "10.10." fica na mesma linha do texto, no editor, no documento e no PDF; os n
 ### T124 – Aviso aparece ao digitar (v0.25.0)
 F: Num edital sem o aviso, crie itens "Item nível 2 Edital" até chegar em "10.10." (ou mude um parágrafo para esse estilo).
 E: Pouco depois o aviso "Corrigir a numeração" aparece; depois de corrigir, ele some.
+
+### T125 – Campos de margem mostram a tabela atual (v0.25.1)
+F: Clique numa tabela, abra "Propriedades da tabela" e veja a parte "Margens, em pixels (px)".
+E: Aparecem quatro campos (Acima, Direita, Abaixo, Esquerda) já preenchidos com as margens que a tabela tem hoje; parando o mouse num campo aparece o valor padrão dele.
+
+### T126 – Mudar uma margem em pixels (v0.25.1)
+F: Na mesma janela, troque só o campo Esquerda para 28 e clique em OK; abra a janela de novo.
+E: A tabela vai para a esquerda com 28 px de recuo, as outras margens não mudam e o campo Esquerda mostra 28.
+
+### T127 – Quarto botão "Alinhar com o texto" em Alinhamento (v0.25.1)
+F: Numa tabela centralizada, abra "Propriedades da tabela", clique no quarto botão de Alinhamento (o mouse em cima mostra "Alinhar com o texto"), depois em OK e salve o documento.
+E: Os campos ficam 10, 0, 10 e 28; a borda esquerda da tabela fica alinhada com o texto dos parágrafos; no documento salvo continua igual.
