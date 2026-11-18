@@ -1,6 +1,6 @@
 # Browser extension – IFTO Campus Palmas (UG 158336)
 
-@~/.claude/regras/programacao.md
+@docs/claude-regras/regras/programacao.md
 
 Extension for **Firefox** and Chrome (free package, v0.5.0) that goes with the campus Budget Management System: it improves the IFTO SEI and, with login, reads the system data from the Google Spreadsheet to fill documents and capture data on other sites (SEI, SUAP, SIAFI, SICAF, Simples Nacional, Comprasnet). Version in `manifest.json`. The main system lives in `../sistema-orcamento-ifto` (another repository): business rules and the spreadsheet are there; **do not copy**, read only the needed part.
 
@@ -11,7 +11,7 @@ Extension for **Firefox** and Chrome (free package, v0.5.0) that goes with the c
 
 ## Economical reading
 
-- **First command of the session:** `diff -q ~/.claude/CLAUDE.md docs/claude-regras/CLAUDE.md; diff -rq ~/.claude/regras docs/claude-regras/regras` (the user's general rules, identical on every computer). If they differ or the computer files are missing, follow "Same rules on every computer" in `docs/claude-regras/regras/programacao.md`.
+- **First command of the session, only on the owner's computers** (`git config user.name` is `gvtenberg`; anyone else skips it, see "Colleague's fork and pull requests"): `diff -q ~/.claude/CLAUDE.md docs/claude-regras/CLAUDE.md; diff -rq ~/.claude/regras docs/claude-regras/regras` (the user's general rules, identical on every computer). If they differ or the computer files are missing, follow "Same rules on every computer" in `docs/claude-regras/regras/programacao.md`.
 - At the start **do not read** `docs/` or `TESTES-PENDENTES.md`. Read only what the task needs, only the needed part, and do not re-read what was already read in the session.
 - Files with several sections have the "**Sections**" index on line 3: read the first 5 lines and search for the section title. `docs/historico.md`: search for the version (`v0.1.3`). `TESTES-PENDENTES.md`: `### T12` or the mark (see `/testes`); never the whole file. To resume work: only the "Status" section of `docs/melhorias-futuras.md`.
 - Where things are: `docs/arquitetura.md` (file map) · `docs/regras/` (decided rules, one file per subject; list in `LEIA-ME.md`) · `docs/padrao-visual.md` (window, settings and what the extension adds to pages) · `docs/referencias/` (other extensions and sites, e.g. SEI++) · `docs/melhorias-futuras.md` (Status: done, in progress, pending; and the ideas, one line each) · `docs/specs/` (one spec per improvement in progress; finished in `feitas/`) · `docs/historico.md` (what went into each version) · `docs/claude-regras/` (copy of Claude's general rules, `~/.claude/CLAUDE.md` and `~/.claude/regras/`) · `docs/publicacao.md` (Mozilla signing via GitHub, installation, Chrome package, saved passwords) · `TESTES-PENDENTES.md` (root: manual tests T01, T02…). In the main system: `docs/planilha.md` (tabs and columns) and `docs/regras/`.
@@ -59,19 +59,26 @@ Extension for **Firefox** and Chrome (free package, v0.5.0) that goes with the c
 
 ## Version and git
 
-- On every code change: bump `version` in `manifest.json` to the **next** number after the last one in `docs/historico.md` (never skip or reuse; middle number only for a big change or new feature, the last one for everything else) and one or two lines in `docs/historico.md` with the date (dd/mm/yyyy). Each version pushed to GitHub is signed only once by Mozilla.
+- **Version number (same rule for everyone: owner and colleagues), format `0.MIDDLE.LAST`:**
+  - The next number after the last one in **master's** `docs/historico.md`; never skip, never reuse. Only `manifest.json` holds it, plus one or two lines in `docs/historico.md` with the date (dd/mm/yyyy).
+  - **Middle +1** (last back to 0) only at the **first stage of a new improvement** (a new spec). Its other stages, fixes and small changes: **last +1**. Example: master at 0.21.1 → new improvement 0.22.0 → its stage 2 0.22.1 → a fix 0.22.2.
+  - Changes not pushed yet share the open number (same line in `historico.md`). Each version pushed to GitHub is signed only once by Mozilla.
+  - **Pull request from a fork:** one number for the whole pull request (stages inside the fork do not bump), taken only when updating the fork with master (next section). The pull request check refuses any other number.
 - **No version, no signing** (15/11/2026): docs only (`.md`, `docs/`, `TESTES-PENDENTES.md`, `.claude/`) and the test-card files (`.github/workflows/testes.yml`, `.github/scripts/` except `baixar-assinada.js`) do not bump the version (commit "docs: …" or "ci: …"), and their push does not start "Assinar extensão" (`paths-ignore` in `assinar.yml`). Rule in `~/.claude/regras/programacao.md`.
 - Commit without waiting to be asked: before each stage or round (if there are pending changes) and when finished, in the format **"vX.Y.Z: type: short summary"** (e.g. "v0.1.3: feat: procurar atualização na janela"; without a version change: "docs: summary"). Types: `feat`, `fix`, `style`, `refactor`, `docs`, `chore`, `test`, `ci`. Check in `git status` that nothing from `ferramentas-de-teste/`, keys or `.xpi` got in.
 - **Never `git push`** without being asked: the push triggers Mozilla signing (and GitHub Actions has usage limits). Say the commit was not pushed.
 
 ## Colleague's fork and pull requests (18/11/2026)
 
-A colleague works in the fork `dcarvalho89/extensao-ifto` and sends pull requests. Two branches made in parallel reuse the same test numbers and versions, and that breaks the merge (v0.21.1: T87 to T94 repeated and a `=======` line left behind). So, **in the fork, before opening or updating a pull request** (and again if GitHub says "This branch has conflicts"):
-1. `git fetch https://github.com/gvtenberg/extensao-ifto.git master` and `git merge FETCH_HEAD`.
-2. Own new tests renumbered to after the last `T`/`P` number of master's `TESTES-PENDENTES.md` and moved to the end of the file; own version after the last one in master's `docs/historico.md` (bump `manifest.json` again if needed).
-3. Conflicts: keep both sides' text, then delete every `<<<<<<<`, `=======` and `>>>>>>>` line (`npm test` fails if one is left).
-4. `npm test` and `npm run conferir` must pass; commit and push to the fork.
-- **Owner (gvtenberg):** merge only when the pull request shows the green check ✓ ("All checks have passed"). With a red ✗, do not merge: ask Claude to fix it.
+A colleague works in the fork `dcarvalho89/extensao-ifto` and sends pull requests to `gvtenberg/extensao-ifto`. If it is not you (`git config user.name` is not `gvtenberg`):
+- **General rules:** this repository uses its own copy of the rules (`docs/claude-regras/`, the owner's); do not sync it with your `~/.claude/` (in either direction) and never change `docs/claude-regras/`. Your personal rules stay in your `~/.claude/`; where they differ, this file and `docs/claude-regras/` win in this project. A rule useful for everyone: write it as a suggestion in the pull request text.
+- **Before opening or updating a pull request** (and again if GitHub says "This branch has conflicts" or "out-of-date"):
+  1. `git fetch https://github.com/gvtenberg/extensao-ifto.git master` and `git merge FETCH_HEAD`.
+  2. Own new tests renumbered to after the highest `T`/`P` number ever used in master (see the cards too) and moved to the end of `TESTES-PENDENTES.md`; version: one number for the pull request, the next after master's (rule in "Version and git").
+  3. Conflicts: keep both sides' text, then delete every `<<<<<<<`, `=======` and `>>>>>>>` line (`npm test` fails if one is left).
+  4. `npm test` and `npm run conferir` must pass; commit and push to the fork.
+- **After pushing:** `gh pr checks <number> --repo gvtenberg/extensao-ifto --watch`. If "assinar" fails: `gh run view <run id> --repo gvtenberg/extensao-ifto --log-failed`, find the "Pull request recusado" lines and explain them to the user in plain words, with the fix (the check `.github/scripts/conferir-pull-request.js` refuses: outdated fork, version out of sequence, reused test number, change to `docs/claude-regras/`).
+- **Owner (gvtenberg):** GitHub blocks the merge until the check is green and the branch is up to date (rule "Merge só com a conferência verde" in Settings > Rules). Do not use "bypass" with a red ✗: ask Claude to fix it.
 
 ## Commands
 

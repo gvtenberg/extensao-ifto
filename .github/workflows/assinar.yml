@@ -16,7 +16,7 @@ on:
     paths-ignore: ['**.md', 'docs/**', 'LICENSE', '.claude/**', '.github/workflows/testes.yml', '.github/scripts/apagar-testes.js', '.github/scripts/ler-resultados.js', '.github/scripts/testes-para-cartoes.js', '.github/scripts/testes-pendentes.js']
   pull_request:
     branches: [master]
-    paths-ignore: ['**.md', 'docs/**', 'LICENSE', '.claude/**', '.github/workflows/testes.yml', '.github/scripts/apagar-testes.js', '.github/scripts/ler-resultados.js', '.github/scripts/testes-para-cartoes.js', '.github/scripts/testes-pendentes.js']
+    # sem paths-ignore: a conferência do pull request roda sempre (só confere, nunca assina), senão o merge fica travado
   workflow_dispatch: # permite rodar à mão na aba Actions
 
 permissions:
@@ -35,6 +35,14 @@ jobs:
     steps:
       - name: Baixar o código
         uses: actions/checkout@v5
+        with:
+          fetch-depth: ${{ github.event_name == 'pull_request' && 0 || 1 }} # pull request: história toda, para a conferência abaixo
+
+      # 18/11/2026: pull request de fork desatualizado, com versão fora da sequência, número de teste repetido ou
+      # mudando as regras gerais do dono é recusado com mensagem clara (.github/scripts/conferir-pull-request.js).
+      - name: Conferir o pull request (master em dia, versão e números de teste)
+        if: github.event_name == 'pull_request'
+        run: node .github/scripts/conferir-pull-request.js
 
       - name: Instalar o Node.js
         uses: actions/setup-node@v5

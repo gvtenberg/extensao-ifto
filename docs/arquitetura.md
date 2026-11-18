@@ -46,6 +46,7 @@ Plain JavaScript, no build step, Manifest V3 (D4 in `specs/base-e-sei.md`). Pure
 | `testes/` | Automated tests (`npm test`) |
 | `.github/workflows/testes.yml` and `.github/scripts/` | Test cards on GitHub: one card per new test, closes resolved ones (`testes-para-cartoes.js`); `ler-resultados.js` summarizes what the user marked (for `/testes`); `testes-pendentes.js` reads the file |
 | `.github/scripts/baixar-assinada.js` | When Mozilla answers "Version X already exists", downloads that version's already-signed `.xpi` (AMO API v5, waits up to 30 min) so `assinar.yml` publishes the Release anyway (12/11/2026) |
+| `.github/scripts/conferir-pull-request.js` | Pull request check (in `assinar.yml`, runs on every pull request, never signs): refuses an outdated fork, a version out of sequence, a reused test number or a change to `docs/claude-regras/`, with the reason in Portuguese (18/11/2026; rules in `CLAUDE.md`) |
 | `.claude/` | Commands (`/planejar`, `/etapa`, `/testes`) and Claude Code permissions |
 | `.github/workflows/assinar.yml` | GitHub: on every push tests and checks; new version: signs with Mozilla (unlisted) and publishes the `.xpi`, the Chrome `.zip` and `updates.json` in Releases (see `publicacao.md`) |
 
