@@ -1,6 +1,6 @@
 # Rules for programming projects
 
-**Sections**: How we work (small specs) · Chat reply after changing code · Texts shown to users · Tests · Version and git · Worktrees · GitHub Actions · External systems can be down · Reusing code · Same rules on every computer
+**Sections**: How we work (small specs) · Chat reply after changing code · Texts shown to users · Tests · Version and git · Forks · Worktrees · GitHub Actions · External systems can be down · Reusing code · Same rules on every computer
 
 Updated on 18/11/2026. Read at the start of every programming session (see `~/.claude/CLAUDE.md`). Model project: `/home/berg/Desktop/Sistema Gestão Orçamentária/sistema-orcamento-ifto`.
 
@@ -33,6 +33,12 @@ Texts shown to people who use the system or the extension are written for them (
 - **Share until pushed:** while nothing was pushed, small changes of the same round join the open version (same line in `historico.md`); a new last number only for a new stage or after a push.
 - Commit without being asked (before and at the end of each stage or round): **"vX.Y.Z: type: short summary"** (no version: "docs: summary"). Types: `feat`, `fix`, `style`, `refactor`, `docs`, `chore`, `test`, `ci`. Check `git status`: nothing from tests, keys or packages. Commit only my own files (`git add <files>`, never `git add -A`).
 - When changing code or a rule, update the right `.md` and the "Status" in the same commit.
+
+## Forks
+(18/11/2026) At the start of every session in a project, before any work, check if it is a fork: `gh repo view --json isFork,parent` (or a remote named `upstream`). If it is, fetch the original's main branch (`git fetch https://github.com/<parent>.git <branch>`) and count what is missing (`git rev-list --count HEAD..FETCH_HEAD`). If something is missing, say how many changes and ask (choice window) whether to sync now:
+- **Sync now (suggested):** `git merge FETCH_HEAD`, then the project's tests. Work starts from the latest version, conflicts stay small and the pull request is accepted; if there are conflicts, they are solved now (keep both sides' text).
+- **Not now:** starts faster, but the work is built on old code, conflicts grow, and it must be synced anyway before the pull request.
+Uncommitted changes: commit them first (ask). Up to date: say so in one line and go on. Never push without being asked. The project's own sync steps (in its `CLAUDE.md`) are followed too.
 
 ## Worktrees
 Every CODE change (a stage or a fix) is made in its own **git worktree**, created by the project's script (no script: create it the first time, or do it by hand): own folder and branch next to the project; links to `node_modules`, the test files folder and `.env.local`; its own test port. Version and test numbers are taken only when merging into `main` (the next free ones); then tests run and `main` is updated. Planning, docs and tests answered in the chat stay in the main folder, which is where the user tests in the browser.
