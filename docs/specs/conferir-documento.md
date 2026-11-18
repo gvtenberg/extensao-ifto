@@ -68,7 +68,7 @@ People copy an old document and forget to fix the "Processo nº:" line, the sect
 ## 6. Stages
 
 - [x] Stage 1 – Settings page reorganized (side menu: Geral, Documentos do SEI, Minhas unidades, Direção-geral, SICAF e Simples, Licitação, Dicas, Ajuda) + "Minhas unidades" list + the 4 switches (v0.26.0). Test: open the settings, add two units, reload, data kept.
-- [ ] Stage 2 – Copy signer names: the signature box on the document page becomes selectable (switch) (v0.26.1). Test: select and copy a name in a signed document.
+- [x] Stage 2 – Copy signer names: the signature box on the document page becomes selectable (switch) (v0.26.1). Test: select and copy a name in a signed document.
 - [ ] Stage 3 – Process number: warning on the document page (unsigned) and in the editor, "Corrigir" button in the editor, pure rule + Node tests (v0.26.2).
 - [ ] Stage 4 – Pre-sign window: "Assinar Documento" in the tree and "Assinar" in the editor (v0.26.3). Critical test (signs in the SEI).
 - [ ] Stage 5 – Pre-sign window in the signature list and in the Bloco de assinatura (v0.26.4). Critical test.

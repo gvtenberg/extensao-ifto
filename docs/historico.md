@@ -2,6 +2,7 @@
 
 One or two lines per version, with the date (dd/mm/yyyy). Number 0.STAGE.FIX.
 
+- v0.26.1 (18/11/2026): signer names in the box "Documento assinado eletronicamente por…" can be selected and copied on the document page (own switch, on; nothing written to the SEI) (stage 2).
 - v0.26.0 (18/11/2026): settings page with a side menu (one group at a time), shorter hints, "Minhas unidades" (SEI sigla, phone, e-mail, sector lines; only in this browser) and the four "Conferir o documento" switches, on by default (`specs/conferir-documento.md`, stage 1).
 - v0.25.3 (18/11/2026): only one Alinhamento button selected in "Propriedades da tabela" (SEI's left button turns off while "Alinhar com o texto" is on; clicking it sets Esquerda 0; center/right undo the indent fields); changing the "Estilo" of the text alone in a table cell no longer clears the cell background, borders and sizes.
 - v0.25.2 (18/11/2026): table margin fields with the name above each field, all four inside the window (the layout fix pushed under 0.25.1 was not signed: Mozilla signs each number once).

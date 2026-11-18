@@ -58,3 +58,7 @@ test('v0.26.0: conferências do documento ligadas e lista de unidades vazia, sem
   assert.deepEqual(PADROES.unidades, [])
   assert.deepEqual(comPadroes({ unidades: [{ sigla: 'CGOC/PAL/REI/IFTO' }] }).unidades, [{ sigla: 'CGOC/PAL/REI/IFTO' }])
 })
+
+test('v0.26.1: copiar o nome de quem assinou ligado por padrão', () => {
+  assert.equal(PADROES.copiarAssinaturas, true)
+})

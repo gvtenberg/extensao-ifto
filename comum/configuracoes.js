@@ -34,6 +34,8 @@
     conferirTimbre: true,
     conferirRodape: true,
     espacamentoDocumento: true,
+    // v0.26.1 (D15): nomes de quem assinou podem ser selecionados e copiados na página do documento.
+    copiarAssinaturas: true,
     unidades: Object.freeze([])
   })
 

@@ -422,3 +422,7 @@ E: Cada clique mostra só aquele grupo; as escolhas que você já tinha continua
 ### T131 – Cadastrar duas unidades (v0.26.0)
 F: Em "Minhas unidades", clique em "Adicionar unidade" duas vezes, preencha sigla, telefone, e-mail e linhas do setor de cada uma, feche a página e abra as Configurações de novo.
 E: As duas unidades continuam lá com os dados digitados; "Remover unidade" pede confirmação e tira a unidade.
+
+### T132 – Copiar o nome de quem assinou (v0.26.1)
+F: Abra um documento já assinado na árvore do processo, selecione com o mouse o nome na caixa "Documento assinado eletronicamente por…" e tecle Ctrl+C; cole num documento de texto.
+E: O nome fica selecionado (azul) e é colado certo; com a opção "Copiar o nome de quem assinou" desligada, volta a não dar para selecionar.

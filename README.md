@@ -107,6 +107,7 @@ Para abrir: clique no ícone da extensão e em **Configurações**. Cada escolha
 **Documentos do SEI (todas as unidades)**
 
 - **Conferir o documento** (quatro opções, ligadas de início): número do processo, timbre e rodapé (unidades do Campus Palmas) e espaço entre as partes do documento.
+- **Copiar o nome de quem assinou** (ligada de início): na página do documento, os nomes da caixa "Documento assinado eletronicamente por…" podem ser selecionados e copiados.
 - **Editor do SEI:** tabelas inteiras ao recortar e colar, margens da tabela e números longos nos itens de edital.
 
 **Minhas unidades**
