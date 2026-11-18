@@ -7,6 +7,11 @@
   const ESTILO = /<style\b[^>]*>[\s\S]*?<\/style>/gi
   const ANCORA = /<span\b[^>]*class\s*=\s*["'][^"']*\bminutaAncora\b[^"']*["'][^>]*>[\s\S]*?<\/span>/gi
   const PARAGRAFO = /<p\b[^>]*>([\s\S]*?)<\/p>/gi
+  // v0.22.1: a etiqueta também pelo texto: o editor do SEI 5 entrega o texto sem a classe minutaAncora
+  // (T110: o fundo saiu, mas as etiquetas "* MINUTA DE DOCUMENTO" ficaram).
+  const ESPACO = '(?:\\s|&nbsp;|&#160;|\u00a0)*'
+  const ROTULO_TEXTO = '\\*' + ESPACO + 'MINUTA' + ESPACO + 'DE' + ESPACO + 'DOCUMENTO'
+  const ROTULO = new RegExp('<span\\b[^>]*>' + ESPACO + ROTULO_TEXTO + ESPACO + '<\\/span>|' + ROTULO_TEXTO, 'gi')
 
   // Bloco de estilo da marca: o do SEI Pro (data-style="seipro-watermark") ou qualquer um que escreva
   // "MINUTA" no fundo (o v2 de 18/11/2026 tinha o bloco sem o data-style).
@@ -16,7 +21,8 @@
 
   function temMarcaMinuta (html) {
     const texto = String(html || '')
-    return (texto.match(ESTILO) || []).some(ehEstiloDaMarca) || new RegExp(ANCORA.source, 'i').test(texto)
+    return (texto.match(ESTILO) || []).some(ehEstiloDaMarca) || new RegExp(ANCORA.source, 'i').test(texto) ||
+      new RegExp(ROTULO.source, 'i').test(texto)
   }
 
   // Tira os blocos de estilo da marca e as etiquetas "MINUTA DE DOCUMENTO" (contadas em "removidas").
@@ -24,6 +30,7 @@
     return trecho
       .replace(ESTILO, bloco => { if (!ehEstiloDaMarca(bloco)) return bloco; contagem.n++; return '' })
       .replace(ANCORA, () => { contagem.n++; return '' })
+      .replace(ROTULO, () => { contagem.n++; return '' })
   }
 
   // Parágrafo que sobrou vazio (só espaços, &nbsp; e etiquetas vazias) depois de tirar a marca.

@@ -350,3 +350,7 @@ E: O MINUTA some do fundo do editor; depois de salvar, ao abrir o documento e ge
 ### T111 – Botão só aparece onde deve (v0.22.0)
 F: Abra no editor uma Minuta de Edital; depois, troque para outra unidade (ex.: CGOC) e abra o mesmo Edital no editor.
 E: Na Minuta de Edital não aparece o botão. Na outra unidade também não (com a opção em "Automática").
+
+### T112 – Remover também as linhas "* MINUTA DE DOCUMENTO" (v0.22.1)
+F: Abra no editor um Edital que ainda tem as linhas "* MINUTA DE DOCUMENTO" (mesmo sem o MINUTA no fundo), clique em "Remover marca MINUTA" e depois em Salvar.
+E: Todas as linhas "* MINUTA DE DOCUMENTO" somem de uma vez, sem deixar linhas em branco, e o resto do texto fica igual.

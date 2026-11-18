@@ -63,7 +63,7 @@
   topo.append(criar('span', { className: 'marca', textContent: 'IFTO' }), fechar)
   const corpo = criar('div', { className: 'corpo' })
   const botao = criar('button', { type: 'button', className: 'principal', textContent: 'Remover marca MINUTA' })
-  corpo.append(criar('p', { textContent: 'Este edital ainda tem a marca d\'água "MINUTA", que veio da minuta. Ela aparece no fundo da página e no PDF.' }), botao)
+  corpo.append(criar('p', { textContent: 'Este edital ainda tem a marca "MINUTA", que veio da minuta (no fundo da página e do PDF, ou nas linhas "* MINUTA DE DOCUMENTO").' }), botao)
   caixa.append(topo, corpo)
   raiz.append(estilo, caixa)
   document.body.append(hospedeiro)

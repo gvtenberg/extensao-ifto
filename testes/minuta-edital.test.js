@@ -73,3 +73,17 @@ test('automática só na Direção-geral (PAL/REI/IFTO)', () => {
   assert.equal(funcaoLigada('sempre', 'CGOC/GAC/DAP/PAL/REI/IFTO'), true)
   assert.equal(funcaoLigada('desligada', 'PAL/REI/IFTO'), false)
 })
+
+test('v0.22.1: etiqueta sem a classe (como o editor do SEI 5 entrega): o parágrafo sai inteiro', () => {
+  const texto = '<p>Antes</p><p class="IFTO_Tabela_Texto_Justificado"><span>&nbsp;* MINUTA DE DOCUMENTO&nbsp;</span> &nbsp;</p><p>&nbsp;*&nbsp;MINUTA DE DOCUMENTO</p><p>Depois</p>'
+  assert.equal(temMarcaMinuta(texto), true)
+  const { html, removidas } = tirarMarcaMinuta(texto)
+  assert.equal(removidas, 2)
+  assert.equal(html, '<p>Antes</p><p>Depois</p>')
+  assert.equal(temMarcaMinuta(html), false)
+})
+
+test('v0.22.1: etiqueta junto com texto: sai só a etiqueta; "minuta" solta no texto fica', () => {
+  const { html } = tirarMarcaMinuta('<p><span>* MINUTA DE DOCUMENTO</span> Texto que fica</p><p>Esta minuta de documento fica.</p>')
+  assert.equal(html, '<p> Texto que fica</p><p>Esta minuta de documento fica.</p>')
+})
