@@ -273,6 +273,20 @@
     return linhasDoTimbre(secoes).filter(linha => !ehReitoria(linha) && !TIMBRE_FIXO.some(fixa => mesmaLinha(fixa, linha)))
   }
 
+  // v0.26.6 (D2): Bloco de assinatura. A página "Documentos do Bloco" guarda o endereço de cada documento
+  // num script (arrLinkDocumento[0]="controlador.php?acao=documento_visualizar&id_documento=…").
+  function documentosDoBloco (html) {
+    const documentos = []
+    for (const achado of String(html || '').matchAll(/arrLinkDocumento\[\d+\]\s*=\s*"([^"]*acao=documento_visualizar[^"]*)"/g)) {
+      const link = achado[1].replace(/&amp;/g, '&')
+      const id = (/[?&]id_documento=(\d+)/.exec(link) || [])[1]
+      if (id) documentos.push({ id, link })
+    }
+    return documentos
+  }
+  // Número interno do documento no valor da caixa de seleção ou no acaoAssinar('3533633-173213').
+  const idDoItemDoBloco = valor => (/(\d+)-\d+/.exec(String(valor || '')) || [])[1] || ''
+
   // v0.26.4: número SEI do documento ("SEI nº 3390347", na linha da referência).
   function numeroSeiDoDocumento (html) {
     const achado = textoDoHtml(html).match(/SEI\s*n\s*[º°o]?\s*(\d{5,})/i)
@@ -303,7 +317,7 @@
   // Documento já assinado: a página do documento mostra "Documento assinado eletronicamente por".
   const estaAssinado = html => /assinado\s+eletronicamente\s+por/i.test(textoDoHtml(html))
 
-  const api = { siglaDaUnidade, ehUnidadePalmas, limparUnidade, limparUnidades, acharUnidade, textoDoHtml, formatarProcesso, mesmoProcesso, processoDaReferencia, linhaDoProcesso, conferirProcesso, avisoDoProcesso, perguntaAntesDeAssinar, corrigirProcesso, estaAssinado, numeroSeiDoDocumento, aceitar, foiAceito, TIMBRE_FIXO, linhasDoTimbre, timbreEsperado, conferirTimbre, avisosDoTimbre, corrigirTimbre, secaoCom, ehDoTimbre, ehDoRodape, formatarTelefone, conferirRodape, rodapeEsperado, corrigirRodape, linhasDoSetor }
+  const api = { siglaDaUnidade, ehUnidadePalmas, limparUnidade, limparUnidades, acharUnidade, textoDoHtml, formatarProcesso, mesmoProcesso, processoDaReferencia, linhaDoProcesso, conferirProcesso, avisoDoProcesso, perguntaAntesDeAssinar, corrigirProcesso, estaAssinado, numeroSeiDoDocumento, aceitar, foiAceito, documentosDoBloco, idDoItemDoBloco, TIMBRE_FIXO, linhasDoTimbre, timbreEsperado, conferirTimbre, avisosDoTimbre, corrigirTimbre, secaoCom, ehDoTimbre, ehDoRodape, formatarTelefone, conferirRodape, rodapeEsperado, corrigirRodape, linhasDoSetor }
   if (typeof module !== 'undefined' && module.exports) module.exports = api
   else raiz.ExtensaoIFTO = Object.assign(raiz.ExtensaoIFTO || {}, { conferirDocumento: api })
 })(globalThis)

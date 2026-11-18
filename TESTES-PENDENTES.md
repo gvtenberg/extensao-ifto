@@ -477,3 +477,18 @@ E: A janela mostra as linhas do setor; depois de confirmar, elas aparecem em Con
 ### T144 – Unidade fora do Campus Palmas (v0.26.5)
 F: Numa unidade sem "/PAL/" na sigla (por exemplo, da Reitoria), abra um documento no editor.
 E: Não aparece aviso de timbre nem de rodapé (o do número do processo continua funcionando).
+
+## Bloco de assinatura: número do processo (v0.26.6)
+> antes de testar: tenha um bloco de assinatura com um documento de número do processo errado (como no teste T133).
+
+### T145 – Assinar o bloco inteiro na lista de blocos (v0.26.6) (Crítico)
+F: Em "Blocos de Assinatura", clique no ícone "Assinar Documentos do Bloco" desse bloco (e, noutra vez, marque o bloco e clique no botão "Assinar"); clique em "Não, corrigir antes".
+E: Depois de um instante aparece uma janela com a lista dos documentos errados (número e os dois processos); "Não" não assina nada; "Assinar mesmo assim" abre a assinatura do SEI. Bloco sem erro: a assinatura abre direto.
+
+### T146 – Assinar dentro do bloco (v0.26.6) (Crítico)
+F: Entre no bloco (clique no número do bloco), clique no ícone de assinar da linha do documento errado e, noutra vez, marque documentos e clique em "Assinar".
+E: A mesma janela aparece só com os documentos errados entre os escolhidos; documentos certos assinam direto.
+
+### T147 – Assinar pela janela do documento no bloco (v0.26.6) (Crítico)
+F: Dentro do bloco, clique no número do documento errado e, na janela que abre, clique em "Assinar Documento".
+E: Aparece "O número do processo está errado (documento no processo X, texto diz Y). Assinar mesmo assim?"; "Não" fecha a pergunta sem assinar.

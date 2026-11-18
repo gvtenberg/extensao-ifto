@@ -132,3 +132,13 @@ test('v0.26.5: rodapé corrigido com o texto do D4 e os links', () => {
   assert.equal(c.conferirRodape([{ nome: 'r', html: novo }], cgoc).certo, true)
   assert.equal(c.formatarTelefone('+55 (63) 3236-4000'), '63 3236-4000')
 })
+
+test('v0.26.6: documentos do Bloco de assinatura (página salva do bloco 173213)', () => {
+  const html = 'arrBloco[0]="173213"; arrLinkDocumento[0]="controlador.php?acao=documento_visualizar&id_documento=3533633&id_bloco=173213&infra_hash=ee"; arrLinkProcedimento[0]="controlador.php?acao=procedimento_trabalhar&id_documento=3533633"; arrLinkDocumento[1]="controlador.php?acao=documento_visualizar&amp;id_documento=3533700&id_bloco=173213";'
+  assert.deepEqual(c.documentosDoBloco(html), [
+    { id: '3533633', link: 'controlador.php?acao=documento_visualizar&id_documento=3533633&id_bloco=173213&infra_hash=ee' },
+    { id: '3533700', link: 'controlador.php?acao=documento_visualizar&id_documento=3533700&id_bloco=173213' }])
+  assert.equal(c.idDoItemDoBloco('3533633-173213'), '3533633')
+  assert.equal(c.idDoItemDoBloco("infraLimparFormatarTrAcessada(this);acaoAssinar('3533633-173213');"), '3533633')
+  assert.equal(c.idDoItemDoBloco('173213'), '')
+})

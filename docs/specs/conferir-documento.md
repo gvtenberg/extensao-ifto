@@ -33,7 +33,7 @@ People copy an old document and forget to fix the "Processo nº:" line, the sect
 - [x] D13 – Edital/Minuta title line "(Processo Administrativo n° …)" (an SEI link) is **also checked**, same warning and fix.
 - [x] D14 – Gabinete (PAL/REI/IFTO): fixed lines + "Gabinete da Direção-Geral"; a "Reitoria" line is an error.
 - [x] D15 – Copy signer names (18/11/2026, user): in SEI 5 the box "Documento assinado eletronicamente por …" cannot be selected; the extension makes it selectable on the document page (own switch, on by default). Nothing written to the SEI; the SEI's PDF is not changed.
-- [x] D16 – Order of work (18/11/2026, user): stages 1–6 now; stage 7 only after T123 is answered. Stage 5: only the extension's signature list; the Bloco de assinatura waits for a saved page of that SEI screen.
+- [x] D16 – Order of work (18/11/2026, user): stages 1–6 now; stage 7 only after T123 is answered. Stage 5: the Bloco de assinatura came later (v0.26.6), after the user saved its three screens.
 - [x] D17 – Edital/Minuta title line with the process as an SEI link (18/11/2026, user): **only warn** (no fix button): the warning says to delete the number and insert the right SEI link.
 - [x] D10 – The four new switches (process number, timbre, footer, spacing) start **on**.
 
@@ -72,7 +72,7 @@ People copy an old document and forget to fix the "Processo nº:" line, the sect
 - [x] Stage 2 – Copy signer names: the signature box on the document page becomes selectable (switch) (v0.26.1). Test: select and copy a name in a signed document.
 - [x] Stage 3 – Process number: warning on the document page (unsigned) and in the editor, "Corrigir" button in the editor, pure rule + Node tests (v0.26.2).
 - [x] Stage 4 – Pre-sign window: "Assinar Documento" in the tree and "Assinar" in the editor (v0.26.3). Critical test (signs in the SEI).
-- [x] Stage 5 – Pre-sign window in the signature list (v0.26.4). Critical test. **Bloco de assinatura: still to do** (D16, needs a saved page of that SEI screen).
+- [x] Stage 5 – Pre-sign window in the signature list (v0.26.4) and in the Bloco de assinatura (v0.26.6: list of blocks, documents of the block, document window). Critical tests.
 - [x] Stage 6 – Timbre and footer: warnings, "Corrigir" buttons, "Usar este timbre como padrão da unidade" (v0.26.5).
 - [ ] Stage 7 – Spacing in every type (gap detection, style block, automatic, "Desfazer") — after T123 (v0.26.6). Needs saved editor pages of Ofício and Memorando too. Critical test: saved Despacho and PDF; plus one test with an Ofício.
 

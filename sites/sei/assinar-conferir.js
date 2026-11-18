@@ -6,6 +6,8 @@
   const { configuracoes, conferirDocumento: regras, janelaAssinar } = globalThis.ExtensaoIFTO
   const opcoes = await configuracoes.lerConfiguracoes()
   if (!opcoes.conferirProcesso) return
+  // v0.26.6: as listas do Bloco de assinatura têm a sua própria conferência (sites/sei/bloco-assinatura.js).
+  if (/[?&]acao=(bloco_assinatura_listar|rel_bloco_protocolo_listar)/.test(location.href)) return
 
   // v0.26.4: documentos que a pessoa já mandou "Assinar mesmo assim" na janela da lista de assinaturas (no
   // dia) não perguntam de novo. Lido antes, porque o clique precisa ser parado na hora.
@@ -18,7 +20,8 @@
   function lerDocumentoAberto () {
     try {
       const quadros = [...document.querySelectorAll('iframe')]
-      const quadro = document.getElementById('ifrArvoreHtml') || quadros.find(q => /documento_visualizar/.test(q.src))
+      // v0.26.6: ifrSeiConteudo = documento aberto pelo número no Bloco de assinatura (bloco_navegar).
+      const quadro = document.getElementById('ifrArvoreHtml') || document.getElementById('ifrSeiConteudo') || quadros.find(q => /documento_visualizar/.test(q.src))
       const html = quadro && quadro.contentDocument && quadro.contentDocument.body ? quadro.contentDocument.body.innerHTML : ''
       if (!html || regras.foiAceito(aceitos, regras.numeroSeiDoDocumento(html), new Date())) return null
       return regras.conferirProcesso([{ nome: 'pagina', html }])
