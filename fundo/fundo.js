@@ -207,6 +207,13 @@ navegador.tabs.onUpdated.addListener(async (idDaAba, mudanca, aba) => {
     const clicar = !tarefa.cliqueiEntrar
     if (clicar) { tarefa.cliqueiEntrar = true; await gravarTarefa(tarefa) }
     await injetar(idDaAba, ['sites/compras/aviso.js'], { modo: 'login', clicar })
+  } else if (pagina === 'loginGovBr') {
+    // v0.21.2 (pedido do usuário em 18/11/2026): só quando a própria extensão levou ao login (o SICAF deu
+    // erro e ela clicou em "Entrar com Gov.br"), clica uma vez em SerproID; QR code e código são da pessoa.
+    if (!tarefa.cliqueiEntrar) return
+    const clicar = !tarefa.cliqueiSerpro
+    if (clicar) { tarefa.cliqueiSerpro = true; await gravarTarefa(tarefa) }
+    await injetar(idDaAba, ['sites/compras/aviso.js'], { modo: 'loginGovBr', clicar })
   } else if (pagina === 'areaDeTrabalho') {
     await injetar(idDaAba, ['sites/compras/aviso.js'], { modo: 'areaDeTrabalho' })
   } else {

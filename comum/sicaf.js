@@ -341,7 +341,8 @@
   // v0.17.3: o SICAF só aceita quem chega pela Área de Trabalho (menu do usuário › SICAF); ir direto ao
   // endereço do SICAF logo depois do login dá "Sessão expirada".
   const URL_AREA_DE_TRABALHO = 'https://cnetmobile.estaleiro.serpro.gov.br/comprasnet-area-trabalho-web/seguro/governo/area-trabalho'
-  const ORIGENS_COMPRAS = Object.freeze(['*://www3.comprasnet.gov.br/*', '*://comprasnet.gov.br/*', '*://www.comprasnet.gov.br/*', '*://cnetmobile.estaleiro.serpro.gov.br/*'])
+  // v0.21.2: e a página de login do Gov.br (para clicar em SerproID).
+  const ORIGENS_COMPRAS = Object.freeze(['*://www3.comprasnet.gov.br/*', '*://comprasnet.gov.br/*', '*://www.comprasnet.gov.br/*', '*://cnetmobile.estaleiro.serpro.gov.br/*', 'https://sso.acesso.gov.br/*'])
 
   // Que página do Compras/SICAF está aberta (pelo endereço).
   function paginaDoCompras (endereco) {
@@ -356,6 +357,7 @@
     }
     if (/(^|\.)comprasnet\.gov\.br$/.test(url.hostname) && /loginportaluasg/.test(caminho)) return 'login'
     if (url.hostname === 'cnetmobile.estaleiro.serpro.gov.br' && /area-trabalho/.test(caminho)) return 'areaDeTrabalho'
+    if (url.hostname === 'sso.acesso.gov.br' && caminho === '/login') return 'loginGovBr'
     return null
   }
 

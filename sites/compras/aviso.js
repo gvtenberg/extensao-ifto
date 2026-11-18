@@ -10,6 +10,8 @@
   const TEXTOS = {
     login: 'Entrando com Gov.br para buscar o SICAF…',
     loginManual: 'Para buscar o SICAF, clique em "Entrar com Gov.br" (destacado abaixo).',
+    loginGovBr: 'Entrando com o certificado SerproID… Depois leia o QR code e digite o código.',
+    loginGovBrManual: 'Para buscar o SICAF, clique em "Seu certificado digital em nuvem" e depois em "SerproID".',
     areaDeTrabalho: 'Abrindo o SICAF…',
     menuManual: 'Clique no seu nome (no alto, à direita) e depois em "SICAF". O resto é automático.',
     naoAbriu: 'O SICAF não abriu. Entre no Compras.gov.br com Gov.br, clique no seu nome (no alto, à direita) e depois em "SICAF". O resto é automático.'
@@ -67,6 +69,16 @@
       entrar.style.outline = '4px solid #1E5E33'
       entrar.style.outlineOffset = '3px'
       entrar.scrollIntoView({ block: 'center' })
+    })
+  } else if (dados.modo === 'loginGovBr') {
+    // v0.21.2: página de login do Gov.br › botão SerproID (fica na janela "Provedores de Certificados em
+    // Nuvem"; o clique funciona mesmo com a janela fechada e passa pela verificação hCaptcha do Gov.br).
+    escrever(dados.clicar ? 'loginGovBr' : 'loginGovBrManual')
+    tentar(() => document.getElementById('login-external-authentication-neoid')).then(serpro => {
+      if (!serpro) { escrever('loginGovBrManual'); return }
+      if (dados.clicar) { serpro.click(); return }
+      const abrir = document.querySelector('#cert-digital-cloud button')
+      if (abrir) { abrir.style.outline = '4px solid #1E5E33'; abrir.style.outlineOffset = '3px'; abrir.scrollIntoView({ block: 'center' }) }
     })
   } else if (dados.modo === 'areaDeTrabalho') {
     escrever('areaDeTrabalho')

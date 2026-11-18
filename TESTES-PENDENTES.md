@@ -326,3 +326,7 @@ E: A janela avisa em amarelo que o processo já tem um documento desse tipo e s�
 ### T103 – Fora da CCL (v0.21.0)
 F: Com peças na lista, troque o SEI para outra unidade e abra um processo.
 E: O botão "peças do Compras IFTO" não aparece. Com "Sempre ligada" nas configurações, aparece.
+
+### T104 – SICAF sem login abre direto o SerproID (v0.21.2)
+F: Saia do Compras.gov.br (ou espere a sessão acabar). No SEI, use "Adicionar Sicaf"; se o navegador pedir acesso aos sites, clique em "Permitir".
+E: A extensão abre o Compras, entra com Gov.br e, na página do Gov.br, clica sozinha em "SerproID": aparece a página do Serpro com o QR code. Se o Gov.br mostrar uma verificação de imagens, resolva e continue. Com a sessão ainda ativa, o SICAF abre direto, sem passar pelo Gov.br.

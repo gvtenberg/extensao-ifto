@@ -2,13 +2,13 @@
   "manifest_version": 3,
   "name": "Extensão IFTO Palmas",
   "short_name": "IFTO Palmas",
-  "version": "0.21.1",
+  "version": "0.21.2",
   "description": "Melhorias no SEI e apoio ao Sistema de Gestão Orçamentária do IFTO Campus Palmas.",
   "icons": { "48": "icones/icone.svg", "96": "icones/icone.svg" },
   "permissions": ["storage", "contextMenus", "scripting"],
   "optional_permissions": ["downloads"],
   "host_permissions": ["*://sei.ifto.edu.br/*controlador.php?acao=*", "*://sei.ifto.edu.br/*login.php*"],
-  "optional_host_permissions": ["*://www3.comprasnet.gov.br/*", "*://comprasnet.gov.br/*", "*://www.comprasnet.gov.br/*", "*://cnetmobile.estaleiro.serpro.gov.br/*", "*://consopt.www8.receita.fazenda.gov.br/*", "https://compras-ifto-teste-v1-mbro.onrender.com/*"],
+  "optional_host_permissions": ["*://www3.comprasnet.gov.br/*", "*://comprasnet.gov.br/*", "*://www.comprasnet.gov.br/*", "*://cnetmobile.estaleiro.serpro.gov.br/*", "https://sso.acesso.gov.br/*", "*://consopt.www8.receita.fazenda.gov.br/*", "https://compras-ifto-teste-v1-mbro.onrender.com/*"],
   "background": {
     "scripts": ["comum/sei.js", "comum/sicaf.js", "comum/simples-nacional.js", "comum/compras-ifto.js", "sites/sei/pdf-texto.js", "sites/sei/editor-preencher.js", "fundo/fundo.js"]
   },

@@ -2,6 +2,7 @@
 
 One or two lines per version, with the date (dd/mm/yyyy). Number 0.STAGE.FIX.
 
+- v0.21.2 (18/11/2026): SICAF search without login: on the Gov.br login page opened by the extension, it clicks "SerproID" by itself (new optional access to `sso.acesso.gov.br`, asked once).
 - (16/11/2026, no version) Compras IFTO pieces, stage 4: README (what it does, settings, data read and kept, precautions), rules in `regras/compras-ifto.md`, spec finished (`specs/feitas/compras-ifto-no-sei.md`).
 - v0.21.0 (16/11/2026): Compras IFTO pieces, stage 3: after creating, the background opens the document editor in a popup window, puts the cleaned text in the body section (CKEditor 5 multi-root of SEI 5 or CKEditor 4) through the page's own editor (`scripting.executeScript`, world MAIN), clicks Salvar (never Assinar), closes the window and the SEI tab checks the saved text on the document page; the piece leaves the list. On any doubt (body section unclear, SEI message, error) it stops, keeps the editor window open and the piece in the list.
 - v0.20.0 (16/11/2026): Compras IFTO pieces, stage 2: "Criar e salvar" creates the internal document in the open process without screens (Incluir Documento › type › Texto inicial "Nenhum" › Público, or Restrito with the hipótese legal › Salvar), refreshes the tree and remembers it for the same-type warning; the text is not filled yet. Tree reading keeps each document's own page (`linkArvore`).

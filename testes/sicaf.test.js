@@ -197,7 +197,8 @@ test('paginaDoCompras pelo endereço', () => {
   assert.equal(sicaf.paginaDoCompras('https://www3.comprasnet.gov.br/sicaf-web/public/pages/acessoNegado.jsf'), 'acessoNegado')
   assert.equal(sicaf.paginaDoCompras('https://comprasnet.gov.br/seguro/loginPortalUASG.asp'), 'login')
   assert.equal(sicaf.paginaDoCompras('https://cnetmobile.estaleiro.serpro.gov.br/comprasnet-area-trabalho-web/seguro/governo/area-trabalho'), 'areaDeTrabalho')
-  assert.equal(sicaf.paginaDoCompras('https://sso.acesso.gov.br/login'), null)
+  assert.equal(sicaf.paginaDoCompras('https://sso.acesso.gov.br/login?client_id=comprasnet.gov.br&authorization_id=1a'), 'loginGovBr')
+  assert.equal(sicaf.paginaDoCompras('https://sso.acesso.gov.br/authorize'), null)
   assert.equal(sicaf.paginaDoCompras('não é endereço'), null)
 })
 

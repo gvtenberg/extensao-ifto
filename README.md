@@ -107,7 +107,7 @@ Cada função abaixo tem três opções: **Automática** (liga só na unidade in
 
 - **Lista de assinaturas:** automática na Direção-geral (PAL/REI/IFTO).
 - **Documentos do pagamento:** automática na CGOC (CGOC/GAC/DAP/PAL/REI/IFTO).
-- **SICAF e Simples Nacional:** "Automática" para o pagamento de notas fiscais na CGOC; "Sempre ligada" (equipe de licitação) mostra só o botão "Incluir SICAF", em qualquer unidade; "Desligada" tira tudo. Na primeira vez, clique em **Permitir acesso ao Compras.gov.br e ao Simples Nacional**: o navegador pede permissão para a extensão abrir esses dois sites e salvar os PDFs na pasta Downloads (só quem usa o SICAF precisa permitir).
+- **SICAF e Simples Nacional:** "Automática" para o pagamento de notas fiscais na CGOC; "Sempre ligada" (equipe de licitação) mostra só o botão "Incluir SICAF", em qualquer unidade; "Desligada" tira tudo. Na primeira vez, clique em **Permitir acesso ao Compras.gov.br e ao Simples Nacional**: o navegador pede permissão para a extensão abrir esses dois sites (e a página de entrada do Gov.br, onde ela clica em "SerproID" quando é preciso entrar de novo) e salvar os PDFs na pasta Downloads (só quem usa o SICAF precisa permitir).
 - **Licitação (CCL): peças do Compras IFTO:** automática na CCL (CCL/GAC/DAP/PAL/REI/IFTO). Na primeira vez, clique em **Permitir no Compras IFTO** e, depois, recarregue a página do Compras IFTO (F5): só então aparece o botão "Enviar ao SEI" lá (só quem usa o Compras IFTO precisa permitir).
 
 **Dicas**
