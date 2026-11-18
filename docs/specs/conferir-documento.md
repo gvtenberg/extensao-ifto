@@ -72,7 +72,7 @@ People copy an old document and forget to fix the "Processo nº:" line, the sect
 - [x] Stage 2 – Copy signer names: the signature box on the document page becomes selectable (switch) (v0.26.1). Test: select and copy a name in a signed document.
 - [x] Stage 3 – Process number: warning on the document page (unsigned) and in the editor, "Corrigir" button in the editor, pure rule + Node tests (v0.26.2).
 - [x] Stage 4 – Pre-sign window: "Assinar Documento" in the tree and "Assinar" in the editor (v0.26.3). Critical test (signs in the SEI).
-- [ ] Stage 5 – Pre-sign window in the signature list and in the Bloco de assinatura (v0.26.4). Critical test.
+- [x] Stage 5 – Pre-sign window in the signature list (v0.26.4). Critical test. **Bloco de assinatura: still to do** (D16, needs a saved page of that SEI screen).
 - [ ] Stage 6 – Timbre and footer: warnings, "Corrigir" buttons, "Usar este timbre como padrão da unidade" (v0.26.5).
 - [ ] Stage 7 – Spacing in every type (gap detection, style block, automatic, "Desfazer") — after T123 (v0.26.6). Needs saved editor pages of Ofício and Memorando too. Critical test: saved Despacho and PDF; plus one test with an Ofício.
 

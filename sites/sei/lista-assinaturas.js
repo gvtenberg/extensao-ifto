@@ -145,6 +145,35 @@
     }
     estado.itens.splice(estado.posicao, 1, ...novos)
     irPara(estado.posicao)
+    conferirProcessosDoIntervalo(novos, lida.documentos)
+  }
+
+  // v0.26.4 (spec conferir-documento, D2): depois de separar os documentos do intervalo, lê cada um e mostra
+  // numa janela só os que estão com o número do processo errado. "Assinar mesmo assim": não pergunta de novo
+  // por eles hoje. "Não": a janela de cada documento aparece de novo ao assinar. Documento que não deu para
+  // ler (SEI lento) fica de fora: nunca trava a lista.
+  async function conferirProcessosDoIntervalo (novos, documentos) {
+    const { conferirDocumento: conferir, janelaAssinar, seiPedidos } = globalThis.ExtensaoIFTO
+    if (!opcoes.conferirProcesso || !conferir || !janelaAssinar || !seiPedidos) return
+    const numeros = new Set(novos.map(novo => novo.documento))
+    const errados = []
+    for (const doc of documentos) {
+      const numero = regras.numeroDoRotulo(doc.rotulo)
+      if (!doc.link || !numeros.has(numero)) continue
+      try {
+        const limite = new Promise((resolve, recusar) => setTimeout(() => recusar(new Error('tempo')), 20000))
+        const { html } = await Promise.race([seiPedidos.pedir(doc.link), limite])
+        const conferido = conferir.conferirProcesso([{ nome: 'pagina', html }])
+        if (conferido && !conferido.certo) errados.push({ numero, rotulo: doc.rotulo, conferido })
+      } catch (erro) {}
+    }
+    if (!errados.length) return
+    const linhas = errados.map(e => `${e.rotulo}: está no processo ${e.conferido.processo}, mas o texto diz ${e.conferido.escrito}`)
+    const resposta = await janelaAssinar.perguntar(errados.length === 1 ? 'Este documento da lista está com o número do processo errado:' : 'Estes documentos da lista estão com o número do processo errado:', linhas, 'Não, corrigir antes')
+    if (resposta !== 'assinar') return
+    const navegador = globalThis.browser || globalThis.chrome
+    const { assinarAceitos } = await navegador.storage.local.get('assinarAceitos')
+    await navegador.storage.local.set({ assinarAceitos: conferir.aceitar(assinarAceitos, errados.map(e => e.numero), new Date()) })
   }
 
   // ---------- Desenho ----------
@@ -406,7 +435,16 @@
     if (acao && atalho(acao)) evento.preventDefault()
   }, true)
   window.addEventListener('message', evento => {
-    if (evento.origin !== location.origin || !evento.data || evento.data.extensaoIfto !== 'lista-assinaturas-tecla') return
+    if (evento.origin !== location.origin || !evento.data) return
+    // v0.26.4: "Não, corrigir antes" na janela do número do processo: para de esperar a assinatura.
+    if (evento.data.extensaoIfto === 'assinar-recusado' && estado && estado.pendente) {
+      delete estado.pendente
+      gravarEstado()
+      aviso = 'Este documento não foi assinado: o número do processo está errado. Corrija no editor e clique em "Assinar e próximo" de novo, ou clique em "Próximo".'
+      desenhar()
+      return
+    }
+    if (evento.data.extensaoIfto !== 'lista-assinaturas-tecla') return
     atalho(evento.data.acao)
   })
 

@@ -7,12 +7,21 @@
   const opcoes = await configuracoes.lerConfiguracoes()
   if (!opcoes.conferirProcesso) return
 
+  // v0.26.4: documentos que a pessoa já mandou "Assinar mesmo assim" na janela da lista de assinaturas (no
+  // dia) não perguntam de novo. Lido antes, porque o clique precisa ser parado na hora.
+  const navegador = globalThis.browser || globalThis.chrome
+  let aceitos = null
+  const lerAceitos = () => navegador.storage.local.get('assinarAceitos').then(r => { aceitos = r.assinarAceitos || null }).catch(() => {})
+  lerAceitos()
+  navegador.storage.onChanged.addListener(mudou => { if (mudou.assinarAceitos) lerAceitos() })
+
   function lerDocumentoAberto () {
     try {
       const quadros = [...document.querySelectorAll('iframe')]
       const quadro = document.getElementById('ifrArvoreHtml') || quadros.find(q => /documento_visualizar/.test(q.src))
       const html = quadro && quadro.contentDocument && quadro.contentDocument.body ? quadro.contentDocument.body.innerHTML : ''
-      return html ? regras.conferirProcesso([{ nome: 'pagina', html }]) : null
+      if (!html || regras.foiAceito(aceitos, regras.numeroSeiDoDocumento(html), new Date())) return null
+      return regras.conferirProcesso([{ nome: 'pagina', html }])
     } catch (erro) {
       return null
     }
@@ -35,6 +44,8 @@
       try { link.click() } finally { liberado = false }
       return
     }
+    // v0.26.4: a lista de assinaturas ("Assinar e próximo") deixa de esperar por esta assinatura.
+    try { window.top.postMessage({ extensaoIfto: 'assinar-recusado' }, location.origin) } catch (erro) {}
     const editar = document.querySelector('a[onclick*="editarConteudo"]')
     if (editar) editar.click()
   }, true)

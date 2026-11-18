@@ -446,3 +446,11 @@ E: Aparece a janela "O número do processo está errado (documento no processo X
 ### T137 – Parar antes de assinar no editor (v0.26.3) (Crítico)
 F: No editor de um documento com o número do processo errado, clique em "Assinar" (e, noutra vez, tecle Ctrl+Shift+A).
 E: Aparece a mesma janela antes da assinatura; "Não, corrigir antes" volta ao editor sem assinar; "Assinar mesmo assim" segue para a assinatura do SEI. Com o número certo, assina direto.
+
+### T138 – "Assinar e próximo" com o número do processo errado (v0.26.4) (Crítico)
+F: Na lista de assinaturas, chegue a um documento com o número do processo errado e clique em "Assinar e próximo"; na janela, clique em "Não, corrigir antes".
+E: A janela "Assinar mesmo assim?" aparece antes da assinatura; com "Não" o documento não é assinado, o editor abre e o painel avisa que o documento não foi assinado (não fica esperando).
+
+### T139 – Intervalo de documentos com números errados (v0.26.4) (Crítico)
+F: Cole na lista um intervalo ("3383754 a 3383903") de um processo em que um ou mais documentos têm o número do processo errado e abra o processo.
+E: Aparece uma janela só com a lista dos documentos errados (número e os dois processos); com "Assinar mesmo assim", "Assinar e próximo" assina esses documentos sem perguntar de novo; com "Não", a pergunta aparece em cada um.

@@ -130,6 +130,22 @@
     return `O número do processo está errado (documento no processo ${conferido.processo}, texto diz ${conferido.escrito}). Assinar mesmo assim?`
   }
 
+  // v0.26.4: número SEI do documento ("SEI nº 3390347", na linha da referência).
+  function numeroSeiDoDocumento (html) {
+    const achado = textoDoHtml(html).match(/SEI\s*n\s*[º°o]?\s*(\d{5,})/i)
+    return achado ? achado[1] : ''
+  }
+
+  // v0.26.4: documentos que a pessoa mandou "Assinar mesmo assim" na janela da lista de assinaturas: valem só
+  // no dia (guardado: { dia: 'aaaa-mm-dd', numeros: [...] }).
+  const diaDe = data => [data.getFullYear(), String(data.getMonth() + 1).padStart(2, '0'), String(data.getDate()).padStart(2, '0')].join('-')
+  function aceitar (guardado, numeros, hoje) {
+    const dia = diaDe(hoje)
+    const antes = guardado && guardado.dia === dia ? guardado.numeros : []
+    return { dia, numeros: [...new Set([...antes, ...numeros.map(String)])] }
+  }
+  const foiAceito = (guardado, numero, hoje) => Boolean(numero) && Boolean(guardado) && guardado.dia === diaDe(hoje) && guardado.numeros.includes(String(numero))
+
   // Troca só o número na linha "Processo nº:" da seção (primeiro parágrafo que bate). null se não deu.
   function corrigirProcesso (html, processoCerto) {
     let trocado = false
@@ -144,7 +160,7 @@
   // Documento já assinado: a página do documento mostra "Documento assinado eletronicamente por".
   const estaAssinado = html => /assinado\s+eletronicamente\s+por/i.test(textoDoHtml(html))
 
-  const api = { siglaDaUnidade, ehUnidadePalmas, limparUnidade, limparUnidades, acharUnidade, textoDoHtml, formatarProcesso, mesmoProcesso, processoDaReferencia, linhaDoProcesso, conferirProcesso, avisoDoProcesso, perguntaAntesDeAssinar, corrigirProcesso, estaAssinado }
+  const api = { siglaDaUnidade, ehUnidadePalmas, limparUnidade, limparUnidades, acharUnidade, textoDoHtml, formatarProcesso, mesmoProcesso, processoDaReferencia, linhaDoProcesso, conferirProcesso, avisoDoProcesso, perguntaAntesDeAssinar, corrigirProcesso, estaAssinado, numeroSeiDoDocumento, aceitar, foiAceito }
   if (typeof module !== 'undefined' && module.exports) module.exports = api
   else raiz.ExtensaoIFTO = Object.assign(raiz.ExtensaoIFTO || {}, { conferirDocumento: api })
 })(globalThis)

@@ -71,3 +71,15 @@ test('v0.26.3: pergunta antes de assinar com os dois números', () => {
   assert.equal(c.perguntaAntesDeAssinar({ processo: '23236.018761/2026-05', escrito: '23236.000001/2025-11' }),
     'O número do processo está errado (documento no processo 23236.018761/2026-05, texto diz 23236.000001/2025-11). Assinar mesmo assim?')
 })
+
+test('v0.26.4: número SEI do documento e "Assinar mesmo assim" só no dia', () => {
+  assert.equal(c.numeroSeiDoDocumento(referencia('23236.018761/2026-05')), '3384977')
+  assert.equal(c.numeroSeiDoDocumento('<p>nada</p>'), '')
+  const hoje = new Date(2026, 10, 18)
+  const guardado = c.aceitar(c.aceitar(null, ['1'], hoje), ['2', '1'], hoje)
+  assert.deepEqual(guardado, { dia: '2026-11-18', numeros: ['1', '2'] })
+  assert.equal(c.foiAceito(guardado, '2', hoje), true)
+  assert.equal(c.foiAceito(guardado, '3', hoje), false)
+  assert.equal(c.foiAceito(guardado, '2', new Date(2026, 10, 19)), false)
+  assert.deepEqual(c.aceitar(guardado, ['9'], new Date(2026, 10, 19)).numeros, ['9'])
+})
