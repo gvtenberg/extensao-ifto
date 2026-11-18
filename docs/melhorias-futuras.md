@@ -21,12 +21,16 @@ Summary to resume work (on another machine or by another person) without reading
 - **Done, waiting for tests (v0.18.4):** password recognized by Firefox also when signing from inside the document editor (user report, 17/11/2026). Test T87.
 - **Done, waiting for tests (v0.18.5):** choose which invoices are searched (cancelled ones unchecked); SICAF/Simples down: warning after 45 s, skip the site, cancel and go back to the invoices. Tests T88 to T91.
 - **Done, waiting for tests (v0.18.6):** blank Sicaf/Consulta without PDF keep the tree order (`specs/feitas/sicaf-em-branco.md`). Tests T92 to T95 (T92, T94 critical: write to the SEI).
+- **Done, waiting for tests (v0.24.0):** tables in the SEI editor: cut and paste keeps the formatting, "Margens" box and "Alinhar com o texto" in "Propriedades da tabela" (`specs/feitas/tabelas-editor.md`, rules in `regras/sei.md`). Tests T118 to T121. Next: "10.10." in Item nível 2 Edital (user request of 18/11/2026; decided: a button changes only the broken paragraphs to Item_Nivel2).
 - **In progress (18/11/2026):** `specs/data-documento.md` (button "Mudar a data para hoje" in the Ofício/Portaria editor): stage 1 coded (v0.23.0); waiting for D4 (setting) and the critical test T114 (does the SEI keep the date after Salvar?); tests T114 to T117.
 - **Planned (with spec):** lines marked **[spec]** below. **Not planned:** the other lines (ideas).
 
 ## Ideas
 
 One line per idea. When an idea is planned, it gets a spec in `docs/specs/` and the line points to it. When finished, the line leaves here and goes to `docs/historico.md`.
+
+- **Blank lines between sections in the SEI editor** (18/11/2026): in SEI 5 the texts of different sections are too close; the extension could add line breaks in some places of some document types (which types and places: ask the user).
+- **All text styles in any document** (18/11/2026): the Edital has twice the styles of a Despacho; the user would like every style in every type. Check first: the editor removes a style the type does not allow (`permitidoEm`), and the final document only has the CSS of its own type, so an extra style may print without formatting.
 
 Marks: **[spec]** already has a spec.
 

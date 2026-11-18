@@ -69,6 +69,8 @@ function tratarRecado (recado, remetente) {
     // v0.23.0 (spec data-documento): data de hoje no Ofício e na Portaria.
     case 'dataVerificar': return dataNoEditor(remetente, false)
     case 'dataAtualizar': return dataNoEditor(remetente, true)
+    // v0.24.0 (spec tabelas-editor): tabelas no editor (recortar e colar, margens).
+    case 'tabelasPreparar': return tabelasNoEditor(remetente, recado)
     // v0.17.5: texto de um PDF pedido pela página do SEI (no Firefox o pdf.js só funciona aqui).
     case 'lerPdf': return globalThis.ExtensaoIFTO.pdfTexto ? globalThis.ExtensaoIFTO.pdfTexto.textoDoPdf(recado.bytes).then(texto => ({ texto })) : Promise.resolve({ erro: 'Leitura de PDF indisponível.' })
   }
@@ -489,6 +491,14 @@ function rodarNoEditor (remetente) {
     const [execucao] = await navegador.scripting.executeScript({ target: alvo, world: 'MAIN', func, args })
     return (execucao && execucao.result) || { ok: false, erro: 'O editor do SEI não respondeu.' }
   }
+}
+
+// v0.24.0 (spec tabelas-editor): põe as regras das margens e o código das tabelas dentro da página do editor
+// (world MAIN) e liga o que a pessoa deixou ligado nas configurações.
+async function tabelasNoEditor (remetente, recado) {
+  const alvo = { tabId: remetente.tab.id, frameIds: [remetente.frameId || 0] }
+  await navegador.scripting.executeScript({ target: alvo, world: 'MAIN', files: ['comum/tabelas-editor.js', 'sites/sei/editor-tabelas.js'] })
+  return rodarNoEditor(remetente)(opcoes => globalThis.ExtensaoIFTO.editorTabelas.preparar(opcoes), [{ mover: Boolean(recado.mover), margens: Boolean(recado.margens) }])
 }
 
 async function minutaNoEditor (remetente, remover) {

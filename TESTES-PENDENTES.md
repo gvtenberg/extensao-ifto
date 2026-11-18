@@ -377,3 +377,22 @@ E: Nos dois não aparece o aviso "Mudar a data para hoje".
 ### T117 – Remover marca MINUTA continua igual (v0.23.0)
 F: Abra no editor um Edital que ainda tem a marca MINUTA e clique em "Remover marca MINUTA".
 E: O aviso aparece e funciona como antes (mesma aparência, a marca some do texto).
+
+## Tabelas no editor do SEI
+> Use um documento de teste (ou feche o editor sem salvar se algo sair errado).
+
+### T118 – Recortar e colar trecho com tabela (v0.24.0)
+F: No editor, selecione um trecho com texto e uma tabela, Ctrl+X, clique em outro lugar do mesmo documento e Ctrl+V.
+E: A tabela aparece no lugar novo com a mesma largura, as mesmas colunas e as mesmas margens; Ctrl+Z desfaz.
+
+### T119 – Copiar trecho com tabela e colar duas vezes (v0.24.0)
+F: Selecione um trecho com tabela, Ctrl+C e cole (Ctrl+V) em dois lugares diferentes do mesmo documento; depois clique em Salvar e abra o documento de novo.
+E: As duas cópias ficam iguais à original, também depois de salvar e reabrir.
+
+### T120 – Margens da tabela no formato antigo (v0.24.0)
+F: Clique numa tabela, abra "Propriedades da tabela", escreva na caixa "Margens" margin:10px auto 10px 28px;width:604px e clique em OK.
+E: A tabela fica com 28 px de recuo à esquerda e 10 px acima e abaixo; a largura não muda; ao reabrir a janela, a caixa mostra as margens.
+
+### T121 – Botão "Alinhar com o texto" (v0.24.0)
+F: Numa tabela centralizada, abra "Propriedades da tabela", clique em "Alinhar com o texto", depois em OK, e clique em Salvar.
+E: A borda esquerda da tabela fica alinhada com o texto dos parágrafos; no documento salvo continua igual.

@@ -38,6 +38,9 @@ Plain JavaScript, no build step, Manifest V3 (D4 in `specs/base-e-sei.md`). Pure
 | `sites/sei/caixa-editor.js` | (v0.23.0) Shared "IFTO" box in the editor window and the message to the background with a time limit (`criarCaixa`, `pedirAoFundo`) |
 | `comum/data-documento.js` | (v0.23.0) Date of Ofício/Portaria: finds the section with the date (locked ones first, never the body), says if it has passed, changes it to today keeping the way it is written |
 | `sites/sei/data-documento.js` | (v0.23.0) Box "Mudar a data para hoje" in the editor of Ofício/Portaria with a past date (asks the background `dataVerificar` / `dataAtualizar`); never saves |
+| `comum/tabelas-editor.js` | (v0.24.0) Table margins in the old SEI format: read (`lerMargens`) and write (`escreverMargens`), "Alinhar com o texto" values |
+| `sites/sei/editor-tabelas.js` | (v0.24.0) Put by the background inside the editor page (world MAIN, with `comum/tabelas-editor.js`): cut/copy and paste with tables through the editor model; "Margens" box in "Propriedades da tabela" |
+| `sites/sei/tabelas.js` | (v0.24.0) Editor window: asks the background (`tabelasPreparar`) to prepare the tables if the settings are on |
 | `sites/sei/editor-preencher.js` | Function run by the background inside the SEI editor window (world MAIN, v0.21.0): finds the editor (CKEditor 5 multi-root or 4) and the body section, puts the text, clicks Salvar (never Assinar) and reports the editor and sections |
 | `sites/sei/lista-assinaturas.js` | Signature list floating panel (SEI main page): paste, navigate, open via quick search, "Assinar e próximo" / "Dar ciência e próximo" (waits for the SEI to reload the tree, then advances) |
 | `sites/sei/lista-assinaturas-teclas.js` | Alt+→ and Alt+← shortcuts with focus inside SEI frames (notifies the main page) |

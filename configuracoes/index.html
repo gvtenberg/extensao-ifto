@@ -29,6 +29,21 @@
           <span class="apoio" style="display:block">Na tela de entrada do SEI e na assinatura de documentos, o SEI novo esconde a senha de um jeito que o navegador não a reconhece. Ligado, o navegador volta a oferecer a senha guardada.</span>
         </span>
       </label>
+      <!-- v0.24.0 (spec tabelas-editor): tabelas no editor do SEI. -->
+      <label class="opcao">
+        <input type="checkbox" id="moverTabelas">
+        <span>
+          Tabelas inteiras ao recortar e colar no editor
+          <span class="apoio" style="display:block">No editor do SEI, ao recortar (Ctrl+X) ou copiar (Ctrl+C) um trecho com tabela e colar (Ctrl+V) em outro lugar do mesmo documento, a tabela fica igual: largura, colunas e margens. Colar em outro documento continua como antes.</span>
+        </span>
+      </label>
+      <label class="opcao">
+        <input type="checkbox" id="margensTabela">
+        <span>
+          Margens da tabela no editor
+          <span class="apoio" style="display:block">Na janela "Propriedades da tabela" do editor do SEI aparece a caixa "Margens", que aceita o formato do SEI antigo (por exemplo margin:10px auto 10px 28px), e o botão "Alinhar com o texto".</span>
+        </span>
+      </label>
     </section>
     <h2 class="titulo-secao">Por unidade</h2>
     <p class="apoio">Cada função aparece num botão no alto, à direita, nas páginas do SEI. "Automática" liga a função só na unidade indicada.</p>

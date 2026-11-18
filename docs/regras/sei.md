@@ -17,6 +17,12 @@
 - (v0.20.0, spec `compras-ifto-no-sei`) Creating an **internal** document without screens: same start as the external one (`documento_escolher_tipo` › POST `frmDocumentoEscolherTipo` with `hdnIdSerie` = the type id read from `escolher(<id>)` on that page) › form `frmDocumentoCadastro` with `rdoTextoInicial` (the "Nenhum" option), `rdoNivelAcesso` (0 Público, 1 Restrito + `selHipoteseLegal`) and `hdnFlagDocumentoCadastro=2`. Not yet confirmed on the IFTO SEI (test T90): the editor link (`editor_montar`) and the text link (`documento_visualizar`) are looked for in the answer and, if missing, in the new document's page in the tree (third argument of `infraArvoreNo`).
 - (v0.14.0; v0.17.0 for every external document) **"Nome na Árvore" takes at most 50 letters** (`maxlength="50"` on the SEI 5.0.4 form; the document type, e.g. "Consulta", is not counted). The extension cuts at the last whole word and drops a final dot, comma or dash (`nomeNaArvore` in `comum/sei.js`).
 
+## Tables in the editor (v0.24.0)
+
+- Every unit, every document type; one switch for each part in the settings (`moverTabelas`, `margensTabela`, on by default).
+- Cut/copy and paste in the **same editor window**: when the copied part has a table, the paste puts back the editor's own copy (model), not the clipboard HTML, so width, column widths and margins stay. Ctrl+Shift+V, drag and drop, pasting in another window and parts without a table stay with the SEI. Ctrl+Z undoes it.
+- SEI 5 keeps the left margin of a table in its own `recuo` setting (only with the table aligned to the left) and the other margins in the HTML styles; saved as `margin:10px auto 10px 28px` like the old SEI. The "Margens" box in "Propriedades da tabela" accepts the old format and applies on OK; width is ignored (the SEI has the Largura field). "Alinhar com o texto" = `margin:10px auto 10px 28px` (text styles use margin-left .75cm).
+
 ## MINUTA mark in editais (v0.22.0)
 
 - The "MINUTA" in the background is not a paragraph: SEI Pro puts a `<style>` block in the text (`data-style="seipro-watermark"`, `content: "MINUTA"`) plus a label `span.minutaAncora` "* MINUTA DE DOCUMENTO" (one pair per marked paragraph). Creating the Edital from the minuta copies them. In SEI 5, deleting the label is not enough: the style block stays hidden in the paragraph and keeps printing MINUTA (v2 of Edital 3390039, 18/11/2026), and editing the HTML by hand is not saved.
