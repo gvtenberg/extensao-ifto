@@ -2,6 +2,7 @@
 
 One or two lines per version, with the date (dd/mm/yyyy). Number 0.STAGE.FIX.
 
+- v0.23.0 (18/11/2026): "Mudar a data para hoje" in the SEI editor of Ofício and Portaria when the date (locked section) has passed; the person checks and clicks Salvar (`specs/data-documento.md`). The editor box and the background helper are now shared with "Remover marca MINUTA".
 - v0.22.2 (18/11/2026): new internal document (Incluir Documento › Edital Gabinete, Despacho…, page `documento_gerar`) comes with Público marked when no access level is marked (same setting as the external document, renamed "Preencher documento novo").
 - v0.22.1 (18/11/2026): "Remover marca MINUTA" also removes the "* MINUTA DE DOCUMENTO" labels recognized by their text (the SEI 5 editor drops their class; T110), and the paragraphs left empty.
 - v0.22.0 (18/11/2026): "Remover marca MINUTA" in the SEI editor of Edital documents (Direção-geral, setting Automática/Sempre/Desligada): removes the SEI Pro watermark style and the "MINUTA DE DOCUMENTO" labels; the person checks and clicks Salvar (`specs/feitas/minuta-edital.md`).

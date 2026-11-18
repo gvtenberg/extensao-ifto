@@ -358,3 +358,22 @@ E: Todas as linhas "* MINUTA DE DOCUMENTO" somem de uma vez, sem deixar linhas e
 ### T113 – Documento interno novo já vem com Público marcado (v0.22.2)
 F: Num processo, clique em Incluir Documento e escolha Edital Gabinete (ou outro documento interno, como Despacho).
 E: O nível de acesso Público já aparece marcado, com o aviso verde "Preenchido pela extensão"; nada é salvo até você clicar em Salvar.
+
+## Data de hoje no Ofício e na Portaria
+> antes de testar: use um Ofício ou uma Portaria ainda sem assinatura, criado em outro dia.
+
+### T114 – Mudar a data de um Ofício para hoje e salvar (v0.23.0) (Crítico)
+F: Abra no editor um Ofício com data antiga, clique em "Mudar a data para hoje", confira e clique em Salvar; feche e abra o documento de novo.
+E: A data passa a ser a de hoje e continua a de hoje depois de salvar e abrir de novo; o resto do texto fica igual.
+
+### T115 – Mudar a data de uma Portaria para hoje (v0.23.0)
+F: Abra no editor uma Portaria com data antiga, clique em "Mudar a data para hoje" e depois em Salvar.
+E: Só a data da linha "PORTARIA … nº …, de …" muda para hoje; as datas citadas no texto (decretos, leis) ficam iguais.
+
+### T116 – Aviso só quando a data já passou (v0.23.0)
+F: Abra no editor um Ofício criado hoje e depois um Despacho antigo.
+E: Nos dois não aparece o aviso "Mudar a data para hoje".
+
+### T117 – Remover marca MINUTA continua igual (v0.23.0)
+F: Abra no editor um Edital que ainda tem a marca MINUTA e clique em "Remover marca MINUTA".
+E: O aviso aparece e funciona como antes (mesma aparência, a marca some do texto).

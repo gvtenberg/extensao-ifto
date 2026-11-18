@@ -106,7 +106,14 @@
   // v0.22.0: Direção-geral (Gabinete) em um lugar só: lista de assinaturas e marca MINUTA dos editais.
   const UNIDADE_DIRECAO_GERAL = 'PAL/REI/IFTO'
 
-  const api = { versaoDoSei, VERSAO_SEI_TESTADA, seiTestado, atributosDoCampoDeSenha, lerArvore, ligadaNaUnidade, nomeNaArvore, numeroDaUnidade, UNIDADE_DIRECAO_GERAL }
+  // v0.23.0: tipo do documento pelo título da janela do editor ("SEI/IFTO - 3163788 - Ofício"): a parte
+  // depois do número. Usado pela marca MINUTA (Edital) e pela data de hoje (Ofício, Portaria).
+  function tipoDoDocumento (titulo) {
+    const partes = String(titulo || '').split(/\s+[-–]\s+/).slice(1)
+    return (partes.find(parte => !/^\d+$/.test(parte.trim())) || '').trim()
+  }
+
+  const api = { tipoDoDocumento, versaoDoSei, VERSAO_SEI_TESTADA, seiTestado, atributosDoCampoDeSenha, lerArvore, ligadaNaUnidade, nomeNaArvore, numeroDaUnidade, UNIDADE_DIRECAO_GERAL }
   if (typeof module !== 'undefined' && module.exports) module.exports = api
   else raiz.ExtensaoIFTO = Object.assign(raiz.ExtensaoIFTO || {}, { sei: api })
 })(globalThis)

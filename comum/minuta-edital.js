@@ -74,13 +74,11 @@
 
   // Só em documento do tipo Edital: o título da janela do editor é "SEI/IFTO - 3390039 - Edital Gabinete"
   // (sigla - número - tipo e nome). "Minuta de Edital" fica de fora (lá a marca deve ficar).
+  const regrasSei = typeof module !== 'undefined' && module.exports ? require('./sei.js') : raiz.ExtensaoIFTO.sei
   function ehEdital (titulo) {
-    const partes = String(titulo || '').split(/\s+[-–]\s+/).slice(1)
-    const tipo = partes.find(parte => !/^\d+$/.test(parte.trim())) || ''
-    return /^edital\b/i.test(tipo.trim())
+    return /^edital\b/i.test(regrasSei.tipoDoDocumento(titulo))
   }
 
-  const regrasSei = typeof module !== 'undefined' && module.exports ? require('./sei.js') : raiz.ExtensaoIFTO.sei
   // Opção das configurações: "automatica" (só na Direção-geral), "sempre" ou "desligada".
   function funcaoLigada (opcao, unidade) {
     return regrasSei.ligadaNaUnidade(opcao, unidade, regrasSei.UNIDADE_DIRECAO_GERAL)

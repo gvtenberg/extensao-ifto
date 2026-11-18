@@ -24,64 +24,21 @@
     return ''
   }
 
-  // Recado para a parte de fundo, com limite de tempo (o editor pode demorar ou travar).
-  function pedir (tipo) {
-    const limite = new Promise(resolve => setTimeout(() => resolve({ ok: false, erro: 'O editor do SEI demorou demais para responder. Feche e abra o editor de novo.' }), 45000))
-    return Promise.race([navegador.runtime.sendMessage({ tipo }).catch(erro => ({ ok: false, erro: erro.message })), limite])
-  }
-
+  const { criarCaixa, pedirAoFundo: pedir, criar } = globalThis.ExtensaoIFTO.caixaEditor
   const verificado = await pedir('minutaVerificar')
   if (!verificado || !verificado.ok || !verificado.marcas) return
 
-  const hospedeiro = document.createElement('div')
-  hospedeiro.dataset.extensaoIfto = 'minuta-edital'
-  const raiz = hospedeiro.attachShadow({ mode: 'open' })
-  const estilo = document.createElement('style')
-  estilo.textContent = `
-    :host { all: initial; }
-    .caixa { position: fixed; z-index: 100000; right: 16px; bottom: 16px; width: min(320px, calc(100vw - 32px));
-      font: 13px/1.4 system-ui, sans-serif; color: #1B2420; background: #fff; border: 1px solid #C9D1CC;
-      border-radius: 6px; box-shadow: 0 2px 8px rgba(0,0,0,.18); overflow: hidden; }
-    .topo { display: flex; align-items: center; justify-content: space-between; }
-    .marca { background: #1E5E33; color: #fff; font-size: 10px; font-weight: 700; padding: 1px 6px; border-bottom-right-radius: 4px; }
-    .fechar { border: 0; background: none; font-size: 16px; line-height: 1; padding: 2px 8px; cursor: pointer; color: #555; }
-    .corpo { padding: 6px 10px 10px; }
-    p { margin: 0 0 8px; }
-    .aviso { color: #8A5A00; }
-    .erro { color: #B3261E; }
-    .ok { color: #1E5E33; font-weight: 600; }
-    ul { margin: 0 0 8px; padding-left: 18px; }
-    .principal { width: 100%; padding: 6px 10px; border: 0; border-radius: 4px; background: #1E5E33; color: #fff;
-      font: inherit; font-weight: 600; cursor: pointer; }
-    .principal:disabled { opacity: .6; cursor: default; }
-  `
-  const caixa = document.createElement('div')
-  caixa.className = 'caixa'
-  const criar = (etiqueta, propriedades = {}) => Object.assign(document.createElement(etiqueta), propriedades)
-  const fechar = criar('button', { type: 'button', className: 'fechar', title: 'Fechar este aviso', textContent: '×' })
-  const topo = criar('div', { className: 'topo' })
-  topo.append(criar('span', { className: 'marca', textContent: 'IFTO' }), fechar)
-  const corpo = criar('div', { className: 'corpo' })
-  const botao = criar('button', { type: 'button', className: 'principal', textContent: 'Remover marca MINUTA' })
-  corpo.append(criar('p', { textContent: 'Este edital ainda tem a marca "MINUTA", que veio da minuta (no fundo da página e do PDF, ou nas linhas "* MINUTA DE DOCUMENTO").' }), botao)
-  caixa.append(topo, corpo)
-  raiz.append(estilo, caixa)
-  document.body.append(hospedeiro)
-  fechar.addEventListener('click', () => hospedeiro.remove())
+  const caixa = criarCaixa('minuta-edital', 'Este edital ainda tem a marca "MINUTA", que veio da minuta (no fundo da página e do PDF, ou nas linhas "* MINUTA DE DOCUMENTO").', 'Remover marca MINUTA')
+  const botao = caixa.botao
 
   function mostrar (classe, texto, trechos = []) {
-    const paragrafo = document.createElement('p')
-    paragrafo.className = classe
-    paragrafo.textContent = texto
-    const itens = trechos.map(trecho => Object.assign(document.createElement('li'), { textContent: trecho }))
-    const partes = [paragrafo]
-    if (itens.length) {
-      const aviso = Object.assign(document.createElement('p'), { className: 'aviso', textContent: 'O texto ainda tem a palavra "minuta" aqui (corrija à mão, se for o caso):' })
-      const lista = document.createElement('ul')
-      lista.append(...itens)
-      partes.push(aviso, lista)
+    const extras = []
+    if (trechos.length) {
+      const lista = criar('ul')
+      lista.append(...trechos.map(trecho => criar('li', { textContent: trecho })))
+      extras.push(criar('p', { className: 'aviso', textContent: 'O texto ainda tem a palavra "minuta" aqui (corrija à mão, se for o caso):' }), lista)
     }
-    corpo.replaceChildren(...partes)
+    caixa.mostrar(classe, texto, ...extras)
   }
 
   botao.addEventListener('click', async () => {

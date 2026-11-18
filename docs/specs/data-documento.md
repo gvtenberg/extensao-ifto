@@ -2,7 +2,7 @@
 
 **Sections**: 1. Goal · 2. Out of scope · 3. Decisions to confirm · 4. Decided rules · 5. What changes · 6. Stages · 7. Manual tests
 
-- **Status:** waiting for the Ofício editor page (saved by the user)
+- **Status:** stage 1 coded (v0.23.0), waiting for the critical test T114
 - **Requested on:** 18/11/2026
 - **Planned version:** 0.23.0
 
@@ -41,7 +41,7 @@ In some SEI 5 document types (Ofício, Portaria) the date is filled in by the SE
 
 ## 6. Stages
 
-- [ ] Stage 1 – Ofício and Portaria: button, rule, tests; critical test of saving in the SEI.
+- [x] Stage 1 – Ofício and Portaria: button, rule, tests (v0.23.0, 18/11/2026). Pages studied: Ofício 3163788 (CKEditor 4, section "Data" readOnly) and Portaria de Pessoal 3390422 (CKEditor 5, date in the locked "Identificador"). Tests T114 to T117.
 
 ## 7. Manual tests
 

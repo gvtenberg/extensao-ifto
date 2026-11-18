@@ -8,7 +8,7 @@
 // v0.17.2: depois do SICAF, a mesma aba consulta o Simples Nacional de cada fornecedor (spec consulta-simples).
 /* global importScripts */
 if (typeof importScripts === 'function' && !(globalThis.ExtensaoIFTO && globalThis.ExtensaoIFTO.simplesNacional)) {
-  importScripts('/comum/sei.js', '/comum/minuta-edital.js', '/comum/configuracoes.js', '/comum/sicaf.js', '/comum/simples-nacional.js', '/comum/compras-ifto.js', '/sites/sei/editor-preencher.js', '/sites/sei/editor-minuta.js')
+  importScripts('/comum/sei.js', '/comum/minuta-edital.js', '/comum/data-documento.js', '/comum/configuracoes.js', '/comum/sicaf.js', '/comum/simples-nacional.js', '/comum/compras-ifto.js', '/sites/sei/editor-preencher.js', '/sites/sei/editor-minuta.js')
 }
 const navegador = globalThis.browser || globalThis.chrome
 const regras = globalThis.ExtensaoIFTO.sicaf
@@ -66,6 +66,9 @@ function tratarRecado (recado, remetente) {
     // v0.22.0 (spec minuta-edital): marca MINUTA dos editais, no editor do SEI de onde veio o recado.
     case 'minutaVerificar': return minutaNoEditor(remetente, false)
     case 'minutaRemover': return minutaNoEditor(remetente, true)
+    // v0.23.0 (spec data-documento): data de hoje no Ofício e na Portaria.
+    case 'dataVerificar': return dataNoEditor(remetente, false)
+    case 'dataAtualizar': return dataNoEditor(remetente, true)
     // v0.17.5: texto de um PDF pedido pela página do SEI (no Firefox o pdf.js só funciona aqui).
     case 'lerPdf': return globalThis.ExtensaoIFTO.pdfTexto ? globalThis.ExtensaoIFTO.pdfTexto.textoDoPdf(recado.bytes).then(texto => ({ texto })) : Promise.resolve({ erro: 'Leitura de PDF indisponível.' })
   }
@@ -479,13 +482,18 @@ navegador.runtime.onStartup.addListener(() => navegador.storage.local.remove(CHA
 // v0.22.0 (spec minuta-edital): lê o texto do editor; com "remover", tira a marca MINUTA das seções editáveis
 // e confere de novo. Nunca salva: a pessoa confere e clica em Salvar.
 // Devolve { ok, erro, marcas, removidas, restou, trechos }.
-async function minutaNoEditor (remetente, remover) {
-  const regrasMinuta = globalThis.ExtensaoIFTO.minutaEdital
+// v0.23.0: roda uma das funções de editor-minuta.js na janela do editor de onde veio o recado (MINUTA e data).
+function rodarNoEditor (remetente) {
   const alvo = { tabId: remetente.tab.id, frameIds: [remetente.frameId || 0] }
-  const rodar = async (func, args = []) => {
+  return async (func, args = []) => {
     const [execucao] = await navegador.scripting.executeScript({ target: alvo, world: 'MAIN', func, args })
     return (execucao && execucao.result) || { ok: false, erro: 'O editor do SEI não respondeu.' }
   }
+}
+
+async function minutaNoEditor (remetente, remover) {
+  const regrasMinuta = globalThis.ExtensaoIFTO.minutaEdital
+  const rodar = rodarNoEditor(remetente)
   const contar = secoes => secoes.filter(secao => regrasMinuta.temMarcaMinuta(secao.html)).length
   const lido = await rodar(globalThis.ExtensaoIFTO.editorLer)
   if (!lido.ok) return { ok: false, erro: lido.erro }
@@ -506,4 +514,24 @@ async function minutaNoEditor (remetente, remover) {
   const secoes = depois.ok ? depois.secoes : []
   const trechos = secoes.flatMap(secao => regrasMinuta.minutaNoTexto(secao.html)).slice(0, 3)
   return { ok: true, marcas, removidas, restou: depois.ok ? contar(secoes) : 0, trechos }
+}
+
+// v0.23.0 (spec data-documento): acha a data do Ofício ou da Portaria; com "trocar", põe a de hoje só nessa
+// seção e confere de novo. Nunca salva. Devolve { ok, erro, passou, data, nova }.
+async function dataNoEditor (remetente, trocar) {
+  const regras = globalThis.ExtensaoIFTO.dataDocumento
+  const rodar = rodarNoEditor(remetente)
+  const hoje = new Date()
+  const lido = await rodar(globalThis.ExtensaoIFTO.editorLer)
+  if (!lido.ok) return { ok: false, erro: lido.erro }
+  const secao = regras.secaoDaData(lido.secoes)
+  const data = secao && regras.acharData(secao.html)
+  const passou = regras.dataPassou(data, hoje)
+  if (!trocar || !passou) return { ok: true, passou, data: data ? regras.dataCurta(data) : '' }
+  const gravado = await rodar(globalThis.ExtensaoIFTO.editorGravar, [{ [secao.nome]: regras.trocarData(secao.html, hoje) }])
+  if (!gravado.ok) return { ok: false, erro: gravado.erro }
+  const depois = await rodar(globalThis.ExtensaoIFTO.editorLer)
+  const conferida = depois.ok && depois.secoes.find(outra => outra.nome === secao.nome)
+  if (!conferida || regras.dataPassou(regras.acharData(conferida.html), hoje)) return { ok: false, erro: 'O editor não ficou com a data nova.' }
+  return { ok: true, passou: false, nova: regras.dataPorExtenso(hoje) }
 }
