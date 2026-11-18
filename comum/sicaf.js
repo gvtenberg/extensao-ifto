@@ -337,6 +337,8 @@
   // ---------- SICAF no Compras.gov.br (etapa 4) ----------
   // v0.13.0: endereços do SICAF e do Compras (acesso pedido só quando a opção é usada: permissão opcional).
   const URL_CONSULTA_SICAF = 'https://www3.comprasnet.gov.br/sicaf-web/private/geral/consultarSituacaoFornecedor.jsf'
+  // v0.21.6 (pedido do usuário em 18/11/2026): início do SICAF, aberto direto da Área de Trabalho na mesma aba.
+  const URL_INICIO_SICAF = 'https://www3.comprasnet.gov.br/sicaf-web/private/index.jsf'
   const URL_LOGIN_COMPRAS = 'https://comprasnet.gov.br/seguro/loginPortalUASG.asp'
   // v0.17.3: o SICAF só aceita quem chega pela Área de Trabalho (menu do usuário › SICAF); ir direto ao
   // endereço do SICAF logo depois do login dá "Sessão expirada".
@@ -573,7 +575,7 @@
     normalizar, mesmoNumero, textoDoHtml, nomesParecidos,
     tipoNaArvore, numeroSei, lerRotuloDaNota, trechoPendente, lerAteste, situacaoDoProcesso, textoDoAviso,
     cnpjsDaNota, notaSemTexto, empenhosDoTexto, nomeNoTexto, conferirNota, agruparPorFornecedor,
-    URL_CONSULTA_SICAF, URL_LOGIN_COMPRAS, URL_AREA_DE_TRABALHO, ORIGENS_COMPRAS, ORIGENS_GOVBR, paginaDoCompras, nomeDoArquivo, lerLinhaDoResultado, lerPdfDoSicaf, paraBase64, deBase64,
+    URL_CONSULTA_SICAF, URL_INICIO_SICAF, URL_LOGIN_COMPRAS, URL_AREA_DE_TRABALHO, ORIGENS_COMPRAS, ORIGENS_GOVBR, paginaDoCompras, nomeDoArquivo, lerLinhaDoResultado, lerPdfDoSicaf, paraBase64, deBase64,
     nomeNaArvore, nomeDoSicaf, nomeDoAnexo, documentosParaIncluir, semPdfNomeados, doFornecedor, aproveitarEmBranco, lerRespostaDoUpload, enderecoDoUpload, lerUsuarioDoUpload, formatarTamanho, linhaDoAnexo,
     SEM_RESPOSTA_MS, andamentoDaBusca, pularFase, buscaComErro
   }

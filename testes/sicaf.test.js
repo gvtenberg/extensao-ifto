@@ -315,6 +315,7 @@ test('conferirNota: nota que não abriu não é chamada de imagem', () => {
   assert.equal(falhou.cnpj, '31302907000139')
   assert.match(falhou.avisos[0].texto, /Não consegui ler a nota/)
   assert.equal(sicaf.paginaDoCompras(sicaf.URL_AREA_DE_TRABALHO), 'areaDeTrabalho')
+  assert.equal(sicaf.paginaDoCompras(sicaf.URL_INICIO_SICAF), 'sicaf') // v0.21.6: início do SICAF continua a busca
 })
 
 test('v0.18.2: Sicaf e Consulta com o CNPJ lido na nota contam, mesmo com outro CNPJ no ateste', () => {

@@ -185,6 +185,10 @@ navegador.tabs.onUpdated.addListener(async (idDaAba, mudanca, aba) => {
   if (!tarefa || tarefa.fase === 'simples') return
   if (idDaAba !== tarefa.idAbaSicaf) {
     if (pagina !== 'consulta' && pagina !== 'sicaf') return
+    // v0.21.6: o SICAF abriu em outra aba (pelo menu ou pela pessoa): tira o aviso "Abrindo o SICAF…" da anterior.
+    if (tarefa.idAbaSicaf != null) {
+      navegador.scripting.executeScript({ target: { tabId: tarefa.idAbaSicaf }, func: () => { const aviso = document.querySelector('[data-extensao-ifto="aviso-compras"]'); if (aviso) aviso.remove() } }).catch(() => {})
+    }
     tarefa.idAbaSicaf = idDaAba
     await gravarTarefa(tarefa)
   }
@@ -218,7 +222,15 @@ navegador.tabs.onUpdated.addListener(async (idDaAba, mudanca, aba) => {
     if (clicar) { tarefa.cliqueiSerpro = true; await gravarTarefa(tarefa) }
     await injetar(idDaAba, ['sites/compras/aviso.js'], { modo: 'loginGovBr', clicar })
   } else if (pagina === 'areaDeTrabalho') {
-    await injetar(idDaAba, ['sites/compras/aviso.js'], { modo: 'areaDeTrabalho' })
+    // v0.21.6 (pedido do usuário em 18/11/2026: o menu não abria o SICAF): primeiro vai direto ao início do
+    // SICAF na mesma aba; se o SICAF recusar e a aba voltar aqui, tenta pelo menu do usuário.
+    if (!tarefa.foiDiretoAoSicaf) {
+      tarefa.foiDiretoAoSicaf = true
+      await gravarTarefa(tarefa)
+      await navegador.tabs.update(idDaAba, { url: regras.URL_INICIO_SICAF })
+    } else {
+      await injetar(idDaAba, ['sites/compras/aviso.js'], { modo: 'areaDeTrabalho' })
+    }
   } else {
     await injetar(idDaAba, ['comum/sei.js', 'comum/sicaf.js', 'sites/sicaf/consulta.js'])
   }
@@ -348,7 +360,8 @@ async function salvarEmDownloads (base64, nomeDoArquivo) {
 async function terminar (tarefa) {
   await gravarTarefa(null)
   // v0.18.5: com algum CNPJ sem PDF (site fora do ar, pulado), a aba aberta pela extensão é fechada.
-  if (regras.buscaComErro(tarefa)) await fecharAbaDaBusca(tarefa)
+  // v0.21.6 (pedido do usuário em 18/11/2026): fechada também quando deu tudo certo (SICAF e Simples).
+  await fecharAbaDaBusca(tarefa)
   const pdfs = tarefa.pdfs || {}
   const consultas = tarefa.consultas || {}
   const errosDoSimples = tarefa.simplesErros || {}

@@ -331,6 +331,10 @@ E: O botão "peças do Compras IFTO" não aparece. Com "Sempre ligada" nas confi
 F: Em Configurações › SICAF, leia a explicação do SerproID; marque a opção e clique em "Não permitir". Depois busque um SICAF sem estar logado.
 E: A explicação diz o que a extensão acessa e o que se perde; a opção volta a ficar desmarcada e, no Gov.br, nada é clicado (você clica em "Seu certificado digital em nuvem" e "SerproID").
 
-### T107 – SICAF sem login abre direto o SerproID, terceira tentativa (v0.21.5)
-F: Em Configurações › SICAF, deixe marcada a opção do SerproID. Saia do Compras.gov.br e, no SEI, use "Adicionar Sicaf". Se não funcionar, conte se apareceu o aviso verde "IFTO" no alto da página do Gov.br e o que ele dizia.
-E: Na página do Gov.br aparece o aviso "Entrando com o certificado SerproID…" e, em poucos segundos, abre a página do Serpro com o QR code.
+### T108 – Depois do Gov.br, o SICAF abre sozinho na mesma aba (v0.21.6)
+F: Saia do Compras.gov.br e, no SEI, use "Adicionar Sicaf" (com a opção do SerproID ligada). Faça o login no Gov.br.
+E: Na Área de Trabalho do Compras, a mesma aba vai sozinha para o SICAF e a busca continua. Se o SICAF não abrir, em até 20 segundos o aviso diz onde clicar; se você abrir o SICAF em outra aba, o aviso "Abrindo o SICAF…" some.
+
+### T109 – Abas do SICAF e do Simples fecham ao terminar (v0.21.6)
+F: No SEI, use o botão que busca SICAF e Simples Nacional de uma nota e espere até o fim.
+E: Quando os PDFs chegam ao SEI, a aba da busca (SICAF e depois Simples Nacional) fecha sozinha e o SEI volta a aparecer.
