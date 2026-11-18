@@ -404,3 +404,7 @@ E: A tabela vai para a esquerda com 28 px de recuo, as outras margens não mudam
 ### T127 – Quarto botão "Alinhar com o texto" em Alinhamento (v0.25.1)
 F: Numa tabela centralizada, abra "Propriedades da tabela", clique no quarto botão de Alinhamento (o mouse em cima mostra "Alinhar com o texto"), depois em OK e salve o documento.
 E: Os campos ficam 10, 0, 10 e 28; a borda esquerda da tabela fica alinhada com o texto dos parágrafos; no documento salvo continua igual.
+
+### T128 – Só um botão de Alinhamento marcado (v0.25.3)
+F: Em "Propriedades da tabela", clique em "à esquerda", depois em "Alinhar com o texto", depois em "Centralizar" e por fim em "à esquerda"; clique em OK.
+E: Em cada clique só o botão clicado fica marcado (nunca dois ao mesmo tempo); no fim a tabela fica alinhada à esquerda.

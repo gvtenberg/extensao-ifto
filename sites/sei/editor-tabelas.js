@@ -170,7 +170,8 @@
       const erro = linha.querySelector('[data-erro]')
       const marcarBotao = () => {
         const botao = formulario.__extensaoIftoBotao
-        if (botao) botao.isOn = campos.every(campo => regras().lerPixels(campo.value) === regras().lerPixels(PADRAO[campo.dataset.lado]))
+        // v0.25.2: só um botão de Alinhamento marcado: o da extensão só com a tabela à esquerda e as margens padrão.
+        if (botao) botao.isOn = formulario.alignment === 'left' && campos.every(campo => regras().lerPixels(campo.value) === regras().lerPixels(PADRAO[campo.dataset.lado]))
       }
       const preencher = valores => {
         for (const campo of campos) if (valores[campo.dataset.lado] !== undefined) campo.value = regras().mostrarPixels(valores[campo.dataset.lado])
@@ -180,7 +181,20 @@
       linha.__preencher = preencher
       linha.__marcar = marcarBotao
       // Sem a barra de Alinhamento (outra versão do SEI): o botão fica abaixo dos campos, com o nome escrito.
-      if (!botaoAlinhar(editor, formulario, preencher)) {
+      if (botaoAlinhar(editor, formulario, preencher)) {
+        // v0.25.2: o botão "à esquerda" do SEI desmarca quando o da extensão está marcado; clicar nele tira o
+        // recuo (Esquerda 0). Centralizar ou alinhar à direita volta Esquerda e Direita ao que eram, para o OK
+        // não puxar a tabela de volta para a esquerda.
+        const botao = formulario.__extensaoIftoBotao
+        const esquerda = formulario.alignmentToolbar.items.first
+        esquerda.unbind('isOn')
+        esquerda.bind('isOn').to(formulario, 'alignment', botao, 'isOn', (alinhamento, nosso) => alinhamento === 'left' && !nosso)
+        esquerda.on('execute', () => { if (botao.isOn) preencher({ esquerda: '0' }) })
+        formulario.on('change:alignment', (evento, nome, alinhamento) => {
+          if (alinhamento !== 'left') for (const campo of campos) if (campo.dataset.lado === 'esquerda' || campo.dataset.lado === 'direita') campo.value = campo.dataset.inicial
+          marcarBotao()
+        })
+      } else {
         const reserva = document.createElement('button')
         reserva.type = 'button'
         reserva.className = 'ck ck-button ck-button_with-text'
