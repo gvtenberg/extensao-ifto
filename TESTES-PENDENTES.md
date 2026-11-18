@@ -396,3 +396,18 @@ E: A tabela fica com 28 px de recuo à esquerda e 10 px acima e abaixo; a largur
 ### T121 – Botão "Alinhar com o texto" (v0.24.0)
 F: Numa tabela centralizada, abra "Propriedades da tabela", clique em "Alinhar com o texto", depois em OK, e clique em Salvar.
 E: A borda esquerda da tabela fica alinhada com o texto dos parágrafos; no documento salvo continua igual.
+
+## Números longos nos itens de edital
+> Use a minuta ou um edital de teste com item "10.10." (ou feche o editor sem salvar).
+
+### T122 – Aviso só quando o número não cabe (v0.25.0)
+F: Abra no editor um edital com itens até "9.9." e depois um com "10.10." em "Item nível 2 Edital".
+E: No primeiro não aparece nada; no segundo aparece no canto de baixo "Corrigir a numeração", dizendo quantos itens estão quebrados.
+
+### T123 – Corrigir a numeração e gerar o PDF (v0.25.0) (Crítico)
+F: Clique em "Corrigir a numeração", confira o texto, clique em Salvar, feche o editor e gere o PDF do documento.
+E: "10.10." fica na mesma linha do texto, no editor, no documento e no PDF; os números curtos ficam iguais a antes.
+
+### T124 – Aviso aparece ao digitar (v0.25.0)
+F: Num edital sem o aviso, crie itens "Item nível 2 Edital" até chegar em "10.10." (ou mude um parágrafo para esse estilo).
+E: Pouco depois o aviso "Corrigir a numeração" aparece; depois de corrigir, ele some.

@@ -23,6 +23,12 @@
 - Cut/copy and paste in the **same editor window**: when the copied part has a table, the paste puts back the editor's own copy (model), not the clipboard HTML, so width, column widths and margins stay. Ctrl+Shift+V, drag and drop, pasting in another window and parts without a table stay with the SEI. Ctrl+Z undoes it.
 - SEI 5 keeps the left margin of a table in its own `recuo` setting (only with the table aligned to the left) and the other margins in the HTML styles; saved as `margin:10px auto 10px 28px` like the old SEI. The "Margens" box in "Propriedades da tabela" accepts the old format and applies on OK; width is ignored (the SEI has the Largura field). "Alinhar com o texto" = `margin:10px auto 10px 28px` (text styles use margin-left .75cm).
 
+## Long numbers in edital items (v0.25.0)
+
+- "Item nível 2/3/4 Edital" put the number in a fixed box (10, 15, 18 mm); "10.10." does not fit and the text goes to the next line (editor, document, PDF). Swapping to "Item_Nivel2" is not possible everywhere: in Minuta 3384558 the SEI does not allow it in the main section (`permitidoEm`).
+- Fix (user's choice, 18/11/2026): a `<style>` block at the start of the first edital item, like SEI Pro's MINUTA mark (the SEI keeps and prints it). It only lets the box grow (`min-width` = old width, `box-sizing:border-box`), so short numbers stay identical. Recognized by the comment `extensao-ifto: numeracao do edital` (the editor drops the `<style>` attributes). "Remover marca MINUTA" does not touch it.
+- The box "Corrigir a numeração" appears in every unit and document type only when a paragraph is really broken (first letter below the first line), checked again 1.5 s after each change; nothing changes without the click; never saves.
+
 ## MINUTA mark in editais (v0.22.0)
 
 - The "MINUTA" in the background is not a paragraph: SEI Pro puts a `<style>` block in the text (`data-style="seipro-watermark"`, `content: "MINUTA"`) plus a label `span.minutaAncora` "* MINUTA DE DOCUMENTO" (one pair per marked paragraph). Creating the Edital from the minuta copies them. In SEI 5, deleting the label is not enough: the style block stays hidden in the paragraph and keeps printing MINUTA (v2 of Edital 3390039, 18/11/2026), and editing the HTML by hand is not saved.

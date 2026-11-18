@@ -71,6 +71,9 @@ function tratarRecado (recado, remetente) {
     case 'dataAtualizar': return dataNoEditor(remetente, true)
     // v0.24.0 (spec tabelas-editor): tabelas no editor (recortar e colar, margens).
     case 'tabelasPreparar': return tabelasNoEditor(remetente, recado)
+    // v0.25.0 (spec numeracao-edital): números longos dos itens de edital.
+    case 'numeracaoPreparar': return numeracaoNoEditor(remetente, false)
+    case 'numeracaoCorrigir': return numeracaoNoEditor(remetente, true)
     // v0.17.5: texto de um PDF pedido pela página do SEI (no Firefox o pdf.js só funciona aqui).
     case 'lerPdf': return globalThis.ExtensaoIFTO.pdfTexto ? globalThis.ExtensaoIFTO.pdfTexto.textoDoPdf(recado.bytes).then(texto => ({ texto })) : Promise.resolve({ erro: 'Leitura de PDF indisponível.' })
   }
@@ -499,6 +502,14 @@ async function tabelasNoEditor (remetente, recado) {
   const alvo = { tabId: remetente.tab.id, frameIds: [remetente.frameId || 0] }
   await navegador.scripting.executeScript({ target: alvo, world: 'MAIN', files: ['comum/tabelas-editor.js', 'sites/sei/editor-tabelas.js'] })
   return rodarNoEditor(remetente)(opcoes => globalThis.ExtensaoIFTO.editorTabelas.preparar(opcoes), [{ mover: Boolean(recado.mover), margens: Boolean(recado.margens) }])
+}
+
+// v0.25.0 (spec numeracao-edital): põe as regras e o código da numeração dentro da página do editor (world
+// MAIN); "preparar" procura os itens quebrados e fica de olho nas mudanças, "corrigir" põe o bloco de estilo.
+async function numeracaoNoEditor (remetente, corrigir) {
+  const alvo = { tabId: remetente.tab.id, frameIds: [remetente.frameId || 0] }
+  if (!corrigir) await navegador.scripting.executeScript({ target: alvo, world: 'MAIN', files: ['comum/numeracao-edital.js', 'sites/sei/editor-numeracao.js'] })
+  return rodarNoEditor(remetente)(fazer => fazer ? globalThis.ExtensaoIFTO.editorNumeracao.corrigir() : globalThis.ExtensaoIFTO.editorNumeracao.preparar(), [corrigir])
 }
 
 async function minutaNoEditor (remetente, remover) {

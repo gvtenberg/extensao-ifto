@@ -24,7 +24,9 @@
     // v0.24.0: no editor do SEI, recortar e colar trecho com tabela sem perder a formatação, e a caixa
     // "Margens" na janela "Propriedades da tabela". Todas as unidades e todos os tipos de documento.
     moverTabelas: true,
-    margensTabela: true
+    margensTabela: true,
+    // v0.25.0: aviso "Corrigir a numeração" quando um item de edital tem o número longo demais ("10.10.").
+    numeracaoEdital: true
   })
 
   // Junta o que o usuário gravou com os padrões; opções que não existem mais são ignoradas.
