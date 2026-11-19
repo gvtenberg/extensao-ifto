@@ -80,3 +80,24 @@ test('tamanho: limite de 10 MiB e dica para PDF acima de 2 MB (D10, D11, D12)', 
   assert.deepEqual(avisosDoArquivo({ nome: 'a.xlsx', tamanho: 5000000 }), [])
   assert.deepEqual(avisosDoArquivo({ nome: 'a.pdf', tamanho: 1000000 }), [])
 })
+
+// v0.27.1 (etapa 3): arquivo arrastado para a árvore, pronto para a lista de conferência.
+const { prepararArquivo } = require('../comum/documento-externo.js')
+test('arquivo arrastado: tipo, nome na árvore, data e bloqueios', () => {
+  const opcoes = { externoCorrigirNome: true, externoNomeArvore: true, externoRegras: [], externoTipoPadrao: '' }
+  const nota = prepararArquivo({ nome: 'Nota Fiscal #123.pdf', tamanho: 50000, modificado: new Date(2026, 0, 5).getTime() }, TIPOS, opcoes)
+  assert.equal(nota.nome, 'Nota Fiscal _123.pdf')
+  assert.equal(nota.tipo, 'Nota fiscal')
+  assert.equal(nota.nomeArvore, '#123')
+  assert.equal(nota.bloqueado, false)
+  assert.equal(nota.avisos[0].nivel, 'dica')
+  assert.equal(nota.data, dataDeHoje())
+  // D6: data do arquivo quando a opção está ligada.
+  assert.equal(prepararArquivo({ nome: 'a.pdf', tamanho: 1, modificado: new Date(2026, 0, 5).getTime() }, TIPOS, { ...opcoes, arrastarDataDoArquivo: true }).data, '05/01/2026')
+  // Tipo não reconhecido: a extensão pergunta (tipo null).
+  assert.equal(prepararArquivo({ nome: 'relatório.pdf', tamanho: 1 }, TIPOS, opcoes).tipo, null)
+  // Acima do limite ou "#" com a troca desligada: não vai.
+  assert.equal(prepararArquivo({ nome: 'grande.pdf', tamanho: 11000000 }, TIPOS, opcoes).bloqueado, true)
+  assert.equal(prepararArquivo({ nome: 'a#1.pdf', tamanho: 1 }, TIPOS, { ...opcoes, externoCorrigirNome: false }).bloqueado, true)
+  assert.equal(prepararArquivo({ nome: 'Anexo X.pdf', tamanho: 1 }, TIPOS, { ...opcoes, externoNomeArvore: false }).nomeArvore, '')
+})

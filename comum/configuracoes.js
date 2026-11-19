@@ -16,6 +16,10 @@
     // D7: "Nome na Árvore" a partir do nome do arquivo. D9: "#" no nome do arquivo vira "_".
     externoNomeArvore: true,
     externoCorrigirNome: true,
+    // v0.27.1 (etapa 3): arrastar arquivos para a árvore do processo (lista para conferir antes de incluir).
+    // D6: data do documento = hoje; ligada, a data do arquivo (última modificação).
+    arrastarArquivos: true,
+    arrastarDataDoArquivo: false,
     senhaReconhecidaPeloNavegador: true,
     // v0.2.0: "automatica" (só na Direção-geral, PAL/REI/IFTO), "sempre" ou "desligada"
     listaAssinaturas: 'automatica',

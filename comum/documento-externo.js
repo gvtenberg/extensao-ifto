@@ -122,6 +122,32 @@
     return { tipo, origem: tipo ? 'padrao' : null, nomeArvore }
   }
 
+  // v0.27.1 (etapa 3): arquivo arrastado para a árvore, pronto para a lista de conferência. arquivo: { nome,
+  // tamanho, modificado (milissegundos) }; tipos: nomes da lista do SEI; opcoes: as configurações.
+  // bloqueado = não pode ir para o SEI (acima do limite, ou "#" no nome com a troca desligada).
+  function prepararArquivo (arquivo, tipos, opcoes = {}) {
+    const avisos = avisosDoArquivo({ nome: arquivo.nome, tamanho: arquivo.tamanho })
+    let nome = arquivo.nome
+    if (nome.includes('#')) {
+      if (opcoes.externoCorrigirNome === false) avisos.push({ nivel: 'erro', partes: ['O SEI não aceita "#" no nome do arquivo. Renomeie o arquivo no computador, sem "#", e arraste de novo.'] })
+      else {
+        nome = corrigirNomeDoArquivo(nome)
+        avisos.push({ nivel: 'dica', partes: [`O SEI não aceita "#" no nome: o arquivo vai como "${nome}".`] })
+      }
+    }
+    const achado = tipoPeloNome(arquivo.nome, tipos, { regras: opcoes.externoRegras, padrao: opcoes.externoTipoPadrao })
+    const data = opcoes.arrastarDataDoArquivo && arquivo.modificado ? dataDeHoje(new Date(arquivo.modificado)) : dataDeHoje()
+    return {
+      nome,
+      avisos,
+      bloqueado: avisos.some(aviso => aviso.nivel === 'erro'),
+      tipo: achado.tipo,
+      origem: achado.origem,
+      nomeArvore: opcoes.externoNomeArvore === false ? '' : achado.nomeArvore,
+      data
+    }
+  }
+
   // Partes de um aviso em elementos da página (os links abrem em outra aba). Usado na página do documento
   // externo (etapa 2) e na lista dos arquivos arrastados (etapa 3).
   function montarPartes (partes, documento) {
@@ -138,7 +164,7 @@
     return fragmento
   }
 
-  const api = { montarPartes, ehDocumentoExternoNovo, ehDocumentoInternoNovo, dataDeHoje, oQuePreencher, semAcento, LIMITE_SEI, DICA_PDF_ACIMA, corrigirNomeDoArquivo, tamanhoEmTexto, avisosDoArquivo, lerRegras, regrasEmTexto, tipoPeloNome }
+  const api = { prepararArquivo, montarPartes, ehDocumentoExternoNovo, ehDocumentoInternoNovo, dataDeHoje, oQuePreencher, semAcento, LIMITE_SEI, DICA_PDF_ACIMA, corrigirNomeDoArquivo, tamanhoEmTexto, avisosDoArquivo, lerRegras, regrasEmTexto, tipoPeloNome }
   if (typeof module !== 'undefined' && module.exports) module.exports = api
   else raiz.ExtensaoIFTO = Object.assign(raiz.ExtensaoIFTO || {}, { documentoExterno: api })
 })(globalThis)

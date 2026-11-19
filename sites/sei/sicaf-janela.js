@@ -49,7 +49,7 @@
     .aviso.verde { background: #E7F2EA; color: #1E5E33; }
     label { display: grid; gap: 4px; font-size: 13px; }
     label.escolha { display: flex; gap: 8px; align-items: center; font-size: 14px; }
-    input[type="text"] { font: inherit; padding: 6px 8px; border: 1px solid #C9D1CC; border-radius: 6px; }
+    input[type="text"], select { font: inherit; padding: 6px 8px; border: 1px solid #C9D1CC; border-radius: 6px; background: #fff; color: #1B2420; }
     ul { margin: 0; padding-left: 20px; }
     a { color: #1E5E33; }
   `

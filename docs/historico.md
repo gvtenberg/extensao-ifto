@@ -2,6 +2,7 @@
 
 One or two lines per version, with the date (dd/mm/yyyy). Number 0.STAGE.FIX.
 
+- v0.27.1 (18/11/2026): drag files from the computer onto the process tree: list to check each file's type (file name, the person's rules or default; none: the person picks), "Nome na Árvore", date and size; included only after "Incluir no processo", reusing the SICAF upload (`incluirNaJanela` in `sei-pedidos.js`); always Nato-digital and Público (D15); option "Usar a data do arquivo"; time limit on every request to the SEI, also for the SICAF (base-e-sei stage 3). T171–T173.
 - v0.27.0 (18/11/2026): new external document with access level, legal basis, format and type of check chosen in the settings; when choosing the file: type and "Nome na Árvore" from the file name (only if no type yet, D14), "#" replaced by "_", file above 10 MiB stopped with the pdf24.org/ilovepdf tips (PDF above 2 MB: tip only) (base-e-sei stage 2). T168–T170.
 - v0.26.12 (18/11/2026): the "Data do documento" switch (on by default) also turns the editor's date box and "Corrigir para …" button on and off (data-documento D4). T167.
 - v0.26.11 (18/11/2026): spacing between the parts of the document in every type (conferir-documento stage 7, D21–D24): when the SEI 5 editor opens, a hidden style block adds one line where timbre, number, date, process, addressee and signer's name are stuck together (also body → date → name); box with "Desfazer"; kept only with Salvar; rules in `regras/conferir-documento.md`. T162–T166.

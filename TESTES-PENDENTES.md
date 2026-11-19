@@ -367,3 +367,14 @@ E: O tipo fica "Nota fiscal", o Nome na Árvore fica "123" e aparece o aviso "Pe
 ### T170 – Arquivo grande ou com "#" no documento externo (v0.27.0)
 F: Em Incluir Documento › Externo, anexe "teste tamanho C" (acima de 10 MB); depois, "teste 01-cerquilha-#.pdf"; depois, um PDF de 3 a 9 MB.
 E: O arquivo C não é anexado e aparece o aviso vermelho com os links do pdf24.org e do ilovepdf.com; o arquivo com "#" é anexado com "_" no lugar do "#"; o PDF médio é anexado com a dica amarela de diminuir.
+
+## Arrastar arquivos para o processo (v0.27.1)
+### T171 – Arrastar arquivos para o processo (v0.27.1) (Crítico)
+F: Num processo de teste, arraste para a árvore (à esquerda) três arquivos: "Nota Fiscal 123.pdf", um com nome qualquer e um acima de 10 MB; confira a lista, escolha o tipo do que ficou sem tipo e clique em "Incluir no processo".
+E: A lista mostra cada arquivo com tipo, Nome na Árvore, data de hoje e tamanho; o grande aparece em vermelho e não é incluído; o botão só libera com todos os tipos escolhidos; depois do clique, os dois documentos entram na árvore (Nato-digital, Público) e aparece "Pronto."
+### T172 – Arrastar e cancelar (v0.27.1)
+F: Arraste um arquivo para a árvore e, na lista, clique em "Cancelar" (ou "Tirar da lista" e depois feche a janela).
+E: A janela fecha e nada é incluído no processo.
+### T173 – SICAF continua incluindo os PDFs (v0.27.1)
+F: Na CGOC, num processo com nota sem SICAF, clique em "notas sem SICAF – Buscar" e depois em "Buscar SICAF e Simples".
+E: Como antes: a janela mostra o andamento e o SEI recebe os PDFs do SICAF e do Simples; o botão Parar mostra "Parando…".

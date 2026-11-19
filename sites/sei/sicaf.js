@@ -318,38 +318,11 @@
               incluir.className = 'acao perigo'
               return
             }
-            incluirNoProcesso(itens, j, nomeDoItem)
+            seiPedidos.incluirNaJanela(itens, j, nomeDoItem)
           }
         }
       ]
     })
-  }
-
-  async function incluirNoProcesso (itens, aberta, nomeDoItem) {
-    const lida = seiPedidos.arvoreAberta()
-    if (!lida) { aberta.trocarConteudo([criar('p', { className: 'aviso vermelho', textContent: 'Não consegui ler a árvore do processo. Espere o processo abrir e tente de novo.' })]); return }
-    const andamento = { parar: false }
-    const incluidos = []
-    const progresso = criar('p', { textContent: 'Incluindo…' })
-    aberta.trocarConteudo([progresso])
-    aberta.trocarBotoes([{ texto: 'Parar', aoClicar: () => { andamento.parar = true } }])
-    let erro = null
-    try {
-      await seiPedidos.incluirExternos(lida, itens, {
-        incluidos,
-        deveParar: () => andamento.parar,
-        aoAvancar: posicao => { progresso.textContent = `Incluindo ${nomeDoItem(itens[posicao])} (${posicao + 1} de ${itens.length})…` }
-      })
-    } catch (falha) {
-      erro = falha
-    }
-    if (incluidos.length) seiPedidos.recarregarArvore()
-    const feitos = incluidos.length ? 'Incluídos: ' + ExtensaoIFTO.documentosPagamento.listaEmTexto(itens.slice(0, incluidos.length).map(nomeDoItem)) + '.' : 'Nenhum documento foi incluído.'
-    aberta.trocarConteudo([
-      erro || andamento.parar ? criar('p', { className: 'aviso vermelho', textContent: erro ? erro.message : 'Inclusão parada.' }) : criar('p', { className: 'aviso verde', textContent: 'Pronto.' }),
-      criar('p', { textContent: feitos })
-    ])
-    aberta.trocarBotoes([{ texto: 'Fechar', tipo: 'principal', aoClicar: j => j.fechar() }])
   }
 
   if (!quadroArvore) return

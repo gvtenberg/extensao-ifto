@@ -4,8 +4,21 @@
   const ExtensaoIFTO = globalThis.ExtensaoIFTO
   const { montarCorpo, trocarCampos } = ExtensaoIFTO.documentosPagamento
 
+  // v0.27.1 (spec base-e-sei, etapa 3): o SEI pode estar lento ou fora do ar: tempo limite em cada pedido
+  // (2 minutos; o envio de arquivo, 5 minutos), com aviso simples.
+  const TEMPO_LIMITE = 120000
+  const TEMPO_LIMITE_ARQUIVO = 300000
+  const MENSAGEM_DEMOROU = 'O SEI demorou demais para responder: ele pode estar lento ou fora do ar. Tente de novo daqui a pouco.'
+  async function buscar (endereco, opcoes, limite = TEMPO_LIMITE) {
+    try {
+      return await fetch(endereco, { credentials: 'same-origin', signal: AbortSignal.timeout(limite), ...opcoes })
+    } catch (erro) {
+      if (erro && (erro.name === 'TimeoutError' || erro.name === 'AbortError')) throw new Error(MENSAGEM_DEMOROU)
+      throw new Error('Não consegui falar com o SEI: ele pode estar fora do ar, ou a internet caiu. Tente de novo daqui a pouco.')
+    }
+  }
   async function responder (endereco, opcoes) {
-    const resposta = await fetch(new URL(endereco, location.href).href, { credentials: 'same-origin', ...opcoes })
+    const resposta = await buscar(new URL(endereco, location.href).href, opcoes)
     if (!resposta.ok) throw new Error('O SEI não respondeu (erro ' + resposta.status + '). Tente de novo.')
     return resposta
   }
@@ -82,34 +95,43 @@
   // v0.14.0 (SICAF automático): item { tipo, nomeArvore, arquivo: { bytes, nome } }: "Nome na Árvore" e o
   // arquivo enviado como no "Anexar Arquivo..." do SEI. aoAvancar(posição) mostra o andamento;
   // deveParar() vê se a pessoa pediu para parar; incluidos recebe o tipo de cada documento salvo.
+  // v0.27.1 (etapa 3 da spec base-e-sei, arquivos arrastados): item.data ("dd/mm/aaaa"; sem ela, hoje) e
+  // arquivo.tipo (tipo do arquivo para o navegador; sem ele, PDF).
+  const formularioDoExterno = pagina => lerHtml(pagina.html).getElementById('frmDocumentoCadastro')
+  // Incluir Documento › Externo (escolher(-1) do SEI): devolve o formulário do documento externo novo (só lê:
+  // nada é gravado no SEI antes do Salvar).
+  async function abrirExternoNovo (lida) {
+    if (!lida.linkIncluir) throw new Error('Não achei "Incluir Documento" na árvore do processo.')
+    const inicio = await pedir(new URL(lida.linkIncluir.replace(/&amp;/g, '&'), location.href).href)
+    const escolherTipo = lerHtml(inicio.html).getElementById('frmDocumentoEscolherTipo')
+    if (!escolherTipo) throw new Error('O SEI não abriu "Incluir Documento". Confira se a sessão do SEI ainda está aberta.')
+    const emBranco = await enviar(escolherTipo, inicio.endereco, { hdnIdSerie: '-1' })
+    if (!formularioDoExterno(emBranco)) throw new Error('O SEI não abriu o documento externo.')
+    return emBranco
+  }
+  // v0.27.1: nomes da lista "Tipo do Documento" do documento externo deste processo.
+  async function tiposDoExterno (lida) {
+    const lista = formularioDoExterno(await abrirExternoNovo(lida)).querySelector('#selSerie')
+    return lista ? [...lista.options].filter(opcao => opcao.getAttribute('value') && opcao.getAttribute('value') !== 'null').map(opcao => opcao.textContent.trim()) : []
+  }
+
   async function incluirExternos (lida, itens, { aoAvancar = () => {}, deveParar = () => false, incluidos = [] } = {}) {
     const regras = ExtensaoIFTO.documentosPagamento
     const sicaf = ExtensaoIFTO.sicaf
-    const formularioDoExterno = pagina => lerHtml(pagina.html).getElementById('frmDocumentoCadastro')
-    // Incluir Documento › Externo (escolher(-1) do SEI): devolve o formulário do documento externo novo.
     // Só é pedido se algum item for novo (v0.16.0: os em branco são alterados).
     let pagina = null
     let paginaEmBranco = null
-    async function abrirExternoNovo () {
-      if (!lida.linkIncluir) throw new Error('Não achei "Incluir Documento" na árvore do processo.')
-      const inicio = await pedir(new URL(lida.linkIncluir.replace(/&amp;/g, '&'), location.href).href)
-      const escolherTipo = lerHtml(inicio.html).getElementById('frmDocumentoEscolherTipo')
-      if (!escolherTipo) throw new Error('O SEI não abriu "Incluir Documento". Confira se a sessão do SEI ainda está aberta.')
-      const emBranco = await enviar(escolherTipo, inicio.endereco, { hdnIdSerie: '-1' })
-      if (!formularioDoExterno(emBranco)) throw new Error('O SEI não abriu o documento externo.')
-      return emBranco
-    }
 
     for (let posicao = 0; posicao < itens.length; posicao++) {
       if (deveParar()) return
-      const { tipo, nomeArvore, arquivo, emBranco: existente } = itens[posicao]
+      const { tipo, nomeArvore, arquivo, data, emBranco: existente } = itens[posicao]
       aoAvancar(posicao)
       if (existente) {
         await alterarExterno(existente, { tipo, nomeArvore, arquivo }, formularioDoExterno, regras, sicaf)
         incluidos.push(tipo)
         continue
       }
-      if (!paginaEmBranco) paginaEmBranco = await abrirExternoNovo()
+      if (!paginaEmBranco) paginaEmBranco = await abrirExternoNovo(lida)
       // 1º: escolher o tipo (trocarSerie() do SEI), sempre a partir do formulário em branco.
       const emBranco = formularioDoExterno(paginaEmBranco)
       const lista = emBranco.querySelector('#selSerie')
@@ -126,7 +148,7 @@
       }
       // 2º: Salvar (confirmarDados() do SEI) com data de hoje, Nato-digital e Público; nível público limpa
       // grau de sigilo e hipótese legal (alterarNivelAcesso() do SEI).
-      const novos = { hdnIdSerie: opcao.valor, selSerie: opcao.valor, txtDataElaboracao: ExtensaoIFTO.documentoExterno.dataDeHoje(), rdoFormato: 'N', rdoNivelAcesso: '0', hdnFlagDocumentoCadastro: '2' }
+      const novos = { hdnIdSerie: opcao.valor, selSerie: opcao.valor, txtDataElaboracao: data || ExtensaoIFTO.documentoExterno.dataDeHoje(), rdoFormato: 'N', rdoNivelAcesso: '0', hdnFlagDocumentoCadastro: '2' }
       for (const nome of ['selGrauSigilo', 'selHipoteseLegal']) {
         const listaNula = doTipo.querySelector(`select[name="${nome}"]`)
         if (listaNula && [...listaNula.options].some(item => item.getAttribute('value') === 'null')) novos[nome] = 'null'
@@ -170,9 +192,9 @@
     const dados = new FormData()
     // Número do andamento do envio, sorteado como o próprio SEI faz (InfraUpload.js).
     dados.append('UPLOAD_IDENTIFIER', String(Math.floor(Math.random() * 999999)))
-    dados.append('filArquivo', new Blob([arquivo.bytes], { type: 'application/pdf' }), arquivo.nome)
+    dados.append('filArquivo', new Blob([arquivo.bytes], { type: arquivo.tipo || 'application/pdf' }), arquivo.nome)
     const destino = new URL(acao, pagina.endereco).href
-    const resposta = await fetch(destino, { method: 'POST', credentials: 'same-origin', body: dados })
+    const resposta = await buscar(destino, { method: 'POST', body: dados }, TEMPO_LIMITE_ARQUIVO)
     if (!resposta.ok) throw new Error('O SEI não recebeu o arquivo (erro ' + resposta.status + ').')
     const upload = sicaf.lerRespostaDoUpload(new TextDecoder('windows-1252').decode(await resposta.arrayBuffer()))
     if (upload.erro) throw new Error('O SEI não aceitou o arquivo: ' + upload.erro)
@@ -194,5 +216,35 @@
     try { quadro.contentWindow.location.reload() } catch (erro) { quadro.setAttribute('src', quadro.getAttribute('src')) }
   }
 
-  ExtensaoIFTO.seiPedidos = { pedir, baixar, baixarPdf, lerHtml, camposDoFormulario, enviar, incluirExternos, arvoreAberta, recarregarArvore }
+  // v0.15.0 (saiu de sicaf.js na v0.27.1 para servir também aos arquivos arrastados): inclui os itens com a
+  // janela da extensão aberta: andamento, botão Parar, árvore recarregada e o resumo no fim.
+  async function incluirNaJanela (itens, aberta, nomeDoItem) {
+    const { criar } = ExtensaoIFTO.janela
+    const lida = arvoreAberta()
+    if (!lida) { aberta.trocarConteudo([criar('p', { className: 'aviso vermelho', textContent: 'Não consegui ler a árvore do processo. Espere o processo abrir e tente de novo.' })]); return }
+    const andamento = { parar: false }
+    const incluidos = []
+    const progresso = criar('p', { textContent: 'Incluindo…' })
+    aberta.trocarConteudo([progresso])
+    aberta.trocarBotoes([{ texto: 'Parar', aoClicar: () => { andamento.parar = true; progresso.textContent = 'Parando depois do documento da vez…' } }])
+    let erro = null
+    try {
+      await incluirExternos(lida, itens, {
+        incluidos,
+        deveParar: () => andamento.parar,
+        aoAvancar: posicao => { progresso.textContent = `Incluindo ${nomeDoItem(itens[posicao])} (${posicao + 1} de ${itens.length})…` }
+      })
+    } catch (falha) {
+      erro = falha
+    }
+    if (incluidos.length) recarregarArvore()
+    const feitos = incluidos.length ? 'Incluídos: ' + ExtensaoIFTO.documentosPagamento.listaEmTexto(itens.slice(0, incluidos.length).map(nomeDoItem)) + '.' : 'Nenhum documento foi incluído.'
+    aberta.trocarConteudo([
+      erro || andamento.parar ? criar('p', { className: 'aviso vermelho', textContent: erro ? erro.message : 'Inclusão parada.' }) : criar('p', { className: 'aviso verde', textContent: 'Pronto.' }),
+      criar('p', { textContent: feitos })
+    ])
+    aberta.trocarBotoes([{ texto: 'Fechar', tipo: 'principal', aoClicar: j => j.fechar() }])
+  }
+
+  ExtensaoIFTO.seiPedidos = { pedir, baixar, baixarPdf, lerHtml, camposDoFormulario, enviar, incluirExternos, tiposDoExterno, incluirNaJanela, arvoreAberta, recarregarArvore }
 })()
