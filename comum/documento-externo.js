@@ -169,7 +169,18 @@
     return fragmento
   }
 
-  const api = { prepararArquivo, montarPartes, ehDocumentoExternoNovo, ehDocumentoInternoNovo, dataDeHoje, oQuePreencher, semAcento, LIMITE_SEI, DICA_PDF_ACIMA, corrigirNomeDoArquivo, tamanhoEmTexto, avisosDoArquivo, lerRegras, regrasEmTexto, tipoPeloNome }
+  // v0.32.0: documento externo em branco aberto à direita (endereço do quadro com id_documento): só se a árvore
+  // diz que ele não tem arquivo e tem o link "Alterar Documento Externo". null se não for o caso.
+  function externoEmBranco (documentos, enderecoDaPagina) {
+    let id
+    try { id = new URL(enderecoDaPagina).searchParams.get('id_documento') } catch (erro) { return null }
+    const doc = id && (documentos || []).find(item => item.id === id)
+    if (!doc || !doc.semConteudo || doc.temArquivo || !doc.linkAlterar) return null
+    const sei = (/\((\d+)\)\s*$/.exec(doc.rotulo || '') || [])[1] || ''
+    return { id, sei, rotulo: doc.rotulo, linkAlterar: doc.linkAlterar }
+  }
+
+  const api = { externoEmBranco, prepararArquivo, montarPartes, ehDocumentoExternoNovo, ehDocumentoInternoNovo, dataDeHoje, oQuePreencher, semAcento, LIMITE_SEI, DICA_PDF_ACIMA, corrigirNomeDoArquivo, tamanhoEmTexto, avisosDoArquivo, lerRegras, regrasEmTexto, tipoPeloNome }
   if (typeof module !== 'undefined' && module.exports) module.exports = api
   else raiz.ExtensaoIFTO = Object.assign(raiz.ExtensaoIFTO || {}, { documentoExterno: api })
 })(globalThis)

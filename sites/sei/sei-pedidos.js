@@ -183,6 +183,12 @@
     if (formularioDoExterno(resposta)) throw new Error(regras.mensagemDoSei(resposta.html) || `O SEI não salvou o ${tipo} ${existente.sei}.`)
   }
 
+  // v0.32.0: arquivo solto na página de um documento externo em branco: só anexa (tipo, data, acesso e nome
+  // ficam como estão), pelo mesmo caminho do SICAF.
+  async function anexarAoExterno (existente, arquivo) {
+    await alterarExterno(existente, { tipo: 'documento', arquivo }, formularioDoExterno, ExtensaoIFTO.documentosPagamento, ExtensaoIFTO.sicaf)
+  }
+
   // v0.14.0: arquivo do documento externo, como o "Anexar Arquivo..." do SEI (formulário frmAnexos, que o
   // SEI envia num quadro escondido). Devolve a linha do campo hdnAnexos para o Salvar.
   async function enviarArquivo (paginaDoTipo, pagina, arquivo, sicaf) {
@@ -246,5 +252,5 @@
     aberta.trocarBotoes([{ texto: 'Fechar', tipo: 'principal', aoClicar: j => j.fechar() }])
   }
 
-  ExtensaoIFTO.seiPedidos = { pedir, baixar, baixarPdf, lerHtml, camposDoFormulario, enviar, incluirExternos, tiposDoExterno, incluirNaJanela, arvoreAberta, recarregarArvore }
+  ExtensaoIFTO.seiPedidos = { pedir, baixar, baixarPdf, lerHtml, camposDoFormulario, enviar, incluirExternos, anexarAoExterno, tiposDoExterno, incluirNaJanela, arvoreAberta, recarregarArvore }
 })()

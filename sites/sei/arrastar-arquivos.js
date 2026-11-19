@@ -15,6 +15,7 @@
   let opcoes = await configuracoes.lerConfiguracoes()
   if (!opcoes.arrastarArquivos) return
   let aberta = null
+  let alvoGuardado // v0.32.0: documento em branco aberto à direita (undefined = ler de novo)
 
   // A árvore é um quadro que o SEI recarrega: liga de novo a cada carga.
   quadroArvore.addEventListener('load', ligar)
@@ -25,37 +26,133 @@
     try { doc = quadroArvore.contentDocument } catch (erro) { return }
     if (!doc || !doc.body || doc.body.dataset.extensaoIftoArrastar) return
     doc.body.dataset.extensaoIftoArrastar = 'sim'
+    alvoGuardado = undefined
+    ligarSoltura(doc, 'Solte aqui para incluir os arquivos neste processo (você confere antes)', () => true, abrirLista)
+  }
+
+  // Área de soltar arquivos num documento da página (v0.32.0: serve à árvore e ao documento em branco).
+  // podeSoltar() diz se este lugar aceita os arquivos agora; se não, o navegador faz o de sempre.
+  function ligarSoltura (doc, texto, podeSoltar, aoSoltar) {
     let aviso = null
     const temArquivos = evento => evento.dataTransfer && [...evento.dataTransfer.types].includes('Files')
     const mostrar = sim => {
       if (sim && !aviso) {
         aviso = doc.createElement('div')
-        aviso.textContent = 'Solte aqui para incluir os arquivos neste processo (você confere antes)'
+        aviso.textContent = texto
         Object.assign(aviso.style, {
           position: 'fixed', inset: '4px', zIndex: '2147483000', display: 'flex', alignItems: 'center', justifyContent: 'center',
           textAlign: 'center', padding: '12px', border: '3px dashed #1E5E33', borderRadius: '10px', background: 'rgba(231,242,234,.92)',
           color: '#1E5E33', font: '600 14px/1.4 system-ui, sans-serif', pointerEvents: 'none'
         })
-        doc.body.append(aviso)
+        ;(doc.body || doc.documentElement).append(aviso)
       } else if (!sim && aviso) {
         aviso.remove()
         aviso = null
       }
     }
     doc.addEventListener('dragover', evento => {
-      if (!temArquivos(evento)) return
+      if (!temArquivos(evento) || !podeSoltar()) return
       evento.preventDefault()
       evento.dataTransfer.dropEffect = 'copy'
       mostrar(true)
     })
     doc.addEventListener('dragleave', evento => { if (!evento.relatedTarget) mostrar(false) })
     doc.addEventListener('drop', evento => {
-      if (!temArquivos(evento)) return
-      evento.preventDefault()
       mostrar(false)
+      if (!temArquivos(evento) || !podeSoltar()) return
+      evento.preventDefault()
       const arquivos = [...evento.dataTransfer.files]
-      if (arquivos.length) abrirLista(arquivos)
+      if (arquivos.length) aoSoltar(arquivos)
     })
+  }
+
+  // ---------- v0.32.0: arquivo solto na página de um documento externo em branco ----------
+  // O documento aberto à direita (quadro ifrConteudoVisualizacao e os quadros dentro dele, que o SEI troca a
+  // cada clique) aceita o arquivo só se estiver em branco. O arquivo é só anexado ("Alterar Documento
+  // Externo"): tipo, data, nível de acesso e nome na árvore ficam como estão. Antes, a pessoa confirma.
+  const quadroDocumento = document.getElementById('ifrConteudoVisualizacao')
+  if (quadroDocumento) {
+    quadroDocumento.addEventListener('load', () => { alvoGuardado = undefined; ligarQuadro(quadroDocumento) })
+    ligarQuadro(quadroDocumento)
+  }
+  // Documento em branco aberto agora (lido da árvore uma vez por documento aberto), ou null.
+  function documentoEmBranco () {
+    if (alvoGuardado !== undefined) return alvoGuardado
+    let endereco = ''
+    try { endereco = quadroDocumento.contentWindow.location.href } catch (erro) { return null }
+    const lida = seiPedidos.arvoreAberta()
+    alvoGuardado = lida ? regras.externoEmBranco(lida.documentos, endereco) : null
+    return alvoGuardado
+  }
+  function ligarQuadro (quadro) {
+    let doc
+    try { doc = quadro.contentDocument } catch (erro) { return }
+    if (!doc || !doc.documentElement) return
+    if (!doc.documentElement.dataset.extensaoIftoAnexar) {
+      doc.documentElement.dataset.extensaoIftoAnexar = 'sim'
+      ligarSoltura(doc, 'Solte aqui para anexar o arquivo a este documento em branco (você confere antes)', () => !!documentoEmBranco(), confirmarAnexo)
+    }
+    for (const filho of doc.querySelectorAll('iframe')) {
+      if (!filho.dataset.extensaoIftoAnexar) {
+        filho.dataset.extensaoIftoAnexar = 'sim'
+        filho.addEventListener('load', () => ligarQuadro(filho))
+      }
+      ligarQuadro(filho)
+    }
+  }
+
+  async function confirmarAnexo (arquivos) {
+    const alvo = documentoEmBranco()
+    if (!alvo) return
+    if (aberta) aberta.fechar()
+    opcoes = await configuracoes.lerConfiguracoes()
+    const titulo = 'Anexar arquivo ao documento'
+    const fechar = { texto: 'Fechar', aoClicar: j => j.fechar() }
+    if (arquivos.length > 1) {
+      aberta = janela.abrir({ titulo, conteudo: [criar('p', { className: 'aviso amarelo', textContent: 'Arraste um arquivo só: o documento em branco recebe um arquivo. Para criar vários documentos de uma vez, arraste os arquivos para a árvore do processo, à esquerda.' })], botoes: [fechar], aoFechar: () => { aberta = null } })
+      return
+    }
+    const arquivo = arquivos[0]
+    const pronto = regras.prepararArquivo({ nome: arquivo.name, tamanho: arquivo.size }, [], opcoes)
+    const avisos = pronto.avisos.map(aviso => {
+      const p = criar('p', { className: 'aviso ' + (aviso.nivel === 'erro' ? 'vermelho' : 'amarelo') })
+      p.append(regras.montarPartes(aviso.partes, document))
+      return p
+    })
+    const conteudo = [
+      criar('div', { className: 'cartao compacto' }, [
+        criar('div', { className: 'linha' }, [criar('h2', { textContent: pronto.nome }), criar('span', { className: 'apoio', textContent: regras.tamanhoEmTexto(arquivo.size) })]),
+        criar('p', { textContent: 'Vai para: ' + alvo.rotulo })
+      ]),
+      criar('p', { className: 'apoio', textContent: pronto.bloqueado ? 'Este arquivo não será anexado.' : 'Só o arquivo é anexado: o tipo, a data, o nível de acesso e o Nome na Árvore do documento ficam como estão. Nada vai para o SEI antes de você clicar em "Anexar".' }),
+      ...avisos
+    ]
+    const botoes = pronto.bloqueado ? [fechar] : [{ texto: 'Anexar', tipo: 'principal', aoClicar: j => anexar(j) }, { texto: 'Cancelar', aoClicar: j => j.fechar() }]
+    aberta = janela.abrir({ titulo, conteudo, botoes, aoFechar: () => { aberta = null } })
+
+    // O clique em "Anexar" é a confirmação; o arquivo é lido só agora.
+    async function anexar (j) {
+      for (const botao of j.botoes) botao.disabled = true
+      j.trocarConteudo([criar('p', { textContent: `Anexando "${pronto.nome}"…` })])
+      let erro = null
+      try {
+        let bytes
+        try { bytes = await arquivo.arrayBuffer() } catch (falha) { throw new Error('Não consegui ler o arquivo do computador. Arraste de novo.') }
+        await seiPedidos.anexarAoExterno(alvo, { bytes, nome: pronto.nome, tipo: arquivo.type || 'application/octet-stream' })
+      } catch (falha) {
+        erro = falha
+      }
+      if (erro) {
+        j.trocarConteudo([criar('p', { className: 'aviso vermelho', textContent: erro.message })])
+        j.trocarBotoes([{ texto: 'Tentar de novo', tipo: 'principal', aoClicar: () => confirmarAnexo([arquivo]) }, fechar])
+        return
+      }
+      alvoGuardado = undefined
+      seiPedidos.recarregarArvore()
+      try { quadroDocumento.contentWindow.location.reload() } catch (falha) { /* a árvore recarregada já mostra */ }
+      j.trocarConteudo([criar('p', { className: 'aviso verde', textContent: `Pronto: "${pronto.nome}" foi anexado ao documento ${alvo.sei || alvo.rotulo}.` })])
+      j.trocarBotoes([{ texto: 'Fechar', tipo: 'principal', aoClicar: k => k.fechar() }])
+    }
   }
 
   // ---------- Janela: ler os tipos do SEI e mostrar a lista ----------

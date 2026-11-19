@@ -450,3 +450,12 @@ E: O texto é curto e pequeno (ex.: "Salvo neste computador hoje às…"); a fra
 ### T212 – Erro de conexão explicado (v0.31.3)
 F: Com um documento aberto no editor e o salvamento automático ligado, recarregue a extensão (ou atualize-a) e espere 30 segundos.
 E: Ao lado do Salvar aparece "⚠ Salvamento automático com erro (clique para ver)"; ao clicar, a mensagem diz para fechar e abrir o editor de novo, sem texto em inglês.
+### T213 – Soltar arquivo num documento externo em branco (v0.32.0) (Crítico)
+F: Num processo de teste, inclua pelo SEI um documento externo em branco (escolha tipo, data e acesso, sem arquivo), clique nele na árvore e arraste um PDF do computador para a página dele, à direita; confira a janela e clique em "Anexar".
+E: Ao arrastar aparece "Solte aqui para anexar…"; a janela mostra o arquivo e o documento; depois de "Anexar", aparece "Pronto" e o documento abre com o PDF, com o mesmo tipo, data, acesso e nome de antes.
+### T214 – Vários arquivos num documento em branco (v0.32.0)
+F: Abra um documento externo em branco e solte dois arquivos de uma vez na página dele.
+E: Aparece a mensagem "Arraste um arquivo só…" e nada é enviado ao SEI.
+### T215 – Documento que já tem conteúdo não recebe arquivo (v0.32.0)
+F: Abra um documento externo que já tem arquivo (ou um documento feito no SEI) e arraste um arquivo para a página dele.
+E: Não aparece "Solte aqui para anexar…" nem a janela da extensão.

@@ -104,3 +104,22 @@ test('arquivo arrastado: tipo, nome na árvore, data e bloqueios', () => {
   assert.equal(prepararArquivo({ nome: 'a#1.pdf', tamanho: 1 }, TIPOS, { ...opcoes, externoCorrigirNome: false }).bloqueado, true)
   assert.equal(prepararArquivo({ nome: 'Anexo X.pdf', tamanho: 1 }, TIPOS, { ...opcoes, externoNomeArvore: false }).nomeArvore, '')
 })
+
+// v0.32.0: arquivo solto na página de um documento externo em branco.
+test('documento externo em branco aberto à direita', () => {
+  const { externoEmBranco, prepararArquivo } = require('../comum/documento-externo.js')
+  const branco = { id: '3670301', rotulo: 'Minuta Termo de Convênio (3391978)', semConteudo: true, temArquivo: false, linkAlterar: 'controlador.php?acao=documento_alterar_recebido&id_documento=3670301' }
+  const comArquivo = { ...branco, id: '2', semConteudo: false, temArquivo: true }
+  const interno = { ...branco, id: '3', linkAlterar: '' }
+  const pagina = id => 'https://sei.ifto.edu.br/sei/controlador.php?acao=arvore_visualizar&id_procedimento=3669881&id_documento=' + id
+  assert.deepEqual(externoEmBranco([comArquivo, branco], pagina('3670301')), { id: '3670301', sei: '3391978', rotulo: branco.rotulo, linkAlterar: branco.linkAlterar })
+  assert.equal(externoEmBranco([comArquivo], pagina('2')), null)
+  assert.equal(externoEmBranco([interno], pagina('3')), null)
+  assert.equal(externoEmBranco([branco], 'https://sei.ifto.edu.br/sei/controlador.php?acao=arvore_visualizar&id_procedimento=3669881'), null)
+  assert.equal(externoEmBranco([branco], ''), null)
+  // Sem lista de tipos (o tipo do documento não muda): só nome e avisos.
+  const pronto = prepararArquivo({ nome: 'nota #1.pdf', tamanho: 1000 }, [], {})
+  assert.equal(pronto.nome, 'nota _1.pdf')
+  assert.equal(pronto.bloqueado, false)
+  assert.equal(prepararArquivo({ nome: 'a.pdf', tamanho: 11 * 1024 * 1024 }, [], {}).bloqueado, true)
+})
