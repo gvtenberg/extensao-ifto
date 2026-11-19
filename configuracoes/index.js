@@ -152,6 +152,19 @@
     })
   }
 
+  // v0.31.0: voltar às configurações padrão (só as escolhas desta página) e apagar tudo o que a extensão guardou.
+  document.getElementById('voltarPadrao').addEventListener('click', async () => {
+    if (!confirm('Voltar todas as escolhas desta página às do início? "Minhas unidades" e as regras do tipo de documento também serão apagadas. Se quiser guardar as atuais, clique antes em Cancelar e use "Baixar cópia das configurações".')) return
+    await navegador.storage.local.remove('configuracoes')
+    location.reload()
+  })
+  document.getElementById('apagarDados').addEventListener('click', async () => {
+    if (!confirm('Apagar todos os dados da extensão neste navegador? Serão apagadas as configurações, as versões dos documentos salvas automaticamente (o que não foi salvo no SEI será perdido), o conteúdo copiado, a lista de assinaturas e o restante. Feche antes as janelas do editor do SEI. Não dá para desfazer.')) return
+    await navegador.storage.local.clear()
+    if (navegador.storage.session) await navegador.storage.session.clear().catch(() => {})
+    location.reload()
+  })
+
   // v0.27.2 (spec base-e-sei, etapa 5): baixar e carregar a cópia das configurações. Lê do navegador na hora
   // (pega também o que outra aba gravou). Nada muda antes da confirmação.
   const { paraArquivo, doArquivo, nomeDoArquivo } = globalThis.ExtensaoIFTO.configuracoes

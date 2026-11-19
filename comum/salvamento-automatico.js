@@ -1,8 +1,8 @@
-// v0.31.0 (spec copia-editor-sei): regras da cópia automática do editor do SEI (sem página: funcionam no
+// v0.31.0 (spec copia-editor-sei): regras da salvamento automático do editor do SEI (sem página: funcionam no
 // navegador e no Node). Uma cópia por documento, por cima da anterior, só neste computador.
 (function (raiz) {
-  const PREFIXO = 'copiaEditor:'
-  const INDICE = 'copiaEditorIndice' // { idDocumento: quando a cópia foi guardada (ms) }
+  const PREFIXO = 'salvamentoAutomatico:'
+  const INDICE = 'salvamentoAutomaticoIndice' // { idDocumento: quando a cópia foi guardada (ms) }
   const DIAS = 7 // D6: cópia que o SEI nunca confirmou some 7 dias depois da última mudança
   const VIDA_JANELA = 70000 // a janela que guarda a cópia dá sinal a cada 30 s; sem sinal por 70 s, está fechada
 
@@ -12,7 +12,7 @@
   }
 
   const chave = id => PREFIXO + id
-  const chaveJanela = id => 'copiaEditorJanela:' + id
+  const chaveJanela = id => 'salvamentoAutomaticoJanela:' + id
 
   // Número do documento no endereço do editor ("id_documento=3662458").
   function idDoEndereco (endereco) {
@@ -118,5 +118,5 @@
 
   const api = { PREFIXO, INDICE, DIAS, chave, chaveJanela, idDoEndereco, comentariosNormais, mesmoConteudo, vencidas, maisAntigas, janelaViva, quando, paragrafos, diferencas }
   if (typeof module !== 'undefined' && module.exports) module.exports = api
-  else raiz.ExtensaoIFTO = Object.assign(raiz.ExtensaoIFTO || {}, { copiaEditor: api })
+  else raiz.ExtensaoIFTO = Object.assign(raiz.ExtensaoIFTO || {}, { salvamentoAutomatico: api })
 })(globalThis)

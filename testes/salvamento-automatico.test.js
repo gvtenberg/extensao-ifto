@@ -1,12 +1,12 @@
 const { test } = require('node:test')
 const assert = require('node:assert/strict')
-const r = require('../comum/copia-editor.js')
+const r = require('../comum/salvamento-automatico.js')
 
 // v0.31.0 (spec copia-editor-sei)
 test('número do documento vem do endereço do editor', () => {
   assert.equal(r.idDoEndereco('https://sei.ifto.edu.br/sei/controlador.php?acao=editor_montar&id_procedimento=3365963&id_documento=3662458&infra_sistema=1'), '3662458')
   assert.equal(r.idDoEndereco('https://sei.ifto.edu.br/sei/controlador.php?acao=procedimento_trabalhar'), '')
-  assert.equal(r.chave('3662458'), 'copiaEditor:3662458')
+  assert.equal(r.chave('3662458'), 'salvamentoAutomatico:3662458')
 })
 
 test('mesmo conteúdo: texto igual e comentários iguais, em qualquer ordem e sem os campos de tela', () => {

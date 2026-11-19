@@ -16,3 +16,4 @@ Decided on 25/10/2026.
 - **Without login:** only the SEI improvements work.
 - No costs: no paid services (as in the system).
 - Never write anything to an official system (SEI, spreadsheet, SIAFI…) without the user seeing and confirming first. Exception (12/11/2026): "Assinar e próximo" in the signature list, where the user's click confirms that document (`lista-assinaturas.md`).
+- (v0.31.0, user 19/11/2026) Settings > Geral > "Dados da extensão": **Voltar às configurações padrão** removes only the `configuracoes` key (optional site permissions stay); **Apagar todos os dados da extensão** clears all extension storage (`storage.local.clear()`, plus `storage.session`). Both ask for confirmation. On uninstall, Firefox and Chrome delete the extension storage themselves; an extension cannot run code when it is removed, and files it saved in Downloads stay.

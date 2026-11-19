@@ -53,6 +53,7 @@ All answered on 19/11/2026 (user, in the chat):
 - (coding, 19/11/2026, user asked for full fidelity) The copy is what the SEI sends on Salvar, so bold, italic, colors, backgrounds, links, images and tables (margins and alignment live in the table attributes) come back as saved. After a restore the extension's table and ★ style helpers start again on the new editor, and the result is compared with the copy: if anything differs, the stored copy is kept ("protegida") until the SEI saves, and the box says how many paragraphs differ.
 - While an earlier copy waits for the choice, the automatic copy is paused (it would overwrite it); clicking the indicator reopens the box.
 - A copy is also taken at the moment Salvar is clicked (if the SEI then fails, nothing typed is lost).
+- (19/11/2026, user) The feature is called "Salvamento automático (neste computador)" in every text and in the code (it is an automatic save, not a copy; it never saves in the SEI). The extension's own changes (numbering and spacing style blocks, ★ classes, table margins) are in the saved HTML; after a restore the numbering helper restarts too. Settings > Geral got "Voltar às configurações padrão" and "Apagar todos os dados da extensão".
 - If the editor refuses the copy, it is reloaded with the text that was there just before.
 
 ## 5. What changes

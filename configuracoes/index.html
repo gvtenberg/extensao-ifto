@@ -71,6 +71,15 @@
               <span class="dica">Na entrada do SEI e na assinatura, o navegador volta a oferecer a senha guardada.</span></span>
           </label>
         </div>
+        <!-- v0.31.0: voltar ao padrão e apagar tudo o que a extensão guardou neste navegador. -->
+        <div class="cartao" id="dados-extensao">
+          <h1>Dados da extensão</h1>
+          <p class="apoio">Tudo o que a extensão guarda fica só neste navegador. Ao remover a extensão, o navegador apaga esses dados.</p>
+          <p><button type="button" class="botao" id="voltarPadrao">Voltar às configurações padrão</button></p>
+          <p class="apoio">Todas as escolhas desta página voltam a ser as do início, inclusive "Minhas unidades" e as regras do tipo de documento. As permissões já dadas a outros sites continuam.</p>
+          <p><button type="button" class="botao" id="apagarDados">Apagar todos os dados da extensão</button></p>
+          <p class="apoio">Apaga as configurações, as versões dos documentos salvas automaticamente, o conteúdo copiado com "Copiar conteúdo", a lista de assinaturas, os estilos aprendidos, as peças recebidas do Compras IFTO e o restante guardado pela extensão. Não dá para desfazer.</p>
+        </div>
       </section>
 
       <section class="grupo" id="documentos">
@@ -144,9 +153,9 @@
               <span class="dica">No texto principal de qualquer documento, a lista de estilos traz também os de outros tipos (como os do Edital), marcados com "★".</span></span>
           </label>
           <label class="opcao">
-            <input type="checkbox" id="copiaAutomatica">
-            <span>Cópia automática do documento
-              <span class="dica">Enquanto você escreve, guarda a cada 30 segundos uma cópia do documento neste computador (texto, formatação, tabelas, imagens e comentários). Se o SEI der erro ao salvar ou a janela fechar, ao abrir o documento de novo aparece o botão "Restaurar a cópia". A cópia é apagada quando o SEI salva o documento, ou depois de 7 dias.</span></span>
+            <input type="checkbox" id="salvamentoAutomatico">
+            <span>Salvamento automático (neste computador)
+              <span class="dica">Enquanto você escreve, a extensão salva o documento neste computador a cada 30 segundos (texto, formatação, tabelas, imagens e comentários). Não salva no SEI: continue clicando em Salvar. Se o SEI der erro ao salvar ou a janela fechar, ao abrir o documento de novo aparece o botão "Restaurar esta versão". A versão salva aqui é apagada quando o SEI salva o documento, ou depois de 7 dias.</span></span>
           </label>
           <label class="opcao">
             <input type="checkbox" id="copiarColarConteudo">

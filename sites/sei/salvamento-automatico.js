@@ -1,15 +1,15 @@
-// v0.31.0 (spec copia-editor-sei): cópia automática do documento na janela do editor do SEI (a cada 30 s, uma
+// v0.31.0 (spec copia-editor-sei): salvamento automático do documento (neste computador, não no SEI) na janela do editor do SEI (a cada 30 s, uma
 // por documento, só neste computador) e os botões "Copiar conteúdo" / "Colar conteúdo". A cópia é o mesmo
 // conteúdo que o SEI envia ao salvar (texto com toda a formatação, tabelas, imagens, links) mais os
-// comentários. A parte que mexe no editor roda dentro da página (sites/sei/editor-copia.js). NUNCA salva.
+// comentários. A parte que mexe no editor roda dentro da página (sites/sei/editor-salvamento.js). NUNCA salva.
 (async function () {
   if (!(await globalThis.ExtensaoIFTO.sei.ligadaNoSei())) return
   if (window.top !== window) return
   const navegador = globalThis.browser || globalThis.chrome
-  const { configuracoes, caixaEditor, copiaEditor: regras } = globalThis.ExtensaoIFTO
+  const { configuracoes, caixaEditor, salvamentoAutomatico: regras } = globalThis.ExtensaoIFTO
   const { criar, pedirAoFundo } = caixaEditor
   const opcoes = await configuracoes.lerConfiguracoes()
-  const automatica = Boolean(opcoes.copiaAutomatica)
+  const automatica = Boolean(opcoes.salvamentoAutomatico)
   const manual = Boolean(opcoes.copiarColarConteudo)
   if (!automatica && !manual) return
   const id = regras.idDoEndereco(location.href)
@@ -81,17 +81,17 @@
     if (!automatica || pendente || protegida || !base || guardando) return
     guardando = true
     try {
-      const lido = await pedirAoFundo('copiaLer', { desde: true })
-      if (!lido.ok) return indicar('A cópia automática não funcionou: ' + lido.erro, 'erro')
+      const lido = await pedirAoFundo('salvamentoLer', { desde: true })
+      if (!lido.ok) return indicar('O salvamento automático não funcionou: ' + lido.erro, 'erro')
       if (!lido.mudou) return
       if (regras.mesmoConteudo(lido, base)) {
         if (await lerCopia()) await apagar(id)
-        return indicar('Cópia automática ligada (sem alterações para guardar)')
+        return indicar('Salvamento automático ligado (nada mudou)')
       }
       const agora = Date.now()
       const ok = await guardar({ id, titulo, versaoSei: base.versaoSei, salvaEm: agora, secoes: lido.secoes, comentarios: lido.comentarios })
-      if (ok) indicar('Cópia guardada ' + regras.quando(agora))
-      else indicar('Não foi possível guardar a cópia: pouco espaço no navegador.', 'erro')
+      if (ok) indicar('Salvo neste computador ' + regras.quando(agora))
+      else indicar('Não foi possível salvar neste computador: pouco espaço no navegador.', 'erro')
     } finally {
       guardando = false
     }
@@ -99,8 +99,10 @@
 
   // --- Pôr outro conteúdo no editor (restaurar, colar) e conferir se ficou igual ---
   async function estilosDeNovo () {
-    // O editor foi montado de novo: liga de novo as ajudas da extensão que ficam no editor (tabelas, ★).
+    // O editor foi montado de novo: liga de novo as ajudas da extensão que ficam no editor (tabelas, números
+    // longos dos editais, ★). O que elas já tinham posto no texto (blocos de estilo, classes, margens) vem na versão salva.
     navegador.runtime.sendMessage({ tipo: 'tabelasPreparar', mover: opcoes.moverTabelas, margens: opcoes.margensTabela }).catch(() => {})
+    if (opcoes.numeracaoEdital) navegador.runtime.sendMessage({ tipo: 'numeracaoPreparar' }).catch(() => {})
     if (!opcoes.todosOsEstilos) return
     const { estilosAprendidos = {} } = await armazem.get('estilosAprendidos')
     await navegador.runtime.sendMessage({ tipo: 'estilosPreparar', aprendidos: estilosAprendidos }).catch(() => {})
@@ -118,32 +120,32 @@
   // Troca o texto do editor por "conteudo"; guarda o de antes para o botão Desfazer.
   async function trocarTexto (caixa, conteudo, fraseOk, aoDesfazer) {
     caixa.mostrar('aviso', 'Pondo o texto no editor…')
-    const antes = await pedirAoFundo('copiaLer', { desde: false })
+    const antes = await pedirAoFundo('salvamentoLer', { desde: false })
     if (!antes.ok) { caixa.mostrar('erro', 'Não consegui ler o editor: ' + antes.erro); return false }
-    const feito = await pedirAoFundo('copiaRestaurar', { copia: conteudo })
+    const feito = await pedirAoFundo('salvamentoRestaurar', { copia: conteudo })
     if (!feito.ok) { caixa.mostrar('erro', 'Não consegui pôr o texto no editor. ' + feito.erro); return false }
     await estilosDeNovo()
     await esperar(1500)
-    const depois = await pedirAoFundo('copiaLer', { desde: false })
+    const depois = await pedirAoFundo('salvamentoLer', { desde: false })
     const dif = depois.ok ? contarDiferencas(conteudo, depois) : { paragrafos: -1, comentarios: false }
     const desfazer = criar('button', { type: 'button', className: 'secundario', textContent: 'Desfazer (voltar ao texto de antes)' })
     const extras = [desfazer]
     if (dif.paragrafos === 0 && !dif.comentarios) {
-      caixa.mostrar('ok', fraseOk, criar('p', { textContent: 'Conferido: texto, formatação e comentários iguais aos da cópia.' }), ...extras)
+      caixa.mostrar('ok', fraseOk, criar('p', { textContent: 'Conferido: texto, formatação e comentários iguais aos da versão salva.' }), ...extras)
       protegida = false
     } else {
       protegida = true
       const partes = []
       if (dif.paragrafos > 0) partes.push(dif.paragrafos + ' parágrafo(s)')
       if (dif.comentarios) partes.push('os comentários')
-      const motivo = dif.paragrafos < 0 ? 'Não consegui conferir o resultado.' : 'O editor não ficou igual à cópia em ' + partes.join(' e ') + '.'
-      caixa.mostrar('aviso', fraseOk, criar('p', { className: 'erro', textContent: motivo + ' A cópia guardada não será trocada até você salvar o documento. Confira o texto com atenção.' }), ...extras)
-      indicar('Cópia guardada protegida: confira o texto antes de salvar.', 'aviso')
+      const motivo = dif.paragrafos < 0 ? 'Não consegui conferir o resultado.' : 'O editor não ficou igual à versão salva em ' + partes.join(' e ') + '.'
+      caixa.mostrar('aviso', fraseOk, criar('p', { className: 'erro', textContent: motivo + ' A versão salva neste computador não será trocada até você salvar o documento no SEI. Confira o texto com atenção.' }), ...extras)
+      indicar('Versão salva protegida: confira o texto antes de salvar.', 'aviso')
     }
     desfazer.addEventListener('click', async () => {
       desfazer.disabled = true
       if (aoDesfazer) aoDesfazer.antes()
-      const volta = await pedirAoFundo('copiaRestaurar', { copia: antes })
+      const volta = await pedirAoFundo('salvamentoRestaurar', { copia: antes })
       if (!volta.ok) { caixa.mostrar('erro', 'Não consegui desfazer: ' + volta.erro); return }
       await estilosDeNovo()
       protegida = false
@@ -177,7 +179,7 @@
     const painel = criar('div', { className: 'painel' })
     const fechar = criar('button', { type: 'button', textContent: 'Fechar' })
     const topo = criar('div', { className: 'topo' })
-    topo.append(criar('h2', { textContent: 'Diferenças entre o documento no SEI e a cópia' }), fechar)
+    topo.append(criar('h2', { textContent: 'Diferenças entre o documento no SEI e a versão salva neste computador' }), fechar)
     const lista = criar('div', { className: 'lista' })
     lista.append(criar('p', { className: 'legenda', textContent: 'Carregando…' }))
     painel.append(topo, lista)
@@ -190,10 +192,10 @@
     fechar.addEventListener('click', sair)
     fundo.addEventListener('click', evento => { if (evento.target === fundo) sair() })
 
-    pedirAoFundo('copiaLer', { desde: false }).then(atual => {
+    pedirAoFundo('salvamentoLer', { desde: false }).then(atual => {
       lista.replaceChildren()
       if (!atual.ok) { lista.append(criar('p', { className: 'nota', textContent: 'Não consegui ler o editor: ' + atual.erro })); return }
-      lista.append(criar('p', { className: 'legenda', textContent: 'Verde: está na cópia e não no SEI. Vermelho riscado: está no SEI e sai se você restaurar a cópia. Números = posição do parágrafo.' }))
+      lista.append(criar('p', { className: 'legenda', textContent: 'Verde: está na versão salva e não no SEI. Vermelho riscado: está no SEI e sai se você restaurar a versão salva. Números = posição do parágrafo.' }))
       const nomes = [...new Set([...Object.keys(atual.secoes || {}), ...Object.keys(copia.secoes || {})])]
       let total = 0
       nomes.forEach((nome, indice) => {
@@ -202,7 +204,7 @@
           if (++total > 300) return
           const item = criar('div', { className: 'item' })
           const onde = (nomes.length > 1 ? 'Parte ' + (indice + 1) + ', ' : '') + 'parágrafo ' + d.numero
-          const tipo = d.tipo === 'novo' ? 'só na cópia' : d.tipo === 'removido' ? 'só no SEI' : d.soFormatacao ? 'mesmo texto, formatação ou imagem diferente' : 'mudou'
+          const tipo = d.tipo === 'novo' ? 'só na versão salva' : d.tipo === 'removido' ? 'só no SEI' : d.soFormatacao ? 'mesmo texto, formatação ou imagem diferente' : 'mudou'
           item.append(criar('div', { className: 'rotulo', textContent: onde + ' – ' + tipo }))
           if (d.antes && !d.soFormatacao) item.append(criar('div', { className: 'sai', textContent: d.antes }))
           if (d.depois) item.append(criar('div', { className: 'entra', textContent: d.depois }))
@@ -212,42 +214,42 @@
       })
       if (total > 300) lista.append(criar('p', { className: 'nota', textContent: 'Mostrando as 300 primeiras diferenças de ' + total + '.' }))
       const comentariosIguais = JSON.stringify(regras.comentariosNormais(atual.comentarios)) === JSON.stringify(regras.comentariosNormais(copia.comentarios))
-      if (!comentariosIguais) lista.append(criar('p', { className: 'nota', textContent: 'Comentários diferentes: ' + (atual.comentarios || []).length + ' no SEI e ' + (copia.comentarios || []).length + ' na cópia.' }))
-      if (!total && comentariosIguais) lista.append(criar('p', { textContent: 'Não há diferenças: o documento no SEI está igual à cópia.' }))
+      if (!comentariosIguais) lista.append(criar('p', { className: 'nota', textContent: 'Comentários diferentes: ' + (atual.comentarios || []).length + ' no SEI e ' + (copia.comentarios || []).length + ' na versão salva.' }))
+      if (!total && comentariosIguais) lista.append(criar('p', { textContent: 'Não há diferenças: o documento no SEI está igual à versão salva.' }))
     })
   }
 
   // --- Cópia anterior encontrada ao abrir o documento ---
   function oferecer (copia, atual) {
     pendente = true
-    indicar('Cópia automática parada: há uma cópia anterior. Clique aqui para escolher.', 'aviso', () => oferecer(copia, atual))
+    indicar('Salvamento automático parado: há uma versão salva antes. Clique aqui para escolher.', 'aviso', () => oferecer(copia, atual))
     // Salvo no SEI depois da cópia (por outra pessoa ou outra janela): restaurar apagaria isso.
     const conflito = Boolean(copia.versaoSei && atual.versaoSei && copia.versaoSei !== atual.versaoSei)
-    const caixa = caixaEditor.criarCaixa('copia-editor', 'Há uma cópia deste documento que não foi salva no SEI, guardada ' + regras.quando(copia.salvaEm) + '. Você pode continuar a partir dela.', 'Restaurar a cópia')
-    if (conflito) caixa.botao.before(criar('p', { className: 'erro', textContent: 'Atenção: o documento foi salvo no SEI depois desta cópia. Restaurar apaga o que foi salvo depois. Veja as diferenças antes.' }))
+    const caixa = caixaEditor.criarCaixa('salvamento-automatico', 'Há uma versão deste documento salva automaticamente neste computador (' + regras.quando(copia.salvaEm) + ') que não foi salva no SEI. Você pode continuar a partir dela.', 'Restaurar esta versão')
+    if (conflito) caixa.botao.before(criar('p', { className: 'erro', textContent: 'Atenção: o documento foi salvo no SEI depois desta versão. Restaurar apaga o que foi salvo no SEI depois. Veja as diferenças antes.' }))
     const ver = criar('button', { type: 'button', className: 'secundario', textContent: 'Ver diferenças' })
-    const descartar = criar('button', { type: 'button', className: 'secundario', textContent: 'Descartar a cópia' })
+    const descartar = criar('button', { type: 'button', className: 'secundario', textContent: 'Descartar esta versão' })
     caixa.corpo.append(ver, descartar)
     ver.addEventListener('click', () => mostrarDiferencas(copia))
     caixa.botao.addEventListener('click', async () => {
-      if (conflito && !window.confirm('O documento foi salvo no SEI depois desta cópia. Restaurar apaga o que foi salvo depois. Restaurar mesmo assim?')) return
-      const ok = await trocarTexto(caixa, copia, 'Pronto: a cópia voltou ao editor. Confira o texto e clique em Salvar. A cópia só é apagada depois que o SEI salvar.', {
+      if (conflito && !window.confirm('O documento foi salvo no SEI depois desta versão. Restaurar apaga o que foi salvo no SEI depois. Restaurar mesmo assim?')) return
+      const ok = await trocarTexto(caixa, copia, 'Pronto: a versão salva voltou ao editor. Confira o texto e clique em Salvar. Ela só é apagada deste computador depois que o SEI salvar.', {
         antes: () => { pendente = true },
         depois: async () => oferecer((await lerCopia()) || copia, atual)
       })
       if (ok) {
         pendente = false
-        if (!protegida) indicar('Cópia restaurada: confira e clique em Salvar.')
+        if (!protegida) indicar('Versão restaurada: confira e clique em Salvar.')
       }
     })
     descartar.addEventListener('click', async () => {
-      if (!window.confirm('A cópia será apagada e não poderá ser recuperada. Apagar a cópia?')) return
+      if (!window.confirm('A versão salva neste computador será apagada e não poderá ser recuperada. Apagar?')) return
       await apagar(id)
-      const lido = await pedirAoFundo('copiaLer', { desde: false })
+      const lido = await pedirAoFundo('salvamentoLer', { desde: false })
       if (lido.ok) base = lido
       pendente = false
-      caixa.mostrar('ok', 'A cópia foi apagada. A cópia automática voltou a funcionar.')
-      indicar('Cópia automática ligada')
+      caixa.mostrar('ok', 'A versão salva foi apagada. O salvamento automático voltou a funcionar.')
+      indicar('Salvamento automático ligado')
     })
   }
 
@@ -256,8 +258,8 @@
     await limparVencidas()
     const trava = (await armazem.get(regras.chaveJanela(id)))[regras.chaveJanela(id)]
     if (regras.janelaViva(trava, minhaJanela, Date.now())) {
-      indicar('Cópia automática parada: este documento está aberto em outra janela.', 'aviso')
-      const caixa = caixaEditor.criarCaixa('copia-editor', 'Este documento também está aberto em outra janela do editor. Só a outra janela guarda a cópia automática. Para não perder trabalho, feche uma das duas.', 'Entendi')
+      indicar('Salvamento automático parado: este documento está aberto em outra janela.', 'aviso')
+      const caixa = caixaEditor.criarCaixa('salvamento-automatico', 'Este documento também está aberto em outra janela do editor. Só a outra janela faz o salvamento automático. Para não perder trabalho, feche uma das duas.', 'Entendi')
       caixa.botao.addEventListener('click', () => caixa.remover())
       return
     }
@@ -271,19 +273,19 @@
       protegida = false
       if (pendente) return // a cópia anterior continua lá: a pessoa ainda não escolheu
       await apagar(id)
-      const lido = await pedirAoFundo('copiaLer', { desde: false })
+      const lido = await pedirAoFundo('salvamentoLer', { desde: false })
       if (lido.ok) base = lido
-      indicar('Salvo no SEI ' + regras.quando(Date.now()) + '. A cópia foi apagada.')
+      indicar('Salvo no SEI ' + regras.quando(Date.now()) + '. A versão deste computador foi apagada.')
     })
     // O editor e as outras ajudas da extensão terminam de abrir antes da primeira leitura.
     await esperar(5000)
-    const lido = await pedirAoFundo('copiaLer', { desde: false })
-    if (!lido.ok) return indicar('A cópia automática não funcionou: ' + lido.erro, 'erro')
+    const lido = await pedirAoFundo('salvamentoLer', { desde: false })
+    if (!lido.ok) return indicar('O salvamento automático não funcionou: ' + lido.erro, 'erro')
     base = lido
     const copia = await lerCopia()
     if (copia && regras.mesmoConteudo(copia, lido)) await apagar(id)
     else if (copia) oferecer(copia, lido)
-    if (!pendente) indicar('Cópia automática ligada')
+    if (!pendente) indicar('Salvamento automático ligado')
     setInterval(() => { travar(); copiarAgora() }, 30000)
   }
 
@@ -298,7 +300,7 @@
     barra.append(copiar, colar)
     copiar.addEventListener('click', async () => {
       copiar.disabled = true
-      const lido = await pedirAoFundo('copiaLer', { desde: false })
+      const lido = await pedirAoFundo('salvamentoLer', { desde: false })
       copiar.disabled = false
       const caixa = caixaEditor.criarCaixa('copia-manual', '', 'Fechar')
       caixa.botao.addEventListener('click', () => caixa.remover())
@@ -316,7 +318,7 @@
       caixa.botao.addEventListener('click', () => caixa.remover())
       if (!copiaManual) return caixa.mostrar('aviso', 'Não há conteúdo copiado. Clique antes em "Copiar conteúdo" na outra janela deste documento.', caixa.botao)
       if (copiaManual.id !== id) return caixa.mostrar('aviso', 'O conteúdo copiado é de outro documento (' + copiaManual.titulo + '). Só é possível colar no mesmo documento.', caixa.botao)
-      const atual = await pedirAoFundo('copiaLer', { desde: false })
+      const atual = await pedirAoFundo('salvamentoLer', { desde: false })
       if (atual.ok && regras.mesmoConteudo(copiaManual, atual)) return caixa.mostrar('ok', 'Esta janela já tem o mesmo conteúdo copiado.', caixa.botao)
       if (!window.confirm('Trocar o texto desta janela pelo conteúdo copiado ' + regras.quando(copiaManual.salvaEm) + '? Depois você confere e clica em Salvar (há o botão Desfazer).')) return caixa.remover()
       await trocarTexto(caixa, copiaManual, 'Pronto: o conteúdo copiado está no editor. Confira o texto e clique em Salvar.', null)
