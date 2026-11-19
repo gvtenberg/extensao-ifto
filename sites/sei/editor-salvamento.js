@@ -84,12 +84,19 @@
       const antes = {}
       for (const nome of nomes) if (typeof todas[nome] === 'string') antes[nome] = todas[nome]
       const itensAntes = (editor.plugins.has('Comentario') ? (editor.plugins.get('Comentario').getData().itens || []) : []).map(c => ({ ...c, visivel: true, podeEditar: true }))
+      // v0.31.3 (T195): o SEI põe a barra de botões de cada editor em ".infra-editor__toolbar" e o destroy não a
+      // tira: ficava uma segunda linha de botões (a velha, com Salvar desligado). Tira a barra velha.
+      const barrasVelhas = (infra.editores || []).map(([, e]) => e.ui && e.ui.view && e.ui.view.toolbar && e.ui.view.toolbar.element).filter(Boolean)
+      const tirarBarras = () => barrasVelhas.forEach(b => b.remove())
       await Promise.all((infra.editores || []).map(([, e]) => e.destroy()))
+      tirarBarras()
       infra.editores = []
       try {
         await infra.montar({ initialData: usar, infra: { comentario: { itens } } })
       } catch (erro) {
+        const outras = (infra.editores || []).map(([, e]) => e.ui && e.ui.view && e.ui.view.toolbar && e.ui.view.toolbar.element).filter(Boolean)
         await Promise.all((infra.editores || []).map(([, e]) => e.destroy().catch(() => {})))
+        outras.forEach(b => b.remove())
         infra.editores = []
         await infra.montar({ initialData: antes, infra: { comentario: { itens: itensAntes } } })
         estado.editor = null
@@ -102,6 +109,12 @@
           c.isContentDifferent = false
           delete c.updatedContentHash
         }
+      } catch (erro) {}
+      // v0.31.3 (T195): o botão Salvar do SEI só liga quando o texto muda depois de abrir; o texto posto aqui
+      // é diferente do que está salvo no SEI, então liga o botão (a pessoa confere e clica em Salvar).
+      try {
+        const salvar = novo.plugins.has('Salvar') && novo.plugins.get('Salvar')
+        if (salvar && 'documentVersion' in salvar) salvar.documentVersion = (salvar.lastSaveDocumentVersion || 0) + 1
       } catch (erro) {}
       estado.editor = null
       vigiar(novo)

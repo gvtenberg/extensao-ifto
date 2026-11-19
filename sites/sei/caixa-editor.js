@@ -102,7 +102,18 @@
   // v0.26.2: "extras" vai junto no recado (ex.: o que corrigir).
   function pedirAoFundo (tipo, extras = {}) {
     const limite = new Promise(resolve => setTimeout(() => resolve({ ok: false, erro: 'O editor do SEI demorou demais para responder. Feche e abra o editor de novo.' }), 45000))
-    return Promise.race([navegador.runtime.sendMessage({ ...extras, tipo }).catch(erro => ({ ok: false, erro: erro.message })), limite])
+    // v0.31.3 (T195): "Could not establish connection" = a parte de fundo da extensão não estava pronta (ou a
+    // extensão foi atualizada com o editor aberto): tenta de novo uma vez e, se falhar, explica em palavras simples.
+    const semConexao = erro => /establish connection|Receiving end|context invalidated/i.test(erro.message || '')
+    const enviar = () => navegador.runtime.sendMessage({ ...extras, tipo })
+    const pedido = enviar().catch(erro => {
+      if (!semConexao(erro)) return { ok: false, erro: erro.message }
+      return new Promise(resolve => setTimeout(resolve, 1500)).then(enviar).catch(e => ({
+        ok: false,
+        erro: semConexao(e) ? 'a extensão foi atualizada ou reiniciada com o editor aberto. Feche esta janela do editor e abra de novo.' : e.message
+      }))
+    })
+    return Promise.race([pedido, limite])
   }
 
   // O editor não mostra a unidade: vem do número no endereço (gravado pelas páginas do SEI) ou da janela

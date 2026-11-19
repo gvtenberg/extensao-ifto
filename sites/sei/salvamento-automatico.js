@@ -28,7 +28,8 @@
   // --- Indicador perto do botão Salvar (não faz parte do documento) ---
   const barra = criar('span')
   barra.dataset.extensaoIfto = 'copia'
-  barra.style.cssText = 'display:inline-flex;align-items:center;gap:6px;margin:0 6px;font:12px/1.3 system-ui,sans-serif;white-space:nowrap;'
+  // v0.31.3 (T195): texto curto e discreto ao lado do Salvar; a frase inteira aparece ao passar o mouse.
+  barra.style.cssText = 'display:inline-flex;align-items:center;gap:6px;margin:0 6px;font:11px/1.3 system-ui,sans-serif;white-space:nowrap;opacity:.85;'
   const texto = criar('span')
   barra.append(texto)
   let aoClicarTexto = null
@@ -41,10 +42,13 @@
       document.body.append(barra)
     }
   }
-  function indicar (frase, tipo = '', clique = null) {
+  function indicar (frase, tipo = '', clique = null, curta = '') {
     porBarra()
-    texto.textContent = frase
-    texto.style.color = tipo === 'erro' ? '#B3261E' : tipo === 'aviso' ? '#8A5A00' : '#1E5E33'
+    texto.textContent = curta || frase
+    texto.title = frase
+    texto.style.color = tipo === 'erro' ? '#B3261E' : tipo === 'aviso' ? '#8A5A00' : '#5F6B64'
+    // Erro com frase curta: o clique mostra a frase inteira.
+    if (!clique && curta && tipo === 'erro') clique = () => window.alert(frase)
     texto.style.cursor = clique ? 'pointer' : ''
     texto.style.textDecoration = clique ? 'underline' : ''
     aoClicarTexto = clique
@@ -92,16 +96,16 @@
     guardando = true
     try {
       const lido = await pedirAoFundo('salvamentoLer', { desde: true })
-      if (!lido.ok) return indicar('O salvamento automático não funcionou: ' + lido.erro, 'erro')
+      if (!lido.ok) return indicar('O salvamento automático não funcionou: ' + lido.erro, 'erro', null, '⚠ Salvamento automático com erro (clique para ver)')
       if (!lido.mudou) return
       if (regras.mesmoConteudo(lido, base)) {
         if (await lerCopia()) await apagar(id)
-        return indicar('Salvamento automático ligado (nada mudou)')
+        return indicar('Salvamento automático ligado (nada mudou desde a última vez)', '', null, 'Salvamento automático ligado')
       }
       const agora = Date.now()
       const ok = await guardar({ id, titulo, versaoSei: base.versaoSei, salvaEm: agora, secoes: lido.secoes, comentarios: lido.comentarios })
       if (ok) indicar('Salvo neste computador ' + regras.quando(agora))
-      else indicar('Não foi possível salvar neste computador: pouco espaço no navegador.', 'erro')
+      else indicar('Não foi possível salvar neste computador: pouco espaço no navegador.', 'erro', null, '⚠ Pouco espaço para salvar (clique para ver)')
     } finally {
       guardando = false
     }
@@ -142,7 +146,7 @@
       if (dif.comentarios) partes.push('os comentários')
       const motivo = dif.paragrafos < 0 ? 'Não consegui conferir o resultado.' : 'O editor não ficou igual à versão salva em ' + partes.join(' e ') + '.'
       caixa.mostrar('aviso', fraseOk, criar('p', { className: 'erro', textContent: motivo + ' A versão salva neste computador não será trocada até você salvar o documento no SEI. Confira o texto com atenção.' }), ...extras)
-      indicar('Versão salva protegida: confira o texto antes de salvar.', 'aviso')
+      indicar('Versão salva protegida: confira o texto antes de salvar.', 'aviso', null, 'Confira o texto antes de salvar')
     }
     desfazer.addEventListener('click', async () => {
       desfazer.disabled = true
@@ -164,8 +168,9 @@
     const sombra = hospedeiro.attachShadow({ mode: 'open' })
     sombra.append(criar('style', { textContent: `
       :host { all: initial; }
-      .fundo { position: fixed; inset: 0; z-index: 100001; background: rgba(0,0,0,.35); display: flex; align-items: center; justify-content: center; }
-      .painel { width: min(900px, calc(100vw - 32px)); max-height: calc(100vh - 32px); display: flex; flex-direction: column; background: #fff; border-radius: 6px; font: 13px/1.45 system-ui, sans-serif; color: #1B2420; box-shadow: 0 4px 16px rgba(0,0,0,.25); }
+      /* v0.31.3 (T195): painel à esquerda, abaixo dos botões do editor e longe da caixa da extensão (direita), sem fundo escuro: a página continua rolando. */
+      .fundo { position: fixed; top: 100px; left: 16px; bottom: 16px; z-index: 100001; display: flex; align-items: flex-start; pointer-events: none; }
+      .painel { pointer-events: auto; width: min(440px, calc(100vw - 32px)); max-height: 100%; display: flex; flex-direction: column; background: #fff; border-radius: 6px; font: 13px/1.45 system-ui, sans-serif; color: #1B2420; box-shadow: 0 4px 16px rgba(0,0,0,.25); }
       .topo { display: flex; align-items: center; justify-content: space-between; padding: 10px 14px; border-bottom: 1px solid #C9D1CC; background: #F1F4F2; border-radius: 6px 6px 0 0; }
       h2 { margin: 0; font-size: 15px; }
       button { border: 1px solid #1E5E33; background: #fff; color: #1E5E33; border-radius: 4px; padding: 4px 10px; font: inherit; cursor: pointer; }
@@ -192,7 +197,6 @@
     const tecla = evento => { if (evento.key === 'Escape') sair() }
     document.addEventListener('keydown', tecla, true)
     fechar.addEventListener('click', sair)
-    fundo.addEventListener('click', evento => { if (evento.target === fundo) sair() })
 
     pedirAoFundo('salvamentoLer', { desde: false }).then(atual => {
       lista.replaceChildren()
@@ -224,7 +228,7 @@
   // --- Cópia anterior encontrada ao abrir o documento ---
   function oferecer (copia, atual) {
     pendente = true
-    indicar('Salvamento automático parado: há uma versão salva antes. Clique aqui para escolher.', 'aviso', () => oferecer(copia, atual))
+    indicar('Salvamento automático parado: há uma versão salva antes. Clique aqui para escolher.', 'aviso', () => oferecer(copia, atual), 'Há uma versão salva: clique para escolher')
     // Salvo no SEI depois da cópia (por outra pessoa ou outra janela): restaurar apagaria isso.
     const conflito = Boolean(copia.versaoSei && atual.versaoSei && copia.versaoSei !== atual.versaoSei)
     const caixa = caixaEditor.criarCaixa('salvamento-automatico', 'Há uma versão deste documento salva automaticamente neste computador (' + regras.quando(copia.salvaEm) + ') que não foi salva no SEI. Você pode continuar a partir dela.', 'Restaurar esta versão')
@@ -241,7 +245,7 @@
       })
       if (ok) {
         pendente = false
-        if (!protegida) indicar('Versão restaurada: confira e clique em Salvar.')
+        if (!protegida) indicar('Versão restaurada: confira e clique em Salvar.', '', null, 'Versão restaurada: confira e salve')
       }
     })
     descartar.addEventListener('click', async () => {
@@ -261,7 +265,7 @@
     await limparVencidas()
     const trava = (await armazem.get(regras.chaveJanela(id)))[regras.chaveJanela(id)]
     if (regras.janelaViva(trava, minhaJanela, Date.now())) {
-      indicar('Salvamento automático parado: este documento está aberto em outra janela.', 'aviso')
+      indicar('Salvamento automático parado: este documento está aberto em outra janela.', 'aviso', null, 'Parado: aberto em outra janela')
       const caixa = caixaEditor.criarCaixa('salvamento-automatico', 'Este documento também está aberto em outra janela do editor. Só a outra janela faz o salvamento automático. Para não perder trabalho, feche uma das duas.', 'Entendi')
       caixa.botao.addEventListener('click', () => caixa.remover())
       return
@@ -278,12 +282,12 @@
       await apagar(id)
       const lido = await pedirAoFundo('salvamentoLer', { desde: false })
       if (lido.ok) base = lido
-      indicar('Salvo no SEI ' + regras.quando(Date.now()) + '. A versão deste computador foi apagada.')
+      indicar('Salvo no SEI ' + regras.quando(Date.now()) + '. A versão deste computador foi apagada.', '', null, 'Salvo no SEI ' + regras.quando(Date.now()))
     })
     // O editor e as outras ajudas da extensão terminam de abrir antes da primeira leitura.
     await esperar(5000)
     const lido = await pedirAoFundo('salvamentoLer', { desde: false })
-    if (!lido.ok) return indicar('O salvamento automático não funcionou: ' + lido.erro, 'erro')
+    if (!lido.ok) return indicar('O salvamento automático não funcionou: ' + lido.erro, 'erro', null, '⚠ Salvamento automático com erro (clique para ver)')
     base = lido
     const copia = await lerCopia()
     if (copia && regras.mesmoConteudo(copia, lido)) await apagar(id)
@@ -297,7 +301,7 @@
       if (configuracoes.comPadroes(mudou.configuracoes.newValue).salvamentoAutomatico) return
       parado = true
       clearInterval(relogio)
-      indicar('Salvamento automático desligado nas configurações. Continue clicando em Salvar.', 'aviso')
+      indicar('Salvamento automático desligado nas configurações. Continue clicando em Salvar.', 'aviso', null, 'Salvamento automático desligado')
     })
   }
 

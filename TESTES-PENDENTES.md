@@ -404,9 +404,6 @@ E: O aviso mostra a hora em que foi salvo; depois de restaurar aparece "Conferid
 ### T194 – Desfazer a restauração (v0.31.0)
 F: Depois de restaurar uma versão salva, clique em "Desfazer (voltar ao texto de antes)".
 E: O texto que o SEI tinha volta ao editor e o aviso com "Restaurar esta versão" aparece de novo.
-### T195 – Ver diferenças (v0.31.0)
-F: Com uma versão salva neste computador (mude, acrescente e apague parágrafos, feche sem salvar e abra de novo), clique em "Ver diferenças".
-E: Abre uma janela só com os parágrafos diferentes: em verde o que está na versão salva, em vermelho riscado o que está no SEI; Esc ou "Fechar" fecham.
 ### T196 – Cópia apagada ao salvar e ao descartar (v0.31.0)
 F: Escreva, espere 30 segundos, clique em Salvar; em outro documento com versão salva, abra de novo e clique em "Descartar esta versão".
 E: Depois de salvar aparece "Salvo no SEI hoje às… A versão deste computador foi apagada."; ao descartar, a extensão pede confirmação e, ao abrir o documento de novo, não há aviso.
@@ -441,3 +438,15 @@ E: A segunda aba recarrega sozinha e mostra as escolhas do início; mudar algo n
 ### T208 – Salvamento automático funciona no editor (v0.31.2)
 F: Com o salvamento automático ligado, abra um documento no editor, escreva uma frase e espere 30 segundos.
 E: Ao lado do botão Salvar aparece "Salvo neste computador hoje às…" com a hora, sem a mensagem "O editor do SEI não respondeu".
+### T209 – Restaurar deixa o botão Salvar ligado (v0.31.3) (Crítico)
+F: Com o salvamento automático ligado, escreva no documento, espere 30 segundos, feche sem salvar, abra de novo e clique em "Restaurar esta versão"; depois clique em Salvar.
+E: Fica só uma linha de botões do editor, o botão Salvar está ligado logo após restaurar e o SEI salva o texto restaurado.
+### T210 – Ver diferenças sem travar a página (v0.31.3)
+F: Com uma versão salva neste computador, clique em "Ver diferenças" e role o documento com a janela aberta.
+E: As diferenças aparecem num painel à esquerda, sem escurecer a página; o documento rola normalmente; Esc ou "Fechar" fecham.
+### T211 – Aviso discreto ao lado do Salvar (v0.31.3)
+F: Com o salvamento automático ligado, escreva, espere 30 segundos e passe o mouse sobre o texto ao lado do botão Salvar.
+E: O texto é curto e pequeno (ex.: "Salvo neste computador hoje às…"); a frase completa aparece ao passar o mouse.
+### T212 – Erro de conexão explicado (v0.31.3)
+F: Com um documento aberto no editor e o salvamento automático ligado, recarregue a extensão (ou atualize-a) e espere 30 segundos.
+E: Ao lado do Salvar aparece "⚠ Salvamento automático com erro (clique para ver)"; ao clicar, a mensagem diz para fechar e abrir o editor de novo, sem texto em inglês.
