@@ -67,8 +67,8 @@ function tratarRecado (recado, remetente) {
     case 'minutaVerificar': return minutaNoEditor(remetente, false)
     case 'minutaRemover': return minutaNoEditor(remetente, true)
     // v0.23.0 (spec data-documento): data de hoje no Ofício e na Portaria.
-    case 'dataVerificar': return dataNoEditor(remetente, false)
-    case 'dataAtualizar': return dataNoEditor(remetente, true)
+    case 'dataVerificar': return dataNoEditor(remetente, false, recado.titulo)
+    case 'dataAtualizar': return dataNoEditor(remetente, true, recado.titulo)
     // v0.24.0 (spec tabelas-editor): tabelas no editor (recortar e colar, margens).
     case 'tabelasPreparar': return tabelasNoEditor(remetente, recado)
     // v0.25.0 (spec numeracao-edital): números longos dos itens de edital.
@@ -584,22 +584,26 @@ async function conferirNoEditor (remetente, recado) {
   return { ok: true, ...conferido }
 }
 
-// v0.23.0 (spec data-documento): acha a data do Ofício ou da Portaria; com "trocar", põe a de hoje só nessa
-// seção e confere de novo. Nunca salva. Devolve { ok, erro, passou, data, nova }.
-async function dataNoEditor (remetente, trocar) {
+// v0.23.0 (spec data-documento): data do Ofício e da Portaria. v0.26.9 (spec conferir-documento, etapa 8):
+// confere a data de todo documento (mês ou ano errado, dia que não chegou, fora do padrão; no Ofício e na
+// Portaria também um dia que já passou). Com "trocar", corrige só essa data e confere de novo. Nunca salva.
+// Devolve { ok, erro, conferido, nova }.
+async function dataNoEditor (remetente, trocar, titulo) {
   const regras = globalThis.ExtensaoIFTO.dataDocumento
   const rodar = rodarNoEditor(remetente)
   const hoje = new Date()
+  const conferir = secoes => regras.conferirData(secoes, hoje, { passouConta: regras.ehOficioOuPortaria(titulo || '') })
   const lido = await rodar(globalThis.ExtensaoIFTO.editorLer)
   if (!lido.ok) return { ok: false, erro: lido.erro }
-  const secao = regras.secaoDaData(lido.secoes)
-  const data = secao && regras.acharData(secao.html)
-  const passou = regras.dataPassou(data, hoje)
-  if (!trocar || !passou) return { ok: true, passou, data: data ? regras.dataCurta(data) : '' }
-  const gravado = await rodar(globalThis.ExtensaoIFTO.editorGravar, [{ [secao.nome]: regras.trocarData(secao.html, hoje) }])
+  const conferido = conferir(lido.secoes)
+  if (!trocar || !conferido || conferido.certo) return { ok: true, conferido }
+  const secao = lido.secoes.find(outra => outra.nome === conferido.secao)
+  const novo = secao && regras.corrigirData(secao.html, conferido)
+  if (!novo) return { ok: false, erro: 'Não achei a data no texto do editor.' }
+  const gravado = await rodar(globalThis.ExtensaoIFTO.editorGravar, [{ [secao.nome]: novo }])
   if (!gravado.ok) return { ok: false, erro: gravado.erro }
   const depois = await rodar(globalThis.ExtensaoIFTO.editorLer)
-  const conferida = depois.ok && depois.secoes.find(outra => outra.nome === secao.nome)
-  if (!conferida || regras.dataPassou(regras.acharData(conferida.html), hoje)) return { ok: false, erro: 'O editor não ficou com a data nova.' }
-  return { ok: true, passou: false, nova: regras.dataPorExtenso(hoje) }
+  const agora = depois.ok ? conferir(depois.secoes) : null
+  if (!depois.ok || (agora && !agora.certo && agora.texto === conferido.texto)) return { ok: false, erro: 'O editor não ficou com a data nova.' }
+  return { ok: true, conferido: agora, nova: conferido.nova }
 }

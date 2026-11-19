@@ -51,7 +51,7 @@ test('entrada com SerproID no Gov.br começa desligada (v0.21.3)', () => {
 })
 
 test('v0.26.0: conferências do documento ligadas e lista de unidades vazia, sem mexer no padrão', () => {
-  for (const chave of ['conferirProcesso', 'conferirTimbre', 'conferirRodape', 'espacamentoDocumento']) assert.equal(PADROES[chave], true)
+  for (const chave of ['conferirProcesso', 'conferirTimbre', 'conferirRodape', 'conferirData', 'espacamentoDocumento']) assert.equal(PADROES[chave], true)
   const lida = comPadroes({})
   assert.deepEqual(lida.unidades, [])
   lida.unidades.push({ sigla: 'X' })

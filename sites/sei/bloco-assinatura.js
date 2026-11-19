@@ -1,5 +1,5 @@
 // v0.26.6 (spec conferir-documento, D2/D16): Bloco de assinatura. Antes de o SEI assinar, lê os documentos que
-// vão ser assinados e, se algum tiver o número do processo errado, mostra uma janela só com todos eles
+// vão ser assinados e, se algum tiver o número do processo (v0.26.9: ou a data) errado, mostra uma janela só com todos eles
 // ("Assinar mesmo assim?"). Vale para as duas telas do SEI:
 // - "Blocos de Assinatura" (acao=bloco_assinatura_listar): ícone de assinar de um bloco e o botão "Assinar"
 //   com blocos marcados (lê a página "Documentos do Bloco" de cada um);
@@ -10,7 +10,7 @@
 (async function () {
   const { configuracoes, conferirDocumento: regras, janelaAssinar, seiPedidos } = globalThis.ExtensaoIFTO
   const opcoes = await configuracoes.lerConfiguracoes()
-  if (!opcoes.conferirProcesso || !seiPedidos) return
+  if ((!opcoes.conferirProcesso && !opcoes.conferirData) || !seiPedidos) return
   const naListaDeBlocos = /[?&]acao=bloco_assinatura_listar/.test(location.href)
   const tempo = ms => new Promise((resolve, recusar) => setTimeout(() => recusar(new Error('tempo')), ms))
 
@@ -19,7 +19,7 @@
   function conferirDocumento (link) {
     if (!lidos.has(link)) {
       const leitura = Promise.race([seiPedidos.pedir(link), tempo(20000)])
-        .then(({ html }) => ({ conferido: regras.conferirProcesso([{ nome: 'pagina', html }]), numero: regras.numeroSeiDoDocumento(html) }))
+        .then(({ html }) => ({ problemas: regras.problemasParaAssinar(html, opcoes, new Date()), numero: regras.numeroSeiDoDocumento(html) }))
         .catch(() => null)
       lidos.set(link, leitura)
     }
@@ -67,10 +67,10 @@
     } catch (erro) {}
     document.documentElement.style.cursor = ''
     conferindo = false
-    const errados = resultados.filter(r => r && r.conferido && !r.conferido.certo)
+    const errados = resultados.filter(r => r && r.problemas && r.problemas.length)
     if (errados.length) {
-      const linhas = errados.map(r => `Documento ${r.numero || '?'}: está no processo ${r.conferido.processo}, mas o texto diz ${r.conferido.escrito}`)
-      const titulo = errados.length === 1 ? 'Este documento do bloco está com o número do processo errado. Assinar mesmo assim?' : 'Estes documentos do bloco estão com o número do processo errado. Assinar mesmo assim?'
+      const linhas = errados.map(r => `Documento ${r.numero || '?'}: ${r.problemas.join(' ')}`)
+      const titulo = errados.length === 1 ? 'Este documento do bloco tem erro. Assinar mesmo assim?' : 'Estes documentos do bloco têm erros. Assinar mesmo assim?'
       if (await janelaAssinar.perguntar(titulo, linhas, 'Não, corrigir antes') !== 'assinar') return
     }
     liberado = true

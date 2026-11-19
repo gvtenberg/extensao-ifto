@@ -68,8 +68,25 @@ test('v0.26.2: documento assinado', () => {
 })
 
 test('v0.26.3: pergunta antes de assinar com os dois números', () => {
-  assert.equal(c.perguntaAntesDeAssinar({ processo: '23236.018761/2026-05', escrito: '23236.000001/2025-11' }),
-    'O número do processo está errado (documento no processo 23236.018761/2026-05, texto diz 23236.000001/2025-11). Assinar mesmo assim?')
+  assert.equal(c.fraseDoProcesso({ processo: '23236.018761/2026-05', escrito: '23236.000001/2025-11' }),
+    'Número do processo errado: o documento está no processo 23236.018761/2026-05, mas o texto diz 23236.000001/2025-11.')
+  assert.equal(c.perguntaAntesDeAssinar(['a']), 'Este documento tem um erro. Assinar mesmo assim?')
+  assert.equal(c.perguntaAntesDeAssinar(['a', 'b']), 'Este documento tem erros. Assinar mesmo assim?')
+})
+
+test('v0.26.9: antes de assinar, número do processo e data errada (não a data só fora do padrão)', () => {
+  const hoje = new Date(2026, 10, 18)
+  const ref = '<p>Referência: Processo nº 23236.018761/2026-05</p>'
+  const doc = (processo, data) => `<p>Palmas, ${data}.</p><p>Processo nº: ${processo}</p><p>Texto</p>` + ref
+  const tudo = { conferirProcesso: true, conferirData: true }
+  assert.deepEqual(c.problemasParaAssinar(doc('23236.018761/2026-05', '18 de novembro de 2026'), tudo, hoje), [])
+  assert.deepEqual(c.problemasParaAssinar(doc('23236.018761/2026-05', '06 de novembro de 2026'), tudo, hoje), [])
+  const dois = c.problemasParaAssinar(doc('23236.000001/2025-11', '18 de outubro de 2026'), tudo, hoje)
+  assert.equal(dois.length, 2)
+  assert.match(dois[1], /^Data errada: o texto diz 18 de outubro de 2026/)
+  assert.equal(c.problemasParaAssinar(doc('23236.000001/2025-11', '18 de outubro de 2026'), { conferirData: true }, hoje).length, 1)
+  const assinado = doc('23236.018761/2026-05', '18 de outubro de 2026') + '<p>Documento assinado eletronicamente por Fulano</p>'
+  assert.deepEqual(c.problemasParaAssinar(assinado, tudo, hoje), [])
 })
 
 test('v0.26.4: número SEI do documento e "Assinar mesmo assim" só no dia', () => {

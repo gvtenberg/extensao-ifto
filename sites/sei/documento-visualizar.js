@@ -39,6 +39,17 @@
       botaoDoEditor(caixa)
     }
   }
+  // v0.26.9 (etapa 8): data com mês ou ano errado, de um dia que não chegou ou fora do padrão (só sem assinatura).
+  if (configuracoes.conferirData && globalThis.ExtensaoIFTO.dataDocumento) {
+    const data = globalThis.ExtensaoIFTO.dataDocumento.conferirData(secoes, new Date())
+    if (data && !data.certo) {
+      const caixa = caixaEditor.criarCaixa('conferir-data', 'Confira a data do documento:', 'Abrir o editor para corrigir')
+      const lista = caixaEditor.criar('ul')
+      for (const problema of data.problemas) lista.append(caixaEditor.criar('li', { textContent: problema }))
+      caixa.botao.before(lista)
+      botaoDoEditor(caixa)
+    }
+  }
   if (!configuracoes.conferirTimbre && !configuracoes.conferirRodape) return
   const sigla = regras.siglaDaUnidade(await caixaEditor.unidadeAberta())
   if (!regras.ehUnidadePalmas(sigla)) return

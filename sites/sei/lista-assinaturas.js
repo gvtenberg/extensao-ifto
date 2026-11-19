@@ -149,12 +149,12 @@
   }
 
   // v0.26.4 (spec conferir-documento, D2): depois de separar os documentos do intervalo, lê cada um e mostra
-  // numa janela só os que estão com o número do processo errado. "Assinar mesmo assim": não pergunta de novo
+  // numa janela só os que estão com o número do processo errado (v0.26.9: ou a data errada). "Assinar mesmo assim": não pergunta de novo
   // por eles hoje. "Não": a janela de cada documento aparece de novo ao assinar. Documento que não deu para
   // ler (SEI lento) fica de fora: nunca trava a lista.
   async function conferirProcessosDoIntervalo (novos, documentos) {
     const { conferirDocumento: conferir, janelaAssinar, seiPedidos } = globalThis.ExtensaoIFTO
-    if (!opcoes.conferirProcesso || !conferir || !janelaAssinar || !seiPedidos) return
+    if ((!opcoes.conferirProcesso && !opcoes.conferirData) || !conferir || !janelaAssinar || !seiPedidos) return
     const numeros = new Set(novos.map(novo => novo.documento))
     const errados = []
     for (const doc of documentos) {
@@ -163,13 +163,13 @@
       try {
         const limite = new Promise((resolve, recusar) => setTimeout(() => recusar(new Error('tempo')), 20000))
         const { html } = await Promise.race([seiPedidos.pedir(doc.link), limite])
-        const conferido = conferir.conferirProcesso([{ nome: 'pagina', html }])
-        if (conferido && !conferido.certo) errados.push({ numero, rotulo: doc.rotulo, conferido })
+        const problemas = conferir.problemasParaAssinar(html, opcoes, new Date())
+        if (problemas.length) errados.push({ numero, rotulo: doc.rotulo, problemas })
       } catch (erro) {}
     }
     if (!errados.length) return
-    const linhas = errados.map(e => `${e.rotulo}: está no processo ${e.conferido.processo}, mas o texto diz ${e.conferido.escrito}`)
-    const resposta = await janelaAssinar.perguntar(errados.length === 1 ? 'Este documento da lista está com o número do processo errado:' : 'Estes documentos da lista estão com o número do processo errado:', linhas, 'Não, corrigir antes')
+    const linhas = errados.map(e => `${e.rotulo}: ${e.problemas.join(' ')}`)
+    const resposta = await janelaAssinar.perguntar(errados.length === 1 ? 'Este documento da lista tem erro:' : 'Estes documentos da lista têm erros:', linhas, 'Não, corrigir antes')
     if (resposta !== 'assinar') return
     const navegador = globalThis.browser || globalThis.chrome
     const { assinarAceitos } = await navegador.storage.local.get('assinarAceitos')

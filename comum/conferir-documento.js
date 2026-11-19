@@ -125,9 +125,26 @@
     return `O documento está no processo ${conferido.processo}, mas o texto diz ${conferido.escrito}.`
   }
 
-  // v0.26.3 (D2): pergunta antes de assinar.
-  function perguntaAntesDeAssinar (conferido) {
-    return `O número do processo está errado (documento no processo ${conferido.processo}, texto diz ${conferido.escrito}). Assinar mesmo assim?`
+  // v0.26.3 (D2): pergunta antes de assinar. v0.26.9 (etapa 8): recebe a lista de problemas do documento
+  // (número do processo e data), mostrados como linhas na janela.
+  function perguntaAntesDeAssinar (problemas) {
+    return (problemas.length === 1 ? 'Este documento tem um erro.' : 'Este documento tem erros.') + ' Assinar mesmo assim?'
+  }
+  const fraseDoProcesso = conferido => `Número do processo errado: o documento está no processo ${conferido.processo}, mas o texto diz ${conferido.escrito}.`
+
+  // v0.26.9 (etapa 8): o que para a assinatura de um documento (frases; lista vazia = nada errado): número do
+  // processo e data errada (mês ou ano, dia que não chegou). Data só fora do padrão não para; documento já
+  // assinado por alguém não tem a data conferida (pedido do usuário, 18/11/2026).
+  const regrasDaData = () => typeof module !== 'undefined' && module.exports ? require('./data-documento.js') : (raiz.ExtensaoIFTO || {}).dataDocumento
+  function problemasParaAssinar (html, opcoes = {}, hoje = new Date()) {
+    const secoes = [{ nome: 'pagina', html }]
+    const problemas = []
+    const processo = opcoes.conferirProcesso ? conferirProcesso(secoes) : null
+    if (processo && !processo.certo) problemas.push(fraseDoProcesso(processo))
+    const datas = regrasDaData()
+    const data = opcoes.conferirData && datas && !estaAssinado(html) ? datas.conferirData(secoes, hoje) : null
+    if (data && data.errada) problemas.push(datas.fraseAntesDeAssinar(data))
+    return problemas
   }
 
   // ---- v0.26.5: timbre e rodapé (unidades do Campus Palmas; D3, D4, D11, D12, D14) ----
@@ -328,7 +345,7 @@
   // Documento já assinado: a página do documento mostra "Documento assinado eletronicamente por".
   const estaAssinado = html => /assinado\s+eletronicamente\s+por/i.test(textoDoHtml(html))
 
-  const api = { siglaDaUnidade, ehUnidadePalmas, limparUnidade, limparUnidades, acharUnidade, textoDoHtml, formatarProcesso, mesmoProcesso, processoDaReferencia, linhaDoProcesso, conferirProcesso, avisoDoProcesso, perguntaAntesDeAssinar, corrigirProcesso, estaAssinado, numeroSeiDoDocumento, aceitar, foiAceito, documentosDoBloco, idDoItemDoBloco, TIMBRE_FIXO, linhasDoTimbre, timbreEsperado, conferirTimbre, avisosDoTimbre, corrigirTimbre, secaoCom, ehDoTimbre, ehDoRodape, formatarTelefone, conferirRodape, rodapeEsperado, corrigirRodape, linhasDoSetor }
+  const api = { siglaDaUnidade, ehUnidadePalmas, limparUnidade, limparUnidades, acharUnidade, textoDoHtml, formatarProcesso, mesmoProcesso, processoDaReferencia, linhaDoProcesso, conferirProcesso, avisoDoProcesso, perguntaAntesDeAssinar, fraseDoProcesso, problemasParaAssinar, corrigirProcesso, estaAssinado, numeroSeiDoDocumento, aceitar, foiAceito, documentosDoBloco, idDoItemDoBloco, TIMBRE_FIXO, linhasDoTimbre, timbreEsperado, conferirTimbre, avisosDoTimbre, corrigirTimbre, secaoCom, ehDoTimbre, ehDoRodape, formatarTelefone, conferirRodape, rodapeEsperado, corrigirRodape, linhasDoSetor }
   if (typeof module !== 'undefined' && module.exports) module.exports = api
   else raiz.ExtensaoIFTO = Object.assign(raiz.ExtensaoIFTO || {}, { conferirDocumento: api })
 })(globalThis)

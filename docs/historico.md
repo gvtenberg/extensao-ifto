@@ -2,6 +2,7 @@
 
 One or two lines per version, with the date (dd/mm/yyyy). Number 0.STAGE.FIX.
 
+- v0.26.9 (18/11/2026): date check (spec conferir-documento, stage 8): unsigned documents get a warning when the date has the wrong month or year, is in the future or breaks the pattern ("Palmas, 1º de dezembro de 2026.": no leading zero, º only on day 1, lowercase month, final dot); found at the top, at the end of the body or in the title (Portaria, Edital); "Corrigir para …" in the editor (the old Ofício/Portaria date box now does this for every type); wrong date also stops signing (tree, editor, signature list, Bloco). New switch "Data do documento". T150–T157.
 - v0.26.8 (18/11/2026): all notices in the editor and on the document page (MINUTA, date, numbering, process number, timbre, footer) in one window at the bottom right, fixed on screen and draggable by its top bar, one section with its own button per notice (T112, T117, T122, T133, T140, T142 comments).
 - v0.26.7 (18/11/2026): footer check (T142): with no phone/e-mail saved for the unit, any Campus Palmas phone (63 3236-4000 to 4099) and e-mail (palmas@ or sector.palmas@ifto.edu.br) count as right, and "Corrigir rodapé" keeps them; with a saved phone/e-mail, compared with it.
 - v0.26.6 (18/11/2026): Bloco de assinatura: before signing a whole block (list of blocks), selected documents or one document (inside the block) or from the document window, the documents are read and the wrong ones shown in one window "Assinar mesmo assim?" (D16 closed).

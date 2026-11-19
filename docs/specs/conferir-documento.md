@@ -35,6 +35,10 @@ People copy an old document and forget to fix the "Processo nº:" line, the sect
 - [x] D15 – Copy signer names (18/11/2026, user): in SEI 5 the box "Documento assinado eletronicamente por …" cannot be selected; the extension makes it selectable on the document page (own switch, on by default). Nothing written to the SEI; the SEI's PDF is not changed.
 - [x] D16 – Order of work (18/11/2026, user): stages 1–6 now; stage 7 only after T123 is answered. Stage 5: the Bloco de assinatura came later (v0.26.6), after the user saved its three screens.
 - [x] D17 – Edital/Minuta title line with the process as an SEI link (18/11/2026, user): **only warn** (no fix button): the warning says to delete the number and insert the right SEI link.
+- [x] D18 – Date check (18/11/2026, user): wrong = month or year different from today, or a day that has not come yet (a day earlier in the same month is fine; Ofício/Portaria keep the v0.23.0 rule: any past day). Also warn when the date breaks the pattern "Palmas, 31 de agosto de 2026." (no leading zero, "1º" on day 1, º only on day 1, lowercase month, final dot), with a "Corrigir" button in the editor.
+- [x] D19 – Where (18/11/2026, user): document page, editor and before signing (all four places of D2). Only a **wrong** date stops signing; a date only out of pattern does not.
+- [x] D20 – Signed documents (18/11/2026, user): the date is ignored; only unsigned documents, compared with today.
+- [x] D21 – Spacing around the date (18/11/2026, user): same fix as stage 7 (tight sections); gaps body → date → signer's name are part of stage 7.
 - [x] D10 – The four new switches (process number, timbre, footer, spacing) start **on**.
 
 ## 4. Decided rules
@@ -50,6 +54,7 @@ People copy an old document and forget to fix the "Processo nº:" line, the sect
 - Timbre and footer: warning lists what differs; button "Corrigir timbre" / "Corrigir rodapé" in the editor; nothing changes without the click.
 - **"Minhas unidades"** in the settings: several units (some people have 10), each with SEI sigla (e.g. CGOC/PAL/REI/IFTO), phone, e-mail and sector lines. Saved only in the browser.
 - **Spacing (every type, 18/11/2026):** in the editor the extension measures the gap between the last line of each section and the first line of the next one; if it is under about half a line, it adds one blank line there (CSS rule for that pair of styles). Gaps inside a section (e.g. between timbre lines) are not touched. Where people already put an empty spacer paragraph, the gap is big enough and nothing is added. In the Despacho this gives: after the last timbre line, the document number, the date, the "Processo/Interessado/Assunto" block, and before the signer's name. Recognized by a comment like `extensao-ifto: espacamento` (as v0.25.0). Coexists with the numbering and MINUTA style blocks.
+- **Date (v0.26.9, D18–D20):** the document date is the "Cidade, D de mês de AAAA." line (top, or end of the body where some sectors put it) or the end of the title in the first 15 paragraphs, when the part before "nº" is in capitals ("PORTARIA … nº 1/2026, de 18 de novembro de 2026", "EDITAL Nº 75/2026…, DE 18 DE NOVEMBRO DE 2026"); dates cited in the body never count. Fix: today's date if wrong, otherwise the same date in the pattern; capitals of titles kept; never saves. Rules in `comum/data-documento.js`; the editor box is the v0.23.0 one (`sites/sei/data-documento.js`), now for every type.
 - Every feature has its own switch in the settings (all on by default) and works in every unit (timbre/footer: Palmas units only).
 
 ## 5. What changes
@@ -74,7 +79,9 @@ People copy an old document and forget to fix the "Processo nº:" line, the sect
 - [x] Stage 4 – Pre-sign window: "Assinar Documento" in the tree and "Assinar" in the editor (v0.26.3). Critical test (signs in the SEI).
 - [x] Stage 5 – Pre-sign window in the signature list (v0.26.4) and in the Bloco de assinatura (v0.26.6: list of blocks, documents of the block, document window). Critical tests.
 - [x] Stage 6 – Timbre and footer: warnings, "Corrigir" buttons, "Usar este timbre como padrão da unidade" (v0.26.5).
-- [ ] Stage 7 – Spacing in every type (gap detection, style block, automatic, "Desfazer") — after T123 (v0.26.6). Needs saved editor pages of Ofício and Memorando too. Critical test: saved Despacho and PDF; plus one test with an Ofício.
+- [ ] Stage 7 – Spacing in every type (gap detection, style block, automatic, "Desfazer"), including the gaps last body line → date → signer's name when the date is at the end (Atestes, D21) — after T123 (v0.26.6). Needs saved editor pages of Ofício and Memorando too. Critical test: saved Despacho and PDF; plus one test with an Ofício.
+
+- [x] Stage 8 – Date of the document (D18–D21): warning on the document page and in the editor, "Corrigir para …", stop before signing, switch "Data do documento" (v0.26.9). Tests T150–T157 (T154 critical).
 
 ## 6b. Analysis of the saved pages (18/11/2026)
 
@@ -83,6 +90,7 @@ Saved documents in `ferramentas-de-teste/paginas-sei/` (development computer):
 - Timbre: Ofício 9/2026/**CGOC** has the GISE lines (copied); Despacho 67/2026/CGOC and Portaria 3390422 (CGOC number) have "Reitoria" without "Campus Palmas"; Ateste de serviços (SEI-ateste-nota-servicos) has no sector lines; Minuta 3384558 has an extra "Reitoria" line; Edital 3390039 has no "Gabinete da Direção-Geral". Invisible characters in some timbre lines.
 - Footer: Reitoria footer (reitoria@, 4000) in Despacho 3390347, Despacho 67/CGOC, Portaria 3390422, Ateste de serviços; Ofício 9/CGOC has GISE e-mail and phone 4023; Ateste de serviços has "CEP Palmas/TO" (CEP number missing). Folhas de encaminhamento (CGOC) are right (only formatting differs).
 - Spacing: header lines and "IFTO_Assinatura" use line-height 10% and the "sem espaço" styles have no margin, so number/date/process/recipient and the signer's name touch. Many documents already have empty spacer paragraphs (Ofício, Atestes, Editais, Portaria).
+- Date (18/11/2026): Despacho, Ofício, Folha de encaminhamento: right-aligned line at the top, under the number (`IFTO_Alin_direita`). Atestes: at the end of the body, right before the signer (`IFTO_Alin_direita_sem_espaço`, line-height 100%, no margin; in the materials ateste body, date and name touch). Portaria and Edital: end of the title. Ateste de serviços: "09 de setembro" signed on 09/11 (wrong month, leading zero); Folha 1: "06 de novembro" (leading zero).
 - Signature box: `unselectable="on"` and `user-select:none` (D15).
 
 ## 7. Manual tests

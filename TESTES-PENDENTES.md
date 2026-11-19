@@ -416,3 +416,38 @@ E: Sem cadastro, não aparece aviso sobre telefone nem e-mail (e "Corrigir rodap
 ### T149 – Todos os avisos numa janela só (v0.26.8)
 F: Abra no editor um documento com número do processo errado e rodapé errado (num edital, também a marca MINUTA); arraste a janela pela barra de cima e role a página.
 E: Os avisos aparecem juntos numa janela no canto inferior direito, cada um com seu botão e seu ×; a janela vai para onde foi arrastada e fica parada na tela ao rolar.
+
+## Data do documento (v0.26.9)
+> antes de testar: use documentos ainda não assinados (pode criar um Despacho de teste e não assinar).
+
+### T150 – Aviso de data com mês errado na página do documento (v0.26.9)
+F: Num documento não assinado, ponha a data com o mês passado (ex.: "Palmas, 18 de outubro de 2026."), salve e clique no documento na árvore do processo.
+E: Na janela de avisos aparece "Confira a data do documento", dizendo que o mês ou o ano está errado, com o botão "Abrir o editor para corrigir".
+
+### T151 – Corrigir a data no editor (v0.26.9)
+F: Abra no editor o mesmo documento, clique no botão "Corrigir para …" do aviso da data e depois em Salvar.
+E: A data vira a de hoje, no padrão ("Palmas, 18 de novembro de 2026."), e o aviso não aparece mais ao abrir de novo.
+
+### T152 – Data fora do padrão (v0.26.9)
+F: Num documento não assinado, escreva um dia deste mês com zero na frente e sem o ponto (ex.: "Palmas, 05 de novembro de 2026") e abra o editor.
+E: O aviso pede o dia sem o zero e o ponto final; "Corrigir para …" deixa "Palmas, 5 de novembro de 2026." (o dia continua o mesmo).
+
+### T153 – Data no fim do texto (Ateste) (v0.26.9)
+F: Num Ateste não assinado com a data no fim do texto, antes do nome de quem assina, ponha um mês errado.
+E: O aviso da data aparece do mesmo jeito, na página do documento e no editor.
+
+### T154 – Parar antes de assinar com a data errada (v0.26.9) (Crítico)
+F: Com a data de mês errado, clique em "Assinar Documento" na barra do SEI; depois abra o editor e clique em "Assinar".
+E: Antes de assinar aparece "Este documento tem um erro. Assinar mesmo assim?" com a data errada; "Não, corrigir antes" abre o editor. Só o zero na frente do dia não para a assinatura.
+
+### T155 – Documento assinado não tem aviso de data (v0.26.9)
+F: Abra um documento já assinado que tenha a data de outro mês.
+E: Nenhum aviso sobre a data.
+
+### T156 – Lista de assinaturas e Bloco com data errada (v0.26.9)
+F: Ponha um documento com data errada num Bloco de assinatura (ou na lista de assinaturas da extensão) e clique em assinar.
+E: A janela mostra o documento com "Data errada: …" e pergunta se quer assinar mesmo assim.
+
+### T157 – Desligar a conferência da data (v0.26.9)
+F: Nas configurações > Documentos do SEI, desmarque "Data do documento" e abra um documento com data errada.
+E: Nenhum aviso de data; ao marcar de novo, o aviso volta.

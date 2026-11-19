@@ -2,7 +2,7 @@
 
 **Sections**: 1. Goal · 2. Out of scope · 3. Decisions to confirm · 4. Decided rules · 5. What changes · 6. Stages · 7. Manual tests
 
-- **Status:** stage 1 coded (v0.23.0), waiting for the critical test T114
+- **Status:** stage 1 coded (v0.23.0), waiting for the critical test T114. v0.26.9: the box became the date check of every type (`conferir-documento.md`, stage 8): button "Corrigir para …", switch "Data do documento" (answers D4).
 - **Requested on:** 18/11/2026
 - **Planned version:** 0.23.0
 

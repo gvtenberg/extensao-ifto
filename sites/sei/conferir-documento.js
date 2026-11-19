@@ -5,9 +5,9 @@
 // timbre como padrão da unidade". Nunca salva: a pessoa confere e clica em Salvar.
 (async function () {
   if (window.top !== window) return
-  const { configuracoes, caixaEditor, conferirDocumento: regras, janelaAssinar } = globalThis.ExtensaoIFTO
+  const { configuracoes, caixaEditor, conferirDocumento: regras, janelaAssinar, dataDocumento } = globalThis.ExtensaoIFTO
   const opcoes = await configuracoes.lerConfiguracoes()
-  if (!opcoes.conferirProcesso && !opcoes.conferirTimbre && !opcoes.conferirRodape) return
+  if (!opcoes.conferirProcesso && !opcoes.conferirTimbre && !opcoes.conferirRodape && !opcoes.conferirData) return
   const sigla = regras.siglaDaUnidade(await caixaEditor.unidadeAberta())
   const verificar = () => caixaEditor.pedirAoFundo('conferirVerificar', { sigla })
   const corrigir = qual => caixaEditor.pedirAoFundo('conferirCorrigir', { sigla, qual })
@@ -19,7 +19,7 @@
   let liberado = false
   let conferindo = false
   async function antesDeAssinar (evento) {
-    if (liberado || !opcoes.conferirProcesso) return
+    if (liberado || (!opcoes.conferirProcesso && !opcoes.conferirData)) return
     const botao = botaoAssinar()
     if (!botao) return
     evento.preventDefault()
@@ -27,11 +27,17 @@
     if (conferindo) return
     conferindo = true
     const limite = new Promise(resolve => setTimeout(() => resolve(null), 10000))
-    const agora = await Promise.race([verificar(), limite])
+    // v0.26.9 (etapa 8): também a data errada (a mesma conferência da caixa da data, sites/sei/data-documento.js).
+    const [agora, data] = await Promise.all([
+      Promise.race([verificar(), limite]),
+      opcoes.conferirData ? Promise.race([caixaEditor.pedirAoFundo('dataVerificar', { titulo: document.title }), limite]) : null
+    ])
     conferindo = false
-    const errado = agora && agora.ok && agora.processo && !agora.processo.certo ? agora.processo : null
-    if (errado) {
-      const resposta = await janelaAssinar.perguntar(regras.perguntaAntesDeAssinar(errado), [], 'Não, corrigir antes')
+    const problemas = []
+    if (opcoes.conferirProcesso && agora && agora.ok && agora.processo && !agora.processo.certo) problemas.push(regras.fraseDoProcesso(agora.processo))
+    if (data && data.ok && data.conferido && data.conferido.errada && dataDocumento) problemas.push(dataDocumento.fraseAntesDeAssinar(data.conferido))
+    if (problemas.length) {
+      const resposta = await janelaAssinar.perguntar(regras.perguntaAntesDeAssinar(problemas), problemas, 'Não, corrigir antes')
       if (resposta !== 'assinar') return
     }
     liberado = true
