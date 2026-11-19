@@ -485,6 +485,8 @@
   // v0.18.5 (pedido de 18/11/2026): com mais de uma nota, cada uma tem "Consultar esta nota", todas marcadas;
   // a nota desmarcada (ex.: cancelada) não ganha Sicaf, Consulta nem Anexo. A escolha não fica guardada.
   function janelaDasNotas (notas, resultado) {
+    // v0.29.3 (T160, T173): a caixa de marcar aparece sempre, até com uma nota só, para ficar claro que dá
+    // para tirar uma nota da busca.
     const escolher = notas.length > 1
     for (const nota of notas) if (nota.marcada === undefined) nota.marcada = true
     const marcadas = () => notas.filter(nota => nota.marcada)
@@ -498,11 +500,11 @@
       const botao = aberta && aberta.botoes[1]
       if (botao) { botao.textContent = textoDoBotao(); botao.className = 'acao principal'; botao.disabled = !marcadas().length }
     }
-    const cartoes = notas.map(nota => cartaoDaNota(nota, resultado, escolher ? aoMarcar : null))
+    const cartoes = notas.map(nota => cartaoDaNota(nota, resultado, aoMarcar))
     aberta = janela.abrir({
       titulo: regras.textoDoAviso(notas.length),
       conteudo: [
-        criar('p', { className: 'apoio', textContent: 'Notas depois da última Folha de Encaminhamento, conferidas com o ateste.' + (escolher ? ' Clique numa nota para desmarcá-la (por exemplo, uma nota cancelada).' : '') }),
+        criar('p', { className: 'apoio', textContent: 'Notas depois da última Folha de Encaminhamento, conferidas com o ateste. Desmarque a nota que não deve entrar na busca (por exemplo, uma nota cancelada).' }),
         ...cartoes,
         alerta
       ],
@@ -538,14 +540,15 @@
   }
 
   function cartaoDaNota (nota, { cnpjsComSicaf, raizesComConsulta }, aoMarcar) {
-    const titulo = `Nota ${nota.numero || '?'} – ${nota.fornecedor || 'fornecedor'}` + (nota.sei ? ` (SEI ${nota.sei})` : '')
+    // v0.29.3 (T160): título sem o número SEI (fica na dica do "Ver a nota") e o CNPJ numa linha só.
+    const titulo = `Nota ${nota.numero || '?'} – ${nota.fornecedor || 'fornecedor'}`
     // v0.26.10 (pedido de 19/11/2026, T76): cartão compacto (caixa de marcar na linha do título) para caberem
     // umas 10 notas sem rolar; um clique em qualquer parte livre do cartão marca ou desmarca a nota.
     const cabeca = [criar('h2', { textContent: titulo }), botaoVerNota(nota)]
     const partes = [criar('div', { className: 'linha' }, cabeca)]
     const cartao = criar('div', { className: 'cartao compacto' })
     if (aoMarcar) {
-      const marca = criar('input', { type: 'checkbox', checked: nota.marcada, title: 'Consultar esta nota' })
+      const marca = criar('input', { type: 'checkbox', className: 'marcar', checked: nota.marcada, title: 'Marcada: entra na busca. Desmarcada: fica de fora.' })
       const mudar = () => { nota.marcada = marca.checked; cartao.classList.toggle('desmarcada', !marca.checked); aoMarcar() }
       marca.addEventListener('change', mudar)
       cartao.classList.toggle('desmarcada', !nota.marcada)
@@ -561,7 +564,7 @@
       const nome = 'cnpj-' + nota.id
       // v0.18.5: ao voltar à janela, o CNPJ digitado antes continua no campo.
       const digitado = nota.cnpjEscolhido && !nota.opcoes.includes(nota.cnpjEscolhido)
-      const outro = criar('input', { type: 'text', placeholder: 'Outro CNPJ', value: digitado ? regras.formatarCnpj(nota.cnpjEscolhido) : '' })
+      const outro = criar('input', { type: 'text', placeholder: nota.opcoes.length ? 'outro CNPJ' : 'digite ou cole o CNPJ', value: digitado ? regras.formatarCnpj(nota.cnpjEscolhido) : '' })
       const opcoes = nota.opcoes.map((cnpj, posicao) => {
         const marca = criar('input', { type: 'radio', name: nome, value: cnpj, checked: cnpj === nota.cnpjEscolhido })
         marca.addEventListener('change', () => { if (marca.checked) { nota.cnpjEscolhido = cnpj; outro.value = '' } })
@@ -573,9 +576,9 @@
         nota.cnpjEscolhido = achado && achado.valido ? achado.cnpj : null
         for (const marca of opcoes.map(rotulo => rotulo.firstChild)) marca.checked = false
       })
-      partes.push(criar('p', { textContent: 'Escolha o CNPJ do fornecedor:' }), ...opcoes, criar('label', {}, ['Outro (digite ou cole):', outro]))
+      partes.push(criar('div', { className: 'linha cnpj' }, ['CNPJ:', ...opcoes, outro]))
     } else {
-      partes.push(criar('p', { className: 'detalhe', textContent: 'CNPJ do fornecedor: ' + regras.formatarCnpj(nota.cnpj) }))
+      partes.push(criar('p', { className: 'detalhe', textContent: 'CNPJ: ' + regras.formatarCnpj(nota.cnpj) }))
     }
     for (const aviso of nota.avisos) partes.push(criar('p', { className: 'aviso ' + aviso.nivel, textContent: aviso.texto }))
     if (nota.cnpj && cnpjsComSicaf.has(nota.cnpj)) partes.push(criar('p', { className: 'aviso verde', textContent: 'Este fornecedor já tem Sicaf neste trecho do processo.' }))
@@ -586,7 +589,7 @@
 
   // v0.17.3: "Ver a nota" abre a nota ao lado da árvore, como o clique na árvore (a janela não tampa mais o SEI).
   function botaoVerNota (nota) {
-    const botao = criar('button', { type: 'button', className: 'pequeno', textContent: 'Ver a nota' })
+    const botao = criar('button', { type: 'button', className: 'pequeno', textContent: 'Ver a nota', title: nota.sei ? `Abrir a nota (SEI ${nota.sei})` : 'Abrir a nota' })
     botao.addEventListener('click', () => {
       let ancora = null
       try { ancora = quadroArvore.contentDocument.getElementById('anchor' + nota.id) } catch (erro) {}

@@ -52,7 +52,7 @@ test('Despacho: espaço depois do timbre, do número, da data, do "Processo" e a
   const plano = planejarEspacamento(despacho())
   assert.deepEqual(plano.lacunas.map(lacuna => lacuna.depois), [
     'DESPACHO Nº 367/2026/DEPPI/PAL/REI/IFTO', 'Palmas, 17 de novembro de 2026.', 'Processo nº: 23236.023147/2026-57',
-    'Ao Diretor de Administração', 'Giulliano Guimarães da Silva'
+    'Ao Diretor de Administração', 'Giulliano Guimarães da Silva', 'Quadra 310 Sul…'
   ])
   // Uma linha inteira (16px) entre as letras: 16 - 5 - 2 = 9px = 0,57em antes da caixa do processo.
   assert.equal(plano.lacunas[2].margem, 0.57)
@@ -61,12 +61,31 @@ test('Despacho: espaço depois do timbre, do número, da data, do "Processo" e a
   assert.ok(plano.bloco.endsWith('</style>'))
 })
 
-test('nada entre linhas da mesma seção, com linha em branco no meio, nem no rodapé', () => {
-  const plano = planejarEspacamento(despacho())
+test('nada entre linhas da mesma seção, com linha em branco no meio, nem dentro do rodapé', () => {
+  const documento = despacho()
+  documento.blocos.push(bloco(8, 'Rodapé', 'IFTO_Centralizado_rodape', 'CEP 77021-090'))
+  const plano = planejarEspacamento(documento)
   const depois = plano.lacunas.map(lacuna => lacuna.depois)
   assert.ok(!depois.includes('Assim, solicito as providências…'))
   assert.ok(!depois.includes('Em resposta ao processo em epígrafe…'))
-  assert.ok(!depois.includes('Quadra 310 Sul…'))
+  assert.ok(!depois.includes('CEP 77021-090'))
+})
+
+// v0.29.3 (T162): o "Separador de seção" do Despacho é uma linha em branco quase sem altura.
+test('linha em branco baixinha no meio não conta como espaço; linha em branco de verdade conta', () => {
+  posicoes = {}
+  const timbre = bloco(0, 'Cabeçalho', 'IFTO_Cabeçalho_Novo', 'Coordenação de Gestão Orçamentária e Contratos', { abaixo: 0 })
+  const separador = bloco(1, 'Separador de seção', 'IFTO_Alin_direita_sem_espaço', '')
+  const numero = bloco(2, 'Identificador', 'IFTO_padrao_Alin_Esquerda_sem_espaço', 'DESPACHO Nº 67/2026/CGOC/GAC/DAP/PAL/REI/IFTO', { acima: 0 })
+  Object.assign(timbre, { topo: 80, base: 100 })
+  Object.assign(numero, { topo: 103, base: 121 })
+  const documento = { blocos: [timbre, separador, numero], outras: [] }
+  const plano = planejarEspacamento(documento)
+  assert.deepEqual(plano.lacunas.map(lacuna => lacuna.depois), ['DESPACHO Nº 67/2026/CGOC/GAC/DAP/PAL/REI/IFTO'])
+  assert.equal(plano.lacunas[0].margem, 0.82)
+  assert.ok(plano.css.includes('p.IFTO_Alin_direita_sem_espa\\0000e7o+p.IFTO_padrao_Alin_Esquerda_sem_espa\\0000e7o{margin-top:0.82em'))
+  numero.topo = 118
+  assert.equal(planejarEspacamento(documento).lacunas.length, 0)
 })
 
 test('distância de meia linha ou mais não recebe espaço', () => {

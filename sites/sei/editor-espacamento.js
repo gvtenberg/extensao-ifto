@@ -56,6 +56,8 @@
       ...bloco,
       texto: textoDe(primeiro).slice(0, 200),
       textoFim: textoDe(ultimo).slice(0, 200),
+      topo: cima.alto,
+      base: baixo.baixo,
       acima: cima.alto - primeiro.getBoundingClientRect().top,
       abaixo: ultimo.getBoundingClientRect().bottom - baixo.baixo,
       margemTopo: Math.max(numero(estilo(primeiro).marginTop), embrulho ? numero(estilo(elemento).marginTop) : 0),

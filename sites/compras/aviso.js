@@ -99,6 +99,15 @@
     // A página pode avisar mais de uma vez que terminou de abrir: só uma tentativa por página.
     if (!globalThis.extensaoIftoAbrindoSicaf) {
       globalThis.extensaoIftoAbrindoSicaf = true
+      // v0.29.3 (T173): vai direto ao endereço do SICAF quando o login termina (o botão com o nome aparece; no
+      // máximo 15 segundos), saindo desta página como um clique, para o SICAF saber de onde a pessoa veio.
+      if (dados.direto) {
+        tentar(() => document.getElementById('avatar-dropdown-trigger'), 30).then(async () => {
+          await esperar(1000)
+          location.assign(dados.direto)
+        })
+        return
+      }
       // v0.21.6: se o SICAF não abrir em 20 segundos, o aviso diz onde clicar (antes ficava parado em "Abrindo…").
       abrirSicafPeloMenu().then(async abriu => {
         if (abriu) await esperar(20000)

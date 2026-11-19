@@ -39,6 +39,10 @@
     .cartao.compacto .aviso { padding: 3px 8px; font-size: 12px; }
     .cartao.compacto label.escolha { font-size: 13px; }
     .cartao.compacto button.pequeno { min-height: 22px; padding: 0 8px; font-size: 12px; }
+    /* v0.29.3 (T160): caixa de marcar maior e o CNPJ numa linha só */
+    .cartao.compacto input.marcar { width: 18px; height: 18px; margin: 0; flex: none; cursor: pointer; accent-color: #1E5E33; }
+    .cartao.compacto .linha.cnpj { flex-wrap: wrap; gap: 4px 10px; font-size: 13px; }
+    .cartao.compacto .linha.cnpj input[type="text"] { padding: 2px 6px; font-size: 13px; width: 19ch; }
     .corpo:has(> .cartao.compacto) { gap: 5px; }
     .cartao.clicavel { cursor: pointer; }
     .cartao.clicavel:hover { background: #F4F8F5; }

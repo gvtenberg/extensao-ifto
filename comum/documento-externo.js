@@ -98,14 +98,19 @@
   function tipoPeloNome (nomeDoArquivo, tipos, { regras = [], padrao = '' } = {}) {
     const semExtensao = String(nomeDoArquivo || '').replace(/\.[^./\\]{1,5}$/, '').replace(/_/g, ' ').replace(/\s+/g, ' ').trim()
     const alvo = semAcento(semExtensao)
+    // v0.29.3 (T170): mesmas letras de "alvo", mas com maiúsculas, para aceitar nomes juntos com maiúscula no
+    // meio ("ConsultaOptantes_…" → "Consulta", como o arquivo do Simples Nacional).
+    const comMaiusculas = String(semExtensao).normalize('NFD').replace(/[\u0300-\u036f]/g, '')
     const achar = nome => (tipos || []).find(tipo => semAcento(tipo) === semAcento(nome)) || null
     let melhor = null
     for (const tipo of tipos || []) {
       const t = semAcento(tipo)
       if (!t || !alvo.startsWith(t)) continue
-      // Depois do nome do tipo vem o fim ou algo que não é letra ("Nota Fiscal 123", "Sicaf-empresa").
+      // Depois do nome do tipo vem o fim, algo que não é letra ("Nota Fiscal 123", "Sicaf-empresa") ou uma
+      // maiúscula logo depois de minúscula ("ConsultaOptantes").
       const depois = alvo.charAt(t.length)
-      if (depois && /[a-z]/.test(depois)) continue
+      const juntoComMaiuscula = /[a-z]/.test(comMaiusculas.charAt(t.length - 1)) && /[A-Z]/.test(comMaiusculas.charAt(t.length))
+      if (depois && /[a-z]/.test(depois) && !juntoComMaiuscula) continue
       if (!melhor || t.length > semAcento(melhor).length) melhor = tipo
     }
     if (melhor) {

@@ -193,8 +193,13 @@ navegador.tabs.onRemoved.addListener(async idDaAba => {
 })
 
 // Cada página do Compras/SICAF que termina de abrir na aba da busca (ou SICAF aberto pelo menu).
+// v0.29.3 (T173): a Área de Trabalho é uma página que troca de endereço sem recarregar; a troca de endereço
+// também conta (só para ela), e a aba é tratada uma vez só até sair da Área de Trabalho.
+const areaEmAndamento = new Set()
 navegador.tabs.onUpdated.addListener(async (idDaAba, mudanca, aba) => {
-  if (mudanca.status !== 'complete' || !aba.url) return
+  if (mudanca.url && regras.paginaDoCompras(mudanca.url) !== 'areaDeTrabalho') areaEmAndamento.delete(idDaAba)
+  if (!aba.url) return
+  if (mudanca.status !== 'complete' && !(mudanca.url && regras.paginaDoCompras(mudanca.url) === 'areaDeTrabalho')) return
   if (simples.ehSiteDoSimples(aba.url)) {
     const tarefa = await lerTarefa()
     if (tarefa && tarefa.fase === 'simples' && idDaAba === tarefa.idAbaSicaf) {
@@ -207,7 +212,8 @@ navegador.tabs.onUpdated.addListener(async (idDaAba, mudanca, aba) => {
   const tarefa = await lerTarefa()
   if (!tarefa || tarefa.fase === 'simples') return
   if (idDaAba !== tarefa.idAbaSicaf) {
-    if (pagina !== 'consulta' && pagina !== 'sicaf') return
+    // v0.29.3 (T173, usuário 19/11/2026): durante a busca, a Área de Trabalho em qualquer aba também vai ao SICAF.
+    if (pagina !== 'consulta' && pagina !== 'sicaf' && pagina !== 'areaDeTrabalho') return
     // v0.21.6: o SICAF abriu em outra aba (pelo menu ou pela pessoa): tira o aviso "Abrindo o SICAF…" da anterior.
     if (tarefa.idAbaSicaf != null) {
       navegador.scripting.executeScript({ target: { tabId: tarefa.idAbaSicaf }, func: () => { const aviso = document.querySelector('[data-extensao-ifto="aviso-compras"]'); if (aviso) aviso.remove() } }).catch(() => {})
@@ -249,12 +255,14 @@ navegador.tabs.onUpdated.addListener(async (idDaAba, mudanca, aba) => {
     // SICAF na mesma aba; se o SICAF recusar e a aba voltar aqui, tenta pelo menu do usuário.
     // v0.26.10 (pedido de 19/11/2026, T94: o SICAF não abriu): espera 3 segundos a Área de Trabalho terminar
     // de entrar antes de ir ao SICAF, e tenta direto duas vezes antes do menu.
+    // v0.29.3 (T173, 3º pedido): a própria página abre o endereço do SICAF (como um clique nela) só depois de
+    // o login terminar (aparece o botão com o nome da pessoa); antes ia por fora, com tempo fixo de 3 segundos.
+    if (areaEmAndamento.has(idDaAba)) return
+    areaEmAndamento.add(idDaAba)
     if ((tarefa.idasDiretoAoSicaf || 0) < 2) {
       tarefa.idasDiretoAoSicaf = (tarefa.idasDiretoAoSicaf || 0) + 1
       await gravarTarefa(tarefa)
-      await new Promise(pronto => setTimeout(pronto, 3000))
-      const agora = await navegador.tabs.get(idDaAba).catch(() => null)
-      if (agora && regras.paginaDoCompras(agora.url) === 'areaDeTrabalho') await navegador.tabs.update(idDaAba, { url: regras.URL_INICIO_SICAF })
+      await injetar(idDaAba, ['sites/compras/aviso.js'], { modo: 'areaDeTrabalho', direto: regras.URL_INICIO_SICAF })
     } else {
       await injetar(idDaAba, ['sites/compras/aviso.js'], { modo: 'areaDeTrabalho' })
     }

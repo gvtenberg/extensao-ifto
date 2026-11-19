@@ -276,6 +276,7 @@
   // Confere uma nota. ateste: item de lerAteste (ou null). Devolve o CNPJ do fornecedor pela nota, as
   // opções para escolher e os avisos: vermelho (precisa de "Continuar mesmo assim") ou amarelo (só aviso).
   // v0.17.3: naoLeu = o PDF da nota não abriu (erro ao baixar ou ler); antes isso aparecia como "imagem".
+  // v0.29.3 (T160): avisos curtos; o botão "Ver a nota" já fica na linha da nota.
   function conferirNota (texto, ateste, { naoLeu = false } = {}) {
     const avisos = []
     const vermelho = mensagem => avisos.push({ nivel: 'vermelho', texto: mensagem })
@@ -285,11 +286,11 @@
     const cnpj = daNota[0] || null
     const opcoes = [...new Set([cnpj, ateste && ateste.cnpj].filter(Boolean))]
     if (naoLeu) {
-      amarelo('Não consegui ler a nota. Confira o CNPJ do fornecedor (botão "Ver a nota").')
+      amarelo('Não consegui ler a nota: confira o CNPJ.')
       return { cnpj: ateste && ateste.cnpj ? ateste.cnpj : null, escolher: true, opcoes, avisos }
     }
     if (semTexto) {
-      amarelo('A nota é uma imagem digitalizada. Confira o CNPJ do fornecedor (botão "Ver a nota").')
+      amarelo('A nota é uma imagem: confira o CNPJ.')
       return { cnpj: ateste && ateste.cnpj ? ateste.cnpj : null, escolher: true, opcoes, avisos }
     }
     // Tomador: Campus Palmas.

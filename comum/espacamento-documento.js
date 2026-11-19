@@ -65,6 +65,7 @@
   // 1), vazio, outro, texto (1ª linha), textoFim (última), acima, abaixo (do texto até a borda do bloco, em px),
   // margemTopo, margemBaixo, fonte (da letra), fonteDoBloco }. outras: listas de irmãos de dentro dos blocos
   // (só para o seletor não acertar onde não deve).
+  // topo e base: alto da primeira linha e baixo da última, em px na página (v0.29.3).
   // Lacunas conferidas: entre a última linha de uma seção e a primeira da seguinte e, dentro da mesma seção,
   // antes e depois da linha da data ("Palmas, 18 de novembro de 2026.", D21). Com linha em branco no meio,
   // o espaço já existe. Devolve { lacunas: [{ indice, margem (em), seletor, secao, posicao, antes, depois }],
@@ -75,17 +76,31 @@
     const ehData = texto => Boolean(texto) && regrasData().ehLinhaDaData(texto)
     const fim = inicioDoRodape(blocos)
     const candidatas = []
-    for (let i = 1; i < fim; i++) {
-      const anterior = blocos[i - 1]
+    // v0.29.3 (T162): a linha em branco do meio ("Separador de seção", estilo "sem espaço") pode ter altura de
+    // quase nada; então, com linhas em branco entre as partes, vale a distância medida entre as letras (topo e
+    // base, em px): só uma linha em branco de verdade (meia linha ou mais) dispensa o espaço novo. O espaço
+    // também vai depois da última linha de quem assina, antes do rodapé (o resto do rodapé fica de fora).
+    let anterior = null
+    for (let i = 0; i <= Math.min(fim, blocos.length - 1); i++) {
       const bloco = blocos[i]
-      if (anterior.vazio || anterior.outro || bloco.vazio || bloco.outro) continue
-      if (anterior.raiz === bloco.raiz && !ehData(bloco.texto) && !ehData(anterior.textoFim)) continue
+      if (bloco.outro) { anterior = null; continue }
+      if (bloco.vazio) continue
+      const ultimo = anterior
+      anterior = bloco
+      if (!ultimo) continue
+      const vizinho = ultimo === blocos[i - 1]
+      if (ultimo.raiz === bloco.raiz && !ehData(bloco.texto) && !ehData(ultimo.textoFim)) continue
       const fonte = Number(bloco.fonte) || 0
       if (fonte <= 0) continue
-      const distancia = anterior.abaixo + bloco.acima + Math.max(anterior.margemBaixo || 0, bloco.margemTopo || 0)
+      const temPosicao = [ultimo.base, bloco.topo].every(valor => typeof valor === 'number')
+      if (!vizinho && !temPosicao) continue
+      const distancia = vizinho
+        ? ultimo.abaixo + bloco.acima + Math.max(ultimo.margemBaixo || 0, bloco.margemTopo || 0)
+        : bloco.topo - ultimo.base
       if (distancia >= LIMITE * fonte) continue
-      const margem = Math.ceil((LINHA * fonte - anterior.abaixo - bloco.acima) / (Number(bloco.fonteDoBloco) || fonte) * 100) / 100
-      candidatas.push({ indice: i, margem, secao: bloco.secao, posicao: bloco.posicao, antes: anterior.textoFim || '', depois: bloco.texto || '' })
+      const falta = vizinho ? LINHA * fonte - ultimo.abaixo - bloco.acima : LINHA * fonte - distancia + (bloco.margemTopo || 0)
+      const margem = Math.ceil(falta / (Number(bloco.fonteDoBloco) || fonte) * 100) / 100
+      candidatas.push({ indice: i, margem, secao: bloco.secao, posicao: bloco.posicao, antes: ultimo.textoFim || '', depois: bloco.texto || '' })
     }
 
     // Seletor do documento salvo (no SEI as seções viram parágrafos irmãos): "anterior+bloco"; se acertar

@@ -327,17 +327,11 @@ E: Aparece só o botão "Incluir SICAF" (sem "Incluir Simples Nacional"). As tr�
 ### T159 – Desligada (v0.26.10)
 F: Nas configurações da extensão, em "SICAF e Simples Nacional", marque "Desligada". No SEI, na CGOC, abra um processo com nota fiscal sem SICAF e selecione um CNPJ num documento.
 E: Nenhum botão do SICAF aparece: nem o aviso das notas, nem o "Incluir SICAF" no alto, nem botão ao selecionar o CNPJ.
-### T160 – Janela das notas compacta (v0.26.10)
-F: Na CGOC, com "Automática", abra um processo com várias notas sem SICAF e clique no aviso "notas sem SICAF – Buscar". Clique no meio de uma das notas.
-E: As notas aparecem em linhas mais baixas (umas 10 cabem sem rolar a janela); o clique na nota desmarca ela (fica apagada) e outro clique marca de novo.
 ### T161 – SICAF e Simples esperam o resultado (v0.26.10)
 F: Na CGOC, num processo com nota sem SICAF, clique no aviso "notas sem SICAF – Buscar" e depois em "Buscar SICAF e Simples". Se o Compras.gov.br pedir, entre com o Gov.br.
 E: Depois da Área de Trabalho do Compras.gov.br, o SICAF abre sozinho em poucos segundos; o SICAF e o Simples Nacional só fecham depois de mostrar o resultado, e o SEI recebe os dois PDFs.
 
 ## Espaço entre as partes do documento (v0.26.11)
-### T162 – Espaço entre as partes no Despacho salvo e no PDF (v0.26.11) (Crítico)
-F: Num Despacho ainda não assinado, abra o editor, confira a caixa "As partes do documento estavam grudadas…", clique em Salvar e depois gere o PDF do documento.
-E: No editor, na página do documento e no PDF aparece uma linha de espaço depois do timbre, do número, da data e do "Processo/Interessado/Assunto" e antes do nome de quem assina; o resto do texto fica igual.
 ### T163 – Espaço entre as partes num Ofício (v0.26.11)
 F: Abra o editor de um Ofício ainda não assinado com partes grudadas, confira e clique em Salvar.
 E: A caixa lista onde a linha foi posta; o Ofício salvo mostra o espaço só nesses lugares.
@@ -364,21 +358,6 @@ E: A página abre com a data de hoje, Digitalizado com Cópia Simples, Restrito 
 F: Em Incluir Documento › Externo, sem escolher o tipo, clique em "Anexar Arquivo..." e escolha um PDF chamado "Nota Fiscal 123.pdf".
 E: O tipo fica "Nota fiscal", o Nome na Árvore fica "123" e aparece o aviso "Pelo nome do arquivo, a extensão escolheu…"; ao salvar, o documento entra com esse tipo. Com um tipo já escolhido antes, o tipo não muda.
 > os arquivos de teste estão no computador de desenvolvimento (ferramentas-de-teste/arquivos-sei).
-### T170 – Arquivo grande ou com "#" no documento externo (v0.27.0)
-F: Em Incluir Documento › Externo, anexe "teste tamanho C" (acima de 10 MB); depois, "teste 01-cerquilha-#.pdf"; depois, um PDF de 3 a 9 MB.
-E: O arquivo C não é anexado e aparece o aviso vermelho com os links do pdf24.org e do ilovepdf.com; o arquivo com "#" é anexado com "_" no lugar do "#"; o PDF médio é anexado com a dica amarela de diminuir.
-
-## Arrastar arquivos para o processo (v0.27.1)
-### T171 – Arrastar arquivos para o processo (v0.27.1) (Crítico)
-F: Num processo de teste, arraste para a árvore (à esquerda) três arquivos: "Nota Fiscal 123.pdf", um com nome qualquer e um acima de 10 MB; confira a lista, escolha o tipo do que ficou sem tipo e clique em "Incluir no processo".
-E: A lista mostra cada arquivo com tipo, Nome na Árvore, data de hoje e tamanho; o grande aparece em vermelho e não é incluído; o botão só libera com todos os tipos escolhidos; depois do clique, os dois documentos entram na árvore (Nato-digital, Público) e aparece "Pronto."
-### T172 – Arrastar e cancelar (v0.27.1)
-F: Arraste um arquivo para a árvore e, na lista, clique em "Cancelar" (ou "Tirar da lista" e depois feche a janela).
-E: A janela fecha e nada é incluído no processo.
-### T173 – SICAF continua incluindo os PDFs (v0.27.1)
-F: Na CGOC, num processo com nota sem SICAF, clique em "notas sem SICAF – Buscar" e depois em "Buscar SICAF e Simples".
-E: Como antes: a janela mostra o andamento e o SEI recebe os PDFs do SICAF e do Simples; o botão Parar mostra "Parando…".
-
 ## Cópia das configurações (v0.27.2)
 ### T174 – Baixar e carregar cópia das configurações (v0.27.2)
 F: Em Configurações › Cópia das configurações, clique em "Baixar cópia das configurações"; mude duas opções; clique em "Escolher o arquivo…", escolha o arquivo baixado e confirme.
@@ -415,3 +394,17 @@ E: Os estilos da Portaria que o Edital não tem (ex.: "★ IFTO_Item_Nvl_1") tam
 ### T183 – Opção desligada com estilos da extensão (v0.29.2)
 F: Em Configurações › Documentos do SEI, desligue "Todos os estilos em todos os documentos" e abra no editor o Despacho do T181; clique em "Ligar de novo".
 E: Aparece o aviso "Este documento usa estilos da extensão…"; depois do clique, a opção volta a ficar ligada e os estilos com "★" voltam à lista.
+
+## Correções dos testes de 19/11/2026 (v0.29.3)
+### T184 – Espaço depois do timbre, do Assunto e em volta da assinatura (v0.29.3) (Crítico)
+F: Num Despacho ainda não assinado, abra o editor, confira a caixa "As partes do documento estavam grudadas…", clique em Salvar e gere o PDF.
+E: Há uma linha de espaço depois da última linha do timbre, depois da linha "Assunto", antes do nome de quem assina e depois do cargo; onde já havia uma linha em branco, não aparece outra.
+### T185 – Arquivo ConsultaOptantes escolhe o tipo Consulta (v0.29.3)
+F: Em Incluir Documento › Externo, anexe um arquivo chamado "ConsultaOptantes_51866043000195_2026-11-19.pdf".
+E: O Tipo do Documento fica "Consulta" sozinho.
+### T186 – Janela das notas com caixa de marcar (v0.29.3)
+F: Na CGOC, com "Automática", clique em "notas sem SICAF – Buscar" num processo com uma nota e depois num com nota que a extensão não conseguiu ler.
+E: Cada nota tem uma caixa de marcar à esquerda do nome; a linha mostra só "Nota N – fornecedor" e "Ver a nota"; o CNPJ fica numa linha só ("CNPJ:" e o campo) e o aviso é curto.
+### T187 – SICAF abre sozinho depois da Área de Trabalho (v0.29.3)
+F: Saia do Compras.gov.br, clique em "notas sem SICAF – Buscar" e "Buscar SICAF e Simples" e faça o login com Gov.br.
+E: Ao chegar à Área de Trabalho, aparece "Abrindo o SICAF…" e, assim que o seu nome aparece no alto, a aba vai sozinha para o SICAF e a busca continua.

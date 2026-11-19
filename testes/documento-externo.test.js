@@ -48,6 +48,9 @@ test('tipo pelo nome: o nome de tipo mais longo que começa o arquivo', () => {
 test('tipo pelo nome: palavra só parecida não conta', () => {
   assert.equal(tipoPeloNome('Notas da reunião.pdf', TIPOS).tipo, null)
   assert.equal(tipoPeloNome('Anexos.pdf', TIPOS).tipo, null)
+  // v0.29.3 (T170): palavras juntas com maiúscula no meio, como o arquivo do Simples Nacional.
+  assert.deepEqual(tipoPeloNome('ConsultaOptantes_51866043000195_2026-11-19.pdf', TIPOS), { tipo: 'Consulta', origem: 'nome', nomeArvore: 'Optantes 51866043000195 2026-11-19' })
+  assert.equal(tipoPeloNome('CONSULTAOPTANTES.pdf', TIPOS).tipo, null)
 })
 
 test('tipo pelo nome: depois as regras da pessoa, depois o tipo padrão', () => {
