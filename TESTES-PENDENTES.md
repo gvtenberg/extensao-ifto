@@ -411,3 +411,31 @@ E: Aparece "Link para o editor copiado.", o menu fecha cerca de 1 segundo depois
 ### T191 – Menu de cópia: fechar com Esc ou clique fora (v0.30.0)
 F: Abra o menu do ícone de um documento e aperte Esc; abra de novo e clique num espaço vazio da árvore; abra de novo e clique no documento à direita.
 E: Nas três vezes o menu fecha na hora, sem copiar nada.
+
+## Cópia automática no editor do SEI
+> antes de testar: em Configurações > Editor do SEI, ligue "Cópia automática do documento" e "Botões Copiar conteúdo e Colar conteúdo"; use um documento de teste, ainda não assinado.
+### T192 – Cópia guardada enquanto escreve (v0.31.0)
+F: Abra um documento no editor, escreva uma frase e espere 30 segundos.
+E: Ao lado do botão Salvar aparece "Cópia guardada hoje às…" com a hora.
+### T193 – Restaurar depois de fechar sem salvar (v0.31.0) (Crítico)
+F: Num documento com negrito, cores, uma tabela, uma imagem e um comentário, mude o texto, espere 30 segundos, feche a janela sem salvar e abra o editor de novo; clique em "Restaurar a cópia".
+E: O aviso mostra a hora da cópia; depois de restaurar aparece "Conferido: texto, formatação e comentários iguais aos da cópia" e o texto mudado volta, com tudo igual (formatação, tabela, imagem, comentário). Nada é salvo até você clicar em Salvar.
+### T194 – Desfazer a restauração (v0.31.0)
+F: Depois de restaurar uma cópia, clique em "Desfazer (voltar ao texto de antes)".
+E: O texto que o SEI tinha volta ao editor e o aviso com "Restaurar a cópia" aparece de novo.
+### T195 – Ver diferenças (v0.31.0)
+F: Com uma cópia guardada (mude, acrescente e apague parágrafos, feche sem salvar e abra de novo), clique em "Ver diferenças".
+E: Abre uma janela só com os parágrafos diferentes: em verde o que está na cópia, em vermelho riscado o que está no SEI; Esc ou "Fechar" fecham.
+### T196 – Cópia apagada ao salvar e ao descartar (v0.31.0)
+F: Escreva, espere a cópia, clique em Salvar; em outro documento com cópia, abra de novo e clique em "Descartar a cópia".
+E: Depois de salvar aparece "Salvo no SEI hoje às… A cópia foi apagada."; ao descartar, a extensão pede confirmação e, ao abrir o documento de novo, não há aviso.
+### T197 – Documento salvo depois da cópia (v0.31.0)
+F: Abra o documento em duas janelas do editor; na segunda, escreva algo, espere 30 s e feche sem salvar; na primeira, mude outra coisa e salve; abra de novo.
+E: A segunda janela avisa que o documento está aberto em outra janela; ao abrir de novo, o aviso da cópia diz em vermelho que o documento foi salvo depois da cópia e "Restaurar" pede confirmação.
+### T198 – Copiar e colar conteúdo entre janelas (v0.31.0)
+F: Numa janela do editor, mude o texto e clique em "Copiar conteúdo"; feche sem salvar, abra o mesmo documento e clique em "Colar conteúdo".
+E: Pede confirmação, põe o texto copiado (com formatação e comentários) e mostra "Desfazer"; em outro documento, "Colar conteúdo" avisa que o conteúdo é de outro documento.
+### T199 – Cópia desligada (v0.31.0)
+F: Com as duas opções desligadas nas configurações, abra um documento no editor.
+E: Não aparece nada da cópia ao lado do botão Salvar.
+

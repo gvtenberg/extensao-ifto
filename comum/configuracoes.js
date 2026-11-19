@@ -55,6 +55,10 @@
     espacamentoDocumento: true,
     // v0.29.2 (spec todos-os-estilos, D4): todos os estilos em todos os documentos (texto principal), todas as unidades.
     todosOsEstilos: true,
+    // v0.31.0 (spec copia-editor-sei, D5): cópia automática do documento no editor (a cada 30 s, só neste
+    // computador) e os botões "Copiar conteúdo" / "Colar conteúdo"; desligados até a pessoa ligar.
+    copiaAutomatica: false,
+    copiarColarConteudo: false,
     // v0.26.1 (D15): nomes de quem assinou podem ser selecionados e copiados na página do documento.
     copiarAssinaturas: true,
     // v0.30.0: menu de cópia do ícone do documento na árvore: todo clique copia, fecha 1 s depois, Esc e clique fora fecham.

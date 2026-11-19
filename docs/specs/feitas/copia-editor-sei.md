@@ -2,7 +2,7 @@
 
 **Sections**: 1. Goal · 2. Out of scope · 3. Decisions to confirm · 4. Decided rules · 5. What changes · 6. Stages · 7. Manual tests
 
-- **Status:** ready to code
+- **Status:** done (v0.31.0, 19/11/2026)
 - **Requested on:** 12/11/2026 (planned 19/11/2026) · **Deadline or priority:** after a connection drop nearly lost hours of work
 - **Planned version:** 0.31.0
 
@@ -50,6 +50,10 @@ All answered on 19/11/2026 (user, in the chat):
 - Differences: changed paragraphs only, numbered; formatting or image only changes appear as "parágrafo com formatação ou imagem diferente".
 - Indicator near the SEI buttons, not part of the document (not printed or saved).
 - The copy never leaves the computer.
+- (coding, 19/11/2026, user asked for full fidelity) The copy is what the SEI sends on Salvar, so bold, italic, colors, backgrounds, links, images and tables (margins and alignment live in the table attributes) come back as saved. After a restore the extension's table and ★ style helpers start again on the new editor, and the result is compared with the copy: if anything differs, the stored copy is kept ("protegida") until the SEI saves, and the box says how many paragraphs differ.
+- While an earlier copy waits for the choice, the automatic copy is paused (it would overwrite it); clicking the indicator reopens the box.
+- A copy is also taken at the moment Salvar is clicked (if the SEI then fails, nothing typed is lost).
+- If the editor refuses the copy, it is reloaded with the text that was there just before.
 
 ## 5. What changes
 
@@ -61,10 +65,10 @@ All answered on 19/11/2026 (user, in the chat):
 
 ## 6. Stages
 
-- [ ] Stage 1 – Copy while editing: switch (off), copy every 30 s overwritten per document, starting point, indicator, delete on SEI save confirmed (find how the SEI shows success and the failure message in the saved pages), 7-day cleanup, space warning. Test: edit, see "Cópia guardada às…"; save, copy gone.
-- [ ] Stage 2 – Reopening: box with Restaurar / Descartar, starting point check (red warning), Desfazer, confirmation, two-window warning. Test: edit, close without saving, reopen, restore, Desfazer.
-- [ ] Stage 3 – "Ver diferenças" window (paragraph differences, pure rule with automated tests). Test: change, add and delete paragraphs, compare.
-- [ ] Stage 4 – "Copiar conteúdo / Colar conteúdo" buttons (off by default, own setting, editing window only), reusing stages 1–2 code. Test: copy from one window, paste in another of the same document.
+- [x] Stage 1 – Copy while editing: switch (off), copy every 30 s overwritten per document, starting point, indicator, delete on SEI save confirmed (find how the SEI shows success and the failure message in the saved pages), 7-day cleanup, space warning. Test: edit, see "Cópia guardada às…"; save, copy gone.
+- [x] Stage 2 – Reopening: box with Restaurar / Descartar, starting point check (red warning), Desfazer, confirmation, two-window warning. Test: edit, close without saving, reopen, restore, Desfazer.
+- [x] Stage 3 – "Ver diferenças" window (paragraph differences, pure rule with automated tests). Test: change, add and delete paragraphs, compare.
+- [x] Stage 4 – "Copiar conteúdo / Colar conteúdo" buttons (off by default, own setting, editing window only), reusing stages 1–2 code. Test: copy from one window, paste in another of the same document.
 
 ## 7. Manual tests
 

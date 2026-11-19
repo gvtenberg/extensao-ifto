@@ -28,6 +28,10 @@
     .principal { width: 100%; padding: 6px 10px; border: 0; border-radius: 4px; background: #1E5E33; color: #fff;
       font: inherit; font-weight: 600; cursor: pointer; }
     .principal:disabled { opacity: .6; cursor: default; }
+    /* v0.31.0 (spec copia-editor-sei): botões a mais no mesmo aviso. */
+    .secundario { width: 100%; margin-top: 6px; padding: 5px 10px; border: 1px solid #1E5E33; border-radius: 4px;
+      background: #fff; color: #1E5E33; font: inherit; cursor: pointer; }
+    .secundario:disabled { opacity: .6; cursor: default; }
   `
   const criar = (etiqueta, propriedades = {}) => Object.assign(document.createElement(etiqueta), propriedades)
 

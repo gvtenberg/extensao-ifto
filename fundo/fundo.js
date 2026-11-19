@@ -77,6 +77,10 @@ function tratarRecado (recado, remetente) {
     // v0.26.11 (spec conferir-documento, etapa 7): espaço entre as partes do documento.
     case 'estilosPreparar': return estilosNoEditor(remetente, recado.aprendidos)
     // v0.29.2 (R7): opção desligada: o documento já tem o bloco dos estilos extras?
+    // v0.31.0 (spec copia-editor-sei): cópia automática e Copiar/Colar conteúdo no editor.
+    case 'copiaPreparar': return copiaNoEditor(remetente, 'preparar')
+    case 'copiaLer': return copiaNoEditor(remetente, 'ler', recado.desde)
+    case 'copiaRestaurar': return copiaNoEditor(remetente, 'montar', recado.copia)
     case 'estilosVerificar': return rodarNoEditor(remetente)(globalThis.ExtensaoIFTO.editorLer).then(lido => lido.ok ? { ok: true, usa: (lido.secoes || []).some(secao => globalThis.ExtensaoIFTO.todosOsEstilos.temBloco(secao.html)) } : lido)
     case 'espacamentoMedir': return espacamentoNoEditor(remetente, 'medir')
     case 'espacamentoPor': return espacamentoNoEditor(remetente, 'por', recado.bloco)
@@ -545,6 +549,16 @@ async function estilosNoEditor (remetente, aprendidos) {
   if (!(temNumeracao && temNumeracao.result)) arquivos.unshift('sites/sei/editor-numeracao.js')
   await navegador.scripting.executeScript({ target: alvo, world: 'MAIN', files: arquivos })
   return rodarNoEditor(remetente)(lista => globalThis.ExtensaoIFTO.editorEstilos.preparar(lista), [aprendidos || {}])
+}
+
+// v0.31.0 (spec copia-editor-sei): põe na página do editor (world MAIN) o código da cópia; lê o texto e os
+// comentários ou recarrega o editor com uma cópia (nunca salva).
+async function copiaNoEditor (remetente, acao, dado) {
+  const alvo = { tabId: remetente.tab.id, frameIds: [remetente.frameId || 0] }
+  if (acao === 'preparar') await navegador.scripting.executeScript({ target: alvo, world: 'MAIN', files: ['sites/sei/editor-copia.js'] })
+  const rodar = rodarNoEditor(remetente)
+  if (acao === 'montar') return rodar((secoes, comentarios) => globalThis.ExtensaoIFTO.editorCopia.montar(secoes, comentarios), [dado.secoes || {}, dado.comentarios || []])
+  return rodar(desde => globalThis.ExtensaoIFTO.editorCopia.ler(desde), [Boolean(dado)])
 }
 
 // v0.26.11 (spec conferir-documento, etapa 7): põe na página do editor (world MAIN) o código que mede as partes
