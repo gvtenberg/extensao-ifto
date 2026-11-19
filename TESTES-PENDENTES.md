@@ -398,9 +398,6 @@ F: Saia do Compras.gov.br, clique em "notas sem SICAF – Buscar" e "Buscar SICA
 E: Ao chegar à Área de Trabalho, aparece "Abrindo o SICAF…" e, assim que o seu nome aparece no alto, a aba vai sozinha para o SICAF e a busca continua.
 ## Salvamento automático no editor do SEI
 > antes de testar: em Configurações > Editor do SEI, ligue "Salvamento automático (neste computador)" e "Botões Copiar conteúdo e Colar conteúdo"; use um documento de teste, ainda não assinado.
-### T192 – Cópia guardada enquanto escreve (v0.31.0)
-F: Abra um documento no editor, escreva uma frase e espere 30 segundos.
-E: Ao lado do botão Salvar aparece "Salvo neste computador hoje às…" com a hora.
 ### T193 – Restaurar depois de fechar sem salvar (v0.31.0) (Crítico)
 F: Num documento com negrito, cores, uma tabela, uma imagem e um comentário, mude o texto, espere 30 segundos, feche a janela sem salvar e abra o editor de novo; clique em "Restaurar esta versão".
 E: O aviso mostra a hora em que foi salvo; depois de restaurar aparece "Conferido: texto, formatação e comentários iguais aos da versão salva" e o texto mudado volta, com tudo igual (formatação, tabela, imagem, comentário). Nada é salvo até você clicar em Salvar.
@@ -441,15 +438,6 @@ E: Ao lado do botão Salvar aparece "Salvamento automático desligado nas config
 ### T204 – Outra aba de configurações não desfaz o "Voltar às configurações padrão" (v0.31.1)
 F: Abra as Configurações em duas abas. Na primeira, clique em "Voltar às configurações padrão" e confirme. Vá à segunda aba.
 E: A segunda aba recarrega sozinha e mostra as escolhas do início; mudar algo nela não traz de volta as escolhas antigas.
-
-### T205 – Negrito na lista de estilos (v0.31.1)
-F: No editor de um Despacho, abra a lista de estilos.
-E: "IFTO_Centralizado_Negrito_Maiusculo", "Item_Nivel1", "Item_nivel_1_Edital_titulo" e os outros estilos em negrito aparecem em negrito na lista; os de fundo cinza continuam com fundo cinza.
-
-### T206 – Janela das notas: caixa de marcar, nota riscada e janela mais estreita (v0.31.1)
-F: Na CGOC, com "Automática", clique em "notas sem SICAF – Buscar" num processo com duas notas e desmarque uma.
-E: A janela é mais estreita; cada nota tem uma caixa de marcar à esquerda do nome; a nota desmarcada fica apagada e com o nome riscado.
-
-### T207 – Abrir documento com estilo ★ não pede para salvar (v0.31.1)
-F: Abra no editor o Despacho 3391318 (ou outro com estilo ★), sem mexer em nada, e feche a janela do editor.
-E: O SEI não pergunta se quer salvar; os parágrafos continuam com o estilo ★. Se você mudar algo antes de fechar, o SEI pergunta, como sempre.
+### T208 – Salvamento automático funciona no editor (v0.31.2)
+F: Com o salvamento automático ligado, abra um documento no editor, escreva uma frase e espere 30 segundos.
+E: Ao lado do botão Salvar aparece "Salvo neste computador hoje às…" com a hora, sem a mensagem "O editor do SEI não respondeu".

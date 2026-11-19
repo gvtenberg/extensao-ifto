@@ -555,7 +555,9 @@ async function estilosNoEditor (remetente, aprendidos) {
 // comentários ou recarrega o editor com uma cópia (nunca salva).
 async function salvamentoNoEditor (remetente, acao, dado) {
   const alvo = { tabId: remetente.tab.id, frameIds: [remetente.frameId || 0] }
-  if (acao === 'preparar') await navegador.scripting.executeScript({ target: alvo, world: 'MAIN', files: ['sites/sei/editor-salvamento.js'] })
+  // v0.31.2: põe o código antes de toda leitura (nenhuma tela pedia "preparar", e o editor "não respondia";
+  // o arquivo não se carrega duas vezes).
+  await navegador.scripting.executeScript({ target: alvo, world: 'MAIN', files: ['sites/sei/editor-salvamento.js'] })
   const rodar = rodarNoEditor(remetente)
   if (acao === 'montar') return rodar((secoes, comentarios) => globalThis.ExtensaoIFTO.editorSalvamento.montar(secoes, comentarios), [dado.secoes || {}, dado.comentarios || []])
   return rodar(desde => globalThis.ExtensaoIFTO.editorSalvamento.ler(desde), [Boolean(dado)])
