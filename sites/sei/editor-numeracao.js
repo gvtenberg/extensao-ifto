@@ -66,6 +66,14 @@
     }
   }
 
+  // Põe um bloco de estilo no começo de um parágrafo do editor (o SEI guarda e imprime o bloco; dá para
+  // desfazer com Ctrl+Z). v0.26.11: também usado pelo espaçamento (editor-espacamento.js).
+  function porBloco (editor, alvo, bloco) {
+    const modelo = editor.model
+    const pedaco = editor.data.toModel(editor.data.processor.toView(bloco), '$block')
+    modelo.change(escritor => { modelo.insertContent(pedaco, escritor.createPositionAt(alvo, 0)) })
+  }
+
   // Põe o bloco de estilo no começo do primeiro item de edital da seção (o editor guarda e imprime o bloco).
   async function corrigir () {
     try {
@@ -85,8 +93,7 @@
         if (alvo) break
       }
       if (!alvo) return { ok: false, erro: 'Não achei um item de edital que dê para editar.' }
-      const pedaco = editor.data.toModel(editor.data.processor.toView(regras().BLOCO), '$block')
-      modelo.change(escritor => { modelo.insertContent(pedaco, escritor.createPositionAt(alvo, 0)) })
+      porBloco(editor, alvo, regras().BLOCO)
       const dados = editor.getData({ rootName: alvo.root.rootName })
       if (!regras().temCorrecao(dados)) return { ok: false, erro: 'O editor não aceitou a correção.' }
       await esperar(300)
@@ -96,5 +103,5 @@
     }
   }
 
-  raiz.ExtensaoIFTO = Object.assign(raiz.ExtensaoIFTO || {}, { editorNumeracao: { preparar, corrigir, procurar } })
+  raiz.ExtensaoIFTO = Object.assign(raiz.ExtensaoIFTO || {}, { editorNumeracao: { preparar, corrigir, procurar, acharEditor, porBloco } })
 })(globalThis)

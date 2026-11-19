@@ -333,3 +333,20 @@ E: As notas aparecem em linhas mais baixas (umas 10 cabem sem rolar a janela); o
 ### T161 – SICAF e Simples esperam o resultado (v0.26.10)
 F: Na CGOC, num processo com nota sem SICAF, clique no aviso "notas sem SICAF – Buscar" e depois em "Buscar SICAF e Simples". Se o Compras.gov.br pedir, entre com o Gov.br.
 E: Depois da Área de Trabalho do Compras.gov.br, o SICAF abre sozinho em poucos segundos; o SICAF e o Simples Nacional só fecham depois de mostrar o resultado, e o SEI recebe os dois PDFs.
+
+## Espaço entre as partes do documento (v0.26.11)
+### T162 – Espaço entre as partes no Despacho salvo e no PDF (v0.26.11) (Crítico)
+F: Num Despacho ainda não assinado, abra o editor, confira a caixa "As partes do documento estavam grudadas…", clique em Salvar e depois gere o PDF do documento.
+E: No editor, na página do documento e no PDF aparece uma linha de espaço depois do timbre, do número, da data e do "Processo/Interessado/Assunto" e antes do nome de quem assina; o resto do texto fica igual.
+### T163 – Espaço entre as partes num Ofício (v0.26.11)
+F: Abra o editor de um Ofício ainda não assinado com partes grudadas, confira e clique em Salvar.
+E: A caixa lista onde a linha foi posta; o Ofício salvo mostra o espaço só nesses lugares.
+### T164 – Espaço antes e depois da data no fim do Ateste (v0.26.11)
+F: Abra o editor de um Ateste em que corpo, data e nome de quem assina estão grudados.
+E: A caixa lista a data e o nome; aparece uma linha antes da data e outra antes do nome.
+### T165 – Desfazer o espaço (v0.26.11)
+F: Na caixa do espaço, clique em "Desfazer", clique em Salvar, feche e abra o editor de novo.
+E: O espaço some do documento salvo; ao abrir o editor de novo, a extensão põe o espaço outra vez e mostra a caixa com "Desfazer".
+### T166 – Espaço desligado e documento que já tem espaço (v0.26.11)
+F: Desligue "Espaço entre as partes do documento" nas configurações e abra um editor; ligue de novo e abra o editor de um documento já salvo com o espaço.
+E: Nos dois casos nada muda e a caixa do espaço não aparece.

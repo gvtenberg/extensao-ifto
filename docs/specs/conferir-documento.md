@@ -2,7 +2,7 @@
 
 **Sections**: 1. Goal · 2. Out of scope · 3. Decisions to confirm · 4. Decided rules · 5. What changes · 6. Stages · 7. Manual tests
 
-- **Status:** ready to code (stage 1)
+- **Status:** all stages done (stage 7: v0.26.11); rules in `docs/regras/conferir-documento.md`. Waiting for the manual tests.
 - **Requested on:** 18/11/2026 · **Deadline or priority:** after the open tests of v0.25.x
 - **Planned version:** 0.26.0
 
@@ -39,6 +39,9 @@ People copy an old document and forget to fix the "Processo nº:" line, the sect
 - [x] D19 – Where (18/11/2026, user): document page, editor and before signing (all four places of D2). Only a **wrong** date stops signing; a date only out of pattern does not.
 - [x] D20 – Signed documents (18/11/2026, user): the date is ignored; only unsigned documents, compared with today.
 - [x] D21 – Spacing around the date (18/11/2026, user): same fix as stage 7 (tight sections); gaps body → date → signer's name are part of stage 7.
+- [x] D22 – Spacing in the editor of a signed document (stage 7). Answer (18/11/2026, user): a signed document cannot be edited; opening the editor of a recently signed one makes the SEI remove the signature. So with the editor open the document is never signed: no check.
+- [x] D23 – "Desfazer" and the next opening (stage 7). Answer (18/11/2026, user): offer again next time: nothing is remembered; the next time the editor opens, the spacing is added again with the box and "Desfazer".
+- [x] D24 – Where the hidden block goes (stage 7): kept (user, 18/11/2026): in the timbre's coat-of-arms paragraph, which has no text, is rarely changed and is kept by "Corrigir timbre"; if that section cannot be edited, in the first paragraph of the body. In the body, replacing all the body text would delete it.
 - [x] D10 – The four new switches (process number, timbre, footer, spacing) start **on**.
 
 ## 4. Decided rules
@@ -79,7 +82,8 @@ People copy an old document and forget to fix the "Processo nº:" line, the sect
 - [x] Stage 4 – Pre-sign window: "Assinar Documento" in the tree and "Assinar" in the editor (v0.26.3). Critical test (signs in the SEI).
 - [x] Stage 5 – Pre-sign window in the signature list (v0.26.4) and in the Bloco de assinatura (v0.26.6: list of blocks, documents of the block, document window). Critical tests.
 - [x] Stage 6 – Timbre and footer: warnings, "Corrigir" buttons, "Usar este timbre como padrão da unidade" (v0.26.5).
-- [ ] Stage 7 – Spacing in every type (gap detection, style block, automatic, "Desfazer"), including the gaps last body line → date → signer's name when the date is at the end (Atestes, D21) (T123 passed). Saved editor pages: Despacho (`Tela-edicao-documento-SEI.html`, `3390347.html`) and Ofício (`SEI_IFTO - 3163788 - Ofício.html`); there is no Memorando at IFTO (replaced by the Despacho, user 19/11/2026). Critical test: saved Despacho and PDF; plus one test with an Ofício.
+- [x] Stage 7 – Spacing in every type (gap detection, style block, automatic, "Desfazer"), including the gaps last body line → date → signer's name when the date is at the end (Atestes, D21) — after T123 (v0.26.11). Saved editor pages: Despacho (`Tela-edicao-documento-SEI.html`, `3390347.html`) and Ofício (`SEI_IFTO - 3163788 - Ofício.html`); there is no Memorando at IFTO (replaced by the Despacho, user 18/11/2026). Critical test: saved Despacho and PDF; plus one test with an Ofício.
+  - Done (18/11/2026): `comum/espacamento-documento.js` (+ Node tests), `sites/sei/editor-espacamento.js` (world MAIN: measure, put, remove), `sites/sei/espacamento-documento.js` (box). Measures the letters (not the boxes: line-height 10%), so it works without knowing each type. Only SEI 5 (CKEditor 5); the saved Ofício 3163788 is a CKEditor 4 page (old SEI), so the Ofício is checked only in the manual test. Selectors checked with the saved Despacho 3390347 (each one hits only its part). Decisions D22–D24 answered by the user.
 
 - [x] Stage 8 – Date of the document (D18–D21): warning on the document page and in the editor, "Corrigir para …", stop before signing, switch "Data do documento" (v0.26.9). Tests T150–T157 (T154 critical).
 

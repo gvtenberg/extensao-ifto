@@ -74,6 +74,10 @@ function tratarRecado (recado, remetente) {
     // v0.25.0 (spec numeracao-edital): números longos dos itens de edital.
     case 'numeracaoPreparar': return numeracaoNoEditor(remetente, false)
     case 'numeracaoCorrigir': return numeracaoNoEditor(remetente, true)
+    // v0.26.11 (spec conferir-documento, etapa 7): espaço entre as partes do documento.
+    case 'espacamentoMedir': return espacamentoNoEditor(remetente, 'medir')
+    case 'espacamentoPor': return espacamentoNoEditor(remetente, 'por', recado.bloco)
+    case 'espacamentoDesfazer': return espacamentoNoEditor(remetente, 'tirar')
     // v0.26.2 (spec conferir-documento): conferir o documento no editor (número do processo).
     case 'conferirVerificar': return conferirNoEditor(remetente, { sigla: recado.sigla })
     case 'conferirCorrigir': return conferirNoEditor(remetente, recado)
@@ -519,6 +523,19 @@ async function numeracaoNoEditor (remetente, corrigir) {
   const alvo = { tabId: remetente.tab.id, frameIds: [remetente.frameId || 0] }
   if (!corrigir) await navegador.scripting.executeScript({ target: alvo, world: 'MAIN', files: ['comum/numeracao-edital.js', 'sites/sei/editor-numeracao.js'] })
   return rodarNoEditor(remetente)(fazer => fazer ? globalThis.ExtensaoIFTO.editorNumeracao.corrigir() : globalThis.ExtensaoIFTO.editorNumeracao.preparar(), [corrigir])
+}
+
+// v0.26.11 (spec conferir-documento, etapa 7): põe na página do editor (world MAIN) o código que mede as partes
+// do documento e põe ou tira o bloco de estilo do espaçamento (reusa acharEditor e porBloco da numeração).
+async function espacamentoNoEditor (remetente, acao, bloco = '') {
+  const alvo = { tabId: remetente.tab.id, frameIds: [remetente.frameId || 0] }
+  if (acao === 'medir') {
+    const [temNumeracao] = await navegador.scripting.executeScript({ target: alvo, world: 'MAIN', func: () => Boolean(globalThis.ExtensaoIFTO && globalThis.ExtensaoIFTO.editorNumeracao) })
+    const arquivos = ['comum/espacamento-documento.js', 'sites/sei/editor-espacamento.js']
+    if (!(temNumeracao && temNumeracao.result)) arquivos.unshift('sites/sei/editor-numeracao.js')
+    await navegador.scripting.executeScript({ target: alvo, world: 'MAIN', files: arquivos })
+  }
+  return rodarNoEditor(remetente)((qual, texto) => globalThis.ExtensaoIFTO.editorEspacamento[qual](texto), [acao, bloco])
 }
 
 async function minutaNoEditor (remetente, remover) {

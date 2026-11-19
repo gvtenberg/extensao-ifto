@@ -22,3 +22,4 @@ ferramentas-de-teste/
 # Resultados de testes e caches
 coverage/
 .eslintcache
+.claude/worktrees/

@@ -40,6 +40,8 @@
   const ENTIDADES = { nbsp: ' ', ordm: 'º', deg: '°', amp: '&', quot: '"', apos: "'", ordf: 'ª' }
   function textoDoParagrafo (html) {
     return String(html || '')
+      // v0.26.11 (etapa 7): blocos de estilo escondidos (espaçamento, numeração, MINUTA) não são texto.
+      .replace(/<style[\s\S]*?<\/style>/gi, ' ')
       .replace(/<br\s*\/?>/gi, ' ')
       .replace(/<[^>]+>/g, '')
       .replace(/&#(\d+);/g, (_, n) => String.fromCharCode(Number(n)))
@@ -55,6 +57,9 @@
   const LINHA_DA_CIDADE = new RegExp("^[A-Za-zÀ-ÿ'’ .-]{2,40},\\s*" + DATA_NO_TEXTO + '\\s*(\\.?)$', 'i')
   const FIM_DO_TITULO = new RegExp('\\bn\\s*[º°o]\\.?\\s*\\S.*\\bde\\s+' + DATA_NO_TEXTO + '\\s*\\.?$', 'i')
   const PARAGRAFOS_DO_TITULO = 15
+
+  // v0.26.11 (etapa 7, D21): o texto (já sem tags) é a linha "Cidade, D de mês de AAAA."?
+  const ehLinhaDaData = texto => LINHA_DA_CIDADE.test(String(texto || '').replace(/[\u200b-\u200d\u2060\ufeff]/g, '').replace(/\s+/g, ' ').trim())
 
   // Todas as datas do documento: [{ secao, editavel, tipo ('cidade' | 'titulo'), texto, dia, mes, ano,
   // diaEscrito, ordinal, mesEscrito, ponto }].
@@ -158,7 +163,7 @@
     return null
   }
 
-  const api = { ehOficioOuPortaria, acharData, dataPassou, dataCurta, dataPorExtenso, textoDoParagrafo, datasDoDocumento, dataEscrita, conferirData, fraseAntesDeAssinar, corrigirData }
+  const api = { ehOficioOuPortaria, ehLinhaDaData, acharData, dataPassou, dataCurta, dataPorExtenso, textoDoParagrafo, datasDoDocumento, dataEscrita, conferirData, fraseAntesDeAssinar, corrigirData }
   if (typeof module !== 'undefined' && module.exports) module.exports = api
   else raiz.ExtensaoIFTO = Object.assign(raiz.ExtensaoIFTO || {}, { dataDocumento: api })
 })(globalThis)
