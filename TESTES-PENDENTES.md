@@ -350,3 +350,8 @@ E: O espaço some do documento salvo; ao abrir o editor de novo, a extensão põ
 ### T166 – Espaço desligado e documento que já tem espaço (v0.26.11)
 F: Desligue "Espaço entre as partes do documento" nas configurações e abra um editor; ligue de novo e abra o editor de um documento já salvo com o espaço.
 E: Nos dois casos nada muda e a caixa do espaço não aparece.
+
+## Data do documento: interruptor (v0.26.12)
+### T167 – Desligar a data do documento (v0.26.12)
+F: Nas configurações, desligue "Data do documento" e abra o editor de um documento com a data de outro mês.
+E: A caixa da data e o botão "Corrigir para …" não aparecem; ligando de novo, aparecem.

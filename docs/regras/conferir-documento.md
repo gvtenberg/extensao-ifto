@@ -42,4 +42,4 @@ Decided in `specs/conferir-documento.md` (v0.26.0 to v0.26.9 and stage 7, 18/11/
 
 ## Settings
 
-- Switches (all on by default, D10): "Número do processo", "Timbre", "Rodapé", "Data do documento", "Espaço entre as partes do documento"; "Copiar o nome de quem assinou" (D15). "Minhas unidades": sigla, phone, e-mail and sector lines, saved only in the browser.
+- Switches (all on by default, D10): "Número do processo", "Timbre", "Rodapé", "Data do documento" (also the editor button "Corrigir para …": data-documento D4), "Espaço entre as partes do documento"; "Copiar o nome de quem assinou" (D15). "Minhas unidades": sigla, phone, e-mail and sector lines, saved only in the browser.

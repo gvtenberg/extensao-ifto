@@ -2,7 +2,7 @@
 
 **Sections**: 1. Goal · 2. Out of scope · 3. Decisions to confirm · 4. Decided rules · 5. What changes · 6. Stages · 7. Manual tests
 
-- **Status:** stage 1 coded (v0.23.0), waiting for the critical test T114. v0.26.9: the box became the date check of every type (`conferir-documento.md`, stage 8): button "Corrigir para …", switch "Data do documento" (answers D4).
+- **Status:** stages 1 and 2 done (v0.23.0, v0.26.12), waiting for the critical test T114. v0.26.9: the box became the date check of every type (`conferir-documento.md`, stage 8): button "Corrigir para …".
 - **Requested on:** 18/11/2026
 - **Planned version:** 0.23.0
 
@@ -21,8 +21,7 @@ In some SEI 5 document types (Ofício, Portaria) the date is filled in by the SE
 - [x] D1 – Where: box in the SEI editor window (like "Remover marca MINUTA").
 - [x] D2 – Which documents: only types whose name starts with "Ofício" or "Portaria".
 - [x] D3 – Saving: the extension only changes the text; the person checks and clicks Salvar.
-- [x] D4 – On/off setting in the settings page? Answer (18/11/2026, user): **yes, a switch, on by default**. To code (small stage).
-  - Answer:
+- [x] D4 – On/off setting in the settings page? Answer (18/11/2026): yes, on by default. It is the switch "Data do documento" (Documentos do SEI > Conferir o documento, `conferirData`, v0.26.9): off, the editor box and its button do not appear (nor the date warnings and the stop before signing). No second switch only for the button.
 
 ## 4. Decided rules
 
@@ -42,6 +41,7 @@ In some SEI 5 document types (Ofício, Portaria) the date is filled in by the SE
 ## 6. Stages
 
 - [x] Stage 1 – Ofício and Portaria: button, rule, tests (v0.23.0, 18/11/2026). Pages studied: Ofício 3163788 (CKEditor 4, section "Data" readOnly) and Portaria de Pessoal 3390422 (CKEditor 5, date in the locked "Identificador"). Tests T114 to T117.
+- [x] Stage 2 – D4: on/off switch, on by default (v0.26.12, 18/11/2026): the switch "Data do documento" already turns the editor box off (`sites/sei/data-documento.js` reads `conferirData`); its hint now also names the editor button; README updated. Test: switch off, open the editor of a document with an old date, no box.
 
 ## 7. Manual tests
 
