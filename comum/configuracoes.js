@@ -53,6 +53,8 @@
     // v0.26.9 (etapa 8): data do documento ainda não assinado (mês ou ano errado, dia que não chegou, padrão).
     conferirData: true,
     espacamentoDocumento: true,
+    // v0.29.2 (spec todos-os-estilos, D4): todos os estilos em todos os documentos (texto principal), todas as unidades.
+    todosOsEstilos: true,
     // v0.26.1 (D15): nomes de quem assinou podem ser selecionados e copiados na página do documento.
     copiarAssinaturas: true,
     unidades: Object.freeze([])

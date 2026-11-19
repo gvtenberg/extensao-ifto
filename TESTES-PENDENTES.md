@@ -412,3 +412,6 @@ E: O parágrafo continua com o estilo (número "1.1." e recuo) no editor, no doc
 ### T182 – Estilo aprendido de outro tipo (v0.29.1)
 F: Abra no editor um documento de outro tipo (ex.: Portaria) e depois um Despacho; abra a lista de estilos do Despacho.
 E: Os estilos da Portaria que o Edital não tem (ex.: "★ IFTO_Item_Nvl_1") também aparecem com "★".
+### T183 – Opção desligada com estilos da extensão (v0.29.2)
+F: Em Configurações › Documentos do SEI, desligue "Todos os estilos em todos os documentos" e abra no editor o Despacho do T181; clique em "Ligar de novo".
+E: Aparece o aviso "Este documento usa estilos da extensão…"; depois do clique, a opção volta a ficar ligada e os estilos com "★" voltam à lista.

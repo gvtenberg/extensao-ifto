@@ -8,7 +8,7 @@
 // v0.17.2: depois do SICAF, a mesma aba consulta o Simples Nacional de cada fornecedor (spec consulta-simples).
 /* global importScripts */
 if (typeof importScripts === 'function' && !(globalThis.ExtensaoIFTO && globalThis.ExtensaoIFTO.simplesNacional)) {
-  importScripts('/comum/sei.js', '/comum/minuta-edital.js', '/comum/conferir-documento.js', '/comum/data-documento.js', '/comum/configuracoes.js', '/comum/sicaf.js', '/comum/simples-nacional.js', '/comum/compras-ifto.js', '/sites/sei/editor-preencher.js', '/sites/sei/editor-minuta.js')
+  importScripts('/comum/sei.js', '/comum/minuta-edital.js', '/comum/conferir-documento.js', '/comum/data-documento.js', '/comum/configuracoes.js', '/comum/todos-os-estilos.js', '/comum/sicaf.js', '/comum/simples-nacional.js', '/comum/compras-ifto.js', '/sites/sei/editor-preencher.js', '/sites/sei/editor-minuta.js')
 }
 const navegador = globalThis.browser || globalThis.chrome
 const regras = globalThis.ExtensaoIFTO.sicaf
@@ -76,6 +76,8 @@ function tratarRecado (recado, remetente) {
     case 'numeracaoCorrigir': return numeracaoNoEditor(remetente, true)
     // v0.26.11 (spec conferir-documento, etapa 7): espaço entre as partes do documento.
     case 'estilosPreparar': return estilosNoEditor(remetente, recado.aprendidos)
+    // v0.29.2 (R7): opção desligada: o documento já tem o bloco dos estilos extras?
+    case 'estilosVerificar': return rodarNoEditor(remetente)(globalThis.ExtensaoIFTO.editorLer).then(lido => lido.ok ? { ok: true, usa: (lido.secoes || []).some(secao => globalThis.ExtensaoIFTO.todosOsEstilos.temBloco(secao.html)) } : lido)
     case 'espacamentoMedir': return espacamentoNoEditor(remetente, 'medir')
     case 'espacamentoPor': return espacamentoNoEditor(remetente, 'por', recado.bloco)
     case 'espacamentoDesfazer': return espacamentoNoEditor(remetente, 'tirar')

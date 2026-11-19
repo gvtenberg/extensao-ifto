@@ -2,7 +2,7 @@
 
 **Sections**: 1. Goal · 2. Out of scope · 3. Decisions to confirm · 4. Decided rules · 5. What changes · 6. Stages · 7. Manual tests
 
-- **Status:** in progress (stage 1 v0.29.0, stage 2 v0.29.1)
+- **Status:** done (stage 1 v0.29.0, stage 2 v0.29.1, stage 3 v0.29.2)
 - **Requested on:** 18/11/2026 (idea), planned 19/11/2026 · **Deadline or priority:** none given
 - **Planned version:** 0.29.0 (0.28.0 is taken by `aviso-versao-sei.md`; take the next free middle number when coding)
 
@@ -52,7 +52,7 @@ All answered on 19/11/2026 (user, choice window):
 
 - [x] Stage 1 – Pure rules + fixed list (`comum/todos-os-estilos.js`, Node tests) and the MAIN-world part showing the extra styles (★, order, no repeated names, note) in the main text of any document, with their formatting in the editor. Test: open a Despacho, see Edital styles, apply one.
 - [x] Stage 2 – Hidden style block in the document (R6) and learned styles (R2). Test (critical): save a Despacho with "Item_Nivel2", reopen it, see the PDF formatted.
-- [ ] Stage 3 – Settings switch (on by default), warning box when off (R7), README and `regras/sei.md`. Test: turn off, open the same Despacho, see the box; "Ligar de novo" works.
+- [x] Stage 3 – Settings switch (on by default), warning box when off (R7), README and `regras/sei.md`. Test: turn off, open the same Despacho, see the box; "Ligar de novo" works.
 
 ## 7. Manual tests
 
