@@ -21,7 +21,7 @@
   }
 
   const opcoes = await configuracoes.lerConfiguracoes()
-  if (opcoes.todosOsEstilos) { await preparar(); return }
+  if (opcoes.todosOsEstilos) { caixaEditor.quandoRemontar(preparar); await preparar(); return }
 
   // R7 (v0.29.2, etapa 3): opção desligada e o documento já usa estilos extras: avisa, sem mexer no texto.
   const verificado = await navegador.runtime.sendMessage({ tipo: 'estilosVerificar' }).catch(() => null)

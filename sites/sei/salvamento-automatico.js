@@ -98,15 +98,6 @@
   }
 
   // --- Pôr outro conteúdo no editor (restaurar, colar) e conferir se ficou igual ---
-  async function estilosDeNovo () {
-    // O editor foi montado de novo: liga de novo as ajudas da extensão que ficam no editor (tabelas, números
-    // longos dos editais, ★). O que elas já tinham posto no texto (blocos de estilo, classes, margens) vem na versão salva.
-    navegador.runtime.sendMessage({ tipo: 'tabelasPreparar', mover: opcoes.moverTabelas, margens: opcoes.margensTabela }).catch(() => {})
-    if (opcoes.numeracaoEdital) navegador.runtime.sendMessage({ tipo: 'numeracaoPreparar' }).catch(() => {})
-    if (!opcoes.todosOsEstilos) return
-    const { estilosAprendidos = {} } = await armazem.get('estilosAprendidos')
-    await navegador.runtime.sendMessage({ tipo: 'estilosPreparar', aprendidos: estilosAprendidos }).catch(() => {})
-  }
 
   // Quantos parágrafos e comentários ficaram diferentes entre o que se queria pôr e o que o editor mostra.
   function contarDiferencas (esperado, lido) {
@@ -124,7 +115,8 @@
     if (!antes.ok) { caixa.mostrar('erro', 'Não consegui ler o editor: ' + antes.erro); return false }
     const feito = await pedirAoFundo('salvamentoRestaurar', { copia: conteudo })
     if (!feito.ok) { caixa.mostrar('erro', 'Não consegui pôr o texto no editor. ' + feito.erro); return false }
-    await estilosDeNovo()
+    // O editor foi montado de novo: as ajudas que ficam nele se ligam de novo (o que já puseram no texto vem junto).
+    await caixaEditor.editorRemontado()
     await esperar(1500)
     const depois = await pedirAoFundo('salvamentoLer', { desde: false })
     const dif = depois.ok ? contarDiferencas(conteudo, depois) : { paragrafos: -1, comentarios: false }
@@ -147,7 +139,7 @@
       if (aoDesfazer) aoDesfazer.antes()
       const volta = await pedirAoFundo('salvamentoRestaurar', { copia: antes })
       if (!volta.ok) { caixa.mostrar('erro', 'Não consegui desfazer: ' + volta.erro); return }
-      await estilosDeNovo()
+      await caixaEditor.editorRemontado()
       protegida = false
       if (aoDesfazer) aoDesfazer.depois()
       else caixa.mostrar('ok', 'Pronto: o texto de antes voltou ao editor.')

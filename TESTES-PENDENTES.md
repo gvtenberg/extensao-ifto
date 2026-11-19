@@ -438,14 +438,14 @@ E: Pede confirmação, põe o texto copiado (com formatação e comentários) e 
 ### T199 – Salvamento automático desligado (v0.31.0)
 F: Com as duas opções desligadas nas configurações, abra um documento no editor.
 E: Não aparece nada da extensão ao lado do botão Salvar.
-### T200 – Correções da extensão voltam ao restaurar (v0.31.0)
+### T200 – Correções da extensão voltam ao restaurar (v0.31.1)
 F: Num Edital, use "Corrigir a numeração", um estilo com ★, a correção de espaço entre as partes e as margens de uma tabela; espere 30 segundos, feche sem salvar, abra de novo e clique em "Restaurar esta versão".
 E: Aparece "Conferido…" e tudo volta igual: números dos itens no lugar, estilo com ★, espaço entre as partes e margens da tabela.
 
 ## Dados da extensão
-### T201 – Voltar às configurações padrão (v0.31.0)
+### T201 – Voltar às configurações padrão (v0.31.1)
 F: Em Configurações > Geral, mude alguma opção e clique em "Voltar às configurações padrão"; confirme.
 E: A página recarrega com as opções do início; as outras informações da extensão continuam.
-### T202 – Apagar todos os dados da extensão (v0.31.0)
+### T202 – Apagar todos os dados da extensão (v0.31.1)
 F: Com uma versão salva de um documento, clique em Configurações > Geral > "Apagar todos os dados da extensão"; confirme e abra o documento no editor.
 E: As configurações voltam às do início e o documento abre sem o aviso de versão salva.

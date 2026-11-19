@@ -1,4 +1,4 @@
-// v0.31.0 (spec copia-editor-sei): regras da salvamento automático do editor do SEI (sem página: funcionam no
+// v0.31.0 (spec copia-editor-sei): regras do salvamento automático do editor do SEI (sem página: funcionam no
 // navegador e no Node). Uma cópia por documento, por cima da anterior, só neste computador.
 (function (raiz) {
   const PREFIXO = 'salvamentoAutomatico:'

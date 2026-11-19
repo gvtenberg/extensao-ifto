@@ -1,4 +1,4 @@
-// v0.31.0 (spec copia-editor-sei): parte da salvamento automático que roda dentro da página do editor do SEI
+// v0.31.0 (spec copia-editor-sei): parte do salvamento automático que roda dentro da página do editor do SEI
 // (scripting.executeScript, world MAIN: o editor só é alcançável pelo JavaScript da própria página).
 // Lê o texto e os comentários como o SEI os envia ao salvar (getFullData + Comentario) e recarrega o editor
 // como na recuperação do documento 3384558 (destroy + montar). NUNCA salva: a pessoa clica em Salvar.
@@ -53,7 +53,7 @@
       const comentarios = editor.plugins.has('Comentario') ? (editor.plugins.get('Comentario').getData().itens || []) : []
       const marca = JSON.stringify(comentarios)
       const versaoModelo = editor.model.document.version
-      // Só a leitura da salvamento automático ("desde") marca o que já foi guardado; as outras leituras não contam.
+      // Só a leitura do salvamento automático ("desde") marca o que já foi guardado; as outras leituras não contam.
       if (desde) {
         const igual = estado.editor === editor && versaoModelo === estado.versaoModelo && marca === estado.comentarios
         Object.assign(estado, { editor, versaoModelo, comentarios: marca })

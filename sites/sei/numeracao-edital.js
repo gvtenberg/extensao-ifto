@@ -40,5 +40,7 @@
     if (evento.source !== window || !evento.data || !evento.data.extensaoIftoNumeracao) return
     mostrar(Number(evento.data.quebrados) || 0)
   })
-  navegador.runtime.sendMessage({ tipo: 'numeracaoPreparar' }).catch(() => {})
+  const preparar = () => navegador.runtime.sendMessage({ tipo: 'numeracaoPreparar' }).catch(() => {})
+  preparar()
+  caixaEditor.quandoRemontar(preparar)
 })()

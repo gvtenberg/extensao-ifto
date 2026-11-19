@@ -121,5 +121,11 @@
     return ''
   }
 
-  raiz.ExtensaoIFTO = Object.assign(raiz.ExtensaoIFTO || {}, { caixaEditor: { criarCaixa, pedirAoFundo, criar, unidadeAberta } })
+  // v0.31.1: as ajudas que se ligam ao editor (tabelas, números longos, ★) entram nesta lista. Quando o editor é
+  // montado de novo (restaurar ou colar uma versão salva), todas se ligam de novo, sem uma lista à parte para cada ajuda.
+  const aoRemontar = []
+  const quandoRemontar = preparar => aoRemontar.push(preparar)
+  const editorRemontado = () => Promise.all(aoRemontar.map(preparar => Promise.resolve().then(preparar).catch(() => {})))
+
+  raiz.ExtensaoIFTO = Object.assign(raiz.ExtensaoIFTO || {}, { caixaEditor: { criarCaixa, pedirAoFundo, criar, unidadeAberta, quandoRemontar, editorRemontado } })
 })(globalThis)

@@ -7,5 +7,7 @@
   const navegador = globalThis.browser || globalThis.chrome
   const opcoes = await globalThis.ExtensaoIFTO.configuracoes.lerConfiguracoes()
   if (!opcoes.moverTabelas && !opcoes.margensTabela) return
-  navegador.runtime.sendMessage({ tipo: 'tabelasPreparar', mover: opcoes.moverTabelas, margens: opcoes.margensTabela }).catch(() => {})
+  const preparar = () => navegador.runtime.sendMessage({ tipo: 'tabelasPreparar', mover: opcoes.moverTabelas, margens: opcoes.margensTabela }).catch(() => {})
+  preparar()
+  globalThis.ExtensaoIFTO.caixaEditor.quandoRemontar(preparar)
 })()
