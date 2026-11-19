@@ -2,7 +2,7 @@
 
 **Sections**: Where and when · Process number · Before signing · Timbre and footer · Date · Spacing between parts · Settings
 
-Decided in `specs/conferir-documento.md` (v0.26.0 to v0.26.9 and stage 7, 18/11/2026). Code: `comum/conferir-documento.js`, `comum/data-documento.js`, `comum/espacamento-documento.js` (pure rules, Node tests) and `sites/sei/` (`conferir-documento.js`, `data-documento.js`, `espacamento-documento.js`, `editor-espacamento.js`, `documento-visualizar.js`, `assinar-conferir.js`, `lista-assinaturas.js`, `bloco-assinatura.js`).
+Decided in `specs/feitas/conferir-documento.md` (v0.26.0 to v0.26.9 and stage 7, 18/11/2026). Code: `comum/conferir-documento.js`, `comum/data-documento.js`, `comum/espacamento-documento.js` (pure rules, Node tests) and `sites/sei/` (`conferir-documento.js`, `data-documento.js`, `espacamento-documento.js`, `editor-espacamento.js`, `documento-visualizar.js`, `assinar-conferir.js`, `lista-assinaturas.js`, `bloco-assinatura.js`).
 
 ## Where and when
 
