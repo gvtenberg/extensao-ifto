@@ -27,6 +27,7 @@ Summary to resume work (on another machine or by another person) without reading
 - **Done, waiting for tests (v0.23.0, v0.26.12):** "Corrigir a data" in the Ofício/Portaria editor, on/off with the "Data do documento" switch (`specs/feitas/data-documento.md`). Tests T114–T117, T167.
 - **Done, waiting for tests (v0.26.0–v0.26.11):** check SEI documents (process number, timbre, footer, date, pre-sign window, spacing between the parts in v0.26.11) (`specs/feitas/conferir-documento.md`, rules in `regras/conferir-documento.md`). Tests T130–T157, T162–T166 (critical T136–T139, T145–T147, T154, T162).
 - **Ready to code (18/11/2026):** `specs/aviso-versao-sei.md` (warning box on the SEI when its version is untested; continue or turn the extension off on the SEI), v0.28.0.
+- **Ready to code (19/11/2026):** `specs/todos-os-estilos.md` (every SEI style in every document, main text only, hidden style block for the PDF; switch on by default, all units), v0.29.0.
 - **Planned (with spec):** lines marked **[spec]** below. **Not planned:** the other lines (ideas).
 
 ## Ideas
@@ -35,7 +36,7 @@ One line per idea. When an idea is planned, it gets a spec in `docs/specs/` and 
 
 - **Check "Interessado" and "Assunto"** (18/11/2026): like the process number, warn when they do not match the process (after `specs/feitas/conferir-documento.md`).
 - **Settings page smaller and clearer** (18/11/2026): today it is long with little information spread out; first round was stage 1 of `specs/feitas/conferir-documento.md`; later rounds as needed.
-- **All text styles in any document** (18/11/2026): the Edital has twice the styles of a Despacho; the user would like every style in every type. Check first: the editor removes a style the type does not allow (`permitidoEm`), and the final document only has the CSS of its own type, so an extra style may print without formatting.
+- **[spec]** `specs/todos-os-estilos.md` **All text styles in any document** (18/11/2026): the Edital has twice the styles of a Despacho; the user would like every style in every type. Check first: the editor removes a style the type does not allow (`permitidoEm`), and the final document only has the CSS of its own type, so an extra style may print without formatting.
 
 Marks: **[spec]** already has a spec.
 
