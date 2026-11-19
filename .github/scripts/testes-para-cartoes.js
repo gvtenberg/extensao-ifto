@@ -22,7 +22,9 @@ async function todosOsCartoes () {
   for (let pagina = 1; ; pagina++) {
     const lote = await chamar('GET', `/issues?labels=teste&state=all&per_page=100&page=${pagina}`)
     cartoes.push(...lote.filter(c => !c.pull_request))
-    if (lote.length < 100) return cartoes
+    // Para só na página vazia: logo depois de apagar cartões, o GitHub devolve páginas incompletas
+    // no meio da lista, e parar antes recriava cartões que já existiam.
+    if (lote.length === 0) return cartoes
   }
 }
 
