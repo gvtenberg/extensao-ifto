@@ -26,6 +26,7 @@ All answered on 19/11/2026 (user, choice window):
 - [x] D4 – Setting. Answer: switch in the SEI settings, **on by default**, for **all SEI units** (user, 19/11/2026).
 - [x] D5 – People without the extension. Answer: extra styles marked with "★" in the list and a one-line note at the end of the list.
 - [x] D6 – Order. Answer: the type's own styles first (as today), then the extra ones in alphabetical order.
+- [x] D8 – No repeated styles in the list (user, 19/11/2026). Answer: an extra style whose **name** the document type already has is not shown (the type's own one stays); styles with different names stay even if they look the same.
 - [x] D7 – Switch turned off and a document already uses extra styles. Answer: a small box in the editor warning that they may be lost on save, with a button to turn the switch back on.
 
 ## 4. Decided rules
@@ -33,7 +34,7 @@ All answered on 19/11/2026 (user, choice window):
 - R1 – Acts only in the SEI editor window (`acao=editor_montar`), every document type and every unit, while the switch "Todos os estilos em todos os documentos" is on (default on).
 - R2 – Style list = fixed list (from the Edital 3384558: `nome`, `classeCss`, CSS) + styles learned from each editor opened (name + CSS from `infra.estilo` and the type's CSS list); a learned style with the same name replaces the fixed one.
 - R3 – Extra styles are allowed only in the main-text parts (the roots where the type's own text styles are allowed); never in header, signature or footer roots.
-- R4 – The type's own styles first, unchanged; then the extra ones, alphabetical, shown as "★ Nome".
+- R4 – The type's own styles first, unchanged; then the extra ones, alphabetical, shown as "★ Nome". No name appears twice: an extra style with the same name as one of the type's own is left out (the type's own CSS wins), and the fixed and learned lists are merged by name (R2).
 - R5 – At the end of the list one line: "Estilos com ★ vêm da extensão; quem editar sem ela pode perder essa formatação."
 - R6 – When an extra style is used, the document gets one hidden `<style>` block (recognized by the comment `extensao-ifto: estilos extras`) with only the CSS of the extra styles in use; updated when styles change, removed when none is used. The SEI's own styles are never copied into it.
 - R7 – Switch off + document with extra styles: a box "Este documento usa estilos da extensão; ao salvar com a opção desligada, eles podem ser perdidos." with the button "Ligar de novo". Nothing is changed in the text.
@@ -49,7 +50,7 @@ All answered on 19/11/2026 (user, choice window):
 
 ## 6. Stages
 
-- [ ] Stage 1 – Pure rules + fixed list (`comum/todos-os-estilos.js`, Node tests) and the MAIN-world part showing the extra styles (★, order, note) in the main text of any document, with their formatting in the editor. Test: open a Despacho, see Edital styles, apply one.
+- [ ] Stage 1 – Pure rules + fixed list (`comum/todos-os-estilos.js`, Node tests) and the MAIN-world part showing the extra styles (★, order, no repeated names, note) in the main text of any document, with their formatting in the editor. Test: open a Despacho, see Edital styles, apply one.
 - [ ] Stage 2 – Hidden style block in the document (R6) and learned styles (R2). Test (critical): save a Despacho with "Item_Nivel2", reopen it, see the PDF formatted.
 - [ ] Stage 3 – Settings switch (on by default), warning box when off (R7), README and `regras/sei.md`. Test: turn off, open the same Despacho, see the box; "Ligar de novo" works.
 
