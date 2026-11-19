@@ -40,6 +40,9 @@ async function todosOsCartoes () {
     await chamar('POST', '/issues', { title: `${item.numero} – ${item.titulo}`, body: aviso + corpoDoCartao(item), labels })
     console.log(`Cartão criado: ${item.numero} – ${item.titulo}`)
     if (numeroRepetido) repetidos.push(item.numero)
+    // O GitHub ordena os cartões pela hora de criação, só até o segundo: cartões do mesmo segundo
+    // aparecem fora de ordem. Esperar 1,1 s entre um e outro mantém a ordem dos números.
+    await new Promise(pronto => setTimeout(pronto, 1100))
   }
 
   for (const cartao of fechar) {
