@@ -75,6 +75,7 @@ function tratarRecado (recado, remetente) {
     case 'numeracaoPreparar': return numeracaoNoEditor(remetente, false)
     case 'numeracaoCorrigir': return numeracaoNoEditor(remetente, true)
     // v0.26.11 (spec conferir-documento, etapa 7): espaço entre as partes do documento.
+    case 'estilosPreparar': return estilosNoEditor(remetente, recado.aprendidos)
     case 'espacamentoMedir': return espacamentoNoEditor(remetente, 'medir')
     case 'espacamentoPor': return espacamentoNoEditor(remetente, 'por', recado.bloco)
     case 'espacamentoDesfazer': return espacamentoNoEditor(remetente, 'tirar')
@@ -523,6 +524,17 @@ async function numeracaoNoEditor (remetente, corrigir) {
   const alvo = { tabId: remetente.tab.id, frameIds: [remetente.frameId || 0] }
   if (!corrigir) await navegador.scripting.executeScript({ target: alvo, world: 'MAIN', files: ['comum/numeracao-edital.js', 'sites/sei/editor-numeracao.js'] })
   return rodarNoEditor(remetente)(fazer => fazer ? globalThis.ExtensaoIFTO.editorNumeracao.corrigir() : globalThis.ExtensaoIFTO.editorNumeracao.preparar(), [corrigir])
+}
+
+// v0.29.0 (spec todos-os-estilos): põe na página do editor (world MAIN) as regras e o código dos estilos extras
+// (reusa acharEditor da numeração) e junta os estilos que faltam ao tipo de documento.
+async function estilosNoEditor (remetente, aprendidos) {
+  const alvo = { tabId: remetente.tab.id, frameIds: [remetente.frameId || 0] }
+  const [temNumeracao] = await navegador.scripting.executeScript({ target: alvo, world: 'MAIN', func: () => Boolean(globalThis.ExtensaoIFTO && globalThis.ExtensaoIFTO.editorNumeracao) })
+  const arquivos = ['comum/todos-os-estilos.js', 'sites/sei/editor-estilos.js']
+  if (!(temNumeracao && temNumeracao.result)) arquivos.unshift('sites/sei/editor-numeracao.js')
+  await navegador.scripting.executeScript({ target: alvo, world: 'MAIN', files: arquivos })
+  return rodarNoEditor(remetente)(lista => globalThis.ExtensaoIFTO.editorEstilos.preparar(lista), [aprendidos || {}])
 }
 
 // v0.26.11 (spec conferir-documento, etapa 7): põe na página do editor (world MAIN) o código que mede as partes

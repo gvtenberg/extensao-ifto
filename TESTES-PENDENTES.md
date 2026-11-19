@@ -398,3 +398,11 @@ E: Nenhuma função da extensão aparece no SEI (barra IFTO, lista de assinatura
 ### T178 – Ativar de novo (v0.28.0)
 F: Em Configurações › Geral clique em "Ativar de novo" e abra outra página do SEI.
 E: As funções da extensão voltam no SEI; o cartão mostra "Extensão ligada no SEI".
+
+## Todos os estilos em todos os documentos
+### T179 – Estilos do Edital num Despacho (v0.29.0)
+F: Abra um Despacho no editor do SEI, clique no texto principal e abra a lista de estilos.
+E: Depois dos estilos do Despacho aparecem os outros em ordem alfabética, com "★" (ex.: "★ Item_Nivel2"), sem nome repetido, e no fim a nota "Estilos com ★ vêm da extensão…"; escolhendo um, o parágrafo fica formatado.
+### T180 – Estilos extras só no texto principal (v0.29.0)
+F: No mesmo Despacho, clique no cabeçalho ou na assinatura e abra a lista de estilos.
+E: Ali não aparece nenhum estilo com "★": só os do próprio SEI.

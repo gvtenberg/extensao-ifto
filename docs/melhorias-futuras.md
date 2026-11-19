@@ -27,7 +27,7 @@ Summary to resume work (on another machine or by another person) without reading
 - **Done, waiting for tests (v0.23.0, v0.26.12):** "Corrigir a data" in the Ofício/Portaria editor, on/off with the "Data do documento" switch (`specs/feitas/data-documento.md`). Tests T114–T117, T167.
 - **Done, waiting for tests (v0.26.0–v0.26.11):** check SEI documents (process number, timbre, footer, date, pre-sign window, spacing between the parts in v0.26.11) (`specs/feitas/conferir-documento.md`, rules in `regras/conferir-documento.md`). Tests T130–T157, T162–T166 (critical T136–T139, T145–T147, T154, T162).
 - **Done, waiting for tests (v0.28.0):** SEI version warning: box on an untested SEI version, continue or turn the extension off on the SEI; "Ativar de novo" in the icon window and settings (`specs/feitas/aviso-versao-sei.md`, rules in `regras/sei.md`). Tests T176–T178.
-- **Ready to code (19/11/2026):** `specs/todos-os-estilos.md` (every SEI style in every document, main text only, hidden style block for the PDF; switch on by default, all units), v0.29.0.
+- **In progress (v0.29.0):** `specs/todos-os-estilos.md` (every SEI style in every document, main text only, hidden style block for the PDF; switch on by default, all units). Stage 1 done (extra styles with ★ in the editor list); next: stage 2. Tests T179–T180.
 - **Planned (with spec):** lines marked **[spec]** below. **Not planned:** the other lines (ideas).
 
 ## Ideas
