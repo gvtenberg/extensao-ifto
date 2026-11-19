@@ -7,5 +7,11 @@
   if (window.top !== window) return
   const navegador = globalThis.browser || globalThis.chrome
   const { estilosAprendidos = {} } = await navegador.storage.local.get('estilosAprendidos')
-  await navegador.runtime.sendMessage({ tipo: 'estilosPreparar', aprendidos: estilosAprendidos }).catch(() => null)
+  const resposta = await navegador.runtime.sendMessage({ tipo: 'estilosPreparar', aprendidos: estilosAprendidos }).catch(() => null)
+  // R2 (v0.29.1, etapa 2): guarda os estilos deste tipo de documento, para oferecê-los nos outros tipos.
+  const proprios = resposta && resposta.ok && resposta.proprios
+  if (!proprios || !Object.keys(proprios).length) return
+  const { estilosAprendidos: atuais = {} } = await navegador.storage.local.get('estilosAprendidos')
+  const juntos = { ...atuais, ...proprios }
+  if (JSON.stringify(juntos) !== JSON.stringify(atuais)) await navegador.storage.local.set({ estilosAprendidos: juntos })
 })()

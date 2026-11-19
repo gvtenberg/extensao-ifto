@@ -72,6 +72,15 @@
     return achado ? achado[1].split(',').filter(Boolean) : null
   }
   const temBloco = html => String(html || '').includes(MARCA)
+  // Tira o bloco do texto (o editor tira os atributos do <style>, o comentário com a marca fica).
+  const tirarBloco = html => String(html || '').replace(/<style\b[^>]*>(?:(?!<\/style>)[\s\S])*?extensao-ifto: estilos extras[\s\S]*?<\/style>/gi, '')
+
+  // Nomes dos estilos extras usados nos parágrafos (o que o editor guarda em cada um), sem repetir.
+  function extrasEmUso (estilosDosParagrafos, extras) {
+    const nomes = new Set((extras || []).map(extra => extra.nome || extra))
+    return [...new Set((estilosDosParagrafos || []).filter(nome => nomes.has(nome)))]
+  }
+  const mesmosNomes = (a, b) => a.length === b.length && [...a].sort().join(',') === [...b].sort().join(',')
 
   // Lista fixa: os 41 estilos do Edital do SEI do IFTO (documento 3384558, 19/11/2026), nome e CSS.
   const FIXOS = [
@@ -118,7 +127,7 @@
     ["Texto_Justificado_Recuo_Primeira_Linha_Esp_Simples", [".Texto_Justificado_Recuo_Primeira_Linha_Esp_Simples{max-width:604px; text-align:justify; font-size:1em; font-family:Calibri; text-indent:25mm;word-wrap:normal;margin:0 0 0 .75cm;;}"]]
   ]
 
-  const api = { MARCA, ESTRELA, NOTA, ESTILOS_DE_TEXTO, FIXOS, nomeDaRegra, estilosDoEditor, listaCompleta, raizesDoTexto, estilosExtras, blocoDeEstilo, nomesNoBloco, temBloco }
+  const api = { MARCA, ESTRELA, NOTA, ESTILOS_DE_TEXTO, FIXOS, nomeDaRegra, estilosDoEditor, listaCompleta, raizesDoTexto, estilosExtras, blocoDeEstilo, nomesNoBloco, temBloco, tirarBloco, extrasEmUso, mesmosNomes }
   if (typeof module !== 'undefined' && module.exports) module.exports = api
   else raiz.ExtensaoIFTO = Object.assign(raiz.ExtensaoIFTO || {}, { todosOsEstilos: api })
 })(globalThis)

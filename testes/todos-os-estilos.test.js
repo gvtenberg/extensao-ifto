@@ -40,3 +40,11 @@ test('blocoDeEstilo: só o CSS dos extras em uso, com a marca; vazio sem nenhum'
   assert.equal(r.blocoDeEstilo([], todos), '')
   assert.ok(r.temBloco(bloco))
 })
+
+test('tirarBloco tira só o bloco da extensão; extrasEmUso só os extras, sem repetir', () => {
+  const bloco = r.blocoDeEstilo(['A'], { A: ['.A{x:1}'] })
+  assert.equal(r.tirarBloco('<p>' + bloco + '<style>.outro{}</style>texto</p>'), '<p><style>.outro{}</style>texto</p>')
+  assert.deepEqual(r.extrasEmUso(['A', 'Texto_Justificado', 'A', undefined, 'B'], [{ nome: 'A' }, { nome: 'B' }]), ['A', 'B'])
+  assert.ok(r.mesmosNomes(['B', 'A'], ['A', 'B']))
+  assert.ok(!r.mesmosNomes(['A'], ['A', 'B']))
+})

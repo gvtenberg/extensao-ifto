@@ -406,3 +406,9 @@ E: Depois dos estilos do Despacho aparecem os outros em ordem alfabética, com "
 ### T180 – Estilos extras só no texto principal (v0.29.0)
 F: No mesmo Despacho, clique no cabeçalho ou na assinatura e abra a lista de estilos.
 E: Ali não aparece nenhum estilo com "★": só os do próprio SEI.
+### T181 – Despacho salvo com estilo do Edital (v0.29.1) (Crítico)
+F: Num Despacho de teste, aplique "★ Item_Nivel2" num parágrafo, clique em Salvar, feche e abra o editor de novo; depois veja o documento e gere o PDF.
+E: O parágrafo continua com o estilo (número "1.1." e recuo) no editor, no documento e no PDF.
+### T182 – Estilo aprendido de outro tipo (v0.29.1)
+F: Abra no editor um documento de outro tipo (ex.: Portaria) e depois um Despacho; abra a lista de estilos do Despacho.
+E: Os estilos da Portaria que o Edital não tem (ex.: "★ IFTO_Item_Nvl_1") também aparecem com "★".
