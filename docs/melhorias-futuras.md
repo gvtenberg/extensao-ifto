@@ -77,5 +77,6 @@ Marks: **[spec]** already has a spec.
 ### Distribution
 
 - Chrome version: free package without the store, done in v0.5.0 (`publicacao.md`, "Chrome version"). **[spec]** Chrome Web Store, unlisted, personal account (US$5 once; user, 18/11/2026): draft with step by step and privacy page in `specs/chrome-web-store.md`, to be planned better.
+- **"What's new" between published versions** (19/11/2026, user): for each version published on GitHub (Releases), a list of the features added or removed compared with the previous published version (not commit by commit), in plain Portuguese for users, e.g. "adicionada opção para remover MINUTA de edital".
 - When the extension leaves development: decide whether the "Procurar atualização" button leaves the icon window (12/11/2026).
 - Mozilla "unlisted" signing via GitHub, with automatic updates: prepared in v0.1.1 and v0.1.2 (`publicacao.md`); the user still has to create the keys. Later, maybe, for campus colleagues. Colleagues currently use SEI Pro.
