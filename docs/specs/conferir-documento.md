@@ -79,7 +79,7 @@ People copy an old document and forget to fix the "Processo nº:" line, the sect
 - [x] Stage 4 – Pre-sign window: "Assinar Documento" in the tree and "Assinar" in the editor (v0.26.3). Critical test (signs in the SEI).
 - [x] Stage 5 – Pre-sign window in the signature list (v0.26.4) and in the Bloco de assinatura (v0.26.6: list of blocks, documents of the block, document window). Critical tests.
 - [x] Stage 6 – Timbre and footer: warnings, "Corrigir" buttons, "Usar este timbre como padrão da unidade" (v0.26.5).
-- [ ] Stage 7 – Spacing in every type (gap detection, style block, automatic, "Desfazer"), including the gaps last body line → date → signer's name when the date is at the end (Atestes, D21) (T123 passed). Needs saved editor pages of Ofício and Memorando too. Critical test: saved Despacho and PDF; plus one test with an Ofício.
+- [ ] Stage 7 – Spacing in every type (gap detection, style block, automatic, "Desfazer"), including the gaps last body line → date → signer's name when the date is at the end (Atestes, D21) (T123 passed). Saved editor pages: Despacho (`Tela-edicao-documento-SEI.html`, `3390347.html`) and Ofício (`SEI_IFTO - 3163788 - Ofício.html`); there is no Memorando at IFTO (replaced by the Despacho, user 19/11/2026). Critical test: saved Despacho and PDF; plus one test with an Ofício.
 
 - [x] Stage 8 – Date of the document (D18–D21): warning on the document page and in the editor, "Corrigir para …", stop before signing, switch "Data do documento" (v0.26.9). Tests T150–T157 (T154 critical).
 
