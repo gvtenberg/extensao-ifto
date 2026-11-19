@@ -4,6 +4,7 @@
 // outras unidades, com "Sempre ligada".
 // v0.18.0 (pedido de 13/11/2026): na CGOC, um botão "Incluir SICAF, Simples e Anexo"; nas outras unidades,
 // dois: "Incluir SICAF" e "Incluir Simples Nacional".
+// v0.26.10 (pedido de 19/11/2026, T62): nas outras unidades só "Incluir SICAF" (licitação não usa o Simples).
 (async function () {
   const ExtensaoIFTO = globalThis.ExtensaoIFTO
   const { sicaf: regras, configuracoes } = ExtensaoIFTO
@@ -32,7 +33,7 @@
     `
     const opcoesDoBotao = cgoc
       ? [['tudo', 'Incluir SICAF, Simples e Anexo', 'Buscar o SICAF e o Simples Nacional do CNPJ ']]
-      : [['sicaf', 'Incluir SICAF', 'Buscar o SICAF do CNPJ '], ['simples', 'Incluir Simples Nacional', 'Consultar o Simples Nacional do CNPJ ']]
+      : [['sicaf', 'Incluir SICAF', 'Buscar o SICAF do CNPJ ']]
     const caixa = document.createElement('div')
     caixa.className = 'botoes'
     for (const [quais, texto, dica] of opcoesDoBotao) {
@@ -52,7 +53,7 @@
       caixa.append(botao)
     }
     const topo = Math.min(retangulo.bottom + 6, window.innerHeight - 34)
-    const esquerda = Math.min(Math.max(retangulo.left, 4), window.innerWidth - (cgoc ? 250 : 340))
+    const esquerda = Math.min(Math.max(retangulo.left, 4), window.innerWidth - (cgoc ? 250 : 140))
     Object.assign(caixa.style, { top: Math.max(topo, 4) + 'px', left: Math.max(esquerda, 4) + 'px' })
     raiz.append(estilo, caixa)
     document.documentElement.append(hospedeiro)
@@ -77,7 +78,7 @@
     if (!achado || !achado.valido) { esconder(); return }
     const retangulo = selecao.getRangeAt(0).getBoundingClientRect()
     if (!retangulo.width && !retangulo.height) { esconder(); return }
-    mostrar(achado.cnpj, retangulo, regras.ehCgoc(unidade))
+    mostrar(achado.cnpj, retangulo, regras.ehCgoc(unidade) && opcoes.incluirSicaf === 'automatica')
   }
 
   let espera = null

@@ -37,13 +37,14 @@
     if (!regras.funcaoLigada(opcoes.incluirSicaf, unidade)) {
       janela.abrir({
         titulo: 'Buscar SICAF',
-        conteudo: [criar('p', { textContent: 'Nesta unidade a busca do SICAF está desligada. Para usar, abra as configurações da extensão e, em "SICAF da nota fiscal", escolha "Sempre ligada".' })],
+        conteudo: [criar('p', { textContent: 'Nesta unidade a busca do SICAF está desligada. Para usar, abra as configurações da extensão e, em "SICAF e Simples Nacional", escolha "Sempre ligada".' })],
         botoes: [{ texto: 'Fechar', tipo: 'principal', aoClicar: j => j.fechar() }]
       })
       return
     }
     // Seleção: o botão escolhido; menu do botão direito: tudo na CGOC, só o SICAF nas outras unidades.
-    const quais = ['tudo', 'sicaf', 'simples'].includes(recado.quais) ? recado.quais : (regras.ehCgoc(unidade) ? 'tudo' : 'sicaf')
+    // v0.26.10: "Sempre ligada" = só o Sicaf, também na CGOC.
+    const quais = ['tudo', 'sicaf', 'simples'].includes(recado.quais) ? recado.quais : (regras.ehCgoc(unidade) && opcoes.incluirSicaf === 'automatica' ? 'tudo' : 'sicaf')
     janelaDoCnpj(recado.cnpj ? regras.formatarCnpj(recado.cnpj) : recado.texto || '', quais)
   })
 
@@ -526,7 +527,7 @@
     aberta = janela.abrir({
       titulo: regras.textoDoAviso(notas.length),
       conteudo: [
-        criar('p', { className: 'apoio', textContent: 'Notas depois da última Folha de Encaminhamento, conferidas com o ateste. Você pode clicar na árvore do processo com esta janela aberta.' + (escolher ? ' Desmarque as notas que não devem ser consultadas (por exemplo, uma nota cancelada).' : '') }),
+        criar('p', { className: 'apoio', textContent: 'Notas depois da última Folha de Encaminhamento, conferidas com o ateste.' + (escolher ? ' Clique numa nota para desmarcá-la (por exemplo, uma nota cancelada).' : '') }),
         ...cartoes,
         alerta
       ],
@@ -563,13 +564,23 @@
 
   function cartaoDaNota (nota, { cnpjsComSicaf, raizesComConsulta }, aoMarcar) {
     const titulo = `Nota ${nota.numero || '?'} – ${nota.fornecedor || 'fornecedor'}` + (nota.sei ? ` (SEI ${nota.sei})` : '')
-    const partes = [criar('div', { className: 'linha' }, [criar('h2', { textContent: titulo }), botaoVerNota(nota)])]
-    const cartao = criar('div', { className: 'cartao' })
+    // v0.26.10 (pedido de 19/11/2026, T76): cartão compacto (caixa de marcar na linha do título) para caberem
+    // umas 10 notas sem rolar; um clique em qualquer parte livre do cartão marca ou desmarca a nota.
+    const cabeca = [criar('h2', { textContent: titulo }), botaoVerNota(nota)]
+    const partes = [criar('div', { className: 'linha' }, cabeca)]
+    const cartao = criar('div', { className: 'cartao compacto' })
     if (aoMarcar) {
-      const marca = criar('input', { type: 'checkbox', checked: nota.marcada })
-      marca.addEventListener('change', () => { nota.marcada = marca.checked; cartao.classList.toggle('desmarcada', !marca.checked); aoMarcar() })
+      const marca = criar('input', { type: 'checkbox', checked: nota.marcada, title: 'Consultar esta nota' })
+      const mudar = () => { nota.marcada = marca.checked; cartao.classList.toggle('desmarcada', !marca.checked); aoMarcar() }
+      marca.addEventListener('change', mudar)
       cartao.classList.toggle('desmarcada', !nota.marcada)
-      partes.push(criar('label', { className: 'escolha' }, [marca, 'Consultar esta nota']))
+      cartao.classList.add('clicavel')
+      cartao.addEventListener('click', evento => {
+        if (evento.target.closest('input, button, label, a, select, textarea')) return
+        marca.checked = !marca.checked
+        mudar()
+      })
+      cabeca.unshift(marca)
     }
     if (nota.escolher) {
       const nome = 'cnpj-' + nota.id
@@ -589,7 +600,7 @@
       })
       partes.push(criar('p', { textContent: 'Escolha o CNPJ do fornecedor:' }), ...opcoes, criar('label', {}, ['Outro (digite ou cole):', outro]))
     } else {
-      partes.push(criar('p', { textContent: 'CNPJ do fornecedor: ' + regras.formatarCnpj(nota.cnpj) }))
+      partes.push(criar('p', { className: 'detalhe', textContent: 'CNPJ do fornecedor: ' + regras.formatarCnpj(nota.cnpj) }))
     }
     for (const aviso of nota.avisos) partes.push(criar('p', { className: 'aviso ' + aviso.nivel, textContent: aviso.texto }))
     if (nota.cnpj && cnpjsComSicaf.has(nota.cnpj)) partes.push(criar('p', { className: 'aviso verde', textContent: 'Este fornecedor já tem Sicaf neste trecho do processo.' }))

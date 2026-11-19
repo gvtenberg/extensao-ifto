@@ -13,7 +13,8 @@ Decided on 13/11/2026 (spec `specs/feitas/sicaf-automatico.md`, v0.10.0 to v0.15
 ## Settings and units
 
 - Option "SICAF e Simples Nacional" (D4): **Automática** (default) = the invoice button only in the CGOC (CGOC/GAC/DAP/PAL/REI/IFTO); **Sempre ligada** (bidding team, until it has its own settings; v0.18.0) = only the "Incluir SICAF" bar button (type or paste the CNPJ, no invoice needed) in any unit with a process open, which adds **only the Sicaf** (also in the CGOC; no invoice notice); **Desligada** = nothing. With Automática, the selected-CNPJ buttons and menu also work only in the CGOC (v0.16.0; elsewhere the menu says to choose "Sempre ligada").
-- Selected CNPJ (v0.18.0): in the CGOC one button "Incluir SICAF, Simples e Anexo" (Sicaf, Consulta and the Anexos of that supplier's pending invoices); in other units two buttons, "Incluir SICAF" and "Incluir Simples Nacional" (only that document). Right-click menu: everything in the CGOC, only the Sicaf elsewhere.
+- Selected CNPJ (v0.18.0): in the CGOC one button "Incluir SICAF, Simples e Anexo" (Sicaf, Consulta and the Anexos of that supplier's pending invoices); elsewhere (and in the CGOC with "Sempre ligada") only "Incluir SICAF" (v0.26.10, user 19/11/2026: other units check the company's SICAF in bidding processes, before any invoice; only the CGOC uses invoice data and the Simples). Right-click menu: everything in the CGOC with Automática, only the Sicaf otherwise.
+- Invoices window (v0.26.10, T76): compact cards, about 10 invoices fit without scrolling (scroll kept as a last resort); a click on a free part of an invoice card ticks or unticks it.
 - Access to Compras.gov.br (`www3.comprasnet.gov.br`, `comprasnet.gov.br`, `www.comprasnet.gov.br`, `cnetmobile.estaleiro.serpro.gov.br`) and to Downloads is an **optional permission**, asked once from the settings ("Permitir acesso ao Compras.gov.br"), so colleagues who do not use it are never asked.
 
 ## Pending invoices

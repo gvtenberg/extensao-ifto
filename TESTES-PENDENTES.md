@@ -35,35 +35,13 @@ E: O painel volta no lugar em que você o deixou e no item 3; "Lugar padrão" o 
 ### T18 – Ciência, minimizar e atalhos (v0.3.0)
 F: Vá a um item com "dar ciência", clique em "–" (minimizar) e depois em "▢"; com o documento aberto, aperte Alt+→ e Alt+←.
 E: O item de ciência aparece em azul com "Só dar ciência"; minimizado, sobra uma barrinha com o contador; os atalhos passam para o próximo e voltam.
-### T19 – Opção nas configurações (v0.3.0)
-F: Configurações > Lista de assinaturas no SEI: escolha "Desligada", recarregue o SEI; depois "Sempre ligada" e troque para outra unidade; feche e abra o Firefox e veja a escolha.
-E: Desligada, o painel some; "Sempre ligada", aparece em qualquer unidade; a escolha continua marcada depois de reabrir o Firefox.
 ### T25 – Dar ciência e próximo (v0.5.0)
 F: Num item de "dar ciência", clique em "Dar ciência e próximo" e confirme no OK do SEI.
 E: A ciência é registrada e o painel abre o próximo item, com o anterior marcado ✓.
-### T27 – Instalar no Chrome (v0.5.0)
-> No computador de desenvolvimento (ou com o .zip da Release, depois do git push).
-F: Rode npm run empacotar-chrome, abra chrome://extensions > Modo do desenvolvedor > Carregar sem compactação > pasta web-ext-artifacts/chrome/extensao-ifto-chrome-0.5.0; entre no SEI na unidade PAL/REI/IFTO.
-E: A extensão aparece sem erros, o painel da lista de assinaturas funciona e a janela do ícone mostra "Procurar atualização".
-
 ## Documentos do pagamento: preenchimento do documento externo (v0.6.0)
-### T28 – Documento externo novo já preenchido (v0.6.0)
-F: Num processo, clique em Incluir Documento > Externo (não salve).
-E: Data de hoje, Nato-digital e Público já marcados, com o aviso verde "Preenchido pela extensão: confira…"; o botão "Novo documento" da extensão não aparece mais.
 ### T29 – Documento externo que já existe não muda (v0.6.0)
 F: Abra um documento externo já incluído (com ou sem arquivo) e clique em Alterar; depois desmarque "Preencher documento externo novo" nas Configurações e repita o T28.
 E: O documento existente fica como estava, sem aviso verde; com a opção desmarcada, o documento novo vem em branco, como no SEI.
-
-## Documentos do pagamento: barra da extensão e botão da CGOC (v0.7.0)
-### T30 – Botão da CGOC só com processo aberto (v0.7.0)
-F: No SEI, na unidade CGOC/GAC/DAP/PAL/REI/IFTO, veja o Controle de Processos e depois abra um processo; troque para uma unidade sem função da extensão (ex.: outra coordenação).
-E: No Controle de Processos não há botão nem barra; na outra unidade a barra não aparece; com o processo aberto aparece, no alto à direita, "IFTO Incluir Sicaf, Consulta e Anexo" (por enquanto, ao clicar, só avisa que chega na próxima versão).
-### T31 – Lista de assinaturas na mesma barra (v0.7.0)
-F: Na unidade PAL/REI/IFTO, veja o Controle de Processos e um processo; clique em "Lista de assinaturas". Depois, nas Configurações, ponha os dois em "Sempre ligada" e abra um processo.
-E: O botão da lista fica no mesmo lugar de antes e o painel abre logo abaixo; com as duas ligadas, os dois botões ficam lado a lado.
-### T32 – Configurações por unidade (v0.7.0)
-F: Clique no ícone da extensão > Configurações.
-E: Primeiro "Geral (todas as unidades)"; depois "Por unidade", com Direção-geral (lista de assinaturas) e CGOC (documentos do pagamento), cada uma com Automática, Sempre ligada e Desligada.
 
 ## Documentos do pagamento: incluir os três documentos (v0.8.0)
 > Use um processo de teste (ou um processo de pagamento que vá mesmo receber os três), na unidade CGOC.
@@ -96,10 +74,6 @@ E: O arquivo externo não entra na lista. No documento de outro setor, a extens�
 F: Clique no ícone da extensão > Configurações e role até o fim da página; clique em "abrir um pedido".
 E: Aparece o quadro "Erros e sugestões de melhoria" com a orientação de procurar a CGOC; o link abre a página de pedidos numa nova aba.
 
-### T43 – Novo ícone com a marca do IF (v0.9.5)
-F: Depois de atualizar a extensão, olhe o ícone na barra do navegador (Firefox e Chrome), no tema claro e no escuro, e em Extensões (about:addons ou chrome://extensions).
-E: Aparece a marca do Instituto Federal (bolinha vermelha e quadrados verdes), nítida e fácil de reconhecer. Se não ficar bom, comente no cartão para voltar ao ícone anterior.
-
 ### T44 – Vários documentos separados por vírgula (v0.9.6)
 F: Cole na lista de assinaturas "23236.022824/2026-10 - 3384598, 3384598, 3384645, 3384674" e clique em "Conferir e começar"; depois limpe e cole "23236.022824/2026-10 - 3384598 a 3384674".
 E: Na primeira forma, a lista tem 3 itens (3384598, 3384645, 3384674; o repetido conta uma vez). Na segunda, ao abrir o processo, a linha vira um item para cada documento do processo entre os dois números.
@@ -107,10 +81,6 @@ E: Na primeira forma, a lista tem 3 itens (3384598, 3384645, 3384674; o repetido
 ### T45 – Painel continua na tela ao abrir o processo (v0.9.6)
 F: Clique no ícone da extensão; se aparecer "Permitir no SEI", clique e confirme. Na Direção-geral, cole uma lista e clique em "Conferir e começar"; depois aperte F5.
 E: O processo abre e o painel da lista continua na tela, também depois de recarregar a página, sem precisar clicar no ícone da extensão.
-
-### T46 – Atualizar pela página da versão (v0.9.7)
-F: Com uma versão nova pronta, clique no ícone da extensão > Procurar atualização > Abrir a página da versão…; na página, clique no arquivo que termina em .xpi > Permitir > Adicionar.
-E: Aparece só o botão "Abrir a página da versão…" (sem "Instalar a versão…"); a página abre numa nova aba e, depois de Adicionar, a janela do ícone mostra a versão nova.
 
 ## SICAF automático: notas sem SICAF (v0.10.0)
 > Na CGOC (CGOC/GAC/DAP/PAL/REI/IFTO), com a opção "SICAF da nota fiscal" em Automática (padrão).
@@ -158,10 +128,6 @@ E: Os três documentos em branco aparecem na árvore, como antes.
 ### T61 – Incluir SICAF em outra unidade (v0.15.0)
 F: Numa unidade que não é a CGOC, abra um processo, clique em "Incluir SICAF" no alto à direita, cole um CNPJ e clique em "Buscar no SICAF"; depois, "Incluir no processo".
 E: Volta do SICAF com o PDF e a janela mostra só "Sicaf <empresa>"; depois de incluir, a árvore mostra só esse Sicaf com o PDF (sem Consulta nem Anexo).
-### T62 – Desligada (v0.15.0)
-F: Nas configurações, deixe "SICAF da nota fiscal" em "Desligada"; no SEI, selecione um CNPJ e abra um processo com nota sem SICAF na CGOC.
-E: Não aparece o botão "Buscar SICAF", nem o aviso de notas sem SICAF, nem "Incluir SICAF".
-
 ## SICAF automático: só na CGOC e documentos em branco (v0.16.0)
 ### T63 – Preencher Sicaf, Consulta e Anexo em branco (v0.16.0) (Crítico)
 F: Num processo com nota sem SICAF, clique antes em "Incluir Sicaf, Consulta e Anexo" (cria os três em branco); depois faça o T55 e, na janela, clique em "Incluir no processo".
@@ -186,9 +152,6 @@ E: Não abre o SICAF nem o Simples Nacional de novo (os PDFs de hoje já servem)
 ### T71 – Nota da HM lida pelo texto (v0.17.3)
 F: No processo 23236.023830/2025-11, clique em "1 nota sem SICAF – Buscar".
 E: A nota 3626 mostra o CNPJ 14.159.957/0006-02 tirado da nota, sem o aviso de "imagem". Se aparecer "Não consegui ler a nota", comente.
-### T72 – Login do Compras e SICAF sem cliques (v0.17.3) (Crítico)
-F: Saído do Compras.gov.br, clique em "Buscar" > "Buscar no SICAF".
-E: A extensão clica em "Entrar com Gov.br"; depois do Gov.br, abre sozinha o SICAF pelo seu nome (no alto, à direita) e faz a busca. Comente em que página parou, se parar, e o texto do aviso.
 ### T73 – Incluir no processo com o PDF (v0.17.3) (Crítico)
 F: Depois do T72, na janela "Incluir no processo…", clique em "Incluir no processo".
 E: A árvore recarrega com "Sicaf <nome da empresa>" (abre o PDF do SICAF), "Consulta" e "Anexo Instrumento de Cobrança NF nº 3626 …", sem a mensagem de erro 404.
@@ -201,21 +164,9 @@ E: no alto à direita aparece uma caixa pequena com "IFTO" e os botões um embai
 F: no SEI da CGOC, abra um processo com nota sem SICAF, clique em "1 nota sem SICAF – Buscar" e faça a busca até voltar ao SEI.
 E: o cartão da nota mostra o CNPJ lido da nota (sem "não consegui ler"); depois da busca, não aparece "Não consegui ler o PDF do SICAF para conferir o CNPJ".
 
-### T76 – Nome do fornecedor limpo e janela sem rolagem para o lado (v0.17.5)
-F: no fim da busca do T75, olhe a janela "Incluir Sicaf, Consulta e Anexo".
-E: o título mostra só "CNPJ – NOME DA EMPRESA" (sem "Relatórios" nem texto estranho) e a janela não tem barra de rolagem para o lado.
-
-### T77 – Janela do ícone sem a mensagem do SEI reconhecido (v0.17.6)
-F: abra o SEI do IFTO e depois clique no ícone da extensão.
-E: não aparece mais "SEI do IFTO reconhecido"; só aparece aviso amarelo se o SEI tiver um problema (com o motivo).
-
 ### T78 – Botão único na CGOC (v0.18.0)
 F: abra um processo de pagamento com nota fiscal depois da última Folha de Encaminhamento, sem Sicaf nem Consulta.
 E: a barra mostra só "1 nota sem SICAF ou Simples – Buscar"; o botão "Incluir Sicaf, Consulta e Anexo" não aparece mais. Num processo sem notas pendentes, nenhum botão.
-
-### T79 – Busca do SICAF e do Simples juntos (v0.18.0)
-F: clique no botão do T78 e em "Buscar SICAF e Simples"; faça o login Gov.br e a verificação, se pedirem.
-E: na volta, a janela mostra para cada fornecedor "PDF do SICAF obtido" e "PDF do Simples Nacional obtido", cada um com "Ver o PDF", e a lista: Sicaf (com o PDF), Consulta Simples Nacional … (com o PDF) e Anexo de cada nota.
 
 ### T80 – Incluir os três no processo (v0.18.0) (Crítico)
 F: na janela do T79, clique em "Incluir no processo".
@@ -225,14 +176,6 @@ E: aparecem na árvore o Sicaf com o PDF, a "Consulta Simples Nacional NOME DA E
 F: na CGOC, selecione um CNPJ num documento do SEI. Depois, em outra unidade com "Sempre ligada", faça o mesmo.
 E: na CGOC aparece "Incluir SICAF, Simples e Anexo"; na outra unidade aparecem "Incluir SICAF" e "Incluir Simples Nacional", e cada um inclui só o seu documento.
 
-### T82 – Equipe de licitação: "Sempre ligada" (v0.18.0)
-F: Configurações > "SICAF e Simples Nacional" > "Sempre ligada"; abra qualquer processo (também na CGOC), clique em "Incluir SICAF" e digite um CNPJ.
-E: a barra mostra só "Incluir SICAF" (sem aviso de notas); no fim, só o Sicaf com o PDF é incluído, sem Consulta nem Anexo. Depois, volte a opção para "Automática".
-
-### T83 – Nomes dos arquivos para baixar (v0.18.1)
-F: Abra a página da versão 0.18.1 no GitHub (ícone da extensão > Procurar atualização > Abrir a página da versão).
-E: Aparecem extensao-ifto-firefox-0.18.1.xpi e extensao-ifto-chrome-edge-0.18.1.zip; clicar no do Firefox instala normalmente.
-
 ### T84 – PDFs buscados na hora e cópia opcional (v0.18.2)
 F: Em Configurações, desmarque "Guardar uma cópia do PDF do SICAF na pasta Downloads"; num processo da CGOC, clique em "Incluir SICAF, Simples e Anexo" duas vezes seguidas (cancelando a primeira inclusão).
 E: Nas duas vezes o SICAF e o Simples Nacional abrem e buscam de novo; o nome do fornecedor aparece limpo (só o nome da empresa); só o PDF do Simples vai para Downloads.
@@ -240,14 +183,6 @@ E: Nas duas vezes o SICAF e o Simples Nacional abrem e buscam de novo; o nome do
 ### T85 – Não incluir de novo o Sicaf e a Consulta que já estão no processo (v0.18.2)
 F: Num processo onde a extensão já incluiu o Sicaf e a Consulta da nota, recarregue a página (F5); depois selecione o CNPJ do fornecedor e clique em "Incluir SICAF, Simples e Anexo".
 E: Depois do F5, o botão "notas sem SICAF ou Simples" não aparece para essa nota; com o CNPJ selecionado, os sites não abrem e a janela diz que o Sicaf e a Consulta já estão no processo e não serão incluídos de novo.
-### T86 – Dicas nas configurações (v0.18.3)
-F: Clique no ícone da extensão > Configurações e desça até o quadro "Dicas".
-E: Aparecem a dica de deixar só a senha do SEI no Firefox e a de diminuir PDF com links para o ilovepdf.com e o pdf24.org (abrem em outra aba).
-
-### T87 – Senha reconhecida na assinatura feita dentro do editor (v0.18.4)
-F: Abra um documento seu para editar (ex.: um ateste), clique em "Assinar" na barra do editor e clique no campo Senha.
-E: O Firefox oferece a senha do SEI guardada (ou ela já aparece preenchida); depois de assinar com uma senha nova, o Firefox pergunta se quer guardá-la.
-
 ## SICAF: escolher as notas e site fora do ar (v0.18.5)
 > antes de testar: um processo da CGOC com duas ou mais notas fiscais depois da última Folha de Encaminhamento.
 ### T88 – Escolher as notas que serão consultadas (v0.18.5)
@@ -316,10 +251,6 @@ E: Quando os PDFs chegam ao SEI, a aba da busca (SICAF e depois Simples Nacional
 
 > antes de testar: SEI na unidade PAL/REI/IFTO (Direção-geral), com a extensão atualizada.
 
-### T111 – Botão só aparece onde deve (v0.22.0)
-F: Abra no editor uma Minuta de Edital; depois, troque para outra unidade (ex.: CGOC) e abra o mesmo Edital no editor.
-E: Na Minuta de Edital não aparece o botão. Na outra unidade também não (com a opção em "Automática").
-
 ### T114 – Mudar a data de um Ofício para hoje e salvar (v0.23.0) (Crítico)
 F: Abra no editor um Ofício com data antiga, clique em "Mudar a data para hoje", confira e clique em Salvar; feche e abra o documento de novo.
 E: A data passa a ser a de hoje e continua a de hoje depois de salvar e abrir de novo; o resto do texto fica igual.
@@ -331,14 +262,6 @@ E: Só a data da linha "PORTARIA … nº …, de …" muda para hoje; as datas c
 ### T116 – Aviso só quando a data já passou (v0.23.0)
 F: Abra no editor um Ofício criado hoje e depois um Despacho antigo.
 E: Nos dois não aparece o aviso "Mudar a data para hoje".
-
-### T118 – Recortar e colar trecho com tabela (v0.24.0)
-F: No editor, selecione um trecho com texto e uma tabela, Ctrl+X, clique em outro lugar do mesmo documento e Ctrl+V.
-E: A tabela aparece no lugar novo com a mesma largura, as mesmas colunas e as mesmas margens; Ctrl+Z desfaz.
-
-### T125 – Campos de margem mostram a tabela atual (v0.25.1)
-F: Clique numa tabela, abra "Propriedades da tabela" e veja a parte "Margens, em pixels (px)".
-E: Aparecem quatro campos (Acima, Direita, Abaixo, Esquerda) já preenchidos com as margens que a tabela tem hoje; parando o mouse num campo aparece o valor padrão dele.
 
 ### T126 – Mudar uma margem em pixels (v0.25.1)
 F: Na mesma janela, troque só o campo Esquerda para 28 e clique em OK; abra a janela de novo.
@@ -423,3 +346,14 @@ E: A janela mostra o documento com "Data errada: …" e pergunta se quer assinar
 ### T157 – Desligar a conferência da data (v0.26.9)
 F: Nas configurações > Documentos do SEI, desmarque "Data do documento" e abra um documento com data errada.
 E: Nenhum aviso de data; ao marcar de novo, o aviso volta.
+
+## SICAF: outras unidades e janela das notas (v0.26.10)
+### T158 – Outras unidades: só "Incluir SICAF" (v0.26.10)
+F: Nas configurações da extensão, em "SICAF e Simples Nacional", marque "Sempre ligada". No SEI, entre numa unidade que não é a CGOC, abra qualquer documento e selecione com o mouse um CNPJ.
+E: Aparece só o botão "Incluir SICAF" (sem "Incluir Simples Nacional"). As três opções das configurações explicam para quem cada uma serve.
+### T159 – Desligada (v0.26.10)
+F: Nas configurações da extensão, em "SICAF e Simples Nacional", marque "Desligada". No SEI, na CGOC, abra um processo com nota fiscal sem SICAF e selecione um CNPJ num documento.
+E: Nenhum botão do SICAF aparece: nem o aviso das notas, nem o "Incluir SICAF" no alto, nem botão ao selecionar o CNPJ.
+### T160 – Janela das notas compacta (v0.26.10)
+F: Na CGOC, com "Automática", abra um processo com várias notas sem SICAF e clique no aviso "notas sem SICAF – Buscar". Clique no meio de uma das notas.
+E: As notas aparecem em linhas mais baixas (umas 10 cabem sem rolar a janela); o clique na nota desmarca ela (fica apagada) e outro clique marca de novo.

@@ -30,6 +30,18 @@
     .cartao { border: 1px solid #E2E6E3; border-radius: 8px; padding: 10px 12px; display: grid; grid-template-columns: minmax(0, 1fr); gap: 6px; }
     /* v0.18.5: nota desmarcada (não será consultada) fica apagada */
     .cartao.desmarcada { opacity: .55; }
+    /* v0.26.10 (T76): cartão das notas compacto; o clique no cartão marca ou desmarca. */
+    .cartao.compacto { padding: 5px 10px; gap: 3px; }
+    .cartao.compacto h2 { font-size: 13px; flex: 1; }
+    .cartao.compacto .linha { justify-content: flex-start; }
+    .cartao.compacto p { margin: 0; }
+    .cartao.compacto .detalhe { font-size: 12px; color: #4A5650; }
+    .cartao.compacto .aviso { padding: 3px 8px; font-size: 12px; }
+    .cartao.compacto label.escolha { font-size: 13px; }
+    .cartao.compacto button.pequeno { min-height: 22px; padding: 0 8px; font-size: 12px; }
+    .corpo:has(> .cartao.compacto) { gap: 5px; }
+    .cartao.clicavel { cursor: pointer; }
+    .cartao.clicavel:hover { background: #F4F8F5; }
     .cartao h2 { font-size: 15px; margin: 0; font-weight: 600; min-width: 0; }
     .aviso { border-radius: 8px; padding: 8px 10px; font-size: 13px; }
     .aviso.vermelho { background: #FDE7E4; color: #8A1F14; }

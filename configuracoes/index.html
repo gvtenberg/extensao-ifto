@@ -170,12 +170,10 @@
       <section class="grupo" id="sicaf">
         <h2>SICAF e Simples Nacional</h2>
         <div class="cartao">
-          <!-- v0.18.0: um botão só na CGOC; "Sempre ligada" é a da equipe de licitação (só o Sicaf). -->
-          <p class="apoio">Na CGOC, com um processo aberto, aparece o botão "2 notas sem SICAF ou Simples – Buscar" quando há notas fiscais depois da última Folha de Encaminhamento. Um clique busca o SICAF e o Simples Nacional de cada fornecedor e, depois que você confirma, inclui o Sicaf e a Consulta com os PDFs e um Anexo em branco para cada nota.</p>
-          <p class="apoio">Ao selecionar um CNPJ numa página do SEI, aparece "Incluir SICAF, Simples e Anexo" (na CGOC) ou "Incluir SICAF" e "Incluir Simples Nacional" (nas outras unidades).</p>
-          <label class="opcao"><input type="radio" name="incluirSicaf" value="automatica"><span>Automática (pagamento de notas fiscais, só na CGOC)</span></label>
-          <label class="opcao"><input type="radio" name="incluirSicaf" value="sempre"><span>Sempre ligada, em qualquer unidade: só o botão "Incluir SICAF", sem precisar de nota fiscal (equipe de licitação)</span></label>
-          <label class="opcao"><input type="radio" name="incluirSicaf" value="desligada"><span>Desligada</span></label>
+          <!-- v0.26.10 (pedido de 19/11/2026, T62): texto mais claro; cada opção diz para quem é. -->
+          <label class="opcao"><input type="radio" name="incluirSicaf" value="automatica"><span><strong>Automática</strong> – para a CGOC (pagamento de notas fiscais). Na CGOC, com um processo aberto, aparece o botão "2 notas sem SICAF ou Simples – Buscar" quando há notas fiscais sem SICAF: ele busca o SICAF e o Simples Nacional de cada empresa e, depois que você confirma, inclui os documentos no processo. Ao selecionar um CNPJ, aparece "Incluir SICAF, Simples e Anexo". Nas outras unidades, nada aparece.</span></label>
+          <label class="opcao"><input type="radio" name="incluirSicaf" value="sempre"><span><strong>Sempre ligada</strong> – para as outras unidades (por exemplo, a licitação), sem precisar de nota fiscal. Em qualquer unidade, com um processo aberto, aparece no alto o botão "Incluir SICAF": cole o CNPJ da empresa e ele inclui o SICAF no processo. Ao selecionar um CNPJ numa página do SEI, aparece o botão "Incluir SICAF".</span></label>
+          <label class="opcao"><input type="radio" name="incluirSicaf" value="desligada"><span><strong>Desligada</strong> – nenhum botão do SICAF aparece.</span></label>
         </div>
         <div class="cartao">
           <!-- v0.18.2: cópia de cada PDF na pasta Downloads, uma opção por documento. -->
