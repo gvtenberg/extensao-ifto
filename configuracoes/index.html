@@ -26,6 +26,9 @@
     .unidade textarea { min-height: 60px; resize: vertical; }
     .unidade .acoes { display: flex; justify-content: flex-end; }
     .botao.pequeno { min-height: 32px; padding: 0 12px; }
+    .campo { display: grid; gap: 2px; font-size: 13px; color: var(--texto-2); margin: 4px 0 8px; }
+    .campo input, .campo textarea, .campo select { font: inherit; color: var(--texto); padding: 6px 8px; border: 1px solid var(--borda-forte); border-radius: 6px; width: 100%; background: var(--cartao); }
+    .campo textarea { min-height: 60px; resize: vertical; }
     #gravado { position: fixed; right: 16px; bottom: 16px; }
     @media (max-width: 720px) {
       .pagina { grid-template-columns: 1fr; }
@@ -54,7 +57,7 @@
           <label class="opcao">
             <input type="checkbox" id="preencherDocumentoExterno">
             <span>Preencher documento novo
-              <span class="dica">Documento externo: data de hoje, Nato-digital e Público. Documento interno: Público. Documentos que já existem não mudam.</span></span>
+              <span class="dica">Documento externo: data de hoje, formato e nível de acesso (escolha em "Documentos do SEI"). Documento interno: Público. Documentos que já existem não mudam.</span></span>
           </label>
           <label class="opcao">
             <input type="checkbox" id="senhaReconhecidaPeloNavegador">
@@ -122,6 +125,45 @@
             <input type="checkbox" id="numeracaoEdital">
             <span>Números longos nos itens de edital
               <span class="dica">Botão "Corrigir a numeração" quando o texto de um item vai para a linha de baixo (como "10.10.").</span></span>
+          </label>
+        </div>
+        <!-- v0.27.0 (spec base-e-sei, etapa 2): valores do documento externo novo e tipo pelo nome do arquivo. -->
+        <div class="cartao" id="externo">
+          <h1>Documento externo novo</h1>
+          <p class="apoio">Em "Incluir Documento › Externo", a extensão já deixa estes valores escolhidos (com "Preencher documento novo" ligado, em Geral). Você confere e clica em Salvar.</p>
+          <p class="apoio"><strong>Nível de acesso</strong></p>
+          <label class="opcao"><input type="radio" name="externoNivel" value="publico"><span>Público</span></label>
+          <label class="opcao"><input type="radio" name="externoNivel" value="restrito"><span>Restrito
+            <span class="dica">A hipótese legal abaixo é escolhida na lista do SEI.</span></span></label>
+          <label class="campo">Hipótese legal (basta uma parte do nome, como aparece no SEI)<input data-config="externoHipoteseLegal" placeholder="Informação Pessoal"></label>
+          <p class="apoio"><strong>Formato</strong></p>
+          <label class="opcao"><input type="radio" name="externoFormato" value="nato"><span>Nato-digital (o arquivo nasceu no computador)</span></label>
+          <label class="opcao"><input type="radio" name="externoFormato" value="digitalizado"><span>Digitalizado (papel escaneado)</span></label>
+          <label class="campo">Tipo de conferência do digitalizado
+            <select data-config="externoConferencia">
+              <option value="">Eu escolho no SEI</option>
+              <option>Documento Original</option>
+              <option>Cópia Autenticada Administrativamente</option>
+              <option>Cópia Autenticada por Cartório</option>
+              <option>Cópia Simples</option>
+            </select>
+          </label>
+        </div>
+        <div class="cartao">
+          <h1>Ao escolher o arquivo</h1>
+          <p class="apoio">Vale em "Incluir Documento › Externo" e ao arrastar arquivos para o processo. Se você já escolheu o tipo, ele não muda.</p>
+          <p class="apoio">O tipo do documento vem do começo do nome do arquivo: "Nota Fiscal 123.pdf" fica com o tipo Nota Fiscal e o Nome na Árvore "123". Se o nome não começar com um tipo do SEI, valem as regras abaixo e, depois, o tipo padrão.</p>
+          <label class="campo">Regras próprias (uma por linha: palavra do nome do arquivo = tipo do SEI)<textarea data-config="externoRegras" placeholder="SICAF = Sicaf&#10;FGTS = Certidão"></textarea></label>
+          <label class="campo">Tipo padrão (quando nada acima serve; vazio = eu escolho)<input data-config="externoTipoPadrao" placeholder="Anexo"></label>
+          <label class="opcao">
+            <input type="checkbox" id="externoNomeArvore">
+            <span>Preencher o Nome na Árvore com o nome do arquivo
+              <span class="dica">Só quando o campo está vazio.</span></span>
+          </label>
+          <label class="opcao">
+            <input type="checkbox" id="externoCorrigirNome">
+            <span>Trocar "#" por "_" no nome do arquivo
+              <span class="dica">O SEI não aceita arquivo com "#" no nome.</span></span>
           </label>
         </div>
       </section>
@@ -245,6 +287,7 @@
   <script src="../comum/configuracoes.js"></script>
   <script src="../comum/conferir-documento.js"></script>
   <script src="../comum/sei.js"></script>
+  <script src="../comum/documento-externo.js"></script>
   <script src="../comum/sicaf.js"></script>
   <script src="../comum/simples-nacional.js"></script>
   <script src="../comum/compras-ifto.js"></script>

@@ -117,4 +117,17 @@
       mostrarAviso()
     })
   }
+
+  // v0.27.0 (spec base-e-sei, etapa 2): campos de texto e listas (data-config = nome da opção); grava ao sair
+  // do campo. "externoRegras" fica guardada como lista ({ contem, tipo }) e aparece uma regra por linha.
+  const { lerRegras, regrasEmTexto } = globalThis.ExtensaoIFTO.documentoExterno
+  for (const campo of document.querySelectorAll('[data-config]')) {
+    const chave = campo.dataset.config
+    campo.value = chave === 'externoRegras' ? regrasEmTexto(configuracoes[chave]) : (configuracoes[chave] || '')
+    campo.addEventListener('change', async () => {
+      configuracoes[chave] = chave === 'externoRegras' ? lerRegras(campo.value) : campo.value.trim()
+      await gravarConfiguracoes(configuracoes)
+      mostrarAviso()
+    })
+  }
 })()

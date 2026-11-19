@@ -22,7 +22,7 @@ A extensão funciona apenas no endereço `sei.ifto.edu.br` e, para quem der a pe
 
 Para todas as unidades:
 
-- **Documento externo já preenchido:** ao incluir um documento externo, a página já vem com a data de hoje, o formato Nato-digital e o nível de acesso Público. Documentos que já existem no processo não são alterados.
+- **Documento externo já preenchido:** ao incluir um documento externo, a página já vem com a data de hoje e com o formato e o nível de acesso escolhidos nas configurações (de início, Nato-digital e Público). Ao escolher o arquivo, a extensão escolhe o tipo pelo nome do arquivo ("Nota Fiscal 123.pdf" fica Nota Fiscal, com o Nome na Árvore "123"), troca o "#" do nome por "_" (o SEI não aceita) e avisa quando o arquivo passa de 10 MB, com dicas para diminuí-lo. Você confere e clica em Salvar. Documentos que já existem no processo não são alterados.
 - **Senha reconhecida pelo navegador:** a versão atual do SEI esconde o campo de senha de um jeito que o navegador deixa de oferecer a senha guardada. A extensão corrige isso na tela de entrada do SEI e na janela de assinatura.
 
 Para unidades específicas (ligadas automaticamente na unidade indicada, e podem ser ligadas em qualquer unidade nas configurações):
@@ -101,7 +101,7 @@ Para abrir: clique no ícone da extensão e em **Configurações**. Cada escolha
 
 **Geral (todas as unidades)**
 
-- **Preencher documento externo novo** (ligada de início): data de hoje, Nato-digital e Público ao incluir um documento externo.
+- **Preencher documento novo** (ligada de início): data de hoje, formato e nível de acesso ao incluir um documento externo (os valores ficam em Documentos do SEI).
 - **Navegador reconhece o campo de senha** (ligada de início): faz o navegador voltar a oferecer a senha guardada no SEI.
 
 **Documentos do SEI (todas as unidades)**
@@ -109,6 +109,8 @@ Para abrir: clique no ícone da extensão e em **Configurações**. Cada escolha
 - **Conferir o documento** (cinco opções, ligadas de início): número do processo, timbre e rodapé (unidades do Campus Palmas), data do documento e espaço entre as partes do documento. Número do processo: quando a linha "Processo nº:" (ou o título do Edital) não é a do processo em que o documento está, aparece um aviso na página do documento (só antes de assinar) e, no editor, o botão "Corrigir o número do processo". Ao assinar (pela árvore ou no editor) um documento com o número errado, a extensão pergunta antes "Assinar mesmo assim?"; na lista de assinaturas, um intervalo de documentos é conferido de uma vez, numa janela só; no Bloco de assinatura, os documentos do bloco são conferidos antes de assinar. Timbre e rodapé (unidades do Campus Palmas): a extensão compara com os dados de "Minhas unidades" (sem cadastro, com o telefone e o e-mail gerais do campus) e avisa o que está errado, com os botões "Corrigir timbre" e "Corrigir rodapé" no editor; "Usar este timbre como padrão da unidade" guarda as linhas do setor do documento aberto. Espaço entre as partes: ao abrir o editor de um documento ainda não assinado, a extensão põe uma linha de espaço onde as partes estão grudadas (timbre, número, data, processo, nome de quem assina) e mostra onde, com o botão "Desfazer". Data do documento: em documentos ainda não assinados, avisa a data com mês ou ano errado, de um dia que ainda não chegou ou fora do padrão ("Palmas, 1º de dezembro de 2026."), com o botão "Corrigir para …" no editor, e pergunta antes de assinar com a data errada; dá para desligar em "Data do documento". Nada é salvo sem você clicar em Salvar.
 - **Copiar o nome de quem assinou** (ligada de início): na página do documento, os nomes da caixa "Documento assinado eletronicamente por…" podem ser selecionados e copiados.
 - **Editor do SEI:** tabelas inteiras ao recortar e colar, margens da tabela e números longos nos itens de edital.
+- **Documento externo novo:** nível de acesso (Público, ou Restrito com a hipótese legal), formato (Nato-digital, ou Digitalizado com o tipo de conferência).
+- **Ao escolher o arquivo:** regras próprias para o tipo (uma por linha, como "SICAF = Sicaf"), tipo padrão, Nome na Árvore com o nome do arquivo e troca do "#" por "_" (as duas últimas ligadas de início). O tipo só é escolhido se você ainda não escolheu um.
 
 **Minhas unidades**
 

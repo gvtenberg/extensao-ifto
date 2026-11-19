@@ -3,6 +3,19 @@
   const PADROES = Object.freeze({
     // v0.6.0: data de hoje, Nato-digital e Público em todo documento externo novo
     preencherDocumentoExterno: true,
+    // v0.27.0 (spec base-e-sei, etapa 2): valores do documento externo novo. Nível "publico" ou "restrito"
+    // (com a hipótese legal: parte do nome dela na lista do SEI); formato "nato" ou "digitalizado" (com o
+    // tipo de conferência: nome na lista do SEI; vazio = a pessoa escolhe).
+    externoNivel: 'publico',
+    externoHipoteseLegal: '',
+    externoFormato: 'nato',
+    externoConferencia: '',
+    // D14: tipo pelo nome do arquivo; depois as regras da pessoa ({ contem, tipo }); depois o tipo padrão.
+    externoTipoPadrao: '',
+    externoRegras: Object.freeze([]),
+    // D7: "Nome na Árvore" a partir do nome do arquivo. D9: "#" no nome do arquivo vira "_".
+    externoNomeArvore: true,
+    externoCorrigirNome: true,
     senhaReconhecidaPeloNavegador: true,
     // v0.2.0: "automatica" (só na Direção-geral, PAL/REI/IFTO), "sempre" ou "desligada"
     listaAssinaturas: 'automatica',

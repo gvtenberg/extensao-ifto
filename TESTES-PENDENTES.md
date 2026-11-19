@@ -355,3 +355,15 @@ E: Nos dois casos nada muda e a caixa do espaço não aparece.
 ### T167 – Desligar a data do documento (v0.26.12)
 F: Nas configurações, desligue "Data do documento" e abra o editor de um documento com a data de outro mês.
 E: A caixa da data e o botão "Corrigir para …" não aparecem; ligando de novo, aparecem.
+
+## Documento externo pré-preenchido (v0.27.0)
+### T168 – Documento externo com os valores das configurações (v0.27.0)
+F: Em Configurações › Documentos do SEI, marque Restrito, escreva "Informação Pessoal" em Hipótese legal e marque Digitalizado com "Cópia Simples"; depois, num processo, clique em Incluir Documento › Externo.
+E: A página abre com a data de hoje, Digitalizado com Cópia Simples, Restrito com a hipótese "Informação Pessoal" e o aviso verde "Preenchido pela extensão: confira…"; nada é salvo.
+### T169 – Tipo pelo nome do arquivo no documento externo (v0.27.0)
+F: Em Incluir Documento › Externo, sem escolher o tipo, clique em "Anexar Arquivo..." e escolha um PDF chamado "Nota Fiscal 123.pdf".
+E: O tipo fica "Nota fiscal", o Nome na Árvore fica "123" e aparece o aviso "Pelo nome do arquivo, a extensão escolheu…"; ao salvar, o documento entra com esse tipo. Com um tipo já escolhido antes, o tipo não muda.
+> os arquivos de teste estão no computador de desenvolvimento (ferramentas-de-teste/arquivos-sei).
+### T170 – Arquivo grande ou com "#" no documento externo (v0.27.0)
+F: Em Incluir Documento › Externo, anexe "teste tamanho C" (acima de 10 MB); depois, "teste 01-cerquilha-#.pdf"; depois, um PDF de 3 a 9 MB.
+E: O arquivo C não é anexado e aparece o aviso vermelho com os links do pdf24.org e do ilovepdf.com; o arquivo com "#" é anexado com "_" no lugar do "#"; o PDF médio é anexado com a dica amarela de diminuir.

@@ -31,3 +31,52 @@ test('documento interno novo: página documento_gerar', () => {
   assert.equal(ehDocumentoInternoNovo('https://sei.ifto.edu.br/sei/controlador.php?acao=documento_alterar&id_documento=1'), false)
   assert.equal(ehDocumentoInternoNovo('https://sei.ifto.edu.br/sei/controlador.php?acao=documento_receber'), false)
 })
+
+// v0.27.0 (spec base-e-sei, etapa 2, D14): tipo do documento pelo nome do arquivo.
+const { tipoPeloNome, lerRegras, regrasEmTexto, avisosDoArquivo, corrigirNomeDoArquivo, tamanhoEmTexto, LIMITE_SEI } = require('../comum/documento-externo.js')
+const TIPOS = ['Anexo', 'Nota', 'Nota fiscal', 'Nota Técnica', 'Sicaf', 'Certidão', 'Consulta']
+
+test('tipo pelo nome: o nome de tipo mais longo que começa o arquivo', () => {
+  assert.deepEqual(tipoPeloNome('Nota Fiscal 123.pdf', TIPOS), { tipo: 'Nota fiscal', origem: 'nome', nomeArvore: '123' })
+  assert.deepEqual(tipoPeloNome('nota_fiscal_45.pdf', TIPOS), { tipo: 'Nota fiscal', origem: 'nome', nomeArvore: '45' })
+  assert.equal(tipoPeloNome('Nota 7.pdf', TIPOS).tipo, 'Nota')
+  assert.equal(tipoPeloNome('certidao FGTS.pdf', TIPOS).tipo, 'Certidão')
+  assert.equal(tipoPeloNome('Sicaf - Empresa X.pdf', TIPOS).nomeArvore, 'Empresa X')
+  assert.equal(tipoPeloNome('Sicaf.pdf', TIPOS).nomeArvore, '')
+})
+
+test('tipo pelo nome: palavra só parecida não conta', () => {
+  assert.equal(tipoPeloNome('Notas da reunião.pdf', TIPOS).tipo, null)
+  assert.equal(tipoPeloNome('Anexos.pdf', TIPOS).tipo, null)
+})
+
+test('tipo pelo nome: depois as regras da pessoa, depois o tipo padrão', () => {
+  const regras = lerRegras('SICAF = Sicaf\nfgts=Certidão\nlinha sem igual\n = Anexo')
+  assert.deepEqual(regras, [{ contem: 'SICAF', tipo: 'Sicaf' }, { contem: 'fgts', tipo: 'Certidão' }])
+  assert.equal(regrasEmTexto(regras), 'SICAF = Sicaf\nfgts = Certidão')
+  assert.deepEqual(tipoPeloNome('relatório sicaf empresa.pdf', TIPOS, { regras }), { tipo: 'Sicaf', origem: 'regra', nomeArvore: 'relatório sicaf empresa' })
+  assert.deepEqual(tipoPeloNome('relatório.pdf', TIPOS, { regras, padrao: 'anexo' }), { tipo: 'Anexo', origem: 'padrao', nomeArvore: 'relatório' })
+  // Regra ou padrão com tipo que não existe no SEI: nada.
+  assert.equal(tipoPeloNome('relatório.pdf', TIPOS, { regras: [{ contem: 'rel', tipo: 'Inexistente' }], padrao: 'Outro' }).tipo, null)
+})
+
+test('nome na árvore com no máximo 50 letras', () => {
+  assert.ok(tipoPeloNome('Anexo ' + 'palavra '.repeat(10) + '.pdf', TIPOS).nomeArvore.length <= 50)
+})
+
+test('nome do arquivo: só o "#" vira "_" (D9)', () => {
+  assert.equal(corrigirNomeDoArquivo('NF #12 ção–x.pdf'), 'NF _12 ção–x.pdf')
+  assert.equal(corrigirNomeDoArquivo('sem nada.pdf'), 'sem nada.pdf')
+})
+
+test('tamanho: limite de 10 MiB e dica para PDF acima de 2 MB (D10, D11, D12)', () => {
+  assert.equal(LIMITE_SEI, 10485760)
+  assert.equal(tamanhoEmTexto(10600000), '10,1 MB')
+  assert.equal(avisosDoArquivo({ nome: 'a.pdf', tamanho: 10200000 })[0].nivel, 'dica')
+  assert.equal(avisosDoArquivo({ nome: 'a.pdf', tamanho: 10600000 })[0].nivel, 'erro')
+  const planilha = avisosDoArquivo({ nome: 'a.xlsx', tamanho: 10600000 })[0]
+  assert.equal(planilha.nivel, 'erro')
+  assert.match(planilha.partes.join(' '), /zip/)
+  assert.deepEqual(avisosDoArquivo({ nome: 'a.xlsx', tamanho: 5000000 }), [])
+  assert.deepEqual(avisosDoArquivo({ nome: 'a.pdf', tamanho: 1000000 }), [])
+})
