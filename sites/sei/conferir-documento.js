@@ -51,7 +51,6 @@
   // Número do processo: caixa no alto.
   if (processo && !processo.certo) {
     const caixa = caixaEditor.criarCaixa('conferir-processo', regras.avisoDoProcesso(processo), 'Corrigir o número do processo')
-    Object.assign(caixa.corpo.parentElement.style, { top: '16px', bottom: 'auto' })
     if (processo.link || !processo.editavel) {
       caixa.botao.remove()
       caixa.corpo.append(caixaEditor.criar('p', {
@@ -77,7 +76,6 @@
   if (!timbreErrado && !rodapeErrado) return
   const partes = [timbreErrado && 'o timbre', rodapeErrado && 'o rodapé'].filter(Boolean).join(' e ')
   const caixa = caixaEditor.criarCaixa('conferir-timbre', `Confira ${partes} desta unidade (${sigla}):`, 'Corrigir')
-  Object.assign(caixa.corpo.parentElement.style, { left: '16px', right: 'auto' })
   caixa.botao.remove()
   const lista = caixaEditor.criar('ul')
   for (const aviso of [...(timbreErrado ? regras.avisosDoTimbre(timbre) : []), ...(rodapeErrado ? rodape.avisos : [])]) lista.append(caixaEditor.criar('li', { textContent: aviso }))

@@ -412,3 +412,7 @@ E: Aparece "O número do processo está errado (documento no processo X, texto d
 ### T148 – Rodapé com telefone e e-mail de outro setor do campus (v0.26.7)
 F: Sem telefone e e-mail cadastrados em "Minhas unidades", abra um documento cujo rodapé tem 63 3236-4023 e gise.palmas@ifto.edu.br; depois cadastre outro telefone e e-mail na unidade e abra de novo.
 E: Sem cadastro, não aparece aviso sobre telefone nem e-mail (e "Corrigir rodapé" os mantém); com cadastro, o aviso pede o telefone e o e-mail cadastrados.
+
+### T149 – Todos os avisos numa janela só (v0.26.8)
+F: Abra no editor um documento com número do processo errado e rodapé errado (num edital, também a marca MINUTA); arraste a janela pela barra de cima e role a página.
+E: Os avisos aparecem juntos numa janela no canto inferior direito, cada um com seu botão e seu ×; a janela vai para onde foi arrastada e fica parada na tela ao rolar.

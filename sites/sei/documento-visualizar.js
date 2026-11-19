@@ -36,7 +36,6 @@
     const processo = regras.conferirProcesso(secoes)
     if (processo && !processo.certo) {
       const caixa = caixaEditor.criarCaixa('conferir-processo', regras.avisoDoProcesso(processo), 'Abrir o editor para corrigir')
-      Object.assign(caixa.corpo.parentElement.style, { top: '16px', bottom: 'auto' })
       botaoDoEditor(caixa)
     }
   }
@@ -50,7 +49,6 @@
   if (!avisos.length) return
   const partes = [timbre && !timbre.certo && 'o timbre', rodape && !rodape.certo && 'o rodapé'].filter(Boolean).join(' e ')
   const caixa = caixaEditor.criarCaixa('conferir-timbre', `Confira ${partes} desta unidade (${sigla}):`, 'Abrir o editor para corrigir')
-  Object.assign(caixa.corpo.parentElement.style, { left: '16px', right: 'auto' })
   const lista = caixaEditor.criar('ul')
   for (const aviso of avisos) lista.append(caixaEditor.criar('li', { textContent: aviso }))
   caixa.botao.before(lista)

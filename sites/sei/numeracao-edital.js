@@ -16,10 +16,9 @@
 
   function mostrar (quebrados) {
     if (corrigindo) return
-    if (!quebrados) { if (caixa) { caixa.hospedeiro.remove(); caixa = null } return }
-    if (caixa && document.body.contains(caixa.hospedeiro)) { caixa.corpo.querySelector('p').textContent = texto(quebrados); return }
+    if (!quebrados) { if (caixa) { caixa.remover(); caixa = null } return }
+    if (caixa && caixa.item.isConnected) { caixa.corpo.querySelector('p').textContent = texto(quebrados); return }
     caixa = caixaEditor.criarCaixa('numeracao-edital', texto(quebrados), 'Corrigir a numeração')
-    caixa.hospedeiro = document.querySelector('[data-extensao-ifto="numeracao-edital"]')
     caixa.botao.addEventListener('click', async () => {
       corrigindo = true
       caixa.botao.disabled = true
