@@ -459,3 +459,6 @@ E: Aparece a mensagem "Arraste um arquivo só…" e nada é enviado ao SEI.
 ### T215 – Documento que já tem conteúdo não recebe arquivo (v0.32.0)
 F: Abra um documento externo que já tem arquivo (ou um documento feito no SEI) e arraste um arquivo para a página dele.
 E: Não aparece "Solte aqui para anexar…" nem a janela da extensão.
+### T216 – Dica "PDF no Firefox como no Chrome" (v0.32.0)
+F: Abra as configurações da extensão e clique em Dicas.
+E: Aparece a dica "PDF no Firefox como no Chrome" com 4 passos numerados; a dica da senha do SEI também aparece em passos numerados.

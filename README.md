@@ -150,8 +150,9 @@ Cada função abaixo tem três opções: **Automática** (liga só na unidade in
 
 **Dicas**
 
-- **Só a senha do SEI na assinatura (Firefox):** como fazer o Firefox oferecer no SEI só a senha do SEI, e não as do SUAP, Moodle etc.
-- **PDF grande demais para o SEI** (limite de 10 MB): sites para diminuir o PDF, o ilovepdf.com (mais rápido) e o pdf24.org (diminui mais).
+- **PDF no Firefox como no Chrome:** quatro ajustes no Firefox para o PDF anexado no SEI aparecer na página sem ser salvo e o link de baixar perguntar o nome e a pasta, sem abrir outra aba.
+- **Só a senha do SEI na assinatura (Firefox):** o Firefox passa a oferecer no SEI só a senha do SEI, e não as do SUAP, Moodle etc.
+- **PDF grande demais para o SEI** (limite de 10 MB): dois sites para diminuir o PDF: ilovepdf.com (mais rápido) e pdf24.org (diminui mais).
 
 ## Quais dados a extensão lê e guarda
 

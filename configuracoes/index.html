@@ -328,14 +328,28 @@
         </div>
       </section>
 
-      <!-- v0.18.3: dicas pedidas no teste T26 (senha do SEI no Firefox e compactar PDF). -->
+      <!-- v0.18.3: dicas pedidas no teste T26 (senha do SEI no Firefox e compactar PDF); v0.32.0: PDF no Firefox como no Chrome. -->
       <section class="grupo" id="dicas">
         <h2>Dicas</h2>
         <div class="cartao">
-          <p class="apoio"><strong>Só a senha do SEI na assinatura (Firefox):</strong> o Firefox oferece no SEI as senhas guardadas de qualquer site do IFTO (SUAP, Moodle etc.). Para ele oferecer só a do SEI: digite <code>about:config</code> na barra de endereço e tecle Enter; clique em "Aceitar o risco e continuar"; na busca, digite <code>signon.includeOtherSubdomainsInLookup</code>; clique no botão ⇄ à direita até o valor ficar <code>false</code>. Com uma senha só, o Firefox já a preenche na assinatura.</p>
+          <p class="apoio"><strong>PDF no Firefox como no Chrome:</strong> o PDF anexado no SEI aparece na página, sem ser salvo; o link de baixar pergunta o nome e a pasta, sem abrir outra aba. No Firefox:</p>
+          <ol class="apoio">
+            <li>Menu ☰ › <strong>Configurações</strong> › <strong>Geral</strong> › <strong>Arquivos e aplicativos</strong>: em <strong>Downloads</strong>, marque <strong>Sempre perguntar onde salvar arquivos</strong>.</li>
+            <li>Logo abaixo, em <strong>Aplicativos</strong>, na linha <strong>Portable Document Format (PDF)</strong>, escolha <strong>Abrir no Firefox</strong>.</li>
+            <li>Em <strong>O que o Firefox deve fazer com outros arquivos?</strong>, deixe <strong>Salvar arquivos automaticamente</strong> (vale para Word, Excel, zip etc.; o Firefox ainda pergunta o nome e a pasta).</li>
+            <li>Digite <code>about:config</code> na barra de endereço, tecle Enter e clique em <strong>Aceitar o risco e continuar</strong>. Na busca, digite <code>browser.download.force_save_internally_handled_attachments</code> e clique no botão ⇄ à direita até ficar <code>true</code>. Se nada aparecer, escolha <strong>Booleano</strong>, clique em <strong>+</strong> e deixe <code>true</code>.</li>
+          </ol>
         </div>
         <div class="cartao">
-          <p class="apoio"><strong>PDF grande demais para o SEI:</strong> o SEI só aceita arquivos de até 10 MB. Para diminuir o PDF, use o <a href="https://www.ilovepdf.com/pt/comprimir_pdf" target="_blank" rel="noopener">ilovepdf.com</a> (mais rápido e fácil) ou o <a href="https://tools.pdf24.org/pt/comprimir-pdf" target="_blank" rel="noopener">pdf24.org</a> (diminui bem mais o arquivo, quando o primeiro não resolve).</p>
+          <p class="apoio"><strong>Só a senha do SEI na assinatura (Firefox):</strong> o Firefox oferece no SEI as senhas de qualquer site do IFTO (SUAP, Moodle etc.). Para ele oferecer só a do SEI:</p>
+          <ol class="apoio">
+            <li>Digite <code>about:config</code> na barra de endereço, tecle Enter e clique em <strong>Aceitar o risco e continuar</strong>.</li>
+            <li>Na busca, digite <code>signon.includeOtherSubdomainsInLookup</code> e clique no botão ⇄ à direita até ficar <code>false</code>.</li>
+          </ol>
+          <p class="apoio">Com uma senha só, o Firefox já a preenche na assinatura.</p>
+        </div>
+        <div class="cartao">
+          <p class="apoio"><strong>PDF grande demais para o SEI:</strong> o SEI só aceita arquivos de até 10 MB. Para diminuir o PDF, use o <a href="https://www.ilovepdf.com/pt/comprimir_pdf" target="_blank" rel="noopener">ilovepdf.com</a> (mais rápido) ou o <a href="https://tools.pdf24.org/pt/comprimir-pdf" target="_blank" rel="noopener">pdf24.org</a> (diminui mais, quando o primeiro não resolve).</p>
         </div>
       </section>
 
