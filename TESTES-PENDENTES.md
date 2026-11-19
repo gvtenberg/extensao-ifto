@@ -21,31 +21,6 @@ E: Aparece em verde "SEI do IFTO reconhecido (versão 5.0.4)" (texto mudado na v
 F: Abra um processo e clique num documento da árvore onde o botão Incluir documento não aparecia; clique no botão. Desmarque a opção nas Configurações, aperte F5 e repita.
 E: Marcada: o botão aparece no começo da barra e abre a escolha do tipo, sem repetir se o SEI já o mostra. Desmarcada: o SEI fica como era.
 
-## Levantamento: nome e tamanho dos arquivos no SEI (etapas 2 e 3)
-> No computador de desenvolvimento (arquivos em ferramentas-de-teste/arquivos-sei/, fora do git). Use um processo de teste; anexe por Incluir documento > Externo.
-### T06 – Caracteres que o SEI não aceita no nome do arquivo
-F: Anexe um a um os 20 arquivos da pasta caracteres.
-E: Comente o número de cada arquivo recusado (com a mensagem) e de cada um com nome mudado (como ficou).
-### T07 – Limite: 10 MB ou 10 MiB
-F: Anexe A (9.900.000 bytes), B (10.200.000) e C (10.600.000) da pasta tamanhos.
-E: Comente quais entraram e a mensagem do recusado. B recusado = 10 MB; B aceito e C recusado = 10 MiB.
-
-## Perguntas (etapas 2 e 3; respostas vão para a spec base-e-sei, D11 a D13)
-### P1 – Arquivo que não é PDF acima de 10 MB
-?: Que tipos de arquivo além de PDF passam do limite (planilha, imagem, vídeo, .zip…)? O que fazem hoje: .zip, dividir, converter para PDF?
-### P2 – Dica de compactação abaixo do limite
-?: Sugerir compactar também abaixo de 10 MB? A partir de que tamanho? Só sugere ou pergunta antes de enviar?
-### P4 – Dicas do pdf24.org
-?: Que opção de compressão usam no pdf24.org quando o ilovepdf não resolve? Que tipo de PDF dá problema (digitalizado, muitas imagens, gerado por sistema)?
-
-## Senha reconhecida pelo navegador no SEI 5 (v0.1.1)
-### T08 – Senha na tela de entrada do SEI (v0.1.1)
-F: Saia do SEI, entre de novo com usuário e senha e salve a senha quando o Firefox perguntar. Saia e abra a tela de entrada outra vez.
-E: A senha aparece como ●. Na segunda vez o Firefox preenche ou oferece a senha guardada.
-### T10 – Desligar a correção da senha (v0.1.1)
-F: Configurações > desmarque "Navegador reconhece o campo de senha", recarregue a entrada do SEI e clique em Senha. Marque de novo.
-E: Desmarcada, o Firefox não oferece a senha; marcada, oferece.
-
 ## Lista de assinaturas no SEI (v0.2.0 a v0.4.0)
 > Instale a versão nova e entre no SEI com a unidade PAL/REI/IFTO (Direção-geral).
 ### T13 – Colar a lista e abrir os itens (v0.2.0)
@@ -416,9 +391,6 @@ E: Sem cadastro, não aparece aviso sobre telefone nem e-mail (e "Corrigir rodap
 ### T149 – Todos os avisos numa janela só (v0.26.8)
 F: Abra no editor um documento com número do processo errado e rodapé errado (num edital, também a marca MINUTA); arraste a janela pela barra de cima e role a página.
 E: Os avisos aparecem juntos numa janela no canto inferior direito, cada um com seu botão e seu ×; a janela vai para onde foi arrastada e fica parada na tela ao rolar.
-
-## Data do documento (v0.26.9)
-> antes de testar: use documentos ainda não assinados (pode criar um Despacho de teste e não assinar).
 
 ### T150 – Aviso de data com mês errado na página do documento (v0.26.9)
 F: Num documento não assinado, ponha a data com o mês passado (ex.: "Palmas, 18 de outubro de 2026."), salve e clique no documento na árvore do processo.

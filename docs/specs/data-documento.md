@@ -21,7 +21,7 @@ In some SEI 5 document types (Ofício, Portaria) the date is filled in by the SE
 - [x] D1 – Where: box in the SEI editor window (like "Remover marca MINUTA").
 - [x] D2 – Which documents: only types whose name starts with "Ofício" or "Portaria".
 - [x] D3 – Saving: the extension only changes the text; the person checks and clicks Salvar.
-- [ ] D4 – On/off setting in the settings page? Suggestion: no setting (the box only appears when the date has passed and can be closed).
+- [x] D4 – On/off setting in the settings page? Answer (18/11/2026, user): **yes, a switch, on by default**. To code (small stage).
   - Answer:
 
 ## 4. Decided rules

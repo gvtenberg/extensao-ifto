@@ -24,7 +24,7 @@ Claude does not code while there is a `[ ]` that affects the stage. The user mar
 
 - [x] D1 – Which is the IFTO SEI version (footer or login page)? Affects stages 2 onward (field names change between versions).
   - Answer: **SEI 5.0.4** (scripts `?5.0.4-2.45.1` in the pages saved on 10/11/2026; the SEI was updated in 11/2026). Stages 2 onward are built for SEI 5; reference pages live in `ferramentas-de-teste/paginas-sei/` (outside git).
-- [ ] D2 – Besides this spec's features, which other SEI++ features were useful (T01 and T02)? They go into an extra stage at the end.
+- [x] D2 – Besides this spec's features, which other SEI++ features were useful (T01 and T02)? They go into an extra stage at the end. Answer (18/11/2026, user): **keep stage 6**; the user will do T01 and T02 and comment.
   - Answer:
 - [x] D3 – License: reusing code from SEI++ (GPL-3.0) and SEI Pro (AGPL-3.0) makes the extension GPL-3.0 (the code stays open if it is ever distributed). Is that OK? Affects stage 1.
   - Answer: yes, GPL-3.0 (25/10/2026).
@@ -32,19 +32,19 @@ Claude does not code while there is a `[ ]` that affects the stage. The user mar
   - Answer: plain JavaScript, Manifest V3, Firefox 128 or newer (25/10/2026).
 - [x] D5 – Where settings, process types, checklists and each process's mark are stored. Claude's suggestion: in the browser itself (works without login), with "Export" and "Import" to a file, for backup and for passing to colleagues; in the spreadsheet only after login (another spec). Affects stage 1.
   - Answer: in the browser, with Export and Import to a file (25/10/2026).
-- [ ] D6 – External document date when dragging: today's (SEI++) or the file's modification date (SEI Pro)? Claude's suggestion: today's by default, with an option in the settings. Affects stage 3.
+- [x] D6 – External document date when dragging: today's (SEI++) or the file's modification date (SEI Pro)? Claude's suggestion: today's by default, with an option in the settings. Affects stage 3. Answer (18/11/2026, user): **today by default**, with a setting to use the file's date instead.
   - Answer:
-- [ ] D7 – Which "other fields" of the external document come pre-filled? SEI options: number/name in the tree, sender, interested parties, description, notes. Affects stage 2.
+- [x] D7 – Which "other fields" of the external document come pre-filled? SEI options: number/name in the tree, sender, interested parties, description, notes. Affects stage 2. Answer (18/11/2026, user): only **"Nome na Árvore" from the file name** (when dragging: "Nota Fiscal 123.pdf" → "123"). Sender, interested parties, description and notes are not filled.
   - Answer:
-- [ ] D8 – How does the extension know a checklist step is done? Claude's suggestion: the process tree has a document of the step's type (e.g. a "SICAF" after the last invoice). In payment processes, which receive several invoices, does each new invoice restart the checklist? Affects stage 4.
+- [x] D8 – How does the extension know a checklist step is done? Claude's suggestion: the process tree has a document of the step's type (e.g. a "SICAF" after the last invoice). In payment processes, which receive several invoices, does each new invoice restart the checklist? Affects stage 4. Answer (18/11/2026, user): **postponed**; stage 4 (process types and checklists) left this spec and became an idea line in `melhorias-futuras.md` (with this question).
   - Answer:
-- [ ] D9 – Which characters the SEI does not accept in the file name (at least "#") and what to do with them: replace with "_" (like SEI Pro), with a space, or remove? And do accents stay? Survey in T06. Affects stages 2 and 3.
+- [x] D9 – Which characters the SEI does not accept in the file name (at least "#") and what to do with them: replace with "_" (like SEI Pro), with a space, or remove? And do accents stay? Survey in T06. Affects stages 2 and 3. Answer (18/11/2026, T06 done by the user): **only "#" is refused**; replace it with "_"; accents and other characters stay.
   - Answer:
-- [ ] D10 – Is the SEI limit 10 MB (10,000,000 bytes) or 10 MiB (10,485,760 bytes)? Survey in T07. Affects stages 2 and 3.
+- [x] D10 – Is the SEI limit 10 MB (10,000,000 bytes) or 10 MiB (10,485,760 bytes)? Survey in T07. Affects stages 2 and 3. Answer (18/11/2026, T07 done by the user: B with 10,200,000 bytes accepted, C with 10,600,000 refused): the limit is **10 MiB = 10,485,760 bytes**. SEI message when refused: "Arquivo excede o tamanho máximo geral permitido para documentos externos de 10Mb."
   - Answer:
-- [ ] D11 – A **non-PDF** file above the limit (spreadsheet, image, video…): which tip to show (zip it, split it, convert to PDF)? Question P1 in `TESTES-PENDENTES.md`. Affects stages 2 and 3.
+- [x] D11 – A **non-PDF** file above the limit (spreadsheet, image, video…): which tip to show (zip it, split it, convert to PDF)? Question P1 in `TESTES-PENDENTES.md`. Affects stages 2 and 3. Answer (18/11/2026, user): tip "**zip it, or save spreadsheet/image as PDF and compress it** (pdf24.org)". P1 (card): spreadsheets, images, videos and .zip all go above the limit.
   - Answer:
-- [ ] D12 – Compression tip also **below** the limit (to save space on the Rectorate server): from what size? Question P2. Affects stages 2 and 3.
+- [x] D12 – Compression tip also **below** the limit (to save space on the Rectorate server): from what size? Question P2. Affects stages 2 and 3. Answer (18/11/2026, user): **PDF above 2 MB: tip only** (never blocks nor asks before sending). P4 (card): ilovepdf fails on PDFs with images or text it cannot compress; pdf24.org solved every case (less easy to use), so the tip names pdf24.org first for those.
   - Answer:
 - [x] D13 – pdf24.org and ilovepdf receive the file on their servers. Does the tip apply to **restricted or confidential** documents? Question P3. Affects stages 2 and 3.
   - Answer (15/11/2026): yes, show the tip for both sites in every case. pdf24.org compresses much more; ilovepdf.com is much faster and easier. Both tips are also in the settings page ("Dicas", v0.18.3).
@@ -86,8 +86,8 @@ Each stage fits in a short conversation (`/etapa base-e-sei <n>`) and ends with 
 - [x] Stage 1 – **Skeleton and Novo documento button.** (done in v0.1.0, 26/10/2026; the extension acts only on `*.ifto.edu.br` addresses — `sei.ifto.edu.br` only since v0.2.0; the button is added on any SEI version when it is missing from the bar, not only before SEI 4 as in SEI++) Installable extension (manifest, icon, icon window, empty settings page), `web-ext` commands in CLAUDE.md, recognition of the SEI and its version, "Novo documento" button always visible. Depends on D3, D4, D5. Test: temporary install; open a process in the SEI and see the button.
 - [ ] Stage 2 – (v0.6.0 already fills today's date, Nato-digital and Público on new external documents: `specs/documentos-pagamento.md`) **Pre-filled external document.** Settings with default values (access level, legal basis, format, type of check, document type and the D7 fields); filling and on-screen message; when choosing the file, name without the characters the SEI does not accept and size warning with compression tips. Depends on D1, D7, D9 to D13. Test: open "Incluir documento › Externo" and see the fields filled, without saving.
 - [ ] Stage 3 – (12/11/2026: an IFTO colleague already adds files directly to a process on SEI 5 with their own extension; check how before starting) **Drag files.** (12/11/2026: user confirmed it stays a planned improvement; method in SEI++ `dropzone.js`, summarized in `regras/sei.md`, v0.8.1 line) Drop area on the tree; type by file name, user rules and default; asks when not recognized; check list before sending, with each file's size (above the limit: does not send and shows the tips); names without the characters the SEI does not accept, with correct accents and dashes. Depends on D1, D6, D9 to D13. Test (critical, writes to the SEI): drag three files into a test process.
-- [ ] Stage 4 – **Process types and checklists.** Register types and steps; choose the open process's type; checklist of steps; dragging suggests the type of the next pending step. Depends on D8. Test: register the payment checklist, mark a process and see what is missing.
-- [ ] Stage 5 – **Export and import** settings and checklists to a file. Test: export, delete, import.
+- [-] Stage 4 – (18/11/2026: postponed, moved to `melhorias-futuras.md` until D8 is answered) **Process types and checklists.**
+- [ ] Stage 5 – **Export and import** settings (and checklists, if stage 4 comes back) to a file. Test: export, delete, import.
 - [ ] Stage 6 – (if D2) other SEI++ features.
 
 **After this spec:** login and reading the spreadsheet; checklist steps with data (routing sheet, commitment note request).

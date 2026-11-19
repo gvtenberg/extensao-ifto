@@ -67,7 +67,7 @@ People copy an old document and forget to fix the "Processo nº:" line, the sect
 ### Knock-on effects (noted)
 
 - Documents where people already added blank lines by hand get double space: "Desfazer" in the box; the person can delete the extra Enter.
-- If T123 shows the style block does not reach the PDF, spacing becomes blank lines (stage 7 waits for T123).
+- T123 passed (card #128, 18/11/2026): the style block reaches the saved document and the PDF, so stage 7 uses it (no blank lines).
 - Timbre/footer sections may be locked in the editor of some types: check in stage 6 with a saved editor page; if locked, only warn.
 - Signing interception must never block signing when the check fails (SEI slow, text not read): then the SEI signs normally.
 
