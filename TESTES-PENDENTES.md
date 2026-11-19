@@ -388,7 +388,7 @@ F: Em Cópia das configurações, clique em "Escolher o arquivo…" e escolha um
 E: Aparece o aviso "Este arquivo não é uma cópia das configurações da extensão…" e nada muda.
 
 ## Aviso de versão do SEI
-> antes de testar: precisa da cópia temporária da extensão com outra versão do SEI marcada como testada (computador de desenvolvimento)
+> antes de testar: no computador de desenvolvimento, desative a extensão instalada e carregue como extensão temporária o manifest.json da pasta ferramentas-de-teste/extensao-sei-nao-testado (ela acha que o SEI mudou de versão); no fim, remova-a e ative de novo a instalada
 ### T176 – Aviso no SEI com versão não testada (v0.28.0)
 F: Instale a cópia temporária e abra o SEI.
 E: No alto à direita aparece a caixa "O SEI do IFTO mudou para a versão…", com "Continuar usando" e "Desativar a extensão no SEI"; em "Continuar usando" ela some e não volta nas próximas páginas.
