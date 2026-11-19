@@ -79,7 +79,41 @@
     await navegador().storage.local.set({ configuracoes: comPadroes(configuracoes) })
   }
 
-  const api = { PADROES, comPadroes, lerConfiguracoes, gravarConfiguracoes }
+  // v0.27.2 (spec base-e-sei, etapa 5; D5): cópia das configurações num arquivo, para guardar ou passar a um
+  // colega. Vai tudo o que está em "configuracoes" (inclusive "Minhas unidades" e as regras do tipo pelo
+  // nome do arquivo); permissões do navegador não vão (cada pessoa permite no próprio navegador).
+  const MARCA_ARQUIVO = 'extensao-ifto-configuracoes'
+  function paraArquivo (configuracoes, versao = '', agora = new Date()) {
+    return JSON.stringify({ marca: MARCA_ARQUIVO, versao, data: agora.toISOString(), configuracoes: comPadroes(configuracoes) }, null, 2)
+  }
+  // Nome do arquivo: configuracoes-extensao-ifto-2026-11-18.json
+  function nomeDoArquivo (agora = new Date()) {
+    const dois = n => String(n).padStart(2, '0')
+    return `configuracoes-extensao-ifto-${agora.getFullYear()}-${dois(agora.getMonth() + 1)}-${dois(agora.getDate())}.json`
+  }
+  // Lê o arquivo: só aceita o arquivo da extensão; cada opção só entra se for do mesmo tipo do padrão (sim/não,
+  // texto ou lista); opções que não existem nesta versão são ignoradas. Erro com texto simples para a pessoa.
+  function doArquivo (texto) {
+    let lido
+    try { lido = JSON.parse(String(texto || '').replace(/^﻿/, '')) } catch (erro) { lido = null }
+    if (!lido || typeof lido !== 'object' || lido.marca !== MARCA_ARQUIVO || !lido.configuracoes || typeof lido.configuracoes !== 'object') {
+      throw new Error('Este arquivo não é uma cópia das configurações da extensão. Escolha o arquivo baixado em "Baixar cópia das configurações".')
+    }
+    const aceitas = {}
+    const ignoradas = []
+    for (const [chave, valor] of Object.entries(lido.configuracoes)) {
+      if (!(chave in PADROES)) continue
+      const padrao = PADROES[chave]
+      const mesmoTipo = Array.isArray(padrao)
+        ? Array.isArray(valor) && valor.every(item => item && typeof item === 'object' && !Array.isArray(item))
+        : typeof valor === typeof padrao
+      if (mesmoTipo) aceitas[chave] = valor
+      else ignoradas.push(chave)
+    }
+    return { configuracoes: comPadroes(aceitas), ignoradas, versao: String(lido.versao || ''), data: String(lido.data || '') }
+  }
+
+  const api = { PADROES, comPadroes, lerConfiguracoes, gravarConfiguracoes, paraArquivo, nomeDoArquivo, doArquivo }
   if (typeof module !== 'undefined' && module.exports) module.exports = api
   else raiz.ExtensaoIFTO = Object.assign(raiz.ExtensaoIFTO || {}, { configuracoes: api })
 })(globalThis)

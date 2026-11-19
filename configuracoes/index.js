@@ -130,4 +130,43 @@
       mostrarAviso()
     })
   }
+
+  // v0.27.2 (spec base-e-sei, etapa 5): baixar e carregar a cópia das configurações. Lê do navegador na hora
+  // (pega também o que outra aba gravou). Nada muda antes da confirmação.
+  const { paraArquivo, doArquivo, nomeDoArquivo } = globalThis.ExtensaoIFTO.configuracoes
+  document.getElementById('baixarCopia').addEventListener('click', async () => {
+    const texto = paraArquivo(await lerConfiguracoes(), navegador.runtime.getManifest().version)
+    const endereco = URL.createObjectURL(new Blob([texto], { type: 'application/json' }))
+    const link = document.createElement('a')
+    link.href = endereco
+    link.download = nomeDoArquivo()
+    document.body.append(link)
+    link.click()
+    link.remove()
+    setTimeout(() => URL.revokeObjectURL(endereco), 10000)
+  })
+  const arquivoCopia = document.getElementById('arquivoCopia')
+  const copiaErro = document.getElementById('copiaErro')
+  document.getElementById('carregarCopia').addEventListener('click', () => { arquivoCopia.value = ''; arquivoCopia.click() })
+  arquivoCopia.addEventListener('change', async () => {
+    const arquivo = arquivoCopia.files[0]
+    copiaErro.hidden = true
+    if (!arquivo) return
+    let lido
+    try {
+      if (arquivo.size > 1024 * 1024) throw new Error('Este arquivo é grande demais para ser uma cópia das configurações.')
+      lido = doArquivo(await arquivo.text())
+    } catch (erro) {
+      copiaErro.textContent = erro.message
+      copiaErro.hidden = false
+      return
+    }
+    const quando = lido.data && !isNaN(new Date(lido.data)) ? ' (baixada em ' + new Date(lido.data).toLocaleDateString('pt-BR') + ')' : ''
+    const aviso = lido.ignoradas.length ? ' Algumas escolhas do arquivo não servem nesta versão da extensão e voltam ao padrão.' : ''
+    if (!confirm('Trocar as suas configurações pelas desta cópia' + quando + '? As escolhas atuais desta página serão substituídas.' + aviso)) return
+    // A entrada com SerproID só fica ligada se este navegador já deu o acesso ao Gov.br.
+    if (lido.configuracoes.entrarComSerproId && !(await navegador.permissions.contains(pedidoGovBr))) lido.configuracoes.entrarComSerproId = false
+    await gravarConfiguracoes(lido.configuracoes)
+    location.reload()
+  })
 })()

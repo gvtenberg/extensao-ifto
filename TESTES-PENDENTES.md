@@ -378,3 +378,11 @@ E: A janela fecha e nada é incluído no processo.
 ### T173 – SICAF continua incluindo os PDFs (v0.27.1)
 F: Na CGOC, num processo com nota sem SICAF, clique em "notas sem SICAF – Buscar" e depois em "Buscar SICAF e Simples".
 E: Como antes: a janela mostra o andamento e o SEI recebe os PDFs do SICAF e do Simples; o botão Parar mostra "Parando…".
+
+## Cópia das configurações (v0.27.2)
+### T174 – Baixar e carregar cópia das configurações (v0.27.2)
+F: Em Configurações › Cópia das configurações, clique em "Baixar cópia das configurações"; mude duas opções; clique em "Escolher o arquivo…", escolha o arquivo baixado e confirme.
+E: O arquivo "configuracoes-extensao-ifto-AAAA-MM-DD.json" vai para Downloads; depois de carregar, a página recarrega com as duas opções de volta como estavam.
+### T175 – Carregar arquivo errado (v0.27.2)
+F: Em Cópia das configurações, clique em "Escolher o arquivo…" e escolha um PDF ou outro arquivo qualquer.
+E: Aparece o aviso "Este arquivo não é uma cópia das configurações da extensão…" e nada muda.

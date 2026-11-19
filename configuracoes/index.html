@@ -47,6 +47,7 @@
       <a href="#direcao">Direção-geral</a>
       <a href="#sicaf">SICAF e Simples</a>
       <a href="#compras">Licitação</a>
+      <a href="#copia">Cópia das configurações</a>
       <a href="#dicas">Dicas</a>
       <a href="#ajuda">Ajuda</a>
     </nav>
@@ -272,6 +273,23 @@
           <p class="apoio">Para o botão "Enviar ao SEI" aparecer no Compras IFTO, a extensão precisa funcionar no site dele. O navegador pede essa permissão uma vez; depois, recarregue a página do Compras IFTO (F5).</p>
           <p><button type="button" class="botao principal" id="permitirCompras">Permitir no Compras IFTO</button></p>
           <div class="aviso sucesso" id="comprasPermitido" hidden>Acesso ao Compras IFTO permitido.</div>
+        </div>
+      </section>
+
+      <!-- v0.27.2 (spec base-e-sei, etapa 5): baixar e carregar uma cópia das configurações (D5). -->
+      <section class="grupo" id="copia">
+        <h2>Cópia das configurações</h2>
+        <div class="cartao">
+          <h1>Baixar cópia</h1>
+          <p class="apoio">Guarda num arquivo todas as suas escolhas desta página, inclusive "Minhas unidades" e as regras do tipo de documento. Serve para guardar uma cópia, passar para outro computador ou para um colega. O arquivo vai para a pasta Downloads.</p>
+          <p><button type="button" class="botao principal" id="baixarCopia">Baixar cópia das configurações</button></p>
+        </div>
+        <div class="cartao">
+          <h1>Carregar cópia</h1>
+          <p class="apoio">Troca as suas configurações pelas do arquivo. As permissões (Compras.gov.br, Simples Nacional, Compras IFTO e Gov.br) não vão no arquivo: se precisar, permita de novo neste navegador.</p>
+          <p><button type="button" class="botao" id="carregarCopia">Escolher o arquivo…</button></p>
+          <input type="file" id="arquivoCopia" accept=".json,application/json" hidden>
+          <div class="aviso pendencia" id="copiaErro" hidden></div>
         </div>
       </section>
 

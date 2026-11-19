@@ -62,3 +62,30 @@ test('v0.26.0: conferências do documento ligadas e lista de unidades vazia, sem
 test('v0.26.1: copiar o nome de quem assinou ligado por padrão', () => {
   assert.equal(PADROES.copiarAssinaturas, true)
 })
+
+// v0.27.2 (spec base-e-sei, etapa 5): cópia das configurações num arquivo.
+const { paraArquivo, doArquivo, nomeDoArquivo } = require('../comum/configuracoes.js')
+test('cópia das configurações: baixar e ler de volta', () => {
+  const minhas = comPadroes({ listaAssinaturas: 'sempre', unidades: [{ sigla: 'CGOC/GAC/DAP/PAL/REI/IFTO' }], externoRegras: [{ contem: 'SICAF', tipo: 'Sicaf' }] })
+  const texto = paraArquivo(minhas, '0.27.0', new Date('2026-11-18T12:00:00Z'))
+  const lido = doArquivo(texto)
+  assert.deepEqual(lido.configuracoes, minhas)
+  assert.equal(lido.versao, '0.27.0')
+  assert.deepEqual(lido.ignoradas, [])
+  assert.equal(nomeDoArquivo(new Date(2026, 10, 8)), 'configuracoes-extensao-ifto-2026-11-08.json')
+})
+
+test('cópia das configurações: opção de outro tipo ou que não existe é ignorada', () => {
+  const texto = JSON.stringify({ marca: 'extensao-ifto-configuracoes', configuracoes: { moverTabelas: 'sim', listaAssinaturas: 'desligada', opcaoAntiga: true, unidades: ['texto'] } })
+  const lido = doArquivo(texto)
+  assert.equal(lido.configuracoes.moverTabelas, PADROES.moverTabelas)
+  assert.equal(lido.configuracoes.listaAssinaturas, 'desligada')
+  assert.equal('opcaoAntiga' in lido.configuracoes, false)
+  assert.deepEqual(lido.ignoradas, ['moverTabelas', 'unidades'])
+})
+
+test('cópia das configurações: arquivo errado dá erro simples', () => {
+  assert.throws(() => doArquivo('não é json'), /não é uma cópia das configurações/)
+  assert.throws(() => doArquivo('{"configuracoes":{}}'), /não é uma cópia das configurações/)
+  assert.throws(() => doArquivo(''), /não é uma cópia/)
+})

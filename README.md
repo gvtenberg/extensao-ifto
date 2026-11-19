@@ -98,7 +98,7 @@ Nos dois casos, as configurações e a lista de assinaturas são mantidas.
 
 ## Configurações
 
-Para abrir: clique no ícone da extensão e em **Configurações**. Cada escolha é gravada na hora, sem botão de salvar. O menu à esquerda mostra um grupo de cada vez: Geral, Documentos do SEI, Minhas unidades, Direção-geral, SICAF e Simples, Licitação, Dicas e Ajuda.
+Para abrir: clique no ícone da extensão e em **Configurações**. Cada escolha é gravada na hora, sem botão de salvar. O menu à esquerda mostra um grupo de cada vez: Geral, Documentos do SEI, Minhas unidades, Direção-geral, SICAF e Simples, Licitação, Cópia das configurações, Dicas e Ajuda.
 
 **Geral (todas as unidades)**
 
@@ -128,6 +128,11 @@ Cada função abaixo tem três opções: **Automática** (liga só na unidade in
 - **SICAF e Simples Nacional:** "Automática" para o pagamento de notas fiscais na CGOC; "Sempre ligada" (equipe de licitação) mostra só o botão "Incluir SICAF", em qualquer unidade; "Desligada" tira tudo. Na primeira vez, clique em **Permitir acesso ao Compras.gov.br e ao Simples Nacional**: o navegador pede permissão para a extensão abrir esses dois sites e salvar os PDFs na pasta Downloads (só quem usa o SICAF precisa permitir).
 - **Entrar no Gov.br com o certificado SerproID** (opcional, começa desligada): quando a busca do SICAF encontra você sem login, a extensão clica sozinha em "SerproID" na página de entrada do Gov.br. Ao ligar, o navegador pede acesso só a essa página (sso.acesso.gov.br); a extensão não lê nem guarda CPF, senha, QR code ou código. Sem permitir (ou ao desligar), o acesso é retirado e você só perde esse clique: na página do Gov.br, clique em "Seu certificado digital em nuvem" e depois em "SerproID".
 - **Licitação (CCL): peças do Compras IFTO:** automática na CCL (CCL/GAC/DAP/PAL/REI/IFTO). Na primeira vez, clique em **Permitir no Compras IFTO** e, depois, recarregue a página do Compras IFTO (F5): só então aparece o botão "Enviar ao SEI" lá (só quem usa o Compras IFTO precisa permitir).
+
+**Cópia das configurações**
+
+- **Baixar cópia das configurações:** guarda todas as escolhas da página (inclusive "Minhas unidades" e as regras do tipo de documento) num arquivo na pasta Downloads, para guardar ou passar para outro computador ou colega.
+- **Carregar cópia:** escolha o arquivo baixado; depois de confirmar, as configurações deste navegador são trocadas pelas do arquivo. As permissões (Compras.gov.br, Simples Nacional, Compras IFTO e Gov.br) não vão no arquivo: permita de novo, se precisar.
 
 **Dicas**
 
