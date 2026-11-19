@@ -220,6 +220,8 @@
     const email = (unidade && unidade.email) || EMAIL_PADRAO
     return { telefone, email: email.toLowerCase(), cep: '77021090' }
   }
+  const temTelefone = unidade => Boolean(digitosDoTelefone(unidade && unidade.telefone))
+  const temEmail = unidade => Boolean(unidade && unidade.email)
   const PARTES_DO_ENDERECO = Object.freeze(['Quadra 310 Sul', 'Lo 5', 'Avenida NS 10', 'Plano Diretor Sul', 'Palmas/TO'])
 
   // Confere o rodapé só pelos dados (D11): endereço, CEP, telefone e e-mail; pontos, parênteses, "esquina
@@ -237,13 +239,17 @@
     if (!cep || soDigitos(cep[1]) !== esperado.cep) avisos.push('O CEP deve ser 77021-090.')
     const telefones = [...texto.matchAll(/(?:\+?55\s*)?\(?\d{2}\)?\s*\d{4,5}\s*-?\s*\d{4}/g)].map(achado => digitosDoTelefone(achado[0]))
     if (!telefones.length) avisos.push(`Falta o telefone ${formatarTelefone(esperado.telefone)}.`)
+    // v0.26.7 (T142): sem telefone cadastrado, qualquer ramal do campus (63 3236-4000 a 4099) está certo.
+    const telefoneAceito = telefone => telefone === esperado.telefone || (!temTelefone(unidade) && /^63323640\d\d$/.test(telefone))
     for (const telefone of new Set(telefones)) {
-      if (telefone !== esperado.telefone) avisos.push(`Telefone ${formatarTelefone(telefone)}: o certo é ${formatarTelefone(esperado.telefone)}.`)
+      if (!telefoneAceito(telefone)) avisos.push(`Telefone ${formatarTelefone(telefone)}: o certo é ${formatarTelefone(esperado.telefone)}.`)
     }
     const emails = [...texto.matchAll(/[\w.+-]+@[\w-]+(?:\.[\w-]+)+/g)].map(achado => achado[0].toLowerCase())
     if (!emails.length) avisos.push(`Falta o e-mail ${esperado.email}.`)
+    // v0.26.7 (T142): sem e-mail cadastrado, qualquer e-mail do campus (palmas@ ou setor.palmas@ifto.edu.br) está certo.
+    const emailAceito = email => email === esperado.email || (!temEmail(unidade) && /^([\w.+-]+\.)?palmas@ifto\.edu\.br$/.test(email))
     for (const email of new Set(emails)) {
-      if (email !== esperado.email) avisos.push(`E-mail ${email}: o certo é ${esperado.email}.`)
+      if (!emailAceito(email)) avisos.push(`E-mail ${email}: o certo é ${esperado.email}.`)
     }
     return { certo: !avisos.length, avisos, secao: secao.nome, editavel: secao.editavel !== false }
   }
@@ -258,6 +264,11 @@
   function corrigirRodape (html, unidade) {
     const lista = paragrafos(html).filter(([, atributos]) => ehDoRodape(classeDe(atributos)))
     if (!lista.length) return null
+    // v0.26.7 (T142): sem cadastro, mantém o telefone e o e-mail do campus que já estão no rodapé.
+    const texto = lista.map(([, , dentro]) => textoDoHtml(dentro)).join(' ')
+    const telefoneDoCampus = !temTelefone(unidade) && [...texto.matchAll(/(?:\+?55\s*)?\(?\d{2}\)?\s*\d{4,5}\s*-?\s*\d{4}/g)].map(a => digitosDoTelefone(a[0])).find(t => /^63323640\d\d$/.test(t))
+    const emailDoCampus = !temEmail(unidade) && [...texto.matchAll(/[\w.+-]+@[\w-]+(?:\.[\w-]+)+/g)].map(a => a[0].toLowerCase()).find(e => /^([\w.+-]+\.)?palmas@ifto\.edu\.br$/.test(e))
+    if (telefoneDoCampus || emailDoCampus) unidade = { ...(unidade || {}), telefone: (unidade && unidade.telefone) || telefoneDoCampus || '', email: (unidade && unidade.email) || emailDoCampus || '' }
     let posto = false
     return String(html).replace(/<p\b([^>]*)>([\s\S]*?)<\/p>/gi, (tudo, attrs) => {
       if (!ehDoRodape(classeDe(attrs))) return tudo

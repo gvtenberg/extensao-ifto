@@ -2,6 +2,7 @@
 
 One or two lines per version, with the date (dd/mm/yyyy). Number 0.STAGE.FIX.
 
+- v0.26.7 (18/11/2026): footer check (T142): with no phone/e-mail saved for the unit, any Campus Palmas phone (63 3236-4000 to 4099) and e-mail (palmas@ or sector.palmas@ifto.edu.br) count as right, and "Corrigir rodapé" keeps them; with a saved phone/e-mail, compared with it.
 - v0.26.6 (18/11/2026): Bloco de assinatura: before signing a whole block (list of blocks), selected documents or one document (inside the block) or from the document window, the documents are read and the wrong ones shown in one window "Assinar mesmo assim?" (D16 closed).
 - v0.26.5 (18/11/2026): timbre and footer check in Campus Palmas units (data from "Minhas unidades"; footer compared by data only, D11; "Reitoria" always warned, D12; Gabinete line, D14): warning on the document page (unsigned) and in the editor with "Corrigir timbre", "Corrigir rodapé" (D4 text with links) and "Usar este timbre como padrão da unidade" (stage 6).
 - v0.26.4 (18/11/2026): signature list: "Não, corrigir antes" stops the "Assinar e próximo" wait; a document range is checked once and the wrong ones shown in one window ("Assinar mesmo assim" holds for the day); Bloco de assinatura left for later (D16) (stage 5).

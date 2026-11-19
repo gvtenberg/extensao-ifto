@@ -341,21 +341,9 @@ E: Quando os PDFs chegam ao SEI, a aba da busca (SICAF e depois Simples Nacional
 
 > antes de testar: SEI na unidade PAL/REI/IFTO (Direção-geral), com a extensão atualizada.
 
-### T110 – Remover a marca MINUTA de um edital e salvar (v0.22.0) (Crítico)
-F: Abra no editor um Edital criado a partir de uma minuta (ex.: 3390039), clique em "Remover marca MINUTA" no canto de baixo, confira o texto e clique em Salvar.
-E: O MINUTA some do fundo do editor; depois de salvar, ao abrir o documento e gerar o PDF, não há MINUTA no fundo. Se o texto tiver "minuta de EDITAL", o aviso mostra onde corrigir.
-
 ### T111 – Botão só aparece onde deve (v0.22.0)
 F: Abra no editor uma Minuta de Edital; depois, troque para outra unidade (ex.: CGOC) e abra o mesmo Edital no editor.
 E: Na Minuta de Edital não aparece o botão. Na outra unidade também não (com a opção em "Automática").
-
-### T112 – Remover também as linhas "* MINUTA DE DOCUMENTO" (v0.22.1)
-F: Abra no editor um Edital que ainda tem as linhas "* MINUTA DE DOCUMENTO" (mesmo sem o MINUTA no fundo), clique em "Remover marca MINUTA" e depois em Salvar.
-E: Todas as linhas "* MINUTA DE DOCUMENTO" somem de uma vez, sem deixar linhas em branco, e o resto do texto fica igual.
-
-### T113 – Documento interno novo já vem com Público marcado (v0.22.2)
-F: Num processo, clique em Incluir Documento e escolha Edital Gabinete (ou outro documento interno, como Despacho).
-E: O nível de acesso Público já aparece marcado, com o aviso verde "Preenchido pela extensão"; nada é salvo até você clicar em Salvar.
 
 ### T114 – Mudar a data de um Ofício para hoje e salvar (v0.23.0) (Crítico)
 F: Abra no editor um Ofício com data antiga, clique em "Mudar a data para hoje", confira e clique em Salvar; feche e abra o documento de novo.
@@ -369,29 +357,9 @@ E: Só a data da linha "PORTARIA … nº …, de …" muda para hoje; as datas c
 F: Abra no editor um Ofício criado hoje e depois um Despacho antigo.
 E: Nos dois não aparece o aviso "Mudar a data para hoje".
 
-### T117 – Remover marca MINUTA continua igual (v0.23.0)
-F: Abra no editor um Edital que ainda tem a marca MINUTA e clique em "Remover marca MINUTA".
-E: O aviso aparece e funciona como antes (mesma aparência, a marca some do texto).
-
 ### T118 – Recortar e colar trecho com tabela (v0.24.0)
 F: No editor, selecione um trecho com texto e uma tabela, Ctrl+X, clique em outro lugar do mesmo documento e Ctrl+V.
 E: A tabela aparece no lugar novo com a mesma largura, as mesmas colunas e as mesmas margens; Ctrl+Z desfaz.
-
-### T119 – Copiar trecho com tabela e colar duas vezes (v0.24.0)
-F: Selecione um trecho com tabela, Ctrl+C e cole (Ctrl+V) em dois lugares diferentes do mesmo documento; depois clique em Salvar e abra o documento de novo.
-E: As duas cópias ficam iguais à original, também depois de salvar e reabrir.
-
-### T122 – Aviso só quando o número não cabe (v0.25.0)
-F: Abra no editor um edital com itens até "9.9." e depois um com "10.10." em "Item nível 2 Edital".
-E: No primeiro não aparece nada; no segundo aparece no canto de baixo "Corrigir a numeração", dizendo quantos itens estão quebrados.
-
-### T123 – Corrigir a numeração e gerar o PDF (v0.25.0) (Crítico)
-F: Clique em "Corrigir a numeração", confira o texto, clique em Salvar, feche o editor e gere o PDF do documento.
-E: "10.10." fica na mesma linha do texto, no editor, no documento e no PDF; os números curtos ficam iguais a antes.
-
-### T124 – Aviso aparece ao digitar (v0.25.0)
-F: Num edital sem o aviso, crie itens "Item nível 2 Edital" até chegar em "10.10." (ou mude um parágrafo para esse estilo).
-E: Pouco depois o aviso "Corrigir a numeração" aparece; depois de corrigir, ele some.
 
 ### T125 – Campos de margem mostram a tabela atual (v0.25.1)
 F: Clique numa tabela, abra "Propriedades da tabela" e veja a parte "Margens, em pixels (px)".
@@ -401,51 +369,17 @@ E: Aparecem quatro campos (Acima, Direita, Abaixo, Esquerda) já preenchidos com
 F: Na mesma janela, troque só o campo Esquerda para 28 e clique em OK; abra a janela de novo.
 E: A tabela vai para a esquerda com 28 px de recuo, as outras margens não mudam e o campo Esquerda mostra 28.
 
-### T127 – Quarto botão "Alinhar com o texto" em Alinhamento (v0.25.1)
-F: Numa tabela centralizada, abra "Propriedades da tabela", clique no quarto botão de Alinhamento (o mouse em cima mostra "Alinhar com o texto"), depois em OK e salve o documento.
-E: Os campos ficam 10, 0, 10 e 28; a borda esquerda da tabela fica alinhada com o texto dos parágrafos; no documento salvo continua igual.
-
 ### T128 – Só um botão de Alinhamento marcado (v0.25.3)
 F: Em "Propriedades da tabela", clique em "à esquerda", depois em "Alinhar com o texto", depois em "Centralizar" e por fim em "à esquerda"; clique em OK.
 E: Em cada clique só o botão clicado fica marcado (nunca dois ao mesmo tempo); no fim a tabela fica alinhada à esquerda.
-
-### T129 – Trocar o estilo sem perder o fundo da célula (v0.25.3)
-F: Numa tabela com uma célula de fundo cinza, clique no texto dessa célula e troque o estilo (ex.: de "Tabela Texto Justificado" para "Tabela Texto Centralizado").
-E: O texto muda de alinhamento e a célula continua cinza (bordas também); um Ctrl+Z volta ao estilo anterior, ainda com o fundo cinza.
-
-## Conferir o documento do SEI (v0.26.0 a v0.26.4)
-
-### T130 – Configurações com menu ao lado (v0.26.0)
-F: Abra as Configurações da extensão e clique em cada item do menu à esquerda (Geral, Documentos do SEI, Minhas unidades…).
-E: Cada clique mostra só aquele grupo; as escolhas que você já tinha continuam marcadas; em "Documentos do SEI" as quatro opções de "Conferir o documento" vêm ligadas.
 
 ### T131 – Cadastrar duas unidades (v0.26.0)
 F: Em "Minhas unidades", clique em "Adicionar unidade" duas vezes, preencha sigla, telefone, e-mail e linhas do setor de cada uma, feche a página e abra as Configurações de novo.
 E: As duas unidades continuam lá com os dados digitados; "Remover unidade" pede confirmação e tira a unidade.
 
-### T132 – Copiar o nome de quem assinou (v0.26.1)
-F: Abra um documento já assinado na árvore do processo, selecione com o mouse o nome na caixa "Documento assinado eletronicamente por…" e tecle Ctrl+C; cole num documento de texto.
-E: O nome fica selecionado (azul) e é colado certo; com a opção "Copiar o nome de quem assinou" desligada, volta a não dar para selecionar.
-
-### T133 – Aviso de processo errado na página do documento (v0.26.2)
-F: Num processo, crie um Despacho e, no editor, troque o número da linha "Processo nº:" por outro; salve, feche o editor e clique no documento na árvore.
-E: No alto do documento aparece "O documento está no processo X, mas o texto diz Y" e o botão "Abrir o editor para corrigir", que abre o editor; num documento já assinado nada aparece.
-
-### T134 – Corrigir o número do processo no editor (v0.26.2)
-F: Abra no editor o Despacho do teste anterior e clique em "Corrigir o número do processo"; confira e clique em Salvar.
-E: Só o número da linha "Processo nº:" muda para o do processo; o resto do texto fica igual; Ctrl+Z desfaz antes de salvar.
-
 ### T135 – Edital com o processo errado no título (v0.26.2)
 F: Abra no editor um Edital ou Minuta copiado de outro processo, com o título "(Processo Administrativo n° …)" de outro processo.
 E: Aparece o aviso com os dois números, sem botão de correção, dizendo para apagar o número e colocar o link do processo certo.
-
-### T136 – Parar antes de assinar pela árvore (v0.26.3) (Crítico)
-F: Com o Despacho de número errado aberto na árvore, clique em "Assinar Documento" na barra do SEI; clique em "Não, corrigir antes"; depois clique de novo em "Assinar Documento" e em "Assinar mesmo assim".
-E: Aparece a janela "O número do processo está errado (documento no processo X, texto diz Y). Assinar mesmo assim?"; "Não" abre o editor sem assinar; "Assinar mesmo assim" abre a assinatura normal do SEI. Num documento com o número certo a assinatura abre direto, sem janela.
-
-### T137 – Parar antes de assinar no editor (v0.26.3) (Crítico)
-F: No editor de um documento com o número do processo errado, clique em "Assinar" (e, noutra vez, tecle Ctrl+Shift+A).
-E: Aparece a mesma janela antes da assinatura; "Não, corrigir antes" volta ao editor sem assinar; "Assinar mesmo assim" segue para a assinatura do SEI. Com o número certo, assina direto.
 
 ### T138 – "Assinar e próximo" com o número do processo errado (v0.26.4) (Crítico)
 F: Na lista de assinaturas, chegue a um documento com o número do processo errado e clique em "Assinar e próximo"; na janela, clique em "Não, corrigir antes".
@@ -455,31 +389,13 @@ E: A janela "Assinar mesmo assim?" aparece antes da assinatura; com "Não" o doc
 F: Cole na lista um intervalo ("3383754 a 3383903") de um processo em que um ou mais documentos têm o número do processo errado e abra o processo.
 E: Aparece uma janela só com a lista dos documentos errados (número e os dois processos); com "Assinar mesmo assim", "Assinar e próximo" assina esses documentos sem perguntar de novo; com "Não", a pergunta aparece em cada um.
 
-## Timbre e rodapé do documento (v0.26.5)
-> antes de testar: cadastre a sua unidade em Configurações > Minhas unidades (sigla, telefone, e-mail e linhas do setor).
-
-### T140 – Aviso de timbre e rodapé na página do documento (v0.26.5)
-F: Numa unidade do Campus Palmas, abra na árvore um documento ainda não assinado com "Reitoria" no timbre ou com o e-mail reitoria@ifto.edu.br no rodapé.
-E: Embaixo, à esquerda, aparece "Confira o timbre e o rodapé desta unidade" com a lista do que está errado e o botão "Abrir o editor para corrigir"; num documento certo ou já assinado nada aparece.
-
 ### T141 – Corrigir timbre no editor (v0.26.5)
 F: Abra no editor esse documento e clique em "Corrigir timbre"; confira e clique em Salvar.
 E: O brasão fica; as linhas ficam "Ministério da Educação … Campus Palmas" e as linhas do setor cadastradas, sem "Reitoria"; Ctrl+Z desfaz antes de salvar.
 
-### T142 – Corrigir rodapé no editor (v0.26.5)
-F: No mesmo editor, clique em "Corrigir rodapé"; confira, clique em Salvar e gere o PDF.
-E: O rodapé fica com o endereço, CEP 77021-090, "Palmas/TO —" e o telefone e o e-mail da unidade; e-mail, site e telefone são links; formatação diferente (pontos, parênteses) num rodapé com os dados certos não gera aviso.
-
 ### T143 – Usar este timbre como padrão da unidade (v0.26.5)
 F: Num documento com o timbre certo do seu setor, mas com a unidade sem as linhas cadastradas (ou com outras), clique em "Usar este timbre como padrão da unidade" e confirme.
 E: A janela mostra as linhas do setor; depois de confirmar, elas aparecem em Configurações > Minhas unidades na sua unidade.
-
-### T144 – Unidade fora do Campus Palmas (v0.26.5)
-F: Numa unidade sem "/PAL/" na sigla (por exemplo, da Reitoria), abra um documento no editor.
-E: Não aparece aviso de timbre nem de rodapé (o do número do processo continua funcionando).
-
-## Bloco de assinatura: número do processo (v0.26.6)
-> antes de testar: tenha um bloco de assinatura com um documento de número do processo errado (como no teste T133).
 
 ### T145 – Assinar o bloco inteiro na lista de blocos (v0.26.6) (Crítico)
 F: Em "Blocos de Assinatura", clique no ícone "Assinar Documentos do Bloco" desse bloco (e, noutra vez, marque o bloco e clique no botão "Assinar"); clique em "Não, corrigir antes".
@@ -492,3 +408,7 @@ E: A mesma janela aparece só com os documentos errados entre os escolhidos; doc
 ### T147 – Assinar pela janela do documento no bloco (v0.26.6) (Crítico)
 F: Dentro do bloco, clique no número do documento errado e, na janela que abre, clique em "Assinar Documento".
 E: Aparece "O número do processo está errado (documento no processo X, texto diz Y). Assinar mesmo assim?"; "Não" fecha a pergunta sem assinar.
+
+### T148 – Rodapé com telefone e e-mail de outro setor do campus (v0.26.7)
+F: Sem telefone e e-mail cadastrados em "Minhas unidades", abra um documento cujo rodapé tem 63 3236-4023 e gise.palmas@ifto.edu.br; depois cadastre outro telefone e e-mail na unidade e abra de novo.
+E: Sem cadastro, não aparece aviso sobre telefone nem e-mail (e "Corrigir rodapé" os mantém); com cadastro, o aviso pede o telefone e o e-mail cadastrados.

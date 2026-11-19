@@ -126,6 +126,21 @@ test('v0.26.5: rodapé conferido só pelos dados (D11)', () => {
   assert.equal(c.conferirRodape([{ nome: 'r', html: '<p>x</p>' }], null), null)
 })
 
+test('v0.26.7: sem cadastro, telefone e e-mail de qualquer setor do campus estão certos (T142)', () => {
+  const gise = rodape('Quadra 310 Sul, Lo 5, s/n, Avenida NS 10 - Plano Diretor Sul — CEP 77021-090<br>Palmas/TO — 63 3236-4023<br>palmas.ifto.edu.br — gise.palmas@ifto.edu.br')
+  assert.equal(c.conferirRodape([{ nome: 'r', html: gise }], null).certo, true)
+  assert.equal(c.conferirRodape([{ nome: 'r', html: gise }], { sigla: 'X' }).certo, true)
+  // com cadastro, confere com o cadastrado
+  assert.deepEqual(c.conferirRodape([{ nome: 'r', html: gise }], cgoc).avisos, ['Telefone 63 3236-4023: o certo é 63 3236-4012.', 'E-mail gise.palmas@ifto.edu.br: o certo é contratos.palmas@ifto.edu.br.'])
+  // fora do campus continua errado
+  const fora = rodape('Quadra 310 Sul, Lo 5, s/n, Avenida NS 10 - Plano Diretor Sul — CEP 77021-090<br>Palmas/TO — 63 3236-4100<br>palmas.ifto.edu.br — gise.paraiso@ifto.edu.br')
+  // corrigir sem cadastro mantém o telefone e o e-mail do setor
+  const semCep = gise.replace('CEP 77021-090', 'CEP')
+  const corrigido = c.corrigirRodape(semCep, null)
+  assert.ok(corrigido.includes('63 3236-4023') && corrigido.includes('gise.palmas@ifto.edu.br') && corrigido.includes('77021-090'))
+  assert.deepEqual(c.conferirRodape([{ nome: 'r', html: fora }], null).avisos, ['Telefone 63 3236-4100: o certo é 63 3236-4000.', 'E-mail gise.paraiso@ifto.edu.br: o certo é palmas@ifto.edu.br.'])
+})
+
 test('v0.26.5: rodapé corrigido com o texto do D4 e os links', () => {
   const novo = c.corrigirRodape(rodape('velho') + rodape('segunda linha'), cgoc)
   assert.equal(novo, '<p class="IFTO_Centralizado_rodape" style="margin: 0px">Quadra 310 Sul, Lo 5, s/n, esquina com a Avenida NS 10 - Plano Diretor Sul — CEP 77021-090<br>Palmas/TO — <a href="tel:+556332364012">63 3236-4012</a><br><a href="https://palmas.ifto.edu.br">palmas.ifto.edu.br</a> — <a href="mailto:contratos.palmas@ifto.edu.br">contratos.palmas@ifto.edu.br</a></p>')
