@@ -31,6 +31,7 @@ Extension for **Firefox** and Chrome (free package, v0.5.0) that goes with the c
 3. **Execute** (`/etapa <spec> <n>`): read only the spec and what it points to. When done: tests, version, history, Status, commit and stage checked.
 4. **End of the improvement:** rules to `docs/regras/`, the line leaves `melhorias-futuras.md`, spec to `docs/specs/feitas/`.
 - Small fixes and test fixes do not need a spec.
+- **Several specs at the same time** (18/11/2026, user): the user opens **one Claude chat per spec** (e.g. `/etapa base-e-sei 2-5` in one, `/etapa conferir-documento 7` in another), to watch the progress and answer the questions; do not start background agents for this. Each chat works in its own worktree.
 - **Manual tests** (`/testes`): the user answers on the GitHub cards ("✅ Passou" / "❌ Falhou" and comments). Fix the failed ones, delete the passed ones from the file and add the new ones (new number, never reused).
 
 ## Who the user is
@@ -61,7 +62,7 @@ Extension for **Firefox** and Chrome (free package, v0.5.0) that goes with the c
 
 - **Version number (same rule for everyone: owner and colleagues), format `0.MIDDLE.LAST`:**
   - The next number after the last one in **master's** `docs/historico.md`; never skip, never reuse. Only `manifest.json` holds it, plus one or two lines in `docs/historico.md` with the date (dd/mm/yyyy).
-  - **Middle +1** (last back to 0) only at the **first stage of a new improvement** (a new spec). Its other stages, fixes and small changes: **last +1**. Example: master at 0.21.1 → new improvement 0.22.0 → its stage 2 0.22.1 → a fix 0.22.2.
+  - **Middle +1** (last back to 0) only at the **first stage of a new improvement** (a new spec, or an old spec resumed with new features: one middle number per spec, 18/11/2026). Its other stages, fixes and small changes: **last +1**. Example: master at 0.21.1 → new improvement 0.22.0 → its stage 2 0.22.1 → a fix 0.22.2.
   - Changes not pushed yet share the open number (same line in `historico.md`). Each version pushed to GitHub is signed only once by Mozilla.
   - **Pull request from a fork:** one number for the whole pull request (stages inside the fork do not bump), taken only when updating the fork with master (next section). The pull request check refuses any other number.
 - **No version, no signing** (15/11/2026): docs only (`.md`, `docs/`, `TESTES-PENDENTES.md`, `.claude/`) and the test-card files (`.github/workflows/testes.yml`, `.github/scripts/` except `baixar-assinada.js`) do not bump the version (commit "docs: …" or "ci: …"), and their push does not start "Assinar extensão" (`paths-ignore` in `assinar.yml`). Rule in `~/.claude/regras/programacao.md`.

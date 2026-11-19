@@ -4,7 +4,7 @@
 
 - **Status:** ready to code (after the base-e-sei and conferir-documento agents of 18/11/2026 are merged: same settings page)
 - **Requested on:** 18/11/2026 · **Deadline or priority:** next
-- **Planned version:** 0.27.0
+- **Planned version:** 0.28.0 (base-e-sei stages 2, 3, 5 take 0.27.x)
 
 ## 1. Goal (what for)
 
