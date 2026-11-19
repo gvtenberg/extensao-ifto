@@ -51,9 +51,6 @@ E: Aparece qual documento já foi incluído e a extensão não inclui mais nada.
 
 ## Documentos do pagamento: inclusão rápida (v0.9.0)
 > Use um processo de teste, na unidade CGOC. Antes, em Firefox › about:debugging, clique em "Recarregar" na extensão (ou instale a versão nova).
-### T36 – Incluir Sicaf, Consulta e Anexo direto, sem abrir telas (v0.9.0) (Crítico)
-F: Abra um processo sem Sicaf, Consulta e Anexo, clique em "Incluir Sicaf, Consulta e Anexo" e em OK.
-E: Nenhuma tela do SEI abre; em cerca de 1 a 3 segundos a árvore recarrega com Sicaf, Consulta e Anexo (data de hoje, Nato-digital, Público) e o botão mostra "Incluídos ✓". Se aparecer mensagem de erro, comente o texto e o que ficou na árvore.
 ### T37 – Pergunta curta antes de incluir (v0.9.0)
 F: No mesmo processo do T36, clique de novo no botão e leia a pergunta; clique em Cancelar.
 E: A pergunta é curta: "Este processo já tem Sicaf, Consulta e Anexo sem arquivo. Incluir mais três?"; nada é incluído.
@@ -203,9 +200,6 @@ E: A janela lista "Sicaf <empresa> – sem PDF (complete depois…)", a Consulta
 ### T93 – SICAF e Simples pulados: nada incluído (v0.18.6)
 F: Comece a busca e clique em "Pular o SICAF" e depois em "Pular o Simples Nacional".
 E: A janela final não oferece incluir nada dessa empresa (nem o Anexo); a nota continua sem SICAF.
-### T94 – Completar o Sicaf sem PDF depois (v0.18.6) (Crítico)
-F: No processo do T92, clique de novo em "1 nota sem SICAF ou Simples – Buscar", faça a busca do SICAF e clique em "Incluir no processo".
-E: A janela diz "no Sicaf em branco <número>"; nenhum documento novo é criado: o mesmo Sicaf ganha o PDF e o nome que está no SICAF.
 ### T95 – Aviso de Sicaf sem PDF antes da Folha (v0.18.6)
 F: Num processo com um Sicaf sem PDF e uma Folha de Encaminhamento depois dele, abra o processo.
 E: A barra da extensão mostra em vermelho "Sicaf sem PDF: <empresa>"; ao clicar, explica como anexar o PDF à mão.
@@ -357,3 +351,6 @@ E: Nenhum botão do SICAF aparece: nem o aviso das notas, nem o "Incluir SICAF" 
 ### T160 – Janela das notas compacta (v0.26.10)
 F: Na CGOC, com "Automática", abra um processo com várias notas sem SICAF e clique no aviso "notas sem SICAF – Buscar". Clique no meio de uma das notas.
 E: As notas aparecem em linhas mais baixas (umas 10 cabem sem rolar a janela); o clique na nota desmarca ela (fica apagada) e outro clique marca de novo.
+### T161 – SICAF e Simples esperam o resultado (v0.26.10)
+F: Na CGOC, num processo com nota sem SICAF, clique no aviso "notas sem SICAF – Buscar" e depois em "Buscar SICAF e Simples". Se o Compras.gov.br pedir, entre com o Gov.br.
+E: Depois da Área de Trabalho do Compras.gov.br, o SICAF abre sozinho em poucos segundos; o SICAF e o Simples Nacional só fecham depois de mostrar o resultado, e o SEI recebe os dois PDFs.

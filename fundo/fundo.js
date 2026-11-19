@@ -240,10 +240,14 @@ navegador.tabs.onUpdated.addListener(async (idDaAba, mudanca, aba) => {
   } else if (pagina === 'areaDeTrabalho') {
     // v0.21.6 (pedido do usuário em 18/11/2026: o menu não abria o SICAF): primeiro vai direto ao início do
     // SICAF na mesma aba; se o SICAF recusar e a aba voltar aqui, tenta pelo menu do usuário.
-    if (!tarefa.foiDiretoAoSicaf) {
-      tarefa.foiDiretoAoSicaf = true
+    // v0.26.10 (pedido de 19/11/2026, T94: o SICAF não abriu): espera 3 segundos a Área de Trabalho terminar
+    // de entrar antes de ir ao SICAF, e tenta direto duas vezes antes do menu.
+    if ((tarefa.idasDiretoAoSicaf || 0) < 2) {
+      tarefa.idasDiretoAoSicaf = (tarefa.idasDiretoAoSicaf || 0) + 1
       await gravarTarefa(tarefa)
-      await navegador.tabs.update(idDaAba, { url: regras.URL_INICIO_SICAF })
+      await new Promise(pronto => setTimeout(pronto, 3000))
+      const agora = await navegador.tabs.get(idDaAba).catch(() => null)
+      if (agora && regras.paginaDoCompras(agora.url) === 'areaDeTrabalho') await navegador.tabs.update(idDaAba, { url: regras.URL_INICIO_SICAF })
     } else {
       await injetar(idDaAba, ['sites/compras/aviso.js'], { modo: 'areaDeTrabalho' })
     }

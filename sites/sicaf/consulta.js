@@ -31,6 +31,10 @@
       for (let vez = 0; vez < 60 && !linha && !saindo; vez++) { await esperar(500); linha = linhaDoCnpj() }
       if (saindo) return
     }
+    // v0.26.10 (pedido de 19/11/2026, T94): depois que a página recarrega, o resultado pode demorar a
+    // aparecer; espera até 15 segundos (ou uma mensagem de erro do SICAF) antes de desistir.
+    for (let vez = 0; vez < 30 && !linha && !saindo && !textoDosErros(); vez++) { await esperar(500); linha = linhaDoCnpj() }
+    if (saindo) return
     if (!linha) throw new Error(textoDosErros() || 'O SICAF não encontrou este CNPJ.')
     const bytes = await pegarPdf(linha)
     await enviar({ tipo: 'sicafPdf', cnpj, nome: linha.nome, arquivo: regras.paraBase64(bytes) })

@@ -17,6 +17,12 @@
     while (pedido && !pedido.fim && pedido.cnpj && !saindo) {
       const titulo = `Extensão IFTO: consultando o Simples Nacional do CNPJ ${sicaf.formatarCnpj(pedido.cnpj)} (${pedido.posicao + 1} de ${pedido.total}). Não feche esta aba.`
       aviso(titulo)
+      // v0.26.10 (pedido de 19/11/2026, T94): depois de "Consultar", o resultado pode demorar a aparecer;
+      // espera até 8 segundos antes de concluir que o site recusou o CNPJ.
+      if (pedido.pesquisado) {
+        for (let vez = 0; vez < 16 && !saindo && !(document.getElementById('conteudo') && document.getElementById('hdnCnpj')) && !textoDoErro(); vez++) await esperar(500)
+        if (saindo) return
+      }
       const conteudo = document.getElementById('conteudo')
       const campo = document.getElementById('Cnpj')
       if (conteudo && document.getElementById('hdnCnpj')) {
