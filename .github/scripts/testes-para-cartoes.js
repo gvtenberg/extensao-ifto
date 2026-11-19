@@ -1,7 +1,7 @@
 // GitHub Actions: cria um cartão (issue) para cada teste ou pergunta nova do TESTES-PENDENTES.md
 // e fecha os cartões cujo teste saiu do arquivo (resolvido pelo /testes). Usa o GITHUB_TOKEN da Action.
 const fs = require('node:fs')
-const { lerTestes, corpoDoCartao, numeroDoCartao } = require('./testes-pendentes.js')
+const { lerTestes, corpoDoCartao, planoDosCartoes } = require('./testes-pendentes.js')
 
 const repositorio = process.env.GITHUB_REPOSITORY
 const api = `https://api.github.com/repos/${repositorio}`
@@ -31,22 +31,25 @@ async function todosOsCartoes () {
   await chamar('POST', '/labels', { name: 'pergunta', color: '1d76db', description: 'Pergunta para o usuário responder' })
 
   const itens = lerTestes(fs.readFileSync('TESTES-PENDENTES.md', 'utf8'))
-  const noArquivo = new Set(itens.map(i => i.numero))
-  const cartoes = await todosOsCartoes()
-  const jaTemCartao = new Set(cartoes.map(numeroDoCartao))
+  const { criar, fechar } = planoDosCartoes(itens, await todosOsCartoes())
+  const repetidos = []
 
-  for (const item of itens) {
-    if (jaTemCartao.has(item.numero)) continue // número nunca é reaproveitado: um cartão por teste
+  for (const { item, numeroRepetido } of criar) {
     const labels = item.numero.startsWith('P') ? ['teste', 'pergunta'] : ['teste']
-    await chamar('POST', '/issues', { title: `${item.numero} – ${item.titulo}`, body: corpoDoCartao(item), labels })
+    const aviso = numeroRepetido ? '> ⚠️ Este número já foi usado por outro teste: o Claude vai trocar o número no próximo /testes.\n\n' : ''
+    await chamar('POST', '/issues', { title: `${item.numero} – ${item.titulo}`, body: aviso + corpoDoCartao(item), labels })
     console.log(`Cartão criado: ${item.numero} – ${item.titulo}`)
+    if (numeroRepetido) repetidos.push(item.numero)
   }
 
-  for (const cartao of cartoes) {
-    const numero = numeroDoCartao(cartao)
-    if (cartao.state !== 'open' || !numero || noArquivo.has(numero)) continue
+  for (const cartao of fechar) {
     await chamar('POST', `/issues/${cartao.number}/comments`, { body: 'Resolvido: o teste saiu do TESTES-PENDENTES.md.' })
     await chamar('PATCH', `/issues/${cartao.number}`, { state: 'closed', state_reason: 'completed' })
     console.log(`Cartão fechado: ${cartao.title}`)
+  }
+  // Cartões criados mesmo assim; o aviso vermelho lembra de trocar o número.
+  if (repetidos.length) {
+    console.log(`::error title=Número de teste repetido::${repetidos.join(', ')}: dois testes diferentes com o mesmo número. Todos ganharam cartão; troque o número do mais novo no TESTES-PENDENTES.md.`)
+    process.exit(1)
   }
 })().catch(erro => { console.error(erro.message); process.exit(1) })

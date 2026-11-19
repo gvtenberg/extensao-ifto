@@ -58,3 +58,16 @@ test('apagarTestes tira o bloco e a seção que ficou vazia', () => {
   assert.ok(!depois.includes('## Senha'))
   assert.ok(depois.includes('## Perguntas'))
 })
+
+test('planoDosCartoes: número igual com outro título também ganha cartão; fecha só o teste que saiu', () => {
+  const { planoDosCartoes } = require('../.github/scripts/testes-pendentes.js')
+  const itens = [{ numero: 'T10', titulo: 'Teste do dono (v1)' }, { numero: 'T11', titulo: 'Teste do colega (v1)' }, { numero: 'T12', titulo: 'Novo (v1)' }]
+  const cartoes = [
+    { title: 'T10 – Teste do dono (v1)', state: 'open', body: '' },
+    { title: 'T11 – Outro teste do dono (v1)', state: 'open', body: '' },
+    { title: 'T09 – Saiu (v1)', state: 'open', body: '' }
+  ]
+  const { criar, fechar } = planoDosCartoes(itens, cartoes)
+  assert.deepEqual(criar.map(c => [c.item.numero, c.numeroRepetido]), [['T11', true], ['T12', false]])
+  assert.deepEqual(fechar.map(c => c.title), ['T11 – Outro teste do dono (v1)', 'T09 – Saiu (v1)'])
+})

@@ -90,4 +90,20 @@ function apagarTestes (texto, numeros) {
     .replace(/\n{3,}/g, '\n\n')
 }
 
-module.exports = { apagarTestes, lerTestes, corpoDoCartao, resultadoDoCartao, numeroDoCartao }
+// 18/11/2026: o cartão de um teste é o que tem o mesmo número E o mesmo título. Número igual com outro título
+// (ex.: teste do colega com número que o dono também usou) não é teste repetido: ganha cartão também, marcado
+// como "número repetido", para ninguém perder o teste. Fecha os cartões abertos cujo teste (número + título)
+// saiu do arquivo.
+const tituloDoCartao = cartao => cartao.title.replace(/^[TP]\d+\s*[–-]\s*/, '').trim()
+function planoDosCartoes (itens, cartoes) {
+  const chave = (numero, titulo) => numero + '|' + titulo.trim()
+  const comCartao = new Set(cartoes.map(c => chave(numeroDoCartao(c), tituloDoCartao(c))))
+  const numerosComCartao = new Set(cartoes.map(numeroDoCartao))
+  const noArquivo = new Set(itens.map(i => chave(i.numero, i.titulo)))
+  const criar = itens.filter(i => !comCartao.has(chave(i.numero, i.titulo)))
+    .map(item => ({ item, numeroRepetido: numerosComCartao.has(item.numero) || itens.filter(i => i.numero === item.numero).length > 1 }))
+  const fechar = cartoes.filter(c => c.state === 'open' && numeroDoCartao(c) && !noArquivo.has(chave(numeroDoCartao(c), tituloDoCartao(c))))
+  return { criar, fechar }
+}
+
+module.exports = { apagarTestes, lerTestes, corpoDoCartao, resultadoDoCartao, numeroDoCartao, planoDosCartoes }
