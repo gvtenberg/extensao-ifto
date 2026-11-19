@@ -1,8 +1,14 @@
 # Extensão IFTO Palmas
 
-Extensão de navegador que facilita o trabalho no SEI do IFTO para os servidores do Campus Palmas. Ela acrescenta botões e atalhos às páginas do SEI, para reduzir tarefas repetitivas, como assinar uma lista de documentos ou incluir documentos externos em processos de pagamento.
+Extensão de navegador que facilita o trabalho no SEI do IFTO para os servidores do Campus Palmas. Ela acrescenta botões e atalhos às páginas do SEI, para reduzir tarefas repetitivas, como assinar uma lista de documentos ou incluir documentos externos em processos de pagamento. Também confere os documentos antes da assinatura (número do processo, timbre, rodapé e data) e melhora o editor de textos do SEI (tabelas, estilos e salvamento automático).
 
-A extensão funciona apenas no endereço `sei.ifto.edu.br` e, para quem der a permissão, no Compras IFTO (`compras-ifto-teste-v1-mbro.onrender.com`). Nos demais sites ela não faz nada.
+A extensão funciona sempre no SEI do IFTO (`sei.ifto.edu.br`). Nos sites abaixo ela só entra **se você der a permissão** nas configurações (cada permissão é pedida à parte e pode ser retirada):
+
+- **Compras.gov.br (SICAF) e Simples Nacional (Receita Federal):** para buscar e salvar os PDFs do fornecedor da nota fiscal.
+- **Gov.br (página de entrada):** só para clicar sozinha em "SerproID" (opcional).
+- **Compras IFTO** (`compras-ifto-teste-v1-mbro.onrender.com`): para receber as peças da licitação enviadas ao SEI.
+
+Nos demais sites ela não faz nada.
 
 ## Sumário
 
@@ -25,6 +31,9 @@ Para todas as unidades:
 - **Documento externo já preenchido:** ao incluir um documento externo, a página já vem com a data de hoje e com o formato e o nível de acesso escolhidos nas configurações (de início, Nato-digital e Público). Ao escolher o arquivo, a extensão escolhe o tipo pelo nome do arquivo ("Nota Fiscal 123.pdf" fica Nota Fiscal, com o Nome na Árvore "123"), troca o "#" do nome por "_" (o SEI não aceita) e avisa quando o arquivo passa de 10 MB, com dicas para diminuí-lo. Você confere e clica em Salvar. Documentos que já existem no processo não são alterados.
 - **Arrastar arquivos para o processo:** com um processo aberto, arraste um ou mais arquivos do computador para a árvore (à esquerda). Abre uma lista com o tipo, o Nome na Árvore, a data e o tamanho de cada arquivo, para conferir e corrigir; os arquivos entram no processo (Nato-digital e Público) só depois que você clica em "Incluir no processo". Arquivo acima de 10 MB não entra (a lista mostra como diminuí-lo).
 - **Senha reconhecida pelo navegador:** a versão atual do SEI esconde o campo de senha de um jeito que o navegador deixa de oferecer a senha guardada. A extensão corrige isso na tela de entrada do SEI e na janela de assinatura.
+- **Conferir o documento antes de assinar:** em documentos ainda não assinados, a extensão avisa quando o número do processo do texto não é o do processo aberto, quando o timbre ou o rodapé estão errados (unidades do Campus Palmas), quando a data está errada ou fora do padrão ("Palmas, 1º de dezembro de 2026.") e quando as partes do documento estão grudadas. Os avisos aparecem numa janela só, no canto de baixo, que pode ser arrastada; no editor, cada aviso tem o seu botão de corrigir. Ao assinar um documento com erro (pela árvore, no editor, na lista de assinaturas ou no Bloco de assinatura), a extensão pergunta antes "Assinar mesmo assim?". Nada é salvo sem você clicar em Salvar. Detalhes em [Configurações](#configurações).
+- **Copiar com mais facilidade:** na página do documento, os nomes de quem assinou podem ser selecionados e copiados. No menu de cópia do ícone de um documento na árvore, se clicar na opção errada é só clicar na certa; o menu fecha sozinho logo depois (ou com Esc ou um clique fora).
+- **Aviso de versão nova do SEI:** quando o SEI muda para uma versão em que a extensão ainda não foi testada, aparece um aviso com "Continuar usando" e "Desativar a extensão no SEI". Desativada, a extensão não mexe em nada no SEI até você clicar em "Ativar de novo" (no ícone da extensão ou em Configurações › Geral).
 
 Para unidades específicas (ligadas automaticamente na unidade indicada, e podem ser ligadas em qualquer unidade nas configurações):
 
@@ -106,6 +115,8 @@ Para abrir: clique no ícone da extensão e em **Configurações**. Cada escolha
 
 - **Preencher documento novo** (ligada de início): data de hoje, formato e nível de acesso ao incluir um documento externo (os valores ficam em Documentos do SEI).
 - **Navegador reconhece o campo de senha** (ligada de início): faz o navegador voltar a oferecer a senha guardada no SEI.
+- **Desativar a extensão no SEI** / **Ativar de novo:** desliga (ou liga de novo) todas as funções da extensão no SEI, por exemplo depois do aviso de versão nova do SEI.
+- **Dados da extensão:** **Voltar às configurações padrão** (todas as escolhas voltam a ser as do início; as permissões já dadas continuam) e **Apagar todos os dados da extensão** (configurações, versões salvas automaticamente, conteúdo copiado, lista de assinaturas e o restante; não dá para desfazer).
 
 **Documentos do SEI (todas as unidades)**
 
@@ -145,7 +156,7 @@ Cada função abaixo tem três opções: **Automática** (liga só na unidade in
 ## Quais dados a extensão lê e guarda
 
 - **O que lê:** somente as páginas do SEI abertas no navegador (unidade atual, árvore do processo, números dos documentos e versão do SEI), para saber onde colocar os botões e qual documento abrir. Para o SICAF, lê também o texto dos atestes e dos PDFs das notas fiscais e do SICAF do processo aberto, a página do SICAF no Compras.gov.br e o resultado da consulta do Simples Nacional (só depois da permissão e do clique em "Buscar"). No Compras IFTO (com a permissão), recebe só as peças que a pessoa envia com "Enviar ao SEI".
-- **O que guarda:** as configurações (com a lista "Minhas unidades"), a lista de assinaturas colada (até o uso do botão "Limpar lista"), a versão do último SEI aberto (e, se o SEI mudar de versão, a sua escolha de continuar ou desativar a extensão nele), os estilos do editor de cada tipo de documento aberto (para oferecê-los nos outros tipos), os PDFs do SICAF e do Simples Nacional obtidos no dia (para não buscar de novo; os de outros dias são apagados), as peças do Compras IFTO que esperam para ir ao SEI (cada uma sai da lista quando é incluída ou com "Tirar da lista") e os tipos de documento criados no dia a partir delas (para o aviso de documento repetido). A "Cópia das configurações" só vai para a pasta Downloads quando você clica em "Baixar cópia das configurações". Esses dados ficam apenas no navegador do próprio computador.
+- **O que guarda:** as configurações (com a lista "Minhas unidades"), a lista de assinaturas colada (até o uso do botão "Limpar lista"), a versão do último SEI aberto (e, se o SEI mudar de versão, a sua escolha de continuar ou desativar a extensão nele), os estilos do editor de cada tipo de documento aberto (para oferecê-los nos outros tipos), os PDFs do SICAF e do Simples Nacional obtidos no dia (para não buscar de novo; os de outros dias são apagados), as peças do Compras IFTO que esperam para ir ao SEI (cada uma sai da lista quando é incluída ou com "Tirar da lista") e os tipos de documento criados no dia a partir delas (para o aviso de documento repetido). Com o **Salvamento automático** ligado, guarda também a versão do documento que está sendo escrito (apagada quando o SEI salva, ou depois de 7 dias) e o conteúdo copiado com "Copiar conteúdo". Tudo isso pode ser apagado em Configurações › Geral › **Apagar todos os dados da extensão**. A "Cópia das configurações" só vai para a pasta Downloads quando você clica em "Baixar cópia das configurações". Esses dados ficam apenas no navegador do próprio computador.
 - **Senha:** a extensão **não lê nem guarda a senha**. A senha fica no gerenciador de senhas do navegador; a extensão apenas verifica se o campo já está preenchido.
 - **Envio de dados:** a extensão não envia dados do SEI para nenhum outro site (no SICAF e no Simples Nacional, só digita o CNPJ do fornecedor na pesquisa). A única consulta externa é a verificação de nova versão (automática no Firefox, ou pelo botão "Procurar atualização"), feita na página de versões indicada em [Onde baixar](#onde-baixar).
 - **O que escreve no SEI:** a extensão só faz alterações no SEI a partir de um clique do usuário, por exemplo em "Assinar e próximo" ou na confirmação de "Incluir no processo" (SICAF, Simples Nacional e arquivos arrastados para a árvore) e de "Criar e salvar" (peças do Compras IFTO; a extensão abre a janela do editor do SEI, salva e a fecha). Em "Remover marca MINUTA", nas correções do documento (número do processo, timbre, rodapé e data) no espaço entre as partes do documento e nos estilos com "★" (um bloco de formatação escondido no texto), a extensão só muda o texto no editor; quem salva é você.
