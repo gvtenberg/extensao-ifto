@@ -558,7 +558,8 @@
         marca.checked = !marca.checked
         mudar()
       })
-      cabeca.unshift(marca)
+      // v0.31.1 (T186): a linha do título já foi montada; a caixa entra nela (antes ia só para a lista e não aparecia).
+      partes[0].prepend(marca)
     }
     if (nota.escolher) {
       const nome = 'cnpj-' + nota.id

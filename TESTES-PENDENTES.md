@@ -393,25 +393,9 @@ E: Há uma linha de espaço depois da última linha do timbre, depois da linha "
 ### T185 – Arquivo ConsultaOptantes escolhe o tipo Consulta (v0.29.3)
 F: Em Incluir Documento › Externo, anexe um arquivo chamado "ConsultaOptantes_51866043000195_2026-11-19.pdf".
 E: O Tipo do Documento fica "Consulta" sozinho.
-### T186 – Janela das notas com caixa de marcar (v0.29.3)
-F: Na CGOC, com "Automática", clique em "notas sem SICAF – Buscar" num processo com uma nota e depois num com nota que a extensão não conseguiu ler.
-E: Cada nota tem uma caixa de marcar à esquerda do nome; a linha mostra só "Nota N – fornecedor" e "Ver a nota"; o CNPJ fica numa linha só ("CNPJ:" e o campo) e o aviso é curto.
 ### T187 – SICAF abre sozinho depois da Área de Trabalho (v0.29.3)
 F: Saia do Compras.gov.br, clique em "notas sem SICAF – Buscar" e "Buscar SICAF e Simples" e faça o login com Gov.br.
 E: Ao chegar à Área de Trabalho, aparece "Abrindo o SICAF…" e, assim que o seu nome aparece no alto, a aba vai sozinha para o SICAF e a busca continua.
-### T188 – Estilo com ★ continua ao abrir o editor de novo (v0.29.3) (Crítico)
-F: No Despacho 3391318 (ou outro de teste), abra o editor sem mexer em nada e veja os parágrafos com "★ Item_nivel_1_Edital_titulo" e "★ Item_nivel_2_Edital"; clique num deles e veja o nome na lista de estilos.
-E: Os parágrafos continuam com número, recuo e fundo cinza, e a lista mostra o nome do estilo; salvar não tira o estilo.
-### T189 – Fundo cinza na lista de estilos (v0.29.3)
-F: No editor de um Despacho e de um Edital, abra a lista de estilos.
-E: "Item_nivel_1_Edital_titulo", "Item_Nivel1" e os "Texto_Fundo_Cinza…" aparecem com fundo cinza na lista, como no SEI sem a extensão.
-### T190 – Menu de cópia: corrigir o clique errado (v0.30.0)
-F: Na árvore de um processo, clique no ícone de um documento, clique em "T" (número como texto) e logo em seguida no "E" com o número; cole num documento.
-E: Aparece "Link para o editor copiado.", o menu fecha cerca de 1 segundo depois e o que foi colado é o link do SEI (o segundo clique valeu).
-### T191 – Menu de cópia: fechar com Esc ou clique fora (v0.30.0)
-F: Abra o menu do ícone de um documento e aperte Esc; abra de novo e clique num espaço vazio da árvore; abra de novo e clique no documento à direita.
-E: Nas três vezes o menu fecha na hora, sem copiar nada.
-
 ## Salvamento automático no editor do SEI
 > antes de testar: em Configurações > Editor do SEI, ligue "Salvamento automático (neste computador)" e "Botões Copiar conteúdo e Colar conteúdo"; use um documento de teste, ainda não assinado.
 ### T192 – Cópia guardada enquanto escreve (v0.31.0)
@@ -457,3 +441,11 @@ E: Ao lado do botão Salvar aparece "Salvamento automático desligado nas config
 ### T204 – Outra aba de configurações não desfaz o "Voltar às configurações padrão" (v0.31.1)
 F: Abra as Configurações em duas abas. Na primeira, clique em "Voltar às configurações padrão" e confirme. Vá à segunda aba.
 E: A segunda aba recarrega sozinha e mostra as escolhas do início; mudar algo nela não traz de volta as escolhas antigas.
+
+### T205 – Negrito na lista de estilos (v0.31.1)
+F: No editor de um Despacho, abra a lista de estilos.
+E: "IFTO_Centralizado_Negrito_Maiusculo", "Item_Nivel1", "Item_nivel_1_Edital_titulo" e os outros estilos em negrito aparecem em negrito na lista; os de fundo cinza continuam com fundo cinza.
+
+### T206 – Janela das notas: caixa de marcar, nota riscada e janela mais estreita (v0.31.1)
+F: Na CGOC, com "Automática", clique em "notas sem SICAF – Buscar" num processo com duas notas e desmarque uma.
+E: A janela é mais estreita; cada nota tem uma caixa de marcar à esquerda do nome; a nota desmarcada fica apagada e com o nome riscado.

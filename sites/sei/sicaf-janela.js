@@ -10,7 +10,7 @@
     :host { all: initial; }
     .janela { position: fixed; z-index: 2147483000; top: 70px; right: 16px; font: 14px/1.5 system-ui, sans-serif; color: #1B2420;
       background: #fff; border-radius: 12px; border: 2px solid #1E5E33; box-shadow: 0 8px 28px rgba(0,0,0,.3);
-      width: min(560px, calc(100vw - 32px)); max-height: calc(100vh - 90px); display: flex; flex-direction: column; }
+      width: min(420px, calc(100vw - 32px)); /* v0.31.1 (T186): mais estreita, para não tampar a nota */ max-height: calc(100vh - 90px); display: flex; flex-direction: column; }
     .janela.recolhida .corpo, .janela.recolhida .botoes { display: none; }
     .topo { display: flex; align-items: center; gap: 8px; padding: 12px 16px 8px; cursor: move; user-select: none; }
     .marca { background: #1E5E33; color: #fff; font-size: 10px; font-weight: 700; padding: 1px 4px; border-radius: 4px; }
@@ -30,6 +30,8 @@
     .cartao { border: 1px solid #E2E6E3; border-radius: 8px; padding: 10px 12px; display: grid; grid-template-columns: minmax(0, 1fr); gap: 6px; }
     /* v0.18.5: nota desmarcada (não será consultada) fica apagada */
     .cartao.desmarcada { opacity: .55; }
+    /* v0.31.1 (T186): e o nome da nota riscado */
+    .cartao.desmarcada h2 { text-decoration: line-through; }
     /* v0.26.10 (T76): cartão das notas compacto; o clique no cartão marca ou desmarca. */
     .cartao.compacto { padding: 5px 10px; gap: 3px; }
     .cartao.compacto h2 { font-size: 13px; flex: 1; }

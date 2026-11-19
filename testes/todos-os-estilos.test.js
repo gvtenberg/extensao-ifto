@@ -61,3 +61,9 @@ test('paragrafosComEstilo acha no texto original os parágrafos com estilo extra
   assert.deepEqual(r.paragrafosComEstilo(html, ['Item_Nivel2']), [{ nome: 'Item_Nivel2', texto: '1.1 Prazo de 10 dias & mais' }])
   assert.deepEqual(r.paragrafosComEstilo('<p>nada</p>', ['Item_Nivel2']), [])
 })
+
+test('fundoNaLista também põe o negrito na lista (v0.31.1, T188)', () => {
+  const css = r.fundoNaLista(r.listaCompleta({}))
+  assert.match(css, /\.ck-button\.IFTO_Centralizado_Negrito_Maiusculo \.ck-button__label\{font-weight:bold\}/)
+  assert.doesNotMatch(css, /Item_Nivel2 \.ck-button__label/)
+})

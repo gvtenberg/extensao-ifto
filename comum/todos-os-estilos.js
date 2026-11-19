@@ -90,6 +90,9 @@
       const principal = (css || []).find(regra => nomeDaRegra(regra) === nome && !/^\s*\.[^{]*:/.test(regra))
       const cor = principal && /background(?:-color)?\s*:\s*([^;}]+)/i.exec(principal)
       if (cor) regras.push('.ck.ck-list__item .ck.ck-button.' + nome + ':not(:hover):not(.ck-on){background:' + cor[1].trim() + '}')
+      // v0.31.1 (T188): e o negrito, como no SEI original (ex.: IFTO_Centralizado_Negrito_Maiusculo).
+      const peso = principal && /font-weight\s*:\s*([^;}]+)/i.exec(principal)
+      if (peso) regras.push('.ck.ck-list__item .ck.ck-button.' + nome + ' .ck-button__label{font-weight:' + peso[1].trim() + '}')
     }
     return regras.join('\n')
   }
