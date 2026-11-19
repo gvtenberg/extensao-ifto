@@ -51,12 +51,17 @@
       if (devolver.length === antes && !original) mudancas[nome] = html
     }
     if (devolver.length) {
+      // v0.31.1 (T188): devolver o estilo não é uma mudança da pessoa (o documento salvo no SEI já o tem); se não
+      // havia nada a salvar antes, o SEI continua sem pedir para salvar (plugin "Salvar" do editor, resetDirty).
+      const salvar = editor.plugins.has('Salvar') ? editor.plugins.get('Salvar') : null
+      const semMudancas = salvar && !salvar.isDirty && typeof salvar.resetDirty === 'function'
       editor.model.enqueueChange({ isUndoable: false }, escritor => {
         for (const [paragrafo, estilo] of devolver) {
           escritor.removeAttribute('isLegacy', paragrafo)
           escritor.setAttribute('estilo', estilo, paragrafo)
         }
       })
+      if (semMudancas) salvar.resetDirty()
     }
     if (Object.keys(mudancas).length) editor.data.set(mudancas, { batchType: { isUndoable: false } })
   }

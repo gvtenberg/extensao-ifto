@@ -449,3 +449,7 @@ E: "IFTO_Centralizado_Negrito_Maiusculo", "Item_Nivel1", "Item_nivel_1_Edital_ti
 ### T206 – Janela das notas: caixa de marcar, nota riscada e janela mais estreita (v0.31.1)
 F: Na CGOC, com "Automática", clique em "notas sem SICAF – Buscar" num processo com duas notas e desmarque uma.
 E: A janela é mais estreita; cada nota tem uma caixa de marcar à esquerda do nome; a nota desmarcada fica apagada e com o nome riscado.
+
+### T207 – Abrir documento com estilo ★ não pede para salvar (v0.31.1)
+F: Abra no editor o Despacho 3391318 (ou outro com estilo ★), sem mexer em nada, e feche a janela do editor.
+E: O SEI não pergunta se quer salvar; os parágrafos continuam com o estilo ★. Se você mudar algo antes de fechar, o SEI pergunta, como sempre.
