@@ -1,26 +1,5 @@
 # Testes pendentes: só a fonte dos cartões do GitHub (formato no CLAUDE.md, seção Testes)
 
-## Levantamento: SEI++ antigo no SEI do IFTO
-> No computador de desenvolvimento (os pacotes ficam em ferramentas-de-teste/seipp/, fora do git). Desative o SEI Pro e outros SEI++; teste uma versão por vez.
-### T01 – SEI++ 5.1.1 (2022)
-F: Carregue seipp-v5.1.1.xpi em about:debugging (Carregar extensão temporária). No SEI, abra Controle de Processos, um processo e um documento; veja as opções no ícone do SEI++.
-E: Comente quais funções aparecem, quais funcionam e quais eram úteis.
-### T02 – SEI++ 6.0 beta (commit c53f1367, 2025)
-F: Igual ao T01, com seipp-c53f136.xpi.
-E: Comente o que funciona e o que não, comparando com o T01.
-
-## Base da extensão e botão Novo documento (v0.1.0)
-> Desative o SEI++ e o SEI Pro, para não aparecerem dois botões.
-### T03 – Janela da extensão e Configurações (v0.1.0)
-F: Com a extensão instalada (T11), clique no ícone dela > Configurações.
-E: A janela mostra o nome e a versão; Configurações abre uma aba com "Botão Novo documento sempre visível" marcado.
-### T04 – SEI reconhecido (v0.1.0)
-F: Abra o Controle de Processos do SEI e clique no ícone da extensão.
-E: Aparece em verde "SEI do IFTO reconhecido (versão 5.0.4)" (texto mudado na v0.4.1). Se ficar a mensagem amarela, comente o endereço do SEI na barra.
-### T05 – Botão "Novo documento" sempre visível (v0.1.0)
-F: Abra um processo e clique num documento da árvore onde o botão Incluir documento não aparecia; clique no botão. Desmarque a opção nas Configurações, aperte F5 e repita.
-E: Marcada: o botão aparece no começo da barra e abre a escolha do tipo, sem repetir se o SEI já o mostra. Desmarcada: o SEI fica como era.
-
 ## Lista de assinaturas no SEI (v0.2.0 a v0.4.0)
 > Instale a versão nova e entre no SEI com a unidade PAL/REI/IFTO (Direção-geral).
 ### T13 – Colar a lista e abrir os itens (v0.2.0)
