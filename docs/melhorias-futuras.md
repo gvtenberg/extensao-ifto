@@ -29,6 +29,7 @@ Summary to resume work (on another machine or by another person) without reading
 - **Done, waiting for tests (v0.28.0):** SEI version warning: box on an untested SEI version, continue or turn the extension off on the SEI; "Ativar de novo" in the icon window and settings (`specs/feitas/aviso-versao-sei.md`, rules in `regras/sei.md`). Tests T176–T178.
 - **Done, waiting for tests (v0.29.0–v0.29.2):** every SEI style in every document, main text only, with ★, hidden style block for the PDF, learned styles, switch on by default (`specs/feitas/todos-os-estilos.md`, rules in `regras/sei.md`). Tests T182, T183, T188, T189 (v0.29.3: styles kept on reopening, grey in the list; T188 critical).
 - **Done, waiting for tests (v0.29.3):** fixes from the tests round of 19/11/2026 (spacing across thin separators and before the footer, "Consulta" type for ConsultaOptantes files, invoices window with checkbox and shorter cards, SICAF opened from the Área de Trabalho after the login). Tests T184–T187 (T184 critical).
+- **Done, waiting for tests (v0.30.0):** faster copy menu on the document icon in the tree (second click works, closes 1 s after the last click, Esc and click outside close it; rules in `regras/sei.md`). Tests T190–T191.
 - **Planned (with spec):** lines marked **[spec]** below. **Not planned:** the other lines (ideas).
 
 ## Ideas

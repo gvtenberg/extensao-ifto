@@ -405,3 +405,9 @@ E: Os parágrafos continuam com número, recuo e fundo cinza, e a lista mostra o
 ### T189 – Fundo cinza na lista de estilos (v0.29.3)
 F: No editor de um Despacho e de um Edital, abra a lista de estilos.
 E: "Item_nivel_1_Edital_titulo", "Item_Nivel1" e os "Texto_Fundo_Cinza…" aparecem com fundo cinza na lista, como no SEI sem a extensão.
+### T190 – Menu de cópia: corrigir o clique errado (v0.30.0)
+F: Na árvore de um processo, clique no ícone de um documento, clique em "T" (número como texto) e logo em seguida no "E" com o número; cole num documento.
+E: Aparece "Link para o editor copiado.", o menu fecha cerca de 1 segundo depois e o que foi colado é o link do SEI (o segundo clique valeu).
+### T191 – Menu de cópia: fechar com Esc ou clique fora (v0.30.0)
+F: Abra o menu do ícone de um documento e aperte Esc; abra de novo e clique num espaço vazio da árvore; abra de novo e clique no documento à direita.
+E: Nas três vezes o menu fecha na hora, sem copiar nada.

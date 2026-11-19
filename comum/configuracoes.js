@@ -57,6 +57,8 @@
     todosOsEstilos: true,
     // v0.26.1 (D15): nomes de quem assinou podem ser selecionados e copiados na página do documento.
     copiarAssinaturas: true,
+    // v0.30.0: menu de cópia do ícone do documento na árvore: todo clique copia, fecha 1 s depois, Esc e clique fora fecham.
+    menuCopiar: true,
     unidades: Object.freeze([])
   })
 
