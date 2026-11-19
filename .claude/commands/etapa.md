@@ -1,10 +1,13 @@
-Execute the given stage(s): $ARGUMENTS (spec name in `docs/specs/` and stage number; can be a range, e.g. `base-e-sei 2-3`).
+---
+description: Execute a spec stage
+---
+Execute the stage(s) $ARGUMENTS (spec in `docs/specs/` + stage number or range, e.g. `base-e-sei 2-3`). Follow CLAUDE.md (version, tests, commits, reply). Do not start subagents: search with `grep` yourself.
 
-1. Read the spec. If any decision in "Decisions to confirm" that affects these stages is still `[ ]`, **stop** and ask me in the chat (choice window); do not decide alone. A new doubt that comes up during the stage (even if it only affects future stages): ask in the chat right away and record the answer in the spec.
-2. If there are pending changes in git, commit them before starting ("vX.Y.Z: type: summary"; types in CLAUDE.md).
-3. Read only the code files and the `docs/regras/` files the stage needs (and, if it uses system data, only the needed part of `../sistema-orcamento-ifto/docs/`). Saved SEI pages: `ferramentas-de-teste/paginas-sei/` (search the excerpt with `grep`, do not read the whole page).
-4. Code the stage. Create automated rule tests when there is a new rule. Run `npm test` and, at the end of the stage, `npm run conferir`.
-5. Bump the version in `manifest.json` (first stage of an improvement: middle number if it is a big change; next stages of the same improvement: only the last number), record it in `docs/historico.md` (with today's date), check the stage as done in the spec, update the "Status" section of `docs/melhorias-futuras.md` and append the manual tests at the end of `TESTES-PENDENTES.md` (compact format from CLAUDE.md, in Portuguese). Commit the stage (no push).
-6. If I asked for a range, go on to the next stage without asking me for tests; only stop before the end for a critical test or a doubt only I can resolve.
-7. If it is the spec's last stage: move the spec's rules to `docs/regras/`, remove the line from `docs/melhorias-futuras.md`, move the spec to `docs/specs/feitas/` and commit.
-8. Reply in the CLAUDE.md format (tests only with number and title, grouped by stage).
+1. Read only the spec. A `[ ]` decision for these stages, or a new doubt: ask in the choice window and wait; record the answer in the spec.
+2. Pending git changes: commit them first.
+3. Read only the code and `docs/regras/` parts the stage needs (saved SEI pages: `grep`, never whole).
+4. Code it, with tests for new rules; `npm test`, and `npm run conferir` at the end.
+5. Version, `historico.md`, stage checked, Status, manual tests at the end of `TESTES-PENDENTES.md`; commit (no push).
+6. Range: go on without asking for tests; stop only for a critical test or a doubt only I can resolve.
+7. Last stage: rules to `docs/regras/`, line out of `melhorias-futuras.md`, spec to `docs/specs/feitas/`; commit.
+8. Reply in the CLAUDE.md format, tests grouped by stage.
