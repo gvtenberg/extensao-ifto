@@ -82,6 +82,38 @@
   }
   const mesmosNomes = (a, b) => a.length === b.length && [...a].sort().join(',') === [...b].sort().join(',')
 
+  // v0.29.3 (T181): fundo cinza dos estilos na lista do editor, como no SEI original. O botão da lista leva a
+  // classe do estilo, mas o CSS do próprio editor cobre a cor; esta regra mais forte devolve o fundo.
+  function fundoNaLista (todos) {
+    const regras = []
+    for (const [nome, css] of Object.entries(todos || {})) {
+      const principal = (css || []).find(regra => nomeDaRegra(regra) === nome && !/^\s*\.[^{]*:/.test(regra))
+      const cor = principal && /background(?:-color)?\s*:\s*([^;}]+)/i.exec(principal)
+      if (cor) regras.push('.ck.ck-list__item .ck.ck-button.' + nome + ':not(:hover):not(.ck-on){background:' + cor[1].trim() + '}')
+    }
+    return regras.join('\n')
+  }
+
+  // v0.29.3 (T181): texto puro de um trecho de HTML, para achar o mesmo parágrafo no editor.
+  function textoSimples (html) {
+    return String(html || '').replace(/<[^>]*>/g, '')
+      .replace(/&nbsp;|&#160;|\u00a0/gi, ' ').replace(/&lt;/g, '<').replace(/&gt;/g, '>').replace(/&quot;/g, '"')
+      .replace(/&#(\d+);/g, (_, n) => String.fromCharCode(Number(n))).replace(/&amp;/g, '&')
+      .replace(/\s+/g, ' ').trim()
+  }
+  // Parágrafos do texto original (o que o SEI entregou ao editor) com classe de um dos estilos extras, em ordem.
+  // O editor do SEI descarta classes que não conhece ao abrir; com esta lista a extensão as devolve.
+  function paragrafosComEstilo (html, nomes) {
+    const conhecidos = new Set(nomes || [])
+    const achados = []
+    for (const [, atributos, dentro] of String(html || '').matchAll(/<p\b([^>]*)>([\s\S]*?)<\/p>/gi)) {
+      const classe = /\bclass\s*=\s*"([^"]*)"/i.exec(atributos) || /\bclass\s*=\s*'([^']*)'/i.exec(atributos)
+      const nome = classe && classe[1].split(/\s+/).find(c => conhecidos.has(c))
+      if (nome) achados.push({ nome, texto: textoSimples(dentro) })
+    }
+    return achados
+  }
+
   // Lista fixa: os 41 estilos do Edital do SEI do IFTO (documento 3384558, 19/11/2026), nome e CSS.
   const FIXOS = [
     ["Citacao", [".Citacao{margin:4pt 0 4pt .75cm;; font-family:Calibri; text-align:justify; font-size:1em; max-width:604px; word-wrap:normal;}"]],
@@ -127,7 +159,7 @@
     ["Texto_Justificado_Recuo_Primeira_Linha_Esp_Simples", [".Texto_Justificado_Recuo_Primeira_Linha_Esp_Simples{max-width:604px; text-align:justify; font-size:1em; font-family:Calibri; text-indent:25mm;word-wrap:normal;margin:0 0 0 .75cm;;}"]]
   ]
 
-  const api = { MARCA, ESTRELA, NOTA, ESTILOS_DE_TEXTO, FIXOS, nomeDaRegra, estilosDoEditor, listaCompleta, raizesDoTexto, estilosExtras, blocoDeEstilo, nomesNoBloco, temBloco, tirarBloco, extrasEmUso, mesmosNomes }
+  const api = { MARCA, ESTRELA, NOTA, ESTILOS_DE_TEXTO, FIXOS, nomeDaRegra, estilosDoEditor, listaCompleta, raizesDoTexto, estilosExtras, blocoDeEstilo, nomesNoBloco, temBloco, tirarBloco, extrasEmUso, mesmosNomes, fundoNaLista, textoSimples, paragrafosComEstilo }
   if (typeof module !== 'undefined' && module.exports) module.exports = api
   else raiz.ExtensaoIFTO = Object.assign(raiz.ExtensaoIFTO || {}, { todosOsEstilos: api })
 })(globalThis)

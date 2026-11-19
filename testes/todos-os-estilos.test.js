@@ -48,3 +48,16 @@ test('tirarBloco tira só o bloco da extensão; extrasEmUso só os extras, sem r
   assert.ok(r.mesmosNomes(['B', 'A'], ['A', 'B']))
   assert.ok(!r.mesmosNomes(['A'], ['A', 'B']))
 })
+
+test('fundoNaLista devolve o cinza só dos estilos com fundo (v0.29.3)', () => {
+  const css = r.fundoNaLista(r.listaCompleta({}))
+  assert.match(css, /\.ck-button\.Item_nivel_1_Edital_titulo:not\(:hover\):not\(\.ck-on\)\{background:#e6e6e6\}/)
+  assert.match(css, /Texto_Fundo_Cinza_Negrito/)
+  assert.doesNotMatch(css, /Item_Nivel2/)
+})
+
+test('paragrafosComEstilo acha no texto original os parágrafos com estilo extra (v0.29.3)', () => {
+  const html = '<p class="Texto_Justificado">Oi</p><p class="Item_Nivel2 x">1.1 Prazo de&nbsp;<b>10</b> dias &amp; mais</p><p>sem</p>'
+  assert.deepEqual(r.paragrafosComEstilo(html, ['Item_Nivel2']), [{ nome: 'Item_Nivel2', texto: '1.1 Prazo de 10 dias & mais' }])
+  assert.deepEqual(r.paragrafosComEstilo('<p>nada</p>', ['Item_Nivel2']), [])
+})

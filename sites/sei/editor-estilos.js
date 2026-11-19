@@ -9,25 +9,54 @@
   let estado = null
 
   // CSS dos estilos extras na página do editor (o SEI só põe o dos estilos do próprio tipo).
-  function porCss (extras, todos) {
+  function porCss (extras, todos, proprios) {
     let elemento = document.getElementById(ID_CSS)
     if (!elemento) {
       elemento = document.createElement('style')
       elemento.id = ID_CSS
       document.head.append(elemento)
     }
-    elemento.textContent = extras.map(extra => todos[extra.nome].join('\n')).join('\n')
+    // v0.29.3: mais o fundo cinza na lista, para os estilos do tipo e os extras (como no SEI original).
+    elemento.textContent = extras.map(extra => todos[extra.nome].join('\n')).join('\n') + '\n' + regras().fundoNaLista(Object.assign({}, todos, proprios))
   }
 
   // O editor abriu antes da extensão: parágrafos com classe de estilo extra (de um documento já salvo com ela)
-  // ficaram sem estilo na lista. Lê de novo só as partes que têm essas classes, agora com os estilos extras.
+  // ficaram sem estilo. v0.29.3 (T181): o editor do SEI joga fora as classes que não conhece ao abrir, então a
+  // extensão lê o texto original que o SEI entregou ao editor (configuração "initialData") e devolve o estilo
+  // a cada parágrafo de mesmo texto, na ordem. Sem o original, tenta pelo texto atual (versão antiga).
+  const textoDoParagrafo = paragrafo => regras().textoSimples([...paragrafo.getChildren()].map(filho => (filho.is('$text') || filho.is('$textProxy')) ? filho.data : ' ').join(''))
   function lerDeNovo (editor, extras, raizes) {
-    const nomes = new Set(extras.map(extra => extra.nome))
+    const nomes = extras.map(extra => extra.nome)
+    let original = null
+    try { original = editor.config.get('initialData') } catch (erro) { original = null }
     const mudancas = {}
+    const devolver = []
     for (const nome of raizes) {
-      const html = editor.getData({ rootName: nome })
-      const usa = [...html.matchAll(/<p\b[^>]*\bclass="([^"]*)"/g)].some(([, classes]) => classes.split(/\s+/).some(classe => nomes.has(classe)))
-      if (usa) mudancas[nome] = html
+      const html = original && typeof original[nome] === 'string' ? original[nome] : editor.getData({ rootName: nome })
+      const achados = regras().paragrafosComEstilo(html, nomes)
+      if (!achados.length) continue
+      const raizDoModelo = editor.model.document.getRoot(nome)
+      const paragrafos = []
+      for (const { item } of editor.model.createRangeIn(raizDoModelo)) {
+        if (item.is('element', 'paragraph')) paragrafos.push(item)
+      }
+      let inicio = 0
+      const antes = devolver.length
+      for (const { nome: estilo, texto } of achados) {
+        const posicao = paragrafos.findIndex((p, i) => i >= inicio && !p.hasAttribute('estilo') && textoDoParagrafo(p) === texto)
+        if (posicao < 0) continue
+        devolver.push([paragrafos[posicao], estilo])
+        inicio = posicao + 1
+      }
+      if (devolver.length === antes && !original) mudancas[nome] = html
+    }
+    if (devolver.length) {
+      editor.model.enqueueChange({ isUndoable: false }, escritor => {
+        for (const [paragrafo, estilo] of devolver) {
+          escritor.removeAttribute('isLegacy', paragrafo)
+          escritor.setAttribute('estilo', estilo, paragrafo)
+        }
+      })
     }
     if (Object.keys(mudancas).length) editor.data.set(mudancas, { batchType: { isUndoable: false } })
   }
@@ -145,7 +174,7 @@
       const todos = r.listaCompleta(aprendidos)
       const extras = r.estilosExtras(Object.keys(plugin.estilos), todos, raizes)
       for (const extra of extras) plugin.estilos[extra.nome] = extra
-      porCss(extras, todos)
+      porCss(extras, todos, proprios)
       lerDeNovo(editor, extras, raizes)
       marcarLista(extras)
       estado = { editor, extras, todos, raizes }

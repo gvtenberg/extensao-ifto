@@ -379,15 +379,6 @@ F: Em Configurações › Geral clique em "Ativar de novo" e abra outra página 
 E: As funções da extensão voltam no SEI; o cartão mostra "Extensão ligada no SEI".
 
 ## Todos os estilos em todos os documentos
-### T179 – Estilos do Edital num Despacho (v0.29.0)
-F: Abra um Despacho no editor do SEI, clique no texto principal e abra a lista de estilos.
-E: Depois dos estilos do Despacho aparecem os outros em ordem alfabética, com "★" (ex.: "★ Item_Nivel2"), sem nome repetido, e no fim a nota "Estilos com ★ vêm da extensão…"; escolhendo um, o parágrafo fica formatado.
-### T180 – Estilos extras só no texto principal (v0.29.0)
-F: No mesmo Despacho, clique no cabeçalho ou na assinatura e abra a lista de estilos.
-E: Ali não aparece nenhum estilo com "★": só os do próprio SEI.
-### T181 – Despacho salvo com estilo do Edital (v0.29.1) (Crítico)
-F: Num Despacho de teste, aplique "★ Item_Nivel2" num parágrafo, clique em Salvar, feche e abra o editor de novo; depois veja o documento e gere o PDF.
-E: O parágrafo continua com o estilo (número "1.1." e recuo) no editor, no documento e no PDF.
 ### T182 – Estilo aprendido de outro tipo (v0.29.1)
 F: Abra no editor um documento de outro tipo (ex.: Portaria) e depois um Despacho; abra a lista de estilos do Despacho.
 E: Os estilos da Portaria que o Edital não tem (ex.: "★ IFTO_Item_Nvl_1") também aparecem com "★".
@@ -408,3 +399,9 @@ E: Cada nota tem uma caixa de marcar à esquerda do nome; a linha mostra só "No
 ### T187 – SICAF abre sozinho depois da Área de Trabalho (v0.29.3)
 F: Saia do Compras.gov.br, clique em "notas sem SICAF – Buscar" e "Buscar SICAF e Simples" e faça o login com Gov.br.
 E: Ao chegar à Área de Trabalho, aparece "Abrindo o SICAF…" e, assim que o seu nome aparece no alto, a aba vai sozinha para o SICAF e a busca continua.
+### T188 – Estilo com ★ continua ao abrir o editor de novo (v0.29.3) (Crítico)
+F: No Despacho 3391318 (ou outro de teste), abra o editor sem mexer em nada e veja os parágrafos com "★ Item_nivel_1_Edital_titulo" e "★ Item_nivel_2_Edital"; clique num deles e veja o nome na lista de estilos.
+E: Os parágrafos continuam com número, recuo e fundo cinza, e a lista mostra o nome do estilo; salvar não tira o estilo.
+### T189 – Fundo cinza na lista de estilos (v0.29.3)
+F: No editor de um Despacho e de um Edital, abra a lista de estilos.
+E: "Item_nivel_1_Edital_titulo", "Item_Nivel1" e os "Texto_Fundo_Cinza…" aparecem com fundo cinza na lista, como no SEI sem a extensão.
