@@ -59,3 +59,10 @@ test('diferenças: tabela conta cada célula, sem repetir o parágrafo de dentro
   const blocos = r.paragrafos('<p>Antes</p><table><tr><td><p>c1</p></td><td>c2</td></tr></table>')
   assert.deepEqual(blocos.map(b => b.texto), ['Antes', 'c1', 'c2'])
 })
+
+test('mudarNomes traz as cópias da v0.31.0 para os nomes novos e apaga as antigas', () => {
+  const copia = { salvaEm: 5, secoes: { a: 'x' } }
+  const { gravar, apagar } = r.mudarNomes({ 1: 5, 2: 6 }, { 'copiaEditor:1': copia }, { 3: 9 })
+  assert.deepEqual(gravar, { 'salvamentoAutomatico:1': copia, salvamentoAutomaticoIndice: { 1: 5, 3: 9 } })
+  assert.deepEqual(apagar.sort(), ['copiaEditor:1', 'copiaEditor:2', 'copiaEditorIndice', 'copiaEditorJanela:1', 'copiaEditorJanela:2'].sort())
+})

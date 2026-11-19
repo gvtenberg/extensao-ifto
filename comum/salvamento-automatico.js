@@ -116,7 +116,25 @@
     return lista
   }
 
-  const api = { PREFIXO, INDICE, DIAS, chave, chaveJanela, idDoEndereco, comentariosNormais, mesmoConteudo, vencidas, maisAntigas, janelaViva, quando, paragrafos, diferencas }
+  // v0.31.1: a v0.31.0 guardava com outros nomes ("copiaEditor:"). Diz o que gravar com o nome novo e o que
+  // apagar, para a pessoa não perder a versão salva ao atualizar a extensão.
+  const ANTIGOS = { prefixo: 'copiaEditor:', indice: 'copiaEditorIndice', janela: 'copiaEditorJanela:' }
+  function mudarNomes (indiceAntigo, copias, indiceNovo) {
+    const indice = { ...(indiceNovo || {}) }
+    const gravar = {}
+    const apagar = [ANTIGOS.indice]
+    for (const [doc, quando] of Object.entries(indiceAntigo || {})) {
+      apagar.push(ANTIGOS.prefixo + doc, ANTIGOS.janela + doc)
+      const copia = copias[ANTIGOS.prefixo + doc]
+      if (!copia || doc in indice) continue // a versão com o nome novo ganha
+      gravar[chave(doc)] = copia
+      indice[doc] = quando
+    }
+    gravar[INDICE] = indice
+    return { gravar, apagar }
+  }
+
+  const api = { PREFIXO, ANTIGOS, mudarNomes, INDICE, DIAS, chave, chaveJanela, idDoEndereco, comentariosNormais, mesmoConteudo, vencidas, maisAntigas, janelaViva, quando, paragrafos, diferencas }
   if (typeof module !== 'undefined' && module.exports) module.exports = api
   else raiz.ExtensaoIFTO = Object.assign(raiz.ExtensaoIFTO || {}, { salvamentoAutomatico: api })
 })(globalThis)

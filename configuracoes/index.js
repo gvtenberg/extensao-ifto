@@ -152,6 +152,11 @@
     })
   }
 
+  // v0.31.1: configurações apagadas em outra aba (voltar ao padrão, apagar dados): recarrega esta, para ela não
+  // gravar de novo as escolhas antigas que ainda tem na memória.
+  navegador.storage.onChanged.addListener((mudou, area) => {
+    if (area === 'local' && mudou.configuracoes && mudou.configuracoes.newValue === undefined) location.reload()
+  })
   // v0.31.0: voltar às configurações padrão (só as escolhas desta página) e apagar tudo o que a extensão guardou.
   document.getElementById('voltarPadrao').addEventListener('click', async () => {
     if (!confirm('Voltar todas as escolhas desta página às do início? "Minhas unidades" e as regras do tipo de documento também serão apagadas. Se quiser guardar as atuais, clique antes em Cancelar e use "Baixar cópia das configurações".')) return

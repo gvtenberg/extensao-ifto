@@ -414,7 +414,7 @@ E: Nas três vezes o menu fecha na hora, sem copiar nada.
 
 ## Salvamento automático no editor do SEI
 > antes de testar: em Configurações > Editor do SEI, ligue "Salvamento automático (neste computador)" e "Botões Copiar conteúdo e Colar conteúdo"; use um documento de teste, ainda não assinado.
-### T192 – Salvamento automático enquanto escreve (v0.31.0)
+### T192 – Cópia guardada enquanto escreve (v0.31.0)
 F: Abra um documento no editor, escreva uma frase e espere 30 segundos.
 E: Ao lado do botão Salvar aparece "Salvo neste computador hoje às…" com a hora.
 ### T193 – Restaurar depois de fechar sem salvar (v0.31.0) (Crítico)
@@ -426,16 +426,16 @@ E: O texto que o SEI tinha volta ao editor e o aviso com "Restaurar esta versão
 ### T195 – Ver diferenças (v0.31.0)
 F: Com uma versão salva neste computador (mude, acrescente e apague parágrafos, feche sem salvar e abra de novo), clique em "Ver diferenças".
 E: Abre uma janela só com os parágrafos diferentes: em verde o que está na versão salva, em vermelho riscado o que está no SEI; Esc ou "Fechar" fecham.
-### T196 – Versão apagada ao salvar no SEI e ao descartar (v0.31.0)
+### T196 – Cópia apagada ao salvar e ao descartar (v0.31.0)
 F: Escreva, espere 30 segundos, clique em Salvar; em outro documento com versão salva, abra de novo e clique em "Descartar esta versão".
 E: Depois de salvar aparece "Salvo no SEI hoje às… A versão deste computador foi apagada."; ao descartar, a extensão pede confirmação e, ao abrir o documento de novo, não há aviso.
-### T197 – Documento salvo no SEI depois da versão salva (v0.31.0)
+### T197 – Documento salvo depois da cópia (v0.31.0)
 F: Abra o documento em duas janelas do editor; na segunda, escreva algo, espere 30 s e feche sem salvar; na primeira, mude outra coisa e salve; abra de novo.
 E: A segunda janela avisa que o documento está aberto em outra janela; ao abrir de novo, o aviso diz em vermelho que o documento foi salvo no SEI depois desta versão e "Restaurar" pede confirmação.
 ### T198 – Copiar e colar conteúdo entre janelas (v0.31.0)
 F: Numa janela do editor, mude o texto e clique em "Copiar conteúdo"; feche sem salvar, abra o mesmo documento e clique em "Colar conteúdo".
 E: Pede confirmação, põe o texto copiado (com formatação e comentários) e mostra "Desfazer"; em outro documento, "Colar conteúdo" avisa que o conteúdo é de outro documento.
-### T199 – Salvamento automático desligado (v0.31.0)
+### T199 – Cópia desligada (v0.31.0)
 F: Com as duas opções desligadas nas configurações, abra um documento no editor.
 E: Não aparece nada da extensão ao lado do botão Salvar.
 ### T200 – Correções da extensão voltam ao restaurar (v0.31.1)
@@ -449,3 +449,11 @@ E: A página recarrega com as opções do início; as outras informações da ex
 ### T202 – Apagar todos os dados da extensão (v0.31.1)
 F: Com uma versão salva de um documento, clique em Configurações > Geral > "Apagar todos os dados da extensão"; confirme e abra o documento no editor.
 E: As configurações voltam às do início e o documento abre sem o aviso de versão salva.
+
+### T203 – Salvamento automático para ao apagar os dados com o editor aberto (v0.31.1)
+F: Com o salvamento automático ligado, abra um documento no editor do SEI e escreva algo. Em outra aba, vá em Configurações > Geral > "Apagar todos os dados da extensão" e confirme. Volte ao editor e espere 1 minuto.
+E: Ao lado do botão Salvar aparece "Salvamento automático desligado nas configurações". Ao fechar e abrir o documento de novo, não aparece "Restaurar esta versão".
+
+### T204 – Outra aba de configurações não desfaz o "Voltar às configurações padrão" (v0.31.1)
+F: Abra as Configurações em duas abas. Na primeira, clique em "Voltar às configurações padrão" e confirme. Vá à segunda aba.
+E: A segunda aba recarrega sozinha e mostra as escolhas do início; mudar algo nela não traz de volta as escolhas antigas.

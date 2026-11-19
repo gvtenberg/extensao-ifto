@@ -23,6 +23,7 @@
   let pendente = false // cópia anterior esperando a escolha da pessoa: a cópia automática fica parada
   let protegida = false // a cópia restaurada não ficou igual no editor: a cópia guardada não é trocada
   let guardando = false
+  let parado = false // v0.31.1: a opção foi desligada (ou os dados apagados) com esta janela aberta
 
   // --- Indicador perto do botão Salvar (não faz parte do documento) ---
   const barra = criar('span')
@@ -60,6 +61,7 @@
   }
   async function guardar (copia) {
     const gravar = async () => {
+      if (parado) return
       const indice = await lerIndice()
       indice[id] = copia.salvaEm
       await armazem.set({ [regras.chave(id)]: copia, [regras.INDICE]: indice })
@@ -73,12 +75,20 @@
       return false
     }
   }
+  async function trazerAntigas () {
+    const antigo = (await armazem.get(regras.ANTIGOS.indice))[regras.ANTIGOS.indice]
+    if (!antigo) return
+    const copias = await armazem.get(Object.keys(antigo).map(doc => regras.ANTIGOS.prefixo + doc))
+    const { gravar, apagar } = regras.mudarNomes(antigo, copias, await lerIndice())
+    await armazem.set(gravar)
+    await armazem.remove(apagar)
+  }
   async function limparVencidas () {
     for (const doc of regras.vencidas(await lerIndice(), Date.now())) if (doc !== id) await apagar(doc)
   }
 
   async function copiarAgora () {
-    if (!automatica || pendente || protegida || !base || guardando) return
+    if (!automatica || parado || pendente || protegida || !base || guardando) return
     guardando = true
     try {
       const lido = await pedirAoFundo('salvamentoLer', { desde: true })
@@ -247,6 +257,7 @@
 
   // --- Cópia automática ---
   async function iniciarAutomatica () {
+    await trazerAntigas().catch(() => {})
     await limparVencidas()
     const trava = (await armazem.get(regras.chaveJanela(id)))[regras.chaveJanela(id)]
     if (regras.janelaViva(trava, minhaJanela, Date.now())) {
@@ -278,7 +289,16 @@
     if (copia && regras.mesmoConteudo(copia, lido)) await apagar(id)
     else if (copia) oferecer(copia, lido)
     if (!pendente) indicar('Salvamento automático ligado')
-    setInterval(() => { travar(); copiarAgora() }, 30000)
+    const relogio = setInterval(() => { travar(); copiarAgora() }, 30000)
+    // v0.31.1: opção desligada ou "Apagar todos os dados" com esta janela aberta: para de salvar aqui, para não
+    // gravar de novo o que a pessoa acabou de apagar.
+    navegador.storage.onChanged.addListener((mudou, area) => {
+      if (parado || area !== 'local' || !('configuracoes' in mudou)) return
+      if (configuracoes.comPadroes(mudou.configuracoes.newValue).salvamentoAutomatico) return
+      parado = true
+      clearInterval(relogio)
+      indicar('Salvamento automático desligado nas configurações. Continue clicando em Salvar.', 'aviso')
+    })
   }
 
   // --- Botões "Copiar conteúdo" e "Colar conteúdo" (etapa 4) ---

@@ -89,3 +89,9 @@ test('cópia das configurações: arquivo errado dá erro simples', () => {
   assert.throws(() => doArquivo('{"configuracoes":{}}'), /não é uma cópia das configurações/)
   assert.throws(() => doArquivo(''), /não é uma cópia/)
 })
+
+test('comPadroes mantém ligada a opção gravada com o nome antigo (copiaAutomatica, v0.31.0)', () => {
+  assert.equal(comPadroes({ copiaAutomatica: true }).salvamentoAutomatico, true)
+  assert.equal(comPadroes({ copiaAutomatica: true, salvamentoAutomatico: false }).salvamentoAutomatico, false)
+  assert.equal('copiaAutomatica' in comPadroes({ copiaAutomatica: true }), false)
+})

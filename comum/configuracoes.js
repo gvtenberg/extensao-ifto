@@ -67,8 +67,13 @@
   })
 
   // Junta o que o usuário gravou com os padrões; opções que não existem mais são ignoradas.
+  // v0.31.1: opções que mudaram de nome; quem já tinha ligado com o nome antigo continua com ela ligada.
+  const NOMES_ANTIGOS = { copiaAutomatica: 'salvamentoAutomatico' }
   function comPadroes (gravadas) {
     const resultado = { ...PADROES }
+    for (const [antigo, novo] of Object.entries(NOMES_ANTIGOS)) {
+      if (gravadas && antigo in gravadas && !(novo in gravadas)) gravadas = { ...gravadas, [novo]: gravadas[antigo] }
+    }
     for (const chave of Object.keys(PADROES)) {
       if (gravadas && chave in gravadas) resultado[chave] = gravadas[chave]
       // v0.26.0: listas são copiadas, para não mexer no padrão.
