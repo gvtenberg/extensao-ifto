@@ -6,6 +6,7 @@
 
 Summary to resume work (on another machine or by another person) without reading everything. Update at the end of each stage or round.
 
+- **Done, waiting for tests (v0.34.0, 19/11/2026):** "Blocos Internos" button in the Controle de Processos bar (no spec; rule in `regras/sei.md`). Test T225.
 - **Done, waiting for tests (v0.33.0, 19/11/2026):** process data on the process screen, "Público" in new processes, Capa de Processo check, timbre lowercase/blank lines, spacing fixed for the saved document (no spec; rules in `regras/sei.md` and `regras/conferir-documento.md`). Tests T217–T224 (T220, T222 critical: change the document text).
 - **Done, waiting for tests (v0.32.0, 19/11/2026):** drop a file on a blank external document page to attach it (no spec, small feature; rule in `regras/sei.md`). Tests T213 (critical: writes to the SEI) to T215.
 - **Done:** each version in `historico.md` (latest: v0.5.0, 12/11/2026); finished specs in `specs/feitas/` (signature list in the SEI, v0.2.0 to v0.5.0; rules in `regras/lista-assinaturas.md`).
@@ -42,6 +43,7 @@ One line per idea. When an idea is planned, it gets a spec in `docs/specs/` and 
 - **Check "Interessado" and "Assunto"** (18/11/2026): like the process number, warn when they do not match the process (after `specs/feitas/conferir-documento.md`).
 - **Settings page smaller and clearer** (18/11/2026): today it is long with little information spread out; first round was stage 1 of `specs/feitas/conferir-documento.md`; later rounds as needed.
 - **Differences inside the document** (19/11/2026, T195): auto-save "Ver diferenças" shown in the text itself (green and struck-through red), instead of the side panel.
+- **Own shortcuts in the SEI button bar** (19/11/2026): each user adds buttons for any SEI page they use often (generalizes the v0.34.0 "Blocos Internos" button; links must come from the menu, since the SEI checks a security hash).
 
 Marks: **[spec]** already has a spec.
 

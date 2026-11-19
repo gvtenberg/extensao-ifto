@@ -489,3 +489,6 @@ E: Há uma linha de espaço entre a última linha do timbre e "Processo:".
 ### T224 – SEI lento na tela do processo (v0.33.0)
 F: Com a internet lenta ou o SEI demorando, clique no número do processo.
 E: Depois de até 20 segundos aparece, em cinza, "Não consegui ler os dados do processo agora…"; a página do SEI continua funcionando.
+### T225 – Botão Blocos Internos (v0.34.0)
+F: Abra a tela inicial do SEI (Controle de Processos) e clique no novo ícone logo depois de "Controle de Prazos".
+E: O ícone tem o mesmo tamanho e espaço dos outros e abre a página de Blocos Internos (a mesma do menu Blocos > Internos).
