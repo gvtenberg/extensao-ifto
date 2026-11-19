@@ -16,7 +16,7 @@ Student, not from IT: plain, simple language; commands with the exact text to ty
 - Files with several sections have the "**Sections**" index on line 3: read the first 5 lines and search for the title.
 - No subagents unless I ask: search with `grep` yourself (subagents cost a lot; when one is needed it runs on Sonnet, `CLAUDE_CODE_SUBAGENT_MODEL` in `~/.claude/settings.json`).
 - Large files (saved pages, spreadsheets, PDFs): search the excerpt (`grep`, scripts); never read them whole.
-- Saved web pages (SEI, etc.): never read embedded images (base64 `data:image…`); cut them out with a script before reading.
+- Never read base64 images (`data:image…`, e.g. in saved web pages), unless the user explicitly asks; cut them out with a script before reading.
 - Short replies, no recap of what the user already knows. Long conversation (many rounds, many files read, or after an automatic summary): leave everything committed and noted and end with "⚠️ The conversation is long: I recommend starting a new one. Type `/clear` (everything is already saved)."
 
 ## Doubts and git
