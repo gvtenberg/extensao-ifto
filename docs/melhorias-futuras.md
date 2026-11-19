@@ -26,6 +26,7 @@ Summary to resume work (on another machine or by another person) without reading
 - **Done, waiting for tests (v0.25.0):** "Corrigir a numeração" for long edital numbers ("10.10.") (`specs/feitas/numeracao-edital.md`, rules in `regras/sei.md`). Tests T122 to T124 (T123 critical: the saved document and the PDF).
 - **In progress (18/11/2026):** `specs/data-documento.md` (button "Mudar a data para hoje" in the Ofício/Portaria editor): stage 1 coded (v0.23.0); D4 answered (switch in the settings, on by default: still to code); waiting for the critical test T114 (does the SEI keep the date after Salvar?); tests T114 to T117.
 - **In progress (18/11/2026):** `specs/conferir-documento.md`: stages 1–6 done (v0.26.0–v0.26.6, Bloco de assinatura in v0.26.6; v0.26.7: footer accepts any campus phone/e-mail, T148; v0.26.8: all notices in one draggable window, T149; stage 8, date check, v0.26.9, T150–T157), tests T130–T157 (critical T136–T139, T145–T147, T154); still to do: stage 7 (spacing, also around the date at the end of the body; waits for T123).
+- **Ready to code (18/11/2026):** `specs/aviso-versao-sei.md` (warning box on the SEI when its version is untested; continue or turn the extension off on the SEI); after the two agents of 18/11/2026 are merged.
 - **Planned (with spec):** lines marked **[spec]** below. **Not planned:** the other lines (ideas).
 
 ## Ideas
