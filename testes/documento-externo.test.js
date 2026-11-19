@@ -1,6 +1,6 @@
 const { test } = require('node:test')
 const assert = require('node:assert/strict')
-const { ehDocumentoExternoNovo, ehDocumentoInternoNovo, dataDeHoje, oQuePreencher } = require('../comum/documento-externo.js')
+const { ehDocumentoExternoNovo, ehDocumentoInternoNovo, ehProcessoNovo, dataDeHoje, oQuePreencher } = require('../comum/documento-externo.js')
 
 // v0.6.0: só o documento externo novo é preenchido; o que já existe no SEI não muda.
 test('documento externo novo: página documento_receber', () => {
@@ -30,6 +30,14 @@ test('documento interno novo: página documento_gerar', () => {
   assert.equal(ehDocumentoInternoNovo('https://sei.ifto.edu.br/sei/controlador.php?acao=documento_gerar&acao_origem=documento_escolher_tipo&id_serie=317'), true)
   assert.equal(ehDocumentoInternoNovo('https://sei.ifto.edu.br/sei/controlador.php?acao=documento_alterar&id_documento=1'), false)
   assert.equal(ehDocumentoInternoNovo('https://sei.ifto.edu.br/sei/controlador.php?acao=documento_receber'), false)
+})
+
+// v0.33.0: processo novo (Iniciar Processo e Iniciar Processo Relacionado) também recebe o nível Público.
+test('processo novo: procedimento_gerar e procedimento_gerar_relacionado', () => {
+  assert.equal(ehProcessoNovo('https://sei.ifto.edu.br/sei/controlador.php?acao=procedimento_gerar&acao_origem=procedimento_escolher_tipo'), true)
+  assert.equal(ehProcessoNovo('https://sei.ifto.edu.br/sei/controlador.php?acao=procedimento_gerar_relacionado&arvore=1'), true)
+  assert.equal(ehProcessoNovo('https://sei.ifto.edu.br/sei/controlador.php?acao=procedimento_gerar_pdf&id_procedimento=1'), false)
+  assert.equal(ehProcessoNovo('https://sei.ifto.edu.br/sei/controlador.php?acao=procedimento_alterar&id_procedimento=1'), false)
 })
 
 // v0.27.0 (spec base-e-sei, etapa 2, D14): tipo do documento pelo nome do arquivo.

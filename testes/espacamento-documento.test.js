@@ -1,6 +1,6 @@
 const { test } = require('node:test')
 const assert = require('node:assert/strict')
-const { MARCA, temEspacamento, tirarEspacamento, escapar, seletorDe, acertos, planejarEspacamento } = require('../comum/espacamento-documento.js')
+const { MARCA, mesmoEspacamento, seletoresDoBloco, temEspacamento, tirarEspacamento, escapar, seletorDe, acertos, planejarEspacamento } = require('../comum/espacamento-documento.js')
 const { ehLinhaDaData, conferirData } = require('../comum/data-documento.js')
 
 // Bloco medido (px, letra de 16px). "grudado": distância de quase nada até a linha de cima.
@@ -20,6 +20,8 @@ function bloco (raiz, secao, classe, texto, medidas = {}) {
     textoFim: medidas.textoFim || texto,
     acima: medidas.acima ?? 2,
     abaixo: medidas.abaixo ?? 2,
+    // v0.33.0: linha em branco salva (duas linhas do estilo "sem espaço", como o separador antes do corpo).
+    altura: medidas.altura ?? (texto ? undefined : 32),
     margemTopo: 0,
     margemBaixo: 0,
     fonte: 16,
@@ -71,21 +73,50 @@ test('nada entre linhas da mesma seção, com linha em branco no meio, nem dentr
   assert.ok(!depois.includes('CEP 77021-090'))
 })
 
-// v0.29.3 (T162): o "Separador de seção" do Despacho é uma linha em branco quase sem altura.
-test('linha em branco baixinha no meio não conta como espaço; linha em branco de verdade conta', () => {
+// v0.33.0: o documento salvo não tem a seção só com a linha vazia do editor, nem a linha em branco logo depois
+// do timbre (Despacho 3392797 e Capa de Processo): timbre e número, "Assunto" e destinatário ficavam grudados.
+test('separador que o SEI não salva não conta como espaço; linha em branco salva conta pela altura', () => {
   posicoes = {}
   const timbre = bloco(0, 'Cabeçalho', 'IFTO_Cabeçalho_Novo', 'Coordenação de Gestão Orçamentária e Contratos', { abaixo: 0 })
   const separador = bloco(1, 'Separador de seção', 'IFTO_Alin_direita_sem_espaço', '')
+  Object.assign(separador, { altura: 32 })
   const numero = bloco(2, 'Identificador', 'IFTO_padrao_Alin_Esquerda_sem_espaço', 'DESPACHO Nº 67/2026/CGOC/GAC/DAP/PAL/REI/IFTO', { acima: 0 })
-  Object.assign(timbre, { topo: 80, base: 100 })
-  Object.assign(numero, { topo: 103, base: 121 })
-  const documento = { blocos: [timbre, separador, numero], outras: [] }
+  const caixa = bloco(3, 'Info e assunto', '', 'Processo nº: 1', { tag: 'div', textoFim: 'Assunto: x', acima: 8 })
+  const vazio = bloco(4, 'Separador de seção2', '', '')
+  Object.assign(vazio, { semNada: true, altura: 16 })
+  const vocativo = bloco(5, 'Vocativo', 'IFTO_padrao_Alin_Esquerda_sem_espaço', 'Ao Senhor Diretor')
+  const linha = bloco(6, 'Separador de seção3', 'IFTO_Alin_direita_sem_espaço', '')
+  Object.assign(linha, { altura: 32 })
+  const corpo = bloco(7, 'Corpo', 'IFTO_Item_Nvl_1', 'Encaminhamos o processo')
+  const documento = { blocos: [timbre, separador, numero, caixa, vazio, vocativo, linha, corpo], outras: [] }
   const plano = planejarEspacamento(documento)
-  assert.deepEqual(plano.lacunas.map(lacuna => lacuna.depois), ['DESPACHO Nº 67/2026/CGOC/GAC/DAP/PAL/REI/IFTO'])
-  assert.equal(plano.lacunas[0].margem, 0.82)
-  assert.ok(plano.css.includes('p.IFTO_Alin_direita_sem_espa\\0000e7o+p.IFTO_padrao_Alin_Esquerda_sem_espa\\0000e7o{margin-top:0.82em'))
-  numero.topo = 118
-  assert.equal(planejarEspacamento(documento).lacunas.length, 0)
+  assert.deepEqual(plano.lacunas.map(lacuna => lacuna.depois), ['DESPACHO Nº 67/2026/CGOC/GAC/DAP/PAL/REI/IFTO', 'Ao Senhor Diretor'])
+  assert.equal(plano.lacunas[0].margem, 1)
+  assert.ok(plano.css.includes('p.IFTO_Cabe\\0000e7alho_Novo+p.IFTO_padrao_Alin_Esquerda_sem_espa\\0000e7o{margin-top:1em'))
+  assert.ok(plano.css.includes('div+p.IFTO_padrao_Alin_Esquerda_sem_espa\\0000e7o{margin-top:'))
+  // Linha em branco salva, mas quase sem altura: o espaço vai mesmo assim.
+  linha.altura = 3
+  assert.ok(planejarEspacamento(documento).lacunas.some(lacuna => lacuna.depois === 'Encaminhamos o processo'))
+})
+
+test('Capa de Processo: espaço entre o timbre e "Processo:" (o separador depois do timbre não é salvo)', () => {
+  posicoes = {}
+  const timbre = bloco(0, 'Cabeçalho', 'IFTO_Cabeçalho_Novo', 'Coordenação de Gestão Orçamentária e Contratos', { abaixo: -7 })
+  const separador = bloco(1, 'Separador de seção', 'IFTO_Alin_direita_sem_espaço', '')
+  Object.assign(separador, { altura: 32 })
+  const corpo = bloco(2, 'Corpo', 'Texto_Justificado', 'Processo: 23236.023277/2026-90', { acima: 2 })
+  corpo.margemTopo = 8
+  const plano = planejarEspacamento({ blocos: [timbre, separador, corpo], outras: [] })
+  assert.deepEqual(plano.lacunas.map(lacuna => lacuna.depois), ['Processo: 23236.023277/2026-90'])
+  assert.equal(plano.lacunas[0].margem, 1.32)
+})
+
+test('bloco que o documento já tem: igual ao novo (só as regras do documento salvo contam) ou diferente', () => {
+  const plano = planejarEspacamento(despacho())
+  assert.equal(mesmoEspacamento('<p>' + plano.bloco + '</p>', plano), true)
+  const antigo = '<style>/* ' + MARCA + ' */p.IFTO_Alin_direita+div{margin-top:0.5em!important}.ck-editor__editable[aria-label=Data] :nth-child(1){margin-top:1em!important}</style>'
+  assert.equal(mesmoEspacamento(antigo, plano), false)
+  assert.deepEqual(seletoresDoBloco(antigo), ['p.IFTO_Alin_direita+div'])
 })
 
 test('distância de meia linha ou mais não recebe espaço', () => {

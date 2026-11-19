@@ -19,6 +19,9 @@
     return texto.replace(/\s+/g, ' ').trim()
   }
   const temConteudo = p => Boolean(textoDe(p).replace(INVISIVEIS, '')) || Boolean(p.querySelector('img'))
+  // v0.33.0: tem algo que o SEI salva (até um espaço ou uma quebra de linha), além da linha vazia do editor.
+  const bruto = no => no.nodeType === Node.TEXT_NODE ? no.data : no.nodeName === 'STYLE' ? '' : [...no.childNodes].map(bruto).join('')
+  const temAlgo = elemento => Boolean(bruto(elemento).replace(/[\u200b-\u200d\u2060\ufeff]/g, '')) || Boolean(elemento.querySelector('img, br:not([data-cke-filler])'))
 
   // Alto da primeira linha e baixo da última (letras e imagens; a altura de linha de 10% não conta).
   function linhas (p) {
@@ -47,7 +50,12 @@
     const paragrafos = bloco.tag === 'p' ? [elemento] : embrulho ? [...elemento.children] : []
     if (!paragrafos.length || paragrafos.some(p => p.tagName !== 'P')) return { ...bloco, outro: true }
     const comTexto = paragrafos.filter(temConteudo)
-    if (!comTexto.length) return { ...bloco, vazio: true }
+    // v0.33.0: linha em branco: altura e margens (contam no documento salvo); semNada = só a linha vazia que o
+    // editor mostra (<br data-cke-filler>): a seção feita só disso não é salva.
+    if (!comTexto.length) {
+      const caixa = elemento.getBoundingClientRect()
+      return { ...bloco, vazio: true, semNada: !temAlgo(elemento), altura: caixa.height, margemTopo: numero(estilo(elemento).marginTop), margemBaixo: numero(estilo(elemento).marginBottom) }
+    }
     const primeiro = comTexto[0]
     const ultimo = comTexto[comTexto.length - 1]
     const [cima, baixo] = [linhas(primeiro), linhas(ultimo)]
@@ -58,8 +66,9 @@
       textoFim: textoDe(ultimo).slice(0, 200),
       topo: cima.alto,
       base: baixo.baixo,
-      acima: cima.alto - primeiro.getBoundingClientRect().top,
-      abaixo: ultimo.getBoundingClientRect().bottom - baixo.baixo,
+      // v0.33.0: na caixa (div) conta até a borda dela: as linhas em branco do fim da caixa são salvas.
+      acima: cima.alto - (embrulho ? elemento : primeiro).getBoundingClientRect().top,
+      abaixo: (embrulho ? elemento : ultimo).getBoundingClientRect().bottom - baixo.baixo,
       margemTopo: Math.max(numero(estilo(primeiro).marginTop), embrulho ? numero(estilo(elemento).marginTop) : 0),
       margemBaixo: Math.max(numero(estilo(ultimo).marginBottom), embrulho ? numero(estilo(elemento).marginBottom) : 0),
       fonte: numero(estilo(primeiro).fontSize),
@@ -82,7 +91,6 @@
       if (!editor) return { ok: false, erro: 'O editor do SEI não abriu a tempo.' }
       if (document.fonts && document.fonts.ready) await document.fonts.ready
       await esperar(800)
-      if (jaTem(editor)) return { ok: true, jaTem: true }
       const blocos = []
       const outras = []
       secoes(editor).forEach((secao, indice) => {
@@ -92,7 +100,9 @@
           if (caixa.children.length > 1) outras.push([...caixa.children].map(descritor))
         }
       })
-      return { ok: true, jaTem: false, documento: { blocos, outras } }
+      // v0.33.0: o documento que já tem o bloco é medido de novo (o bloco antigo pode ter faltado lacunas).
+      const atual = secoes(editor).map(secao => editor.getData({ rootName: secao.nome })).find(html => regras().temEspacamento(html)) || ''
+      return { ok: true, jaTem: Boolean(atual), atual, documento: { blocos, outras } }
     } catch (erro) {
       return { ok: false, erro: erro.message }
     }
@@ -119,10 +129,15 @@
     return null
   }
 
-  async function por (bloco) {
+  async function por (bloco, substituir) {
     try {
       const editor = await ajuda().acharEditor()
       if (!editor) return { ok: false, erro: 'Não achei o editor do SEI.' }
+      // v0.33.0: "substituir" troca o bloco antigo pelo novo.
+      if (substituir && jaTem(editor)) {
+        const tirado = await tirar()
+        if (!tirado.ok) return tirado
+      }
       if (jaTem(editor)) return { ok: true, jaTinha: true }
       const alvo = lugarDoBloco(editor)
       if (!alvo) return { ok: false, erro: 'Não achei uma parte do documento que dê para editar.' }

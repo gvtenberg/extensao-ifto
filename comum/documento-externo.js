@@ -18,6 +18,14 @@
     return acao === 'documento_gerar'
   }
 
+  // v0.33.0: processo NOVO (Iniciar Processo e Iniciar Processo Relacionado): só o nível Público, como no
+  // documento interno novo.
+  function ehProcessoNovo (endereco) {
+    let acao
+    try { acao = new URL(endereco, 'https://sei.ifto.edu.br/').searchParams.get('acao') } catch (erro) { return false }
+    return acao === 'procedimento_gerar' || acao === 'procedimento_gerar_relacionado'
+  }
+
   // Data no formato do SEI: dd/mm/aaaa.
   function dataDeHoje (agora = new Date()) {
     const dois = n => String(n).padStart(2, '0')
@@ -180,7 +188,7 @@
     return { id, sei, rotulo: doc.rotulo, linkAlterar: doc.linkAlterar }
   }
 
-  const api = { externoEmBranco, prepararArquivo, montarPartes, ehDocumentoExternoNovo, ehDocumentoInternoNovo, dataDeHoje, oQuePreencher, semAcento, LIMITE_SEI, DICA_PDF_ACIMA, corrigirNomeDoArquivo, tamanhoEmTexto, avisosDoArquivo, lerRegras, regrasEmTexto, tipoPeloNome }
+  const api = { externoEmBranco, prepararArquivo, montarPartes, ehDocumentoExternoNovo, ehDocumentoInternoNovo, ehProcessoNovo, dataDeHoje, oQuePreencher, semAcento, LIMITE_SEI, DICA_PDF_ACIMA, corrigirNomeDoArquivo, tamanhoEmTexto, avisosDoArquivo, lerRegras, regrasEmTexto, tipoPeloNome }
   if (typeof module !== 'undefined' && module.exports) module.exports = api
   else raiz.ExtensaoIFTO = Object.assign(raiz.ExtensaoIFTO || {}, { documentoExterno: api })
 })(globalThis)

@@ -87,7 +87,8 @@
   // Linha de identificação do alto: "Processo nº: …" (Despacho, Memorando…) ou, no título do Edital e da
   // Minuta, "(Processo Administrativo n° …)". Só os primeiros parágrafos contam (o corpo pode citar outros
   // processos de propósito).
-  const LINHA = /^\(?\s*Processo\s+(?:Administrativo\s+)?n\s*[º°o.]?\s*\.?\s*:?\s*/i
+  // v0.33.0: também "Processo:" sem o "nº" (Capa de Processo).
+  const LINHA = /^\(?\s*Processo\s*(?:Administrativo\s+)?(?:n\s*[º°o.]?\s*\.?\s*)?:?\s*/i
   const PARAGRAFOS_DO_ALTO = 20
   function linhaDoProcesso (secoes) {
     let contados = 0
@@ -188,15 +189,48 @@
     return [...TIMBRE_FIXO, ...outras]
   }
 
-  // Confere o timbre: null se o documento não tem timbre. Devolve { certo, faltam, sobram, foraDeOrdem, esperado }.
+  // v0.33.0 (pedido do usuário, 19/11/2026): cada palavra do timbre começa com letra maiúscula ("Gestão
+  // Orçamentária"), menos as palavras de ligação (de, da, e…) e a letra logo depois de um hífen (depende da
+  // classe da palavra: pode ser maiúscula ou minúscula).
+  const LIGACOES = new Set(['a', 'à', 'ao', 'aos', 'as', 'às', 'com', 'da', 'das', 'de', 'do', 'dos', 'e', 'em', 'na', 'nas', 'no', 'nos', 'o', 'os', 'ou', 'para', 'pela', 'pelas', 'pelo', 'pelos', 'por', 'sem', 'sob'])
+  function comMaiusculas (linha) {
+    let primeira = true
+    return String(linha).replace(/(^|[\s(/])([a-zà-ÿ][\p{L}]*)/gu, (tudo, antes, palavra, posicao) => {
+      const inicio = primeira && !String(linha).slice(0, posicao).trim()
+      primeira = false
+      if (!inicio && LIGACOES.has(palavra)) return tudo
+      return antes + palavra[0].toUpperCase() + palavra.slice(1)
+    })
+  }
+
+  // v0.33.0: parágrafos do timbre com linha a mais: em branco (sem texto nem brasão) ou com quebra de linha
+  // dentro (<br>), que deixam espaço vazio no cabeçalho.
+  function linhasVaziasDoTimbre (secoes) {
+    let vazias = 0
+    for (const secao of secoes || []) {
+      for (const [, atributos, dentro] of paragrafos(secao.html)) {
+        if (!ehDoTimbre(classeDe(atributos))) continue
+        if (/<img\b/i.test(dentro)) continue
+        if (!textoDoHtml(dentro).replace(/[\u200b-\u200d\u2060\ufeff\s]/g, '')) vazias++
+        else vazias += (dentro.match(/<br\b[^>]*>/gi) || []).length
+      }
+    }
+    return vazias
+  }
+
+  // Confere o timbre: null se o documento não tem timbre. Devolve { certo, faltam, sobram, foraDeOrdem,
+  // minusculas (linhas com palavra em minúscula: { escrito, certo }), vazias (nº de linhas a mais), esperado }.
   function conferirTimbre (secoes, unidade, sigla) {
     const linhas = linhasDoTimbre(secoes)
     if (!linhas.length) return null
-    const esperado = timbreEsperado(linhas, unidade, sigla)
+    const esperado = timbreEsperado(linhas, unidade, sigla).map(comMaiusculas)
     const faltam = esperado.filter(linha => !linhas.some(outra => mesmaLinha(outra, linha)))
     const sobram = linhas.filter(linha => !esperado.some(outra => mesmaLinha(outra, linha)))
     const igual = linhas.length === esperado.length && linhas.every((linha, i) => mesmaLinha(linha, esperado[i]))
-    return { certo: igual, faltam, sobram, foraDeOrdem: !igual && !faltam.length && !sobram.length, esperado }
+    const minusculas = linhas.filter(linha => comMaiusculas(sohTexto(linha)) !== sohTexto(linha) && esperado.some(outra => mesmaLinha(outra, linha)))
+      .map(linha => ({ escrito: sohTexto(linha), certo: comMaiusculas(sohTexto(linha)) }))
+    const vazias = linhasVaziasDoTimbre(secoes)
+    return { certo: igual && !minusculas.length && !vazias, faltam, sobram, foraDeOrdem: !igual && !faltam.length && !sobram.length, minusculas, vazias, esperado }
   }
 
   function avisosDoTimbre (conferido) {
@@ -204,6 +238,8 @@
     for (const linha of conferido.faltam) avisos.push(`Falta a linha "${linha}".`)
     for (const linha of conferido.sobram) avisos.push(`A linha "${linha}" não é desta unidade.`)
     if (conferido.foraDeOrdem) avisos.push('As linhas estão fora de ordem.')
+    for (const linha of conferido.minusculas || []) avisos.push(`A linha "${linha.escrito}" deve ser "${linha.certo}".`)
+    if (conferido.vazias) avisos.push(conferido.vazias === 1 ? 'O timbre tem uma linha em branco a mais.' : `O timbre tem ${conferido.vazias} linhas em branco a mais.`)
     return avisos
   }
 
@@ -218,7 +254,9 @@
     const novas = esperado.map(linha => `<p${atributos}>${escaparHtml(linha)}</p>`).join('')
     let posto = false
     const novo = String(html).replace(/<p\b([^>]*)>([\s\S]*?)<\/p>/gi, (tudo, attrs, dentro) => {
-      if (!ehDoTimbre(classeDe(attrs)) || !textoDoHtml(dentro)) return tudo
+      if (!ehDoTimbre(classeDe(attrs))) return tudo
+      // v0.33.0: linha em branco do timbre (sem o brasão) sai.
+      if (!textoDoHtml(dentro).replace(/[\u200b-\u200d\u2060\ufeff\s]/g, '')) return /<img\b/i.test(dentro) ? tudo : ''
       if (posto) return ''
       posto = true
       return novas
@@ -345,7 +383,7 @@
   // Documento já assinado: a página do documento mostra "Documento assinado eletronicamente por".
   const estaAssinado = html => /assinado\s+eletronicamente\s+por/i.test(textoDoHtml(html))
 
-  const api = { siglaDaUnidade, ehUnidadePalmas, limparUnidade, limparUnidades, acharUnidade, textoDoHtml, formatarProcesso, mesmoProcesso, processoDaReferencia, linhaDoProcesso, conferirProcesso, avisoDoProcesso, perguntaAntesDeAssinar, fraseDoProcesso, problemasParaAssinar, corrigirProcesso, estaAssinado, numeroSeiDoDocumento, aceitar, foiAceito, documentosDoBloco, idDoItemDoBloco, TIMBRE_FIXO, linhasDoTimbre, timbreEsperado, conferirTimbre, avisosDoTimbre, corrigirTimbre, secaoCom, ehDoTimbre, ehDoRodape, formatarTelefone, conferirRodape, rodapeEsperado, corrigirRodape, linhasDoSetor }
+  const api = { siglaDaUnidade, ehUnidadePalmas, limparUnidade, limparUnidades, acharUnidade, textoDoHtml, formatarProcesso, mesmoProcesso, processoDaReferencia, linhaDoProcesso, conferirProcesso, avisoDoProcesso, perguntaAntesDeAssinar, fraseDoProcesso, problemasParaAssinar, corrigirProcesso, estaAssinado, numeroSeiDoDocumento, aceitar, foiAceito, documentosDoBloco, idDoItemDoBloco, TIMBRE_FIXO, comMaiusculas, linhasVaziasDoTimbre, linhasDoTimbre, timbreEsperado, conferirTimbre, avisosDoTimbre, corrigirTimbre, secaoCom, ehDoTimbre, ehDoRodape, formatarTelefone, conferirRodape, rodapeEsperado, corrigirRodape, linhasDoSetor }
   if (typeof module !== 'undefined' && module.exports) module.exports = api
   else raiz.ExtensaoIFTO = Object.assign(raiz.ExtensaoIFTO || {}, { conferirDocumento: api })
 })(globalThis)

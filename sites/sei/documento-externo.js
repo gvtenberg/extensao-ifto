@@ -2,6 +2,7 @@
 // Nato-digital e o nível de acesso Público, só nos campos ainda vazios. Nunca clica em Salvar aqui.
 // v0.22.2: documento interno novo (Incluir Documento › Edital, Despacho…): marca o nível Público, se nenhum
 // nível estiver marcado (o Edital Gabinete vinha sem nível marcado).
+// v0.33.0: processo novo (Iniciar Processo, Iniciar Processo Relacionado): também marca o nível Público.
 // v0.27.0 (spec base-e-sei, etapa 2): nível, hipótese legal, formato e tipo de conferência escolhidos nas
 // configurações; ao escolher o arquivo: tipo e "Nome na Árvore" pelo nome do arquivo (D14, D7), "#" do
 // nome trocado por "_" (D9) e aviso de tamanho com as dicas para diminuir (D10 a D13).
@@ -9,7 +10,8 @@
   // v0.28.0 (spec aviso-versao-sei): a pessoa desativou a extensão nesta versão do SEI.
   if (!(await globalThis.ExtensaoIFTO.sei.ligadaNoSei())) return
   const { documentoExterno: regras, configuracoes } = globalThis.ExtensaoIFTO
-  const interno = regras.ehDocumentoInternoNovo(location.href)
+  // v0.33.0: o processo novo recebe o mesmo cuidado do documento interno novo (só o nível Público).
+  const interno = regras.ehDocumentoInternoNovo(location.href) || regras.ehProcessoNovo(location.href)
   if (!interno && !regras.ehDocumentoExternoNovo(location.href)) return
   const opcoes = await configuracoes.lerConfiguracoes()
 

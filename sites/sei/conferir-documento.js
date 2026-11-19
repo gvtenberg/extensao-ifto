@@ -2,7 +2,7 @@
 // unidade): a linha "Processo nº:" do alto contra o processo em que ele está ("Referência: Processo nº …"),
 // com o botão "Corrigir o número do processo" (no título do Edital, número em link do SEI, só avisa: D17).
 // v0.26.5: timbre e rodapé (unidades do Campus Palmas), com "Corrigir timbre", "Corrigir rodapé" e "Usar este
-// timbre como padrão da unidade". Nunca salva: a pessoa confere e clica em Salvar.
+// timbre como padrão da unidade". v0.33.0: Capa de Processo ("Corrigir a capa"). Nunca salva: a pessoa confere e clica em Salvar.
 (async function () {
   // v0.28.0 (spec aviso-versao-sei): a pessoa desativou a extensão nesta versão do SEI.
   if (!(await globalThis.ExtensaoIFTO.sei.ligadaNoSei())) return
@@ -76,6 +76,22 @@
         caixa.mostrar('ok', `Número trocado para ${processo.processo}.` + DESFAZER)
       })
     }
+  }
+
+  // v0.33.0: Capa de Processo com dados de outro processo (Data de Autuação, Tipo, Especificação, Interessados).
+  const { capa } = verificado
+  if (capa && !capa.certo) {
+    const caixaCapa = caixaEditor.criarCaixa('conferir-capa', 'A capa não confere com os dados do processo:', 'Corrigir a capa')
+    const itens = caixaEditor.criar('ul')
+    for (const aviso of capa.avisos) itens.append(caixaEditor.criar('li', { textContent: aviso }))
+    caixaCapa.botao.before(itens)
+    caixaCapa.botao.addEventListener('click', async () => {
+      caixaCapa.botao.disabled = true
+      caixaCapa.botao.textContent = 'Corrigindo…'
+      const resultado = await corrigir('capa')
+      if (!resultado || !resultado.ok) return caixaCapa.mostrar('erro', 'Não consegui corrigir. ' + ((resultado && resultado.erro) || '') + ' Nada foi salvo.')
+      caixaCapa.mostrar('ok', 'Capa corrigida com os dados do processo.' + DESFAZER)
+    })
   }
 
   // v0.26.5: timbre e rodapé: uma caixa no canto de baixo, à esquerda (as outras caixas ficam à direita).

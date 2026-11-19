@@ -174,3 +174,31 @@ test('v0.26.6: documentos do Bloco de assinatura (página salva do bloco 173213)
   assert.equal(c.idDoItemDoBloco("infraLimparFormatarTrAcessada(this);acaoAssinar('3533633-173213');"), '3533633')
   assert.equal(c.idDoItemDoBloco('173213'), '')
 })
+
+// v0.33.0: Capa de Processo escreve "Processo:" sem o "nº".
+test('linha "Processo:" sem o nº também é conferida (Capa de Processo)', () => {
+  const secoes = [{ nome: 'Corpo', html: '<p class="Texto_Justificado"><strong>Processo:</strong>&nbsp;23236.016968/2026-37 &nbsp; <strong>Data de Autuação:</strong> 12/08/2026</p>' },
+    { nome: 'Id Processo', html: '<td><strong>Referência:</strong> Processo nº 23236.023326/2026-94</td>', editavel: false }]
+  const r = c.conferirProcesso(secoes)
+  assert.equal(r.certo, false)
+  assert.equal(r.escrito, '23236.016968/2026-37')
+  assert.ok(c.corrigirProcesso(secoes[0].html, r.processo).includes('23236.023326/2026-94 &nbsp; <strong>Data de Autuação:</strong> 12/08/2026'))
+  assert.equal(c.linhaDoProcesso([{ nome: 'x', html: '<p>Processo de Pagamento do Contrato 23236.016968/2026-37</p>' }]), null)
+})
+
+// v0.33.0 (pedido do usuário, 19/11/2026): palavra do timbre em minúscula e linhas em branco a mais.
+test('timbre: palavra em minúscula (menos ligação e depois do hífen) e linhas em branco a mais', () => {
+  assert.equal(c.comMaiusculas('Coordenação de Gestão orçamentária e Contratos'), 'Coordenação de Gestão Orçamentária e Contratos')
+  assert.equal(c.comMaiusculas('Pró-reitoria de Ensino'), 'Pró-reitoria de Ensino')
+  assert.equal(c.comMaiusculas('de Apoio'), 'De Apoio')
+  const html = '<p class="IFTO_Cabeçalho_Novo"><img src="x"></p>' + [...FIXO, 'Campus Palmas', 'Diretoria de Administração e Planejamento'].map((linha, i) => `<p class="IFTO_Cabeçalho_Novo">${i === 1 ? '<br>' : ''}${linha}</p>`).join('') +
+    '<p class="IFTO_Cabeçalho_Novo">Coordenação de Gestão orçamentária e Contratos</p><p class="IFTO_Cabeçalho_Novo">&nbsp;</p>'
+  const r = c.conferirTimbre([{ nome: 'a', html }], cgoc, cgoc.sigla)
+  assert.equal(r.certo, false)
+  assert.equal(r.vazias, 2)
+  assert.deepEqual(r.minusculas, [{ escrito: 'Coordenação de Gestão orçamentária e Contratos', certo: 'Coordenação de Gestão Orçamentária e Contratos' }])
+  assert.deepEqual(c.avisosDoTimbre(r), ['A linha "Coordenação de Gestão orçamentária e Contratos" deve ser "Coordenação de Gestão Orçamentária e Contratos".', 'O timbre tem 2 linhas em branco a mais.'])
+  const novo = c.corrigirTimbre(html, r.esperado)
+  assert.ok(novo.includes('<img src="x">'))
+  assert.equal(c.conferirTimbre([{ nome: 'a', html: novo }], cgoc, cgoc.sigla).certo, true)
+})

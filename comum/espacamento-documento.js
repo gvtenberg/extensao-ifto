@@ -65,41 +65,58 @@
   // 1), vazio, outro, texto (1ª linha), textoFim (última), acima, abaixo (do texto até a borda do bloco, em px),
   // margemTopo, margemBaixo, fonte (da letra), fonteDoBloco }. outras: listas de irmãos de dentro dos blocos
   // (só para o seletor não acertar onde não deve).
-  // topo e base: alto da primeira linha e baixo da última, em px na página (v0.29.3).
+  // v0.33.0: linha em branco (vazio): altura (px), margens e semNada (só a linha vazia do editor, sem espaço,
+  // texto ou quebra de linha de verdade). A medida pela posição na página (topo e base, v0.29.3) saiu.
   // Lacunas conferidas: entre a última linha de uma seção e a primeira da seguinte e, dentro da mesma seção,
-  // antes e depois da linha da data ("Palmas, 18 de novembro de 2026.", D21). Com linha em branco no meio,
-  // o espaço já existe. Devolve { lacunas: [{ indice, margem (em), seletor, secao, posicao, antes, depois }],
+  // antes e depois da linha da data ("Palmas, 18 de novembro de 2026.", D21). Linha em branco de verdade no
+  // meio conta como espaço. Devolve { lacunas: [{ indice, margem (em), seletor, secao, posicao, antes, depois }],
   // css, bloco } (bloco vazio quando não há o que fazer).
+  // v0.33.0: o documento salvo é diferente do editor. A seção que só tem uma linha vazia do editor ("Separador
+  // de seção" com <p><br data-cke-filler></p>: semNada) não é salva; no editor ela e a borda de cada seção
+  // afastam as partes, mas no documento salvo e no PDF elas ficam grudadas (timbre e número, "Assunto" e
+  // destinatário). Então a distância é a do documento salvo: o que sobra do bloco de cima e do de baixo, as
+  // linhas em branco que existem de verdade (altura medida) e as margens entre eles.
+  function semFantasmas (blocos) {
+    const porSecao = new Map()
+    for (const bloco of blocos) porSecao.set(bloco.raiz, [...(porSecao.get(bloco.raiz) || []), bloco])
+    // Também a seção só de linhas em branco logo depois do timbre (Capa de Processo, 19/11/2026: o SEI não a salva).
+    const ehTimbre = bloco => (bloco.classes || []).some(classe => /^IFTO_Cabe(ç|&ccedil;)alho/i.test(classe))
+    const secoes = [...porSecao]
+    const fantasmas = new Set(secoes.filter(([, lista], i) => lista.every(bloco => bloco.vazio && bloco.semNada) ||
+      (i > 0 && lista.every(bloco => bloco.vazio) && secoes[i - 1][1].some(ehTimbre))).map(([raiz]) => raiz))
+    return blocos.filter(bloco => !fantasmas.has(bloco.raiz))
+  }
+
   function planejarEspacamento (documento) {
-    const blocos = (documento && documento.blocos) || []
+    const blocos = semFantasmas((documento && documento.blocos) || [])
     const outras = (documento && documento.outras) || []
     const ehData = texto => Boolean(texto) && regrasData().ehLinhaDaData(texto)
     const fim = inicioDoRodape(blocos)
     const candidatas = []
-    // v0.29.3 (T162): a linha em branco do meio ("Separador de seção", estilo "sem espaço") pode ter altura de
-    // quase nada; então, com linhas em branco entre as partes, vale a distância medida entre as letras (topo e
-    // base, em px): só uma linha em branco de verdade (meia linha ou mais) dispensa o espaço novo. O espaço
-    // também vai depois da última linha de quem assina, antes do rodapé (o resto do rodapé fica de fora).
-    let anterior = null
+    // O espaço também vai depois da última linha de quem assina, antes do rodapé (o resto do rodapé fica de fora).
+    let anterior = -1
     for (let i = 0; i <= Math.min(fim, blocos.length - 1); i++) {
       const bloco = blocos[i]
-      if (bloco.outro) { anterior = null; continue }
+      if (bloco.outro) { anterior = -1; continue }
       if (bloco.vazio) continue
-      const ultimo = anterior
-      anterior = bloco
-      if (!ultimo) continue
-      const vizinho = ultimo === blocos[i - 1]
+      const indiceDoUltimo = anterior
+      anterior = i
+      if (indiceDoUltimo < 0) continue
+      const ultimo = blocos[indiceDoUltimo]
       if (ultimo.raiz === bloco.raiz && !ehData(bloco.texto) && !ehData(ultimo.textoFim)) continue
       const fonte = Number(bloco.fonte) || 0
       if (fonte <= 0) continue
-      const temPosicao = [ultimo.base, bloco.topo].every(valor => typeof valor === 'number')
-      if (!vizinho && !temPosicao) continue
-      const distancia = vizinho
-        ? ultimo.abaixo + bloco.acima + Math.max(ultimo.margemBaixo || 0, bloco.margemTopo || 0)
-        : bloco.topo - ultimo.base
+      // Sequência no documento salvo: bloco de cima, linhas em branco, bloco de baixo. "resto" é tudo menos a
+      // margem logo acima do bloco de baixo (a que o espaço novo troca).
+      const sequencia = blocos.slice(indiceDoUltimo, i + 1)
+      let resto = (ultimo.abaixo || 0) + (bloco.acima || 0)
+      for (let k = 1; k < sequencia.length; k++) {
+        if (k < sequencia.length - 1) resto += (sequencia[k].altura || 0) + Math.max(sequencia[k - 1].margemBaixo || 0, sequencia[k].margemTopo || 0)
+      }
+      const margemDeCima = sequencia[sequencia.length - 2].margemBaixo || 0
+      const distancia = resto + Math.max(margemDeCima, bloco.margemTopo || 0)
       if (distancia >= LIMITE * fonte) continue
-      const falta = vizinho ? LINHA * fonte - ultimo.abaixo - bloco.acima : LINHA * fonte - distancia + (bloco.margemTopo || 0)
-      const margem = Math.ceil(falta / (Number(bloco.fonteDoBloco) || fonte) * 100) / 100
+      const margem = Math.ceil((LINHA * fonte - resto) / (Number(bloco.fonteDoBloco) || fonte) * 100) / 100
       candidatas.push({ indice: i, margem, secao: bloco.secao, posicao: bloco.posicao, antes: ultimo.textoFim || '', depois: bloco.texto || '' })
     }
 
@@ -131,7 +148,15 @@
     return { lacunas, css, bloco: '<style>' + css + '</style>' }
   }
 
-  const api = { MARCA, LIMITE, LINHA, temEspacamento, tirarEspacamento, escapar, seletorDe, acertos, planejarEspacamento }
+  // v0.33.0: regras do documento salvo de um bloco (sem as do editor), para ver se o bloco que o documento já tem
+  // é o mesmo que a extensão poria agora.
+  function seletoresDoBloco (texto) {
+    const css = (String(texto || '').match(/extensao-ifto: espacamento \*\/([\s\S]*?)(?:<\/style>|$)/) || [])[1] || ''
+    return [...css.matchAll(/([^{}]+)\{margin-top/g)].map(([, seletor]) => seletor.trim()).filter(seletor => !seletor.startsWith('.ck-editor')).sort()
+  }
+  const mesmoEspacamento = (textoAtual, plano) => seletoresDoBloco(textoAtual).join('|') === seletoresDoBloco(plano.bloco).join('|')
+
+  const api = { seletoresDoBloco, mesmoEspacamento, semFantasmas, MARCA, LIMITE, LINHA, temEspacamento, tirarEspacamento, escapar, seletorDe, acertos, planejarEspacamento }
   if (doNode) module.exports = api
   else raiz.ExtensaoIFTO = Object.assign(raiz.ExtensaoIFTO || {}, { espacamentoDocumento: api })
 })(globalThis)

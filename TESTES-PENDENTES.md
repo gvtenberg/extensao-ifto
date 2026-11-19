@@ -462,3 +462,30 @@ E: Não aparece "Solte aqui para anexar…" nem a janela da extensão.
 ### T216 – Dica "PDF no Firefox como no Chrome" (v0.32.0)
 F: Abra as configurações da extensão e clique em Dicas.
 E: Aparece a dica "PDF no Firefox como no Chrome" com 4 passos numerados; a dica da senha do SEI também aparece em passos numerados.
+
+## Processo e Capa de Processo (v0.33.0)
+> Recarregue a extensão (versão 0.33.0) e entre no SEI.
+### T217 – Processo novo já vem Público (v0.33.0)
+F: Clique em "Iniciar Processo" (ou "Iniciar Processo Relacionado"), escolha o tipo e veja o nível de acesso.
+E: "Público" já vem marcado e aparece o aviso para conferir antes de salvar.
+### T218 – Dados do processo na tela do processo (v0.33.0)
+F: Abra um processo e clique no número dele, no alto da árvore.
+E: Na área da direita, abaixo de "Processo aberto…", aparecem Tipo do Processo, Especificação e Interessados, com a mesma letra do SEI.
+### T219 – Desligar os dados do processo (v0.33.0)
+F: Nas configurações, desmarque "Mostrar os dados do processo" e clique de novo no número do processo.
+E: A área da direita fica como o SEI mostra, sem os dados.
+### T220 – Capa de Processo com dados de outro processo (v0.33.0) (Crítico)
+F: Clique no número do processo (para a extensão ler os dados) e abra no editor uma Capa de Processo copiada de outro processo, sem assinar; clique em "Corrigir o número do processo" e em "Corrigir a capa".
+E: Aparecem os avisos do número e de cada dado diferente (data de autuação, tipo, especificação, interessados); depois das correções, a capa mostra os dados do processo aberto. Só fica guardado se você clicar em Salvar.
+### T221 – Timbre com letra minúscula e linha em branco (v0.33.0)
+F: No editor de um documento de teste não assinado, troque no timbre "Orçamentária" por "orçamentária", aperte Shift+Enter no início de uma linha do timbre, salve, feche e abra o editor de novo; clique em "Corrigir timbre".
+E: O aviso mostra a linha que deve começar com maiúscula e a linha em branco a mais; depois de "Corrigir timbre", o timbre fica sem linhas vazias e com "Gestão Orçamentária".
+### T222 – Espaço depois do timbre e antes do destinatário (v0.33.0) (Crítico)
+F: Abra no editor um Despacho ainda não assinado (também um que já tinha o espaço da extensão), clique em Salvar e gere o PDF.
+E: No PDF há uma linha de espaço entre a última linha do timbre e "DESPACHO Nº…", e entre a linha "Assunto" e "Ao Senhor…"; o resto continua como antes.
+### T223 – Espaço entre o timbre e "Processo:" na Capa (v0.33.0)
+F: Abra no editor uma Capa de Processo ainda não assinada, clique em Salvar e veja o documento na árvore.
+E: Há uma linha de espaço entre a última linha do timbre e "Processo:".
+### T224 – SEI lento na tela do processo (v0.33.0)
+F: Com a internet lenta ou o SEI demorando, clique no número do processo.
+E: Depois de até 20 segundos aparece, em cinza, "Não consegui ler os dados do processo agora…"; a página do SEI continua funcionando.

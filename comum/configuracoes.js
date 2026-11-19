@@ -3,6 +3,8 @@
   const PADROES = Object.freeze({
     // v0.6.0: data de hoje, Nato-digital e Público em todo documento externo novo
     preencherDocumentoExterno: true,
+    // v0.33.0: Tipo, Especificação e Interessados na tela do processo (lidos da página "Consultar/Alterar Processo")
+    dadosDoProcesso: true,
     // v0.27.0 (spec base-e-sei, etapa 2): valores do documento externo novo. Nível "publico" ou "restrito"
     // (com a hipótese legal: parte do nome dela na lista do SEI); formato "nato" ou "digitalizado" (com o
     // tipo de conferência: nome na lista do SEI; vazio = a pessoa escolhe).

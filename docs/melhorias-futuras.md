@@ -6,6 +6,7 @@
 
 Summary to resume work (on another machine or by another person) without reading everything. Update at the end of each stage or round.
 
+- **Done, waiting for tests (v0.33.0, 19/11/2026):** process data on the process screen, "Público" in new processes, Capa de Processo check, timbre lowercase/blank lines, spacing fixed for the saved document (no spec; rules in `regras/sei.md` and `regras/conferir-documento.md`). Tests T217–T224 (T220, T222 critical: change the document text).
 - **Done, waiting for tests (v0.32.0, 19/11/2026):** drop a file on a blank external document page to attach it (no spec, small feature; rule in `regras/sei.md`). Tests T213 (critical: writes to the SEI) to T215.
 - **Done:** each version in `historico.md` (latest: v0.5.0, 12/11/2026); finished specs in `specs/feitas/` (signature list in the SEI, v0.2.0 to v0.5.0; rules in `regras/lista-assinaturas.md`).
 - **In progress:** `specs/base-e-sei.md`: stages 1, 2, 3 and 5 done (v0.1.0; v0.27.0 pre-filled external document and type from the file name; v0.27.1 drag files onto the tree; v0.27.2 copy of the settings to a file); stage 4 postponed (D8); stage 6 (other SEI++ features): T01 and T02 passed without comments, ask the user which features. Tests T168–T175 (T171 critical: writes to the SEI).

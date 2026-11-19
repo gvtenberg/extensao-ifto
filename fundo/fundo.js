@@ -8,7 +8,7 @@
 // v0.17.2: depois do SICAF, a mesma aba consulta o Simples Nacional de cada fornecedor (spec consulta-simples).
 /* global importScripts */
 if (typeof importScripts === 'function' && !(globalThis.ExtensaoIFTO && globalThis.ExtensaoIFTO.simplesNacional)) {
-  importScripts('/comum/sei.js', '/comum/minuta-edital.js', '/comum/conferir-documento.js', '/comum/data-documento.js', '/comum/configuracoes.js', '/comum/todos-os-estilos.js', '/comum/sicaf.js', '/comum/simples-nacional.js', '/comum/compras-ifto.js', '/sites/sei/editor-preencher.js', '/sites/sei/editor-minuta.js')
+  importScripts('/comum/sei.js', '/comum/minuta-edital.js', '/comum/conferir-documento.js', '/comum/dados-processo.js', '/comum/data-documento.js', '/comum/configuracoes.js', '/comum/todos-os-estilos.js', '/comum/sicaf.js', '/comum/simples-nacional.js', '/comum/compras-ifto.js', '/sites/sei/editor-preencher.js', '/sites/sei/editor-minuta.js')
 }
 const navegador = globalThis.browser || globalThis.chrome
 const regras = globalThis.ExtensaoIFTO.sicaf
@@ -83,7 +83,7 @@ function tratarRecado (recado, remetente) {
     case 'salvamentoRestaurar': return salvamentoNoEditor(remetente, 'montar', recado.copia)
     case 'estilosVerificar': return rodarNoEditor(remetente)(globalThis.ExtensaoIFTO.editorLer).then(lido => lido.ok ? { ok: true, usa: (lido.secoes || []).some(secao => globalThis.ExtensaoIFTO.todosOsEstilos.temBloco(secao.html)) } : lido)
     case 'espacamentoMedir': return espacamentoNoEditor(remetente, 'medir')
-    case 'espacamentoPor': return espacamentoNoEditor(remetente, 'por', recado.bloco)
+    case 'espacamentoPor': return espacamentoNoEditor(remetente, 'por', recado.bloco, recado.substituir)
     case 'espacamentoDesfazer': return espacamentoNoEditor(remetente, 'tirar')
     // v0.26.2 (spec conferir-documento): conferir o documento no editor (número do processo).
     case 'conferirVerificar': return conferirNoEditor(remetente, { sigla: recado.sigla })
@@ -565,7 +565,7 @@ async function salvamentoNoEditor (remetente, acao, dado) {
 
 // v0.26.11 (spec conferir-documento, etapa 7): põe na página do editor (world MAIN) o código que mede as partes
 // do documento e põe ou tira o bloco de estilo do espaçamento (reusa acharEditor e porBloco da numeração).
-async function espacamentoNoEditor (remetente, acao, bloco = '') {
+async function espacamentoNoEditor (remetente, acao, bloco = '', substituir = false) {
   const alvo = { tabId: remetente.tab.id, frameIds: [remetente.frameId || 0] }
   if (acao === 'medir') {
     const [temNumeracao] = await navegador.scripting.executeScript({ target: alvo, world: 'MAIN', func: () => Boolean(globalThis.ExtensaoIFTO && globalThis.ExtensaoIFTO.editorNumeracao) })
@@ -573,7 +573,7 @@ async function espacamentoNoEditor (remetente, acao, bloco = '') {
     if (!(temNumeracao && temNumeracao.result)) arquivos.unshift('sites/sei/editor-numeracao.js')
     await navegador.scripting.executeScript({ target: alvo, world: 'MAIN', files: arquivos })
   }
-  return rodarNoEditor(remetente)((qual, texto) => globalThis.ExtensaoIFTO.editorEspacamento[qual](texto), [acao, bloco])
+  return rodarNoEditor(remetente)((qual, texto, trocar) => globalThis.ExtensaoIFTO.editorEspacamento[qual](texto, trocar), [acao, bloco, Boolean(substituir)])
 }
 
 async function minutaNoEditor (remetente, remover) {
@@ -604,7 +604,8 @@ async function minutaNoEditor (remetente, remover) {
 // v0.26.2 (spec conferir-documento): confere o texto do editor; com "qual" corrige só aquela parte e confere
 // de novo. Nunca salva. 'processo': troca o número só na linha "Processo nº:". v0.26.5: 'timbre' e 'rodape'
 // (só em unidades do Campus Palmas; dados da unidade em "Minhas unidades").
-// Devolve { ok, erro, processo, timbre, rodape } (cada um null quando não há o que conferir).
+// v0.33.0: 'capa' (Data de Autuação, Tipo, Especificação e Interessados da Capa de Processo).
+// Devolve { ok, erro, processo, timbre, rodape, capa } (cada um null quando não há o que conferir).
 async function conferirNoEditor (remetente, recado) {
   const regras = globalThis.ExtensaoIFTO.conferirDocumento
   const opcoes = await globalThis.ExtensaoIFTO.configuracoes.lerConfiguracoes()
@@ -612,10 +613,20 @@ async function conferirNoEditor (remetente, recado) {
   const palmas = regras.ehUnidadePalmas(sigla)
   const unidade = regras.acharUnidade(opcoes.unidades, sigla)
   const rodar = rodarNoEditor(remetente)
+  // v0.33.0: Capa de Processo contra os dados do processo guardados pela tela do processo (dados-processo.js).
+  const dadosProcesso = globalThis.ExtensaoIFTO.dadosProcesso
+  const guardados = opcoes.conferirProcesso ? ((await navegador.storage.local.get(dadosProcesso.CHAVE))[dadosProcesso.CHAVE] || {}) : {}
+  const capaDe = secoes => {
+    const capa = dadosProcesso.lerCapa(secoes)
+    const dados = capa && guardados[regras.processoDaReferencia(secoes)]
+    const conferido = dados ? dadosProcesso.conferirCapa(capa, dados) : null
+    return conferido ? { ...conferido, secao: capa.secao, avisos: dadosProcesso.avisosDaCapa(conferido), dados } : null
+  }
   const conferir = secoes => ({
     processo: opcoes.conferirProcesso ? regras.conferirProcesso(secoes) : null,
     timbre: palmas && opcoes.conferirTimbre ? regras.conferirTimbre(secoes, unidade, sigla) : null,
-    rodape: palmas && opcoes.conferirRodape ? regras.conferirRodape(secoes, unidade) : null
+    rodape: palmas && opcoes.conferirRodape ? regras.conferirRodape(secoes, unidade) : null,
+    capa: opcoes.conferirProcesso ? capaDe(secoes) : null
   })
   const lido = await rodar(globalThis.ExtensaoIFTO.editorLer)
   if (!lido.ok) return { ok: false, erro: lido.erro }
@@ -630,6 +641,9 @@ async function conferirNoEditor (remetente, recado) {
   } else if (qual === 'timbre') {
     secao = regras.secaoCom(lido.secoes, regras.ehDoTimbre)
     novo = secao && regras.corrigirTimbre(secao.html, antes.timbre.esperado)
+  } else if (qual === 'capa') {
+    secao = lido.secoes.find(outra => outra.nome === antes.capa.secao)
+    novo = secao && dadosProcesso.corrigirCapa(secao.html, antes.capa.dados, antes.capa)
   } else if (qual === 'rodape') {
     secao = regras.secaoCom(lido.secoes, regras.ehDoRodape)
     novo = secao && regras.corrigirRodape(secao.html, unidade)
