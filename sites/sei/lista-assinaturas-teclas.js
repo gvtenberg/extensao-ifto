@@ -2,6 +2,8 @@
 // (árvore, documento). Só avisa a página principal, onde fica o painel (sites/sei/lista-assinaturas.js).
 // Sem lista guardada, não faz nada: Alt+← continua sendo "Voltar" do navegador.
 (async function () {
+  // v0.28.0 (spec aviso-versao-sei): a pessoa desativou a extensão nesta versão do SEI.
+  if (!(await globalThis.ExtensaoIFTO.sei.ligadaNoSei())) return
   if (window.top === window) return
   const navegador = globalThis.browser || globalThis.chrome
   const CHAVE = 'listaAssinaturas'

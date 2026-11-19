@@ -2,6 +2,8 @@
 // barra mostra "N peças do Compras IFTO"; cada peça abre a janela de confirmação (processo, NUP, tipo do
 // documento, nível de acesso, prévia). Nunca assina (D1).
 (async function () {
+  // v0.28.0 (spec aviso-versao-sei): a pessoa desativou a extensão nesta versão do SEI.
+  if (!(await globalThis.ExtensaoIFTO.sei.ligadaNoSei())) return
   if (window.top !== window) return
   const ExtensaoIFTO = globalThis.ExtensaoIFTO
   const { comprasIfto: regras, configuracoes, barra, seiPedidos, janela } = ExtensaoIFTO

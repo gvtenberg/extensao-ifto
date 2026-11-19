@@ -156,7 +156,7 @@ Cada função abaixo tem três opções: **Automática** (liga só na unidade in
 - **Senhas de outros sistemas:** o Firefox pode sugerir no SEI senhas guardadas para outros endereços do IFTO (SUAP, Moodle e outros). Confira se a senha sugerida é a do SEI.
 - **Baixe somente pelo endereço oficial** indicado em [Onde baixar](#onde-baixar).
 - **Se algo parecer errado no SEI:** desligue a função correspondente nas configurações (ou desative a extensão em "Extensões e temas") e verifique se o problema continua. Isso ajuda a saber se a causa é a extensão ou o próprio SEI antes de acionar o suporte.
-- **Mudanças no SEI:** quando o SEI do IFTO é atualizado, alguma função pode deixar de funcionar até a extensão ser ajustada. Nesse caso, comunique pelos meios abaixo.
+- **Mudanças no SEI:** quando o SEI do IFTO é atualizado, alguma função pode deixar de funcionar até a extensão ser ajustada. A extensão avisa no próprio SEI e deixa escolher entre continuar usando ou desativá-la no SEI (para ligar de novo: ícone da extensão > **Ativar de novo**, ou Configurações > Geral). Nesse caso, comunique pelos meios abaixo.
 
 ## Erros e sugestões de melhoria
 

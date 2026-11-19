@@ -16,6 +16,33 @@
     return (versao || '').split('.').slice(0, 3).join('.') === VERSAO_SEI_TESTADA
   }
 
+  // v0.28.0 (spec aviso-versao-sei): SEI numa versão não testada. A pessoa escolhe continuar ou desativar a
+  // extensão no SEI; a escolha vale só para aquela versão (D3). Versão testada: sempre ligada, sem aviso.
+  // Devolve 'testado', 'perguntar', 'ligada' ou 'desligada'.
+  const tresNumeros = versao => String(versao || '').split('.').slice(0, 3).join('.')
+  function estadoNoSei (versao, escolha) {
+    if (!versao || seiTestado(versao)) return 'testado'
+    if (!escolha || tresNumeros(escolha.versao) !== tresNumeros(versao)) return 'perguntar'
+    return escolha.ligada ? 'ligada' : 'desligada'
+  }
+
+  // Leitura e gravação da escolha no navegador (só dentro da extensão). A versão vem da própria página
+  // (script "js/sei.js?...") ou, nas páginas sem ele (janelas, quadros), da última vista (seiVisto).
+  const navegador = () => raiz.browser || raiz.chrome
+  async function estadoAtualNoSei () {
+    const { seiVisto, seiEscolha } = await navegador().storage.local.get(['seiVisto', 'seiEscolha'])
+    const script = raiz.document && raiz.document.querySelector('script[src^="js/sei.js?"]')
+    const versao = (script && versaoDoSei(script.getAttribute('src'))) || (seiVisto && seiVisto.versao) || null
+    return { versao, estado: estadoNoSei(versao, seiEscolha) }
+  }
+  // D2: desativada, nenhuma função da extensão age no SEI. Cada script do SEI espera esta resposta antes de agir.
+  async function ligadaNoSei () {
+    try { return (await estadoAtualNoSei()).estado !== 'desligada' } catch (erro) { return true }
+  }
+  async function gravarEscolhaNoSei (versao, ligada) {
+    await navegador().storage.local.set({ seiEscolha: { versao: tresNumeros(versao), ligada: Boolean(ligada), em: new Date().toISOString() } })
+  }
+
   // v0.1.1: o SEI 5 troca o campo de senha por um campo de texto que mostra "●" (MaskedPassword) e guarda
   // a senha num campo escondido; assim o navegador não reconhece a senha. A extensão volta a pôr um campo
   // de senha de verdade, com os mesmos atributos do campo visível (tabindex, onkeypress, maxlength...).
@@ -113,7 +140,7 @@
     return (partes.find(parte => !/^\d+$/.test(parte.trim())) || '').trim()
   }
 
-  const api = { tipoDoDocumento, versaoDoSei, VERSAO_SEI_TESTADA, seiTestado, atributosDoCampoDeSenha, lerArvore, ligadaNaUnidade, nomeNaArvore, numeroDaUnidade, UNIDADE_DIRECAO_GERAL }
+  const api = { tipoDoDocumento, versaoDoSei, VERSAO_SEI_TESTADA, seiTestado, estadoNoSei, estadoAtualNoSei, ligadaNoSei, gravarEscolhaNoSei, atributosDoCampoDeSenha, lerArvore, ligadaNaUnidade, nomeNaArvore, numeroDaUnidade, UNIDADE_DIRECAO_GERAL }
   if (typeof module !== 'undefined' && module.exports) module.exports = api
   else raiz.ExtensaoIFTO = Object.assign(raiz.ExtensaoIFTO || {}, { sei: api })
 })(globalThis)

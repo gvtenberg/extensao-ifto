@@ -4,6 +4,8 @@
 // de um dia que ainda não chegou ou escrita fora do padrão ("Palmas, 1º de dezembro de 2026."), com o botão
 // "Corrigir a data". A extensão troca só a data no texto do editor; a pessoa confere e clica em Salvar.
 (async function () {
+  // v0.28.0 (spec aviso-versao-sei): a pessoa desativou a extensão nesta versão do SEI.
+  if (!(await globalThis.ExtensaoIFTO.sei.ligadaNoSei())) return
   if (window.top !== window) return
   const { configuracoes, caixaEditor } = globalThis.ExtensaoIFTO
   const opcoes = await configuracoes.lerConfiguracoes()

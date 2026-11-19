@@ -5,16 +5,37 @@
 
   // v0.17.6 (pedido de 13/11/2026): mensagem de sucesso não aparece; só o aviso, com o motivo, quando o SEI
   // ainda não foi reconhecido ou está numa versão em que a extensão não foi testada.
-  const { seiVisto } = await navegador.storage.local.get('seiVisto')
+  // v0.28.0 (spec aviso-versao-sei, D2): SEI não testado: desativar a extensão no SEI ou ativar de novo.
+  const { sei } = globalThis.ExtensaoIFTO
   const caixa = document.getElementById('sei')
-  caixa.className = 'aviso pendencia'
-  if (!seiVisto) {
-    caixa.textContent = 'A extensão ainda não reconheceu o SEI do IFTO: ele não foi aberto neste navegador desde a instalação. Abra o SEI e entre com sua senha.'
-  } else if (!globalThis.ExtensaoIFTO.sei.seiTestado(seiVisto.versao)) {
-    caixa.textContent = `O SEI do IFTO mudou para a versão ${seiVisto.versao}, e a extensão foi feita para a versão ${globalThis.ExtensaoIFTO.sei.VERSAO_SEI_TESTADA}. Algumas funções podem não funcionar: se notar algum erro, avise.`
-  } else {
-    caixa.hidden = true
+  const botaoDesativar = document.getElementById('desativar-sei')
+  const botaoAtivar = document.getElementById('ativar-sei')
+  async function mostrarSei () {
+    const { seiVisto } = await navegador.storage.local.get('seiVisto')
+    const { estado } = await sei.estadoAtualNoSei()
+    caixa.className = 'aviso pendencia'
+    caixa.hidden = false
+    botaoDesativar.hidden = !seiVisto || estado === 'testado' || estado === 'desligada'
+    botaoAtivar.hidden = estado !== 'desligada'
+    if (!seiVisto) {
+      caixa.textContent = 'A extensão ainda não reconheceu o SEI do IFTO: ele não foi aberto neste navegador desde a instalação. Abra o SEI e entre com sua senha.'
+    } else if (estado === 'desligada') {
+      caixa.textContent = `A extensão está desativada no SEI (versão ${seiVisto.versao}, ainda não testada). Para usar as funções dela de novo, clique em "Ativar de novo" e abra outra página do SEI.`
+    } else if (estado !== 'testado') {
+      caixa.textContent = `O SEI do IFTO mudou para a versão ${seiVisto.versao}, e a extensão foi testada na versão ${sei.VERSAO_SEI_TESTADA}. Algumas funções podem não funcionar: se notar algum erro, avise.`
+    } else {
+      caixa.hidden = true
+    }
   }
+  botaoDesativar.addEventListener('click', async () => {
+    await sei.gravarEscolhaNoSei((await sei.estadoAtualNoSei()).versao, false)
+    mostrarSei()
+  })
+  botaoAtivar.addEventListener('click', async () => {
+    await sei.gravarEscolhaNoSei((await sei.estadoAtualNoSei()).versao, true)
+    mostrarSei()
+  })
+  await mostrarSei()
 
   // v0.9.6: no Firefox, sem a licença permanente para o SEI, a extensão só age na página aberta quando a
   // pessoa clica no ícone, e some ao trocar de página (ex.: a lista de assinaturas ao abrir o processo).

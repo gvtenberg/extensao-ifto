@@ -2,6 +2,8 @@
 // "Corrigir a numeração" aparece só quando um item de edital (nível 2, 3 ou 4) está com o texto empurrado para
 // a linha de baixo por um número longo ("10.10."). Nada muda sem o clique; a pessoa confere e clica em Salvar.
 (async function () {
+  // v0.28.0 (spec aviso-versao-sei): a pessoa desativou a extensão nesta versão do SEI.
+  if (!(await globalThis.ExtensaoIFTO.sei.ligadaNoSei())) return
   if (window.top !== window) return
   const navegador = globalThis.browser || globalThis.chrome
   const { configuracoes, caixaEditor } = globalThis.ExtensaoIFTO

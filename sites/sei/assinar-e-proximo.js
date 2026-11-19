@@ -5,6 +5,8 @@
 // (ou a extensão) envia, marca "enviado" para o painel avançar depois que o SEI confirmar.
 // A senha nunca é lida nem guardada pela extensão; só se confere se o campo está preenchido.
 (async function () {
+  // v0.28.0 (spec aviso-versao-sei): a pessoa desativou a extensão nesta versão do SEI.
+  if (!(await globalThis.ExtensaoIFTO.sei.ligadaNoSei())) return
   const navegador = globalThis.browser || globalThis.chrome
   const CHAVE = 'listaAssinaturas'
   const { [CHAVE]: lista } = await navegador.storage.local.get(CHAVE)

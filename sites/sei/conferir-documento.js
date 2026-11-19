@@ -4,6 +4,8 @@
 // v0.26.5: timbre e rodapé (unidades do Campus Palmas), com "Corrigir timbre", "Corrigir rodapé" e "Usar este
 // timbre como padrão da unidade". Nunca salva: a pessoa confere e clica em Salvar.
 (async function () {
+  // v0.28.0 (spec aviso-versao-sei): a pessoa desativou a extensão nesta versão do SEI.
+  if (!(await globalThis.ExtensaoIFTO.sei.ligadaNoSei())) return
   if (window.top !== window) return
   const { configuracoes, caixaEditor, conferirDocumento: regras, janelaAssinar, dataDocumento } = globalThis.ExtensaoIFTO
   const opcoes = await configuracoes.lerConfiguracoes()

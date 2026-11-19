@@ -3,6 +3,27 @@
   const { lerConfiguracoes, gravarConfiguracoes } = globalThis.ExtensaoIFTO.configuracoes
   const configuracoes = await lerConfiguracoes()
   const aviso = document.getElementById('gravado')
+
+  // v0.28.0 (spec aviso-versao-sei, D2): SEI numa versão não testada: estado e botão para desativar ou ativar
+  // de novo a extensão no SEI. Versão testada: o cartão não aparece.
+  const { sei } = globalThis.ExtensaoIFTO
+  async function mostrarSei () {
+    const { versao, estado } = await sei.estadoAtualNoSei()
+    document.getElementById('cartao-sei').hidden = estado === 'testado'
+    document.getElementById('desativar-sei').hidden = estado === 'testado' || estado === 'desligada'
+    document.getElementById('ativar-sei').hidden = estado !== 'desligada'
+    document.getElementById('estado-sei').textContent = estado === 'desligada'
+      ? `Extensão desativada no SEI (versão ${versao}, ainda não testada). Nenhuma função da extensão age no SEI.`
+      : `Extensão ligada no SEI. O SEI está na versão ${versao}, ainda não testada: algumas funções podem não funcionar.`
+  }
+  for (const [id, ligada] of [['desativar-sei', false], ['ativar-sei', true]]) {
+    document.getElementById(id).addEventListener('click', async () => {
+      await sei.gravarEscolhaNoSei((await sei.estadoAtualNoSei()).versao, ligada)
+      mostrarSei()
+      mostrarAviso()
+    })
+  }
+  mostrarSei()
   // v0.26.0: o aviso "Configuração gravada" aparece no canto e some sozinho.
   let some
   const mostrarAviso = () => {

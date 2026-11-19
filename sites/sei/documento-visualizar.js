@@ -1,5 +1,7 @@
 // v0.26.1 (spec conferir-documento): página do documento no SEI (quadro "documento_visualizar" da árvore).
 (async function () {
+  // v0.28.0 (spec aviso-versao-sei): a pessoa desativou a extensão nesta versão do SEI.
+  if (!(await globalThis.ExtensaoIFTO.sei.ligadaNoSei())) return
   const { configuracoes: config, conferirDocumento: regras, caixaEditor } = globalThis.ExtensaoIFTO
   const configuracoes = await config.lerConfiguracoes()
 

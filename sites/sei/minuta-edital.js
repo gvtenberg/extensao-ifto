@@ -3,6 +3,8 @@
 // tira a marca do texto do editor; a pessoa confere e clica em Salvar (a extensão nunca salva aqui).
 // Opção "automatica": só na Direção-geral.
 (async function () {
+  // v0.28.0 (spec aviso-versao-sei): a pessoa desativou a extensão nesta versão do SEI.
+  if (!(await globalThis.ExtensaoIFTO.sei.ligadaNoSei())) return
   if (window.top !== window) return
   const { minutaEdital: regras, configuracoes } = globalThis.ExtensaoIFTO
   if (!regras.ehEdital(document.title)) return

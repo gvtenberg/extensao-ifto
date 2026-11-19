@@ -4,6 +4,8 @@
 // e o Firefox deixa de oferecer (e de guardar) a senha. Aqui trocamos os dois por um campo de senha comum,
 // igual ao do SEI antigo: mesmo id e nome "pwdSenha", então o SEI continua lendo e enviando a senha.
 (async function () {
+  // v0.28.0 (spec aviso-versao-sei): a pessoa desativou a extensão nesta versão do SEI.
+  if (!(await globalThis.ExtensaoIFTO.sei.ligadaNoSei())) return
   const { sei, configuracoes } = globalThis.ExtensaoIFTO
   const { senhaReconhecidaPeloNavegador } = await configuracoes.lerConfiguracoes()
   if (!senhaReconhecidaPeloNavegador) return

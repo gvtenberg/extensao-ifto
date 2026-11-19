@@ -4,6 +4,8 @@
 // seiPedidos.incluirNaJanela). Tipo: pelo nome do arquivo, regras da pessoa e tipo padrão (D14); sem
 // nenhum, a pessoa escolhe na lista.
 (async function () {
+  // v0.28.0 (spec aviso-versao-sei): a pessoa desativou a extensão nesta versão do SEI.
+  if (!(await globalThis.ExtensaoIFTO.sei.ligadaNoSei())) return
   if (window.top !== window) return
   const ExtensaoIFTO = globalThis.ExtensaoIFTO
   const { configuracoes, seiPedidos, janela, documentoExterno: regras } = ExtensaoIFTO

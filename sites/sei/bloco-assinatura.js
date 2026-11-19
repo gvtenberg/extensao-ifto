@@ -8,6 +8,8 @@
 // A janela do documento aberta pelo número (bloco_navegar) usa o botão "Assinar Documento" de sempre
 // (sites/sei/assinar-conferir.js). SEI lento ou documento que não deu para ler: o SEI assina normalmente.
 (async function () {
+  // v0.28.0 (spec aviso-versao-sei): a pessoa desativou a extensão nesta versão do SEI.
+  if (!(await globalThis.ExtensaoIFTO.sei.ligadaNoSei())) return
   const { configuracoes, conferirDocumento: regras, janelaAssinar, seiPedidos } = globalThis.ExtensaoIFTO
   const opcoes = await configuracoes.lerConfiguracoes()
   if ((!opcoes.conferirProcesso && !opcoes.conferirData) || !seiPedidos) return

@@ -6,6 +6,8 @@
 // dois: "Incluir SICAF" e "Incluir Simples Nacional".
 // v0.26.10 (pedido de 19/11/2026, T62): nas outras unidades só "Incluir SICAF" (licitação não usa o Simples).
 (async function () {
+  // v0.28.0 (spec aviso-versao-sei): a pessoa desativou a extensão nesta versão do SEI.
+  if (!(await globalThis.ExtensaoIFTO.sei.ligadaNoSei())) return
   const ExtensaoIFTO = globalThis.ExtensaoIFTO
   const { sicaf: regras, configuracoes } = ExtensaoIFTO
   const navegador = globalThis.browser || globalThis.chrome

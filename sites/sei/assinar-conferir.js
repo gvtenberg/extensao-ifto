@@ -3,6 +3,8 @@
 // errado (v0.26.9: ou a data errada) pergunta "Assinar mesmo assim?". "Não" abre o editor (o aviso aparece lá). Se o documento não puder
 // ser lido (SEI lento, quadro ainda carregando), o SEI assina normalmente: a conferência nunca trava a assinatura.
 (async function () {
+  // v0.28.0 (spec aviso-versao-sei): a pessoa desativou a extensão nesta versão do SEI.
+  if (!(await globalThis.ExtensaoIFTO.sei.ligadaNoSei())) return
   const { configuracoes, conferirDocumento: regras, janelaAssinar } = globalThis.ExtensaoIFTO
   const opcoes = await configuracoes.lerConfiguracoes()
   if (!opcoes.conferirProcesso && !opcoes.conferirData) return

@@ -6,6 +6,8 @@
 // configurações; ao escolher o arquivo: tipo e "Nome na Árvore" pelo nome do arquivo (D14, D7), "#" do
 // nome trocado por "_" (D9) e aviso de tamanho com as dicas para diminuir (D10 a D13).
 (async function () {
+  // v0.28.0 (spec aviso-versao-sei): a pessoa desativou a extensão nesta versão do SEI.
+  if (!(await globalThis.ExtensaoIFTO.sei.ligadaNoSei())) return
   const { documentoExterno: regras, configuracoes } = globalThis.ExtensaoIFTO
   const interno = regras.ehDocumentoInternoNovo(location.href)
   if (!interno && !regras.ehDocumentoExternoNovo(location.href)) return

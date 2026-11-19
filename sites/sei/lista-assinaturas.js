@@ -2,6 +2,8 @@
 // colar a lista, abrir os itens um a um pela pesquisa rápida e mostrar "8/28". A lista fica no navegador
 // (storage.local, chave listaAssinaturas) até o usuário limpar; nada vai para a internet.
 (async function () {
+  // v0.28.0 (spec aviso-versao-sei): a pessoa desativou a extensão nesta versão do SEI.
+  if (!(await globalThis.ExtensaoIFTO.sei.ligadaNoSei())) return
   if (window.top !== window) return
   const { listaAssinaturas: regras, configuracoes, barra: barraExtensao, sei } = globalThis.ExtensaoIFTO
   const navegador = globalThis.browser || globalThis.chrome

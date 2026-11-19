@@ -2,7 +2,7 @@
 
 **Sections**: 1. Goal · 2. Out of scope · 3. Decisions to confirm · 4. Decided rules · 5. What changes · 6. Stages · 7. Manual tests
 
-- **Status:** ready to code (after the base-e-sei and conferir-documento agents of 18/11/2026 are merged: same settings page)
+- **Status:** done in v0.28.0 (19/11/2026)
 - **Requested on:** 18/11/2026 · **Deadline or priority:** next
 - **Planned version:** 0.28.0 (base-e-sei stages 2, 3, 5 take 0.27.x)
 
@@ -36,7 +36,7 @@ When the IFTO SEI changes to a version the extension was not tested on, the pers
 
 ## 6. Stages
 
-- [ ] Stage 1 – Shared rule + box on the SEI + icon window + settings + all SEI scripts obey the "off" state. Test: change `VERSAO_SEI_TESTADA` in a temporary copy (development computer) and see the box; choose each button.
+- [x] Stage 1 – Shared rule + box on the SEI + icon window + settings + all SEI scripts obey the "off" state. Test: change `VERSAO_SEI_TESTADA` in a temporary copy (development computer) and see the box; choose each button.
 
 ## 7. Manual tests
 

@@ -58,3 +58,19 @@ test('seiTestado: só a versão 5.0.4 do SEI conta como testada', () => {
   assert.equal(seiTestado('5.0.5.0'), false)
   assert.equal(seiTestado(null), false)
 })
+
+// v0.28.0 (spec aviso-versao-sei): perguntar, ligada ou desligada, só para a versão em que a pessoa escolheu.
+test('estadoNoSei: versão testada nunca pergunta, mesmo com escolha antiga', () => {
+  const { estadoNoSei, VERSAO_SEI_TESTADA } = require('../comum/sei.js')
+  assert.equal(estadoNoSei(VERSAO_SEI_TESTADA + '.2'), 'testado')
+  assert.equal(estadoNoSei(VERSAO_SEI_TESTADA + '.0', { versao: VERSAO_SEI_TESTADA, ligada: false }), 'testado')
+  assert.equal(estadoNoSei(null), 'testado')
+})
+
+test('estadoNoSei: versão nova pergunta; a escolha vale só para a mesma versão', () => {
+  const { estadoNoSei } = require('../comum/sei.js')
+  assert.equal(estadoNoSei('9.1.0.0'), 'perguntar')
+  assert.equal(estadoNoSei('9.1.0.3', { versao: '9.1.0', ligada: true }), 'ligada')
+  assert.equal(estadoNoSei('9.1.0.3', { versao: '9.1.0', ligada: false }), 'desligada')
+  assert.equal(estadoNoSei('9.2.0.0', { versao: '9.1.0', ligada: false }), 'perguntar')
+})

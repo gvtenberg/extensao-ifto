@@ -386,3 +386,15 @@ E: O arquivo "configuracoes-extensao-ifto-AAAA-MM-DD.json" vai para Downloads; d
 ### T175 – Carregar arquivo errado (v0.27.2)
 F: Em Cópia das configurações, clique em "Escolher o arquivo…" e escolha um PDF ou outro arquivo qualquer.
 E: Aparece o aviso "Este arquivo não é uma cópia das configurações da extensão…" e nada muda.
+
+## Aviso de versão do SEI
+> antes de testar: precisa da cópia temporária da extensão com outra versão do SEI marcada como testada (computador de desenvolvimento)
+### T176 – Aviso no SEI com versão não testada (v0.28.0)
+F: Instale a cópia temporária e abra o SEI.
+E: No alto à direita aparece a caixa "O SEI do IFTO mudou para a versão…", com "Continuar usando" e "Desativar a extensão no SEI"; em "Continuar usando" ela some e não volta nas próximas páginas.
+### T177 – Desativar a extensão no SEI (v0.28.0)
+F: Ainda na cópia temporária, clique no ícone da extensão, em "Desativar a extensão no SEI", e abra outra página do SEI (um processo).
+E: Nenhuma função da extensão aparece no SEI (barra IFTO, lista de assinaturas, avisos do editor, senha); o ícone mostra "A extensão está desativada no SEI" e o botão "Ativar de novo".
+### T178 – Ativar de novo (v0.28.0)
+F: Em Configurações › Geral clique em "Ativar de novo" e abra outra página do SEI.
+E: As funções da extensão voltam no SEI; o cartão mostra "Extensão ligada no SEI".

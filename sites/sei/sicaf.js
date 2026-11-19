@@ -8,6 +8,8 @@
 // juntos; Sicaf e Consulta com os PDFs e Anexo em branco. "Sempre ligada" (equipe de licitação): só o botão
 // "Incluir SICAF", que inclui só o Sicaf. Pedido "quais": 'tudo' (CGOC), 'sicaf' ou 'simples'.
 (async function () {
+  // v0.28.0 (spec aviso-versao-sei): a pessoa desativou a extensão nesta versão do SEI.
+  if (!(await globalThis.ExtensaoIFTO.sei.ligadaNoSei())) return
   if (window.top !== window) return
   const ExtensaoIFTO = globalThis.ExtensaoIFTO
   const { sicaf: regras, simplesNacional, configuracoes, barra, seiPedidos, pdfTexto, janela } = ExtensaoIFTO
