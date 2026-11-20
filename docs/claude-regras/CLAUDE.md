@@ -5,7 +5,7 @@
 Updated on 20/11/2026. Only what applies to EVERY project is here (this file is loaded in every message). The rest is in the theme files below: read one only when the task needs it.
 
 ## Who the user is
-Student, not from IT: plain, simple language; commands with the exact text to type and the click path. Tokens are scarce: always be economical.
+Student, not from IT: plain, simple language; commands with the exact text to type and the click path. Commands that need `sudo` (password): never suggest the `!` prefix in the chat (it cannot read the password); tell the user to open the Terminal (Ctrl+Alt+T), paste with Ctrl+Shift+V and type the password. Tokens are scarce: always be economical.
 
 ## Language
 - Chat replies, choice-window questions and `.md` docs in plain English (saves tokens), unless the project's `CLAUDE.md` says otherwise. Project docs still in Portuguese: translate each file when it is next edited.
