@@ -492,3 +492,6 @@ E: Depois de até 20 segundos aparece, em cinza, "Não consegui ler os dados do 
 ### T225 – Botão Blocos Internos (v0.34.0)
 F: Abra a tela inicial do SEI (Controle de Processos) e clique no novo ícone logo depois de "Controle de Prazos".
 E: O ícone tem o mesmo tamanho e espaço dos outros e abre a página de Blocos Internos (a mesma do menu Blocos > Internos).
+### T226 – Mesmo tamanho de letra na tela do processo (v0.34.1)
+F: Clique no número de um processo no SEI.
+E: "Tipo do Processo", "Especificação" e "Interessados" têm o mesmo tamanho de letra de "Processo aberto somente na unidade…".

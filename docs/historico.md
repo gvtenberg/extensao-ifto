@@ -2,6 +2,7 @@
 
 One or two lines per version, with the date (dd/mm/yyyy). Number 0.STAGE.FIX.
 
+- v0.34.1 (19/11/2026): process screen: Tipo, Especificação and Interessados in the same size as "Processo aberto somente na unidade…" (the SEI style made the paragraphs smaller). T226.
 - v0.34.0 (19/11/2026): "Blocos Internos" button in the Controle de Processos button bar, after "Controle de Prazos" (same link as menu Blocos > Internos, icon `icones/bloco-interno.svg`; setting `botaoBlocosInternos`, on by default). T225.
 - v0.33.0 (19/11/2026): process screen shows Tipo, Especificação and Interessados (read-only from "Consultar/Alterar Processo", setting `dadosDoProcesso`); new process gets "Público"; Capa de Processo checked ("Processo:" without "nº", Data de Autuação, Tipo, Especificação, Interessados, "Corrigir a capa"); timbre: words in lowercase and extra blank lines; spacing measured as in the saved document (separators the SEI does not save are ignored), documents with the old spacing are redone. T217–T224.
 - v0.32.0 (19/11/2026): drop one file on the page of a blank external document (opened on the right) to attach it: confirm window ("Anexar"), only the file goes in ("Alterar Documento Externo", same path as the SICAF); type, date, access and tree name stay as they are; several files are refused; setting `arrastarArquivos`. T213–T215. Settings › Dicas: "PDF no Firefox como no Chrome" (4 Firefox settings, tested by the user on 19/11/2026); the other tips as short numbered steps.

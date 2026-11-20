@@ -56,7 +56,8 @@
     caixa.style.cssText = 'margin-top:1rem;font-size:.875rem;'
     const linha = (rotulo, valores) => {
       const paragrafo = documento.createElement('p')
-      paragrafo.style.cssText = 'margin:0 0 .75rem 0;'
+      // v0.34.1: tamanho em cada parágrafo, porque o estilo do SEI diminuía o <p> (ficava menor que "Processo aberto...")
+      paragrafo.style.cssText = 'margin:0 0 .75rem 0;font-size:.875rem;'
       const titulo = documento.createElement('span')
       titulo.style.fontWeight = 'bold'
       titulo.textContent = rotulo
@@ -66,7 +67,7 @@
     }
     if (erro) {
       const aviso = documento.createElement('p')
-      aviso.style.cssText = 'margin:0;color:#666;'
+      aviso.style.cssText = 'margin:0;color:#666;font-size:.875rem;'
       aviso.textContent = 'Não consegui ler os dados do processo agora (o SEI pode estar lento ou fora do ar). Clique de novo no número do processo para tentar outra vez.'
       caixa.append(aviso)
     } else {
