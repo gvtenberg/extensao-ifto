@@ -7,6 +7,7 @@
     "test": "node --test \"testes/**/*.test.js\"",
     "conferir": "web-ext lint --self-hosted --ignore-files \"testes/**\" \"docs/**\" \"ferramentas-de-teste/**\" \".github/**\" \"scripts/**\" package.json package-lock.json CLAUDE.md TESTES-PENDENTES.md",
     "rodar": "web-ext run --ignore-files \"testes/**\" \"docs/**\" \"ferramentas-de-teste/**\"",
+    "rodar-sei": "web-ext run --firefox-profile ferramentas-de-teste/perfil-firefox-teste --profile-create-if-missing --keep-profile-changes --start-url https://sei.ifto.edu.br/sei/ --ignore-files \"testes/**\" \"docs/**\" \"ferramentas-de-teste/**\" --watch-ignored \"ferramentas-de-teste/**\" \"docs/**\" \"testes/**\" \".git/**\"",
     "empacotar-chrome": "node scripts/empacotar-chrome.js",
     "empacotar": "web-ext build --overwrite-dest --ignore-files \"testes/**\" \"docs/**\" \"ferramentas-de-teste/**\" \".github/**\" \"scripts/**\" package.json package-lock.json CLAUDE.md TESTES-PENDENTES.md"
   },
