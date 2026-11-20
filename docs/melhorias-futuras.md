@@ -65,6 +65,9 @@ One line per idea. When an idea is planned, it gets a spec in `docs/specs/` and 
 
 - **Campus TVs** (19/11/2026, user; separate web page, not the extension): TVs in busy places show the campus panel content (actions, open calls, grants, events, urgent notices) from the same public sheet. Each TV opens a full-screen page with its location (e.g. `?local=refeitorio`); each item has audiences (professores, ensino médio, ensino superior, servidores, público externo) and each location its own (sala dos professores, refeitório, biblioteca, blocks of ensino médio = minors, only items marked for them). Free hosting (Google, like the main system). Later: "Hoje neste bloco" from the room booking, timetable, calendar and room allocation systems, if they export data (which systems: to ask). Campus still deciding.
 
+- **Gmail drafts for companies and sectors** (19/11/2026): one click opens a Gmail draft (link only, no login or permission; the user checks and sends): standard e-mails to suppliers (send documents, SICAF certificate expired, empenho issued; address from the SICAF data), sector e-mail templates kept in a sheet, and the monthly SEI report to the boss or Communication. Off by default; choose the right Google account.
+- **Google Calendar from the SEI** (19/11/2026): one click opens a new Calendar event (link only; the user saves): process deadlines (Controle de Prazos), end of contracts and commitments, call deadlines, with reminders; and "meeting about this process" with the link and the people of the involved units.
+
 Marks: **[spec]** already has a spec.
 
 ### Suggested order (to confirm with the user)
