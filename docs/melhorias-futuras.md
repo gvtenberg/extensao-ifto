@@ -63,6 +63,8 @@ One line per idea. When an idea is planned, it gets a spec in `docs/specs/` and 
 - **Sector numbers for the month** (19/11/2026): processes in and out, time they stayed, the oldest ones; read from the SEI, shown only to the user.
 - **Waiting for my signature** (19/11/2026): reminder in the icon window for documents waiting for the user's signature for days.
 
+- **Campus TVs** (19/11/2026, user; separate web page, not the extension): TVs in busy places show the campus panel content (actions, open calls, grants, events, urgent notices) from the same public sheet. Each TV opens a full-screen page with its location (e.g. `?local=refeitorio`); each item has audiences (professores, ensino médio, ensino superior, servidores, público externo) and each location its own (sala dos professores, refeitório, biblioteca, blocks of ensino médio = minors, only items marked for them). Free hosting (Google, like the main system). Later: "Hoje neste bloco" from the room booking, timetable, calendar and room allocation systems, if they export data (which systems: to ask). Campus still deciding.
+
 Marks: **[spec]** already has a spec.
 
 ### Suggested order (to confirm with the user)
