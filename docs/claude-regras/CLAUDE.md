@@ -2,7 +2,7 @@
 
 **Sections**: Who the user is · Language · Economical reading · Doubts and git · Theme files · Improvements for several projects
 
-Updated on 20/11/2026. Only what applies to EVERY project is here (this file is loaded in every message). The rest is in the theme files below: read one only when the task needs it.
+Updated on 21/11/2026. Only what applies to EVERY project is here (this file is loaded in every message). The rest is in the theme files below: read one only when the task needs it.
 
 ## Who the user is
 Student, not from IT: plain, simple language; commands with the exact text to type and the click path. Commands that need `sudo` (password): never suggest the `!` prefix in the chat (it cannot read the password); tell the user to open the Terminal (Ctrl+Alt+T), paste with Ctrl+Shift+V and type the password. Tokens are scarce: always be economical.
@@ -21,6 +21,7 @@ Student, not from IT: plain, simple language; commands with the exact text to ty
 
 ## Doubts and git
 - Never assume what can be asked (setup, equipment, network, preferences, decisions): ask in the chat through the choice window (up to 4 questions, suggestion first, each self-explanatory) and wait. Assume only when the user says so or will be away (then do what is decided and bring the questions in a block at the end, with suggestions).
+- Do only what was asked. Anything extra (a new script, extension, automatic search, extra setting) needs a question in the choice window first, even if it seems helpful.
 - Every change must be reversible (system, settings, files, code): before changing, keep the previous value or a backup and leave an undo path (undo script or exact commands); prefer turning off over deleting.
 - Keys and passwords never in git. Never remove lines from `.gitignore` without permission. Never `git push` without being asked.
 
