@@ -56,6 +56,9 @@
     return janela
   }
 
+  // Fecha todos os avisos desta página.
+  const fecharAvisos = () => { if (janela) janela.hospedeiro.remove() }
+
   // Arrastar pela barra de cima, sem deixar a janela sair da tela.
   function arrastar (topo, caixa, fechar) {
     topo.addEventListener('pointerdown', evento => {
@@ -138,5 +141,5 @@
   const quandoRemontar = preparar => aoRemontar.push(preparar)
   const editorRemontado = () => Promise.all(aoRemontar.map(preparar => Promise.resolve().then(preparar).catch(() => {})))
 
-  raiz.ExtensaoIFTO = Object.assign(raiz.ExtensaoIFTO || {}, { caixaEditor: { criarCaixa, pedirAoFundo, criar, unidadeAberta, quandoRemontar, editorRemontado } })
+  raiz.ExtensaoIFTO = Object.assign(raiz.ExtensaoIFTO || {}, { caixaEditor: { criarCaixa, fecharAvisos, pedirAoFundo, criar, unidadeAberta, quandoRemontar, editorRemontado } })
 })(globalThis)

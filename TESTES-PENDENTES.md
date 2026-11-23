@@ -549,3 +549,8 @@ E: O documento entra na lista e a atribuição no SEI não muda.
 ### T243 – Desligar a lista para a direção (v0.35.0)
 F: Em Configurações > Direção-geral, desmarque "Usar a lista para a direção" e recarregue o SEI; marque de novo. Troque também para outra unidade.
 E: Desligada ou em outra unidade, o botão e as opções do menu somem; ligada de novo, a lista continua guardada.
+
+## Avisos da página do documento
+### T244 – Avisos fecham ao abrir o editor (v0.35.1)
+F: Na árvore, abra um documento não assinado que mostre "Avisos da extensão" e abra o editor pelo botão do aviso; repita com "Editar Conteúdo" do SEI.
+E: Nos dois casos, os avisos da página do documento fecham e ficam só os do editor.

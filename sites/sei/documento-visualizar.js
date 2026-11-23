@@ -28,9 +28,18 @@
   if (regras.estaAssinado(html)) return
   const secoes = [{ nome: 'pagina', html }]
   // Botão "Editar Conteúdo" da barra do SEI, no quadro de cima (mesmo site).
+  let editar = null
+  try { editar = window.parent.document.querySelector('a[onclick*="editarConteudo"]') } catch (erro) {}
+  // Ao abrir o editor (pelo aviso ou pelo botão do SEI), os avisos daqui fecham: o editor mostra os dele, e duas
+  // janelas confundiam. Abrir o documento de novo na árvore confere outra vez.
+  let editorAberto = false
+  if (editar) {
+    const aoAbrirEditor = () => { editorAberto = true; caixaEditor.fecharAvisos() }
+    editar.addEventListener('click', aoAbrirEditor)
+    // A barra do SEI continua na tela quando o quadro do documento recarrega.
+    window.addEventListener('pagehide', () => editar.removeEventListener('click', aoAbrirEditor), { once: true })
+  }
   function botaoDoEditor (caixa) {
-    let editar = null
-    try { editar = window.parent.document.querySelector('a[onclick*="editarConteudo"]') } catch (erro) {}
     if (editar) caixa.botao.addEventListener('click', () => editar.click())
     else caixa.botao.replaceWith(caixaEditor.criar('p', { className: 'aviso', textContent: 'Clique em "Editar Conteúdo" na barra do SEI para corrigir.' }))
   }
@@ -58,6 +67,8 @@
   const unidade = regras.acharUnidade(configuracoes.unidades, sigla)
   const timbre = configuracoes.conferirTimbre ? regras.conferirTimbre(secoes, unidade, sigla) : null
   const rodape = configuracoes.conferirRodape ? regras.conferirRodape(secoes, unidade) : null
+  // O editor pode ter sido aberto enquanto a extensão lia a unidade.
+  if (editorAberto) return
   const avisos = [...(timbre && !timbre.certo ? regras.avisosDoTimbre(timbre) : []), ...(rodape && !rodape.certo ? rodape.avisos : [])]
   if (!avisos.length) return
   const partes = [timbre && !timbre.certo && 'o timbre', rodape && !rodape.certo && 'o rodapé'].filter(Boolean).join(' e ')
