@@ -658,14 +658,14 @@ async function conferirNoEditor (remetente, recado) {
 }
 
 // v0.23.0 (spec data-documento): data do Ofício e da Portaria. v0.26.9 (spec conferir-documento, etapa 8):
-// confere a data de todo documento (mês ou ano errado, dia que não chegou, fora do padrão; no Ofício e na
-// Portaria também um dia que já passou). Com "trocar", corrige só essa data e confere de novo. Nunca salva.
+// confere a data de todo documento (mês ou ano errado, dia que não chegou ou, v0.34.2, que já passou,
+// fora do padrão). Com "trocar", corrige só essa data e confere de novo. Nunca salva.
 // Devolve { ok, erro, conferido, nova }.
 async function dataNoEditor (remetente, trocar, titulo) {
   const regras = globalThis.ExtensaoIFTO.dataDocumento
   const rodar = rodarNoEditor(remetente)
   const hoje = new Date()
-  const conferir = secoes => regras.conferirData(secoes, hoje, { passouConta: regras.ehOficioOuPortaria(titulo || '') })
+  const conferir = secoes => regras.conferirData(secoes, hoje)
   const lido = await rodar(globalThis.ExtensaoIFTO.editorLer)
   if (!lido.ok) return { ok: false, erro: lido.erro }
   const conferido = conferir(lido.secoes)

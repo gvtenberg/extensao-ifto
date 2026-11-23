@@ -2,6 +2,7 @@
 
 One or two lines per version, with the date (dd/mm/yyyy). Number 0.STAGE.FIX.
 
+- v0.34.2 (23/11/2026): spacing: 1.5 lines after the timbre, 1 line after the number, own block turned off while measuring, old block replaced when the size differs; date: a past day is wrong in every unsigned document (Notificação 3394735); signing window says "possíveis divergências"; signed documents never checked; "Reitoria" in the timbre accepted. T227 to T231.
 - v0.34.1 (19/11/2026): process screen: Tipo, Especificação and Interessados in the same size as "Processo aberto somente na unidade…" (the SEI style made the paragraphs smaller). T226.
 - v0.34.0 (19/11/2026): "Blocos Internos" button in the Controle de Processos button bar, after "Controle de Prazos" (same link as menu Blocos > Internos, icon `icones/bloco-interno.svg`; setting `botaoBlocosInternos`, on by default). T225.
 - v0.33.0 (19/11/2026): process screen shows Tipo, Especificação and Interessados (read-only from "Consultar/Alterar Processo", setting `dadosDoProcesso`); new process gets "Público"; Capa de Processo checked ("Processo:" without "nº", Data de Autuação, Tipo, Especificação, Interessados, "Corrigir a capa"); timbre: words in lowercase and extra blank lines; spacing measured as in the saved document (separators the SEI does not save are ignored), documents with the old spacing are redone. T217–T224.

@@ -10,6 +10,16 @@
   // Distâncias em "tamanho da letra": menos de meia linha é grudado; o espaço novo deixa uma linha inteira.
   const LIMITE = 0.5
   const LINHA = 1
+  // v0.34.2 (Notificação 3394735): depois do timbre, uma linha e meia; depois do número do documento, uma linha
+  // inteira mesmo quando já havia meia. Nesses dois lugares a distância menor que a desejada já recebe o espaço.
+  const LINHA_DO_TIMBRE = 1.5
+  const ehDoTimbre = bloco => (bloco.classes || []).some(classe => /^IFTO_Cabe(ç|&ccedil;)alho/i.test(classe))
+  const ehIdentificador = bloco => /^Identificador/i.test(bloco.secao || '')
+  function espacoDesejado (ultimo, bloco) {
+    if (ultimo.raiz !== bloco.raiz && ehDoTimbre(ultimo)) return { limite: LINHA_DO_TIMBRE, linha: LINHA_DO_TIMBRE }
+    if (ultimo.raiz !== bloco.raiz && ehIdentificador(ultimo)) return { limite: LINHA, linha: LINHA }
+    return { limite: LIMITE, linha: LINHA }
+  }
 
   const doNode = typeof module !== 'undefined' && module.exports
   const regrasData = () => doNode ? require('./data-documento.js') : raiz.ExtensaoIFTO.dataDocumento
@@ -80,10 +90,9 @@
     const porSecao = new Map()
     for (const bloco of blocos) porSecao.set(bloco.raiz, [...(porSecao.get(bloco.raiz) || []), bloco])
     // Também a seção só de linhas em branco logo depois do timbre (Capa de Processo, 19/11/2026: o SEI não a salva).
-    const ehTimbre = bloco => (bloco.classes || []).some(classe => /^IFTO_Cabe(ç|&ccedil;)alho/i.test(classe))
     const secoes = [...porSecao]
     const fantasmas = new Set(secoes.filter(([, lista], i) => lista.every(bloco => bloco.vazio && bloco.semNada) ||
-      (i > 0 && lista.every(bloco => bloco.vazio) && secoes[i - 1][1].some(ehTimbre))).map(([raiz]) => raiz))
+      (i > 0 && lista.every(bloco => bloco.vazio) && secoes[i - 1][1].some(ehDoTimbre))).map(([raiz]) => raiz))
     return blocos.filter(bloco => !fantasmas.has(bloco.raiz))
   }
 
@@ -115,8 +124,9 @@
       }
       const margemDeCima = sequencia[sequencia.length - 2].margemBaixo || 0
       const distancia = resto + Math.max(margemDeCima, bloco.margemTopo || 0)
-      if (distancia >= LIMITE * fonte) continue
-      const margem = Math.ceil((LINHA * fonte - resto) / (Number(bloco.fonteDoBloco) || fonte) * 100) / 100
+      const { limite, linha } = espacoDesejado(ultimo, bloco)
+      if (distancia >= limite * fonte) continue
+      const margem = Math.ceil((linha * fonte - resto) / (Number(bloco.fonteDoBloco) || fonte) * 100) / 100
       candidatas.push({ indice: i, margem, secao: bloco.secao, posicao: bloco.posicao, antes: ultimo.textoFim || '', depois: bloco.texto || '' })
     }
 
@@ -154,7 +164,18 @@
     const css = (String(texto || '').match(/extensao-ifto: espacamento \*\/([\s\S]*?)(?:<\/style>|$)/) || [])[1] || ''
     return [...css.matchAll(/([^{}]+)\{margin-top/g)].map(([, seletor]) => seletor.trim()).filter(seletor => !seletor.startsWith('.ck-editor')).sort()
   }
-  const mesmoEspacamento = (textoAtual, plano) => seletoresDoBloco(textoAtual).join('|') === seletoresDoBloco(plano.bloco).join('|')
+  // v0.34.2: também o tamanho do espaço (antes, um espaço menor ficava para sempre); diferença de até 0,1 é só
+  // arredondamento da medida.
+  function margensDoBloco (texto) {
+    const css = (String(texto || '').match(/extensao-ifto: espacamento \*\/([\s\S]*?)(?:<\/style>|$)/) || [])[1] || ''
+    return new Map([...css.matchAll(/([^{}]+)\{margin-top:\s*(-?[\d.]+)em/g)].map(([, seletor, margem]) => [seletor.trim(), Number(margem)]))
+  }
+  function mesmoEspacamento (textoAtual, plano) {
+    const seletores = seletoresDoBloco(textoAtual)
+    if (seletores.join('|') !== seletoresDoBloco(plano.bloco).join('|')) return false
+    const [atuais, novas] = [margensDoBloco(textoAtual), margensDoBloco(plano.bloco)]
+    return seletores.every(seletor => Math.abs(atuais.get(seletor) - novas.get(seletor)) <= 0.1)
+  }
 
   const api = { seletoresDoBloco, mesmoEspacamento, semFantasmas, MARCA, LIMITE, LINHA, temEspacamento, tirarEspacamento, escapar, seletorDe, acertos, planejarEspacamento }
   if (doNode) module.exports = api

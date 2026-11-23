@@ -171,7 +171,7 @@
     }
     if (!errados.length) return
     const linhas = errados.map(e => `${e.rotulo}: ${e.problemas.join(' ')}`)
-    const resposta = await janelaAssinar.perguntar(errados.length === 1 ? 'Este documento da lista tem erro:' : 'Estes documentos da lista têm erros:', linhas, 'Não, corrigir antes')
+    const resposta = await janelaAssinar.perguntar(errados.length === 1 ? 'Este documento da lista tem possíveis divergências. Assinar mesmo assim?' : 'Estes documentos da lista têm possíveis divergências. Assinar mesmo assim?', linhas, 'Não, corrigir antes')
     if (resposta !== 'assinar') return
     const navegador = globalThis.browser || globalThis.chrome
     const { assinarAceitos } = await navegador.storage.local.get('assinarAceitos')
@@ -442,7 +442,7 @@
     if (evento.data.extensaoIfto === 'assinar-recusado' && estado && estado.pendente) {
       delete estado.pendente
       gravarEstado()
-      aviso = 'Este documento não foi assinado: o número do processo está errado. Corrija no editor e clique em "Assinar e próximo" de novo, ou clique em "Próximo".'
+      aviso = 'Este documento não foi assinado: ele tem possíveis divergências. Confira no editor e clique em "Assinar e próximo" de novo, ou clique em "Próximo".'
       desenhar()
       return
     }

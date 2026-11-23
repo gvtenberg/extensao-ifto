@@ -85,6 +85,16 @@
   }
   const jaTem = editor => secoes(editor).some(secao => regras().temEspacamento(editor.getData({ rootName: secao.nome })))
 
+  function medirSecoes (editor, blocos, outras) {
+    secoes(editor).forEach((secao, indice) => {
+      const nome = secao.dom.getAttribute('aria-label') || secao.nome
+      ;[...secao.dom.children].forEach((filho, i) => blocos.push(medirBloco(filho, indice, nome, i + 1)))
+      for (const caixa of secao.dom.querySelectorAll('div, td, th, li, blockquote, figure')) {
+        if (caixa.children.length > 1) outras.push([...caixa.children].map(descritor))
+      }
+    })
+  }
+
   async function medir () {
     try {
       const editor = await ajuda().acharEditor()
@@ -93,13 +103,15 @@
       await esperar(800)
       const blocos = []
       const outras = []
-      secoes(editor).forEach((secao, indice) => {
-        const nome = secao.dom.getAttribute('aria-label') || secao.nome
-        ;[...secao.dom.children].forEach((filho, i) => blocos.push(medirBloco(filho, indice, nome, i + 1)))
-        for (const caixa of secao.dom.querySelectorAll('div, td, th, li, blockquote, figure')) {
-          if (caixa.children.length > 1) outras.push([...caixa.children].map(descritor))
-        }
-      })
+      // v0.34.2: mede sem o espaço que a extensão já pôs (o bloco fica desligado só durante a medida); senão as
+      // partes já afastadas sairiam do bloco novo.
+      const proprios = [...document.querySelectorAll('style')].filter(no => no.sheet && regras().temEspacamento(no.textContent))
+      proprios.forEach(no => { no.sheet.disabled = true })
+      try {
+        medirSecoes(editor, blocos, outras)
+      } finally {
+        proprios.forEach(no => { if (no.sheet) no.sheet.disabled = false })
+      }
       // v0.33.0: o documento que já tem o bloco é medido de novo (o bloco antigo pode ter faltado lacunas).
       const atual = secoes(editor).map(secao => editor.getData({ rootName: secao.nome })).find(html => regras().temEspacamento(html)) || ''
       return { ok: true, jaTem: Boolean(atual), atual, documento: { blocos, outras } }

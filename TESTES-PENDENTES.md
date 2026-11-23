@@ -262,7 +262,7 @@ E: Aparece uma janela só com a lista dos documentos errados (número e os dois 
 
 ### T141 – Corrigir timbre no editor (v0.26.5)
 F: Abra no editor esse documento e clique em "Corrigir timbre"; confira e clique em Salvar.
-E: O brasão fica; as linhas ficam "Ministério da Educação … Campus Palmas" e as linhas do setor cadastradas, sem "Reitoria"; Ctrl+Z desfaz antes de salvar.
+E: O brasão fica; as linhas ficam "Ministério da Educação … Campus Palmas" e as linhas do setor cadastradas (a linha "Reitoria", se houver, fica); Ctrl+Z desfaz antes de salvar.
 
 ### T143 – Usar este timbre como padrão da unidade (v0.26.5)
 F: Num documento com o timbre certo do seu setor, mas com a unidade sem as linhas cadastradas (ou com outras), clique em "Usar este timbre como padrão da unidade" e confirme.
@@ -495,3 +495,18 @@ E: O ícone tem o mesmo tamanho e espaço dos outros e abre a página de Blocos 
 ### T226 – Mesmo tamanho de letra na tela do processo (v0.34.1)
 F: Clique no número de um processo no SEI.
 E: "Tipo do Processo", "Especificação" e "Interessados" têm o mesmo tamanho de letra de "Processo aberto somente na unidade…".
+### T227 – Espaço depois do timbre e do número (v0.34.2)
+F: Abra no editor a Notificação 3394735 (ou outro documento não assinado), confira a caixa do espaço, clique em Salvar, veja o documento e abra o editor de novo.
+E: Há uma linha e meia entre o timbre e o número e uma linha entre o número e "Assunto:"; os outros espaços continuam; na segunda vez a caixa do espaço não aparece.
+### T228 – Data que já passou em qualquer documento (v0.34.2)
+F: Abra no editor a Notificação 3394735, com "Palmas, 10 de novembro de 2026." no fim, e clique em "Corrigir para …".
+E: A caixa diz que a data já passou e o botão troca só essa data pela de hoje; as outras datas do texto não mudam.
+### T229 – Possíveis divergências antes de assinar (v0.34.2)
+F: Num documento ainda não assinado com a data de outro dia, clique em "Assinar Documento"; depois separe esse documento na lista de assinaturas.
+E: A janela diz "possíveis divergências" (sem a palavra "errado") e lista cada uma, por exemplo "Data: o texto diz 10 de novembro de 2026, mas hoje é…".
+### T230 – Documento já assinado não é conferido (v0.34.2)
+F: Na árvore, na lista de assinaturas e no Bloco de assinatura, vá assinar um documento que outra pessoa já assinou e que tem outra data ou outro número de processo.
+E: A janela "Assinar mesmo assim?" não aparece e nenhuma correção é sugerida.
+### T231 – Reitoria no timbre (v0.34.2)
+F: Abra no editor um documento não assinado com "Reitoria" entre "Instituto Federal…" e "Campus Palmas".
+E: A extensão não avisa sobre "Reitoria"; se houver outra divergência, "Corrigir timbre" mantém essa linha.

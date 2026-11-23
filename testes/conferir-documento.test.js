@@ -69,9 +69,9 @@ test('v0.26.2: documento assinado', () => {
 
 test('v0.26.3: pergunta antes de assinar com os dois números', () => {
   assert.equal(c.fraseDoProcesso({ processo: '23236.018761/2026-05', escrito: '23236.000001/2025-11' }),
-    'Número do processo errado: o documento está no processo 23236.018761/2026-05, mas o texto diz 23236.000001/2025-11.')
-  assert.equal(c.perguntaAntesDeAssinar(['a']), 'Este documento tem um erro. Assinar mesmo assim?')
-  assert.equal(c.perguntaAntesDeAssinar(['a', 'b']), 'Este documento tem erros. Assinar mesmo assim?')
+    'Número do processo: o documento está no processo 23236.018761/2026-05, mas o texto diz 23236.000001/2025-11.')
+  assert.equal(c.perguntaAntesDeAssinar(['a']), 'Este documento tem uma possível divergência. Assinar mesmo assim?')
+  assert.equal(c.perguntaAntesDeAssinar(['a', 'b']), 'Este documento tem possíveis divergências. Assinar mesmo assim?')
 })
 
 test('v0.26.9: antes de assinar, número do processo e data errada (não a data só fora do padrão)', () => {
@@ -80,13 +80,15 @@ test('v0.26.9: antes de assinar, número do processo e data errada (não a data 
   const doc = (processo, data) => `<p>Palmas, ${data}.</p><p>Processo nº: ${processo}</p><p>Texto</p>` + ref
   const tudo = { conferirProcesso: true, conferirData: true }
   assert.deepEqual(c.problemasParaAssinar(doc('23236.018761/2026-05', '18 de novembro de 2026'), tudo, hoje), [])
-  assert.deepEqual(c.problemasParaAssinar(doc('23236.018761/2026-05', '06 de novembro de 2026'), tudo, hoje), [])
+  assert.deepEqual(c.problemasParaAssinar(doc('23236.018761/2026-05', '18 de Novembro de 2026'), tudo, hoje), [])
   const dois = c.problemasParaAssinar(doc('23236.000001/2025-11', '18 de outubro de 2026'), tudo, hoje)
   assert.equal(dois.length, 2)
-  assert.match(dois[1], /^Data errada: o texto diz 18 de outubro de 2026/)
+  assert.match(dois[1], /^Data: o texto diz 18 de outubro de 2026/)
   assert.equal(c.problemasParaAssinar(doc('23236.000001/2025-11', '18 de outubro de 2026'), { conferirData: true }, hoje).length, 1)
   const assinado = doc('23236.018761/2026-05', '18 de outubro de 2026') + '<p>Documento assinado eletronicamente por Fulano</p>'
   assert.deepEqual(c.problemasParaAssinar(assinado, tudo, hoje), [])
+  // v0.34.2: documento já assinado também não tem o número do processo conferido.
+  assert.deepEqual(c.problemasParaAssinar(assinado.replace('Processo nº: 23236.018761/2026-05', 'Processo nº: 23236.000001/2025-11'), tudo, hoje), [])
 })
 
 test('v0.26.4: número SEI do documento e "Assinar mesmo assim" só no dia', () => {
@@ -115,13 +117,28 @@ test('v0.26.5: timbre certo, com espaço duro e caracteres invisíveis', () => {
 test('v0.26.5: timbre com "Reitoria" e sem as linhas do setor (D12)', () => {
   const r = c.conferirTimbre([{ nome: 'a', html: cab([...FIXO, 'Reitoria']) }], cgoc, cgoc.sigla)
   assert.equal(r.certo, false)
-  assert.deepEqual(c.avisosDoTimbre(r), ['Falta a linha "Campus Palmas".', 'Falta a linha "Diretoria de Administração e Planejamento".', 'Falta a linha "Coordenação de Gestão Orçamentária e Contratos".', 'A linha "Reitoria" não é desta unidade.'])
+  assert.deepEqual(c.avisosDoTimbre(r), ['Falta a linha "Campus Palmas".', 'Falta a linha "Diretoria de Administração e Planejamento".', 'Falta a linha "Coordenação de Gestão Orçamentária e Contratos".'])
   // unidade sem cadastro: só as fixas e "Reitoria" contam
   const sem = c.conferirTimbre([{ nome: 'a', html: cab([...FIXO, 'Campus Palmas', 'Gerência X']) }], null, 'X/PAL/REI/IFTO')
   assert.equal(sem.certo, true)
   // D14: Gabinete sem cadastro
   const gab = c.conferirTimbre([{ nome: 'a', html: cab([...FIXO, 'Campus Palmas']) }], null, 'PAL/REI/IFTO')
   assert.deepEqual(gab.faltam, ['Gabinete da Direção-Geral'])
+})
+
+test('v0.34.2: "Reitoria" no timbre não é divergência e fica no lugar ao corrigir', () => {
+  const certo = [...FIXO, 'Reitoria', 'Campus Palmas', ...cgoc.linhas]
+  assert.equal(c.conferirTimbre([{ nome: 'a', html: cab(certo) }], cgoc, cgoc.sigla).certo, true)
+  assert.equal(c.conferirTimbre([{ nome: 'a', html: cab(certo) }], null, 'X/PAL/REI/IFTO').certo, true)
+  // "Reitoria" digitada em "Minhas unidades": também vale o timbre sem ela.
+  const comReitoria = { ...cgoc, linhas: ['Reitoria', ...cgoc.linhas] }
+  assert.equal(c.conferirTimbre([{ nome: 'a', html: cab([...FIXO, 'Campus Palmas', ...cgoc.linhas]) }], comReitoria, cgoc.sigla).certo, true)
+  assert.equal(c.conferirTimbre([{ nome: 'a', html: cab(certo) }], comReitoria, cgoc.sigla).certo, true)
+  // Outra divergência: corrige só ela e mantém "Reitoria".
+  const r = c.conferirTimbre([{ nome: 'a', html: cab([...FIXO, 'Reitoria', 'Campus Palmas', 'Gerência X']) }], cgoc, cgoc.sigla)
+  assert.equal(r.certo, false)
+  assert.ok(!c.avisosDoTimbre(r).some(aviso => aviso.includes('Reitoria')))
+  assert.deepEqual(r.esperado.slice(2, 5), ['Instituto Federal de Educação, Ciência e Tecnologia do Tocantins', 'Reitoria', 'Campus Palmas'])
 })
 
 test('v0.26.5: corrigir o timbre mantém o brasão e a classe', () => {

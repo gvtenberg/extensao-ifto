@@ -90,9 +90,9 @@ test('separador que o SEI não salva não conta como espaço; linha em branco sa
   const corpo = bloco(7, 'Corpo', 'IFTO_Item_Nvl_1', 'Encaminhamos o processo')
   const documento = { blocos: [timbre, separador, numero, caixa, vazio, vocativo, linha, corpo], outras: [] }
   const plano = planejarEspacamento(documento)
-  assert.deepEqual(plano.lacunas.map(lacuna => lacuna.depois), ['DESPACHO Nº 67/2026/CGOC/GAC/DAP/PAL/REI/IFTO', 'Ao Senhor Diretor'])
-  assert.equal(plano.lacunas[0].margem, 1)
-  assert.ok(plano.css.includes('p.IFTO_Cabe\\0000e7alho_Novo+p.IFTO_padrao_Alin_Esquerda_sem_espa\\0000e7o{margin-top:1em'))
+  assert.deepEqual(plano.lacunas.map(lacuna => lacuna.depois), ['DESPACHO Nº 67/2026/CGOC/GAC/DAP/PAL/REI/IFTO', 'Processo nº: 1', 'Ao Senhor Diretor'])
+  assert.equal(plano.lacunas[0].margem, 1.5)
+  assert.ok(plano.css.includes('p.IFTO_Cabe\\0000e7alho_Novo+p.IFTO_padrao_Alin_Esquerda_sem_espa\\0000e7o{margin-top:1.5em'))
   assert.ok(plano.css.includes('div+p.IFTO_padrao_Alin_Esquerda_sem_espa\\0000e7o{margin-top:'))
   // Linha em branco salva, mas quase sem altura: o espaço vai mesmo assim.
   linha.altura = 3
@@ -108,7 +108,7 @@ test('Capa de Processo: espaço entre o timbre e "Processo:" (o separador depois
   corpo.margemTopo = 8
   const plano = planejarEspacamento({ blocos: [timbre, separador, corpo], outras: [] })
   assert.deepEqual(plano.lacunas.map(lacuna => lacuna.depois), ['Processo: 23236.023277/2026-90'])
-  assert.equal(plano.lacunas[0].margem, 1.32)
+  assert.equal(plano.lacunas[0].margem, 1.82)
 })
 
 test('bloco que o documento já tem: igual ao novo (só as regras do documento salvo contam) ou diferente', () => {
@@ -121,12 +121,16 @@ test('bloco que o documento já tem: igual ao novo (só as regras do documento s
 
 test('distância de meia linha ou mais não recebe espaço', () => {
   const documento = despacho()
-  documento.blocos[2].acima = 8
-  documento.blocos[1].abaixo = 0
   documento.blocos[2].abaixo = 6
   documento.blocos[3].acima = 2
   const plano = planejarEspacamento(documento)
-  assert.ok(!plano.lacunas.some(lacuna => lacuna.depois.startsWith('Palmas')))
+  assert.ok(!plano.lacunas.some(lacuna => lacuna.depois.startsWith('Processo')))
+  // v0.34.2: depois do número do documento, só uma linha inteira basta.
+  documento.blocos[1].abaixo = 0
+  documento.blocos[2].acima = 8
+  assert.ok(planejarEspacamento(documento).lacunas.some(lacuna => lacuna.depois.startsWith('Palmas')))
+  documento.blocos[2].acima = 16
+  assert.ok(!planejarEspacamento(documento).lacunas.some(lacuna => lacuna.depois.startsWith('Palmas')))
 })
 
 test('seletor do documento salvo: classes sem acento, sem aspas nem ">"', () => {
@@ -212,4 +216,25 @@ test('linha da data e o bloco de estilo não atrapalham a conferência da data',
   const plano = planejarEspacamento(despacho())
   const titulo = '<p>' + plano.bloco + 'PORTARIA Nº 12/2026/PAL/REI/IFTO, DE 18 DE NOVEMBRO DE 2026</p>'
   assert.equal(conferirData([{ nome: 'a', html: titulo }], new Date(2026, 10, 18)).certo, true)
+})
+
+// v0.34.2: Notificação 3394735.
+test('Notificação: uma linha e meia depois do timbre e uma linha inteira entre o número e "Assunto:"', () => {
+  posicoes = {}
+  const timbre = bloco(0, 'Cabeçalho', 'IFTO_Cabeçalho_Novo', 'Coordenação de Gestão Orçamentária e Contratos', { abaixo: -8.1 })
+  Object.assign(timbre, { margemBaixo: 14.4 })
+  const numero = bloco(1, 'Identificador', 'Texto_Centralizado_Maiusculas', 'notificação nº 4/2026/PORT/880/2022/PAL/REI/IFTO, de 23 de novembro de 2026', { acima: 0, abaixo: 0 })
+  const assunto = bloco(2, 'Corpo', 'Texto_Justificado', 'Assunto: Resposta', { acima: 0, abaixo: 0 })
+  Object.assign(assunto, { margemTopo: 8, margemBaixo: 8 })
+  const notificada = bloco(2, 'Corpo', 'Texto_Justificado', 'Notificada: X', { acima: 0, abaixo: 0 })
+  Object.assign(notificada, { margemTopo: 8, margemBaixo: 8 })
+  const plano = planejarEspacamento({ blocos: [timbre, numero, assunto, notificada], outras: [] })
+  assert.deepEqual(plano.lacunas.map(lacuna => [lacuna.seletor, lacuna.margem]), [
+    ['p.IFTO_Cabe\\0000e7alho_Novo+p.Texto_Centralizado_Maiusculas', 2.01],
+    ['p.Texto_Centralizado_Maiusculas+p.Texto_Justificado', 1]
+  ])
+  // Mesmas partes com o espaço menor: o bloco é trocado; diferença de arredondamento, não.
+  assert.equal(mesmoEspacamento(plano.bloco, plano), true)
+  assert.equal(mesmoEspacamento(plano.bloco.replace('2.01em', '1.52em'), plano), false)
+  assert.equal(mesmoEspacamento(plano.bloco.replace('2.01em', '2.05em'), plano), true)
 })

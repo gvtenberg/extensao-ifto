@@ -48,21 +48,26 @@ test('acha a data no alto, no fim do corpo e no título, nunca nas datas citadas
 
 test('data errada: mês, ano, dia que não chegou; Ofício e Portaria também dia que passou', () => {
   const linha = data => [p(`<p>Palmas, ${data}.</p>`)]
-  assert.equal(conferirData(linha('12 de novembro de 2026'), HOJE).certo, true)
+  // v0.34.2: dia que já passou é errado em todo tipo de documento (Notificação 3394735).
+  const passou = conferirData(linha('12 de novembro de 2026'), HOJE)
+  assert.equal(passou.errada, true)
+  assert.match(passou.problemas[0], /já passou/)
+  assert.equal(passou.nova, '18 de novembro de 2026')
+  assert.equal(conferirData(linha('18 de novembro de 2026'), HOJE).certo, true)
   const mes = conferirData(linha('12 de outubro de 2026'), HOJE)
   assert.equal(mes.errada, true)
   assert.equal(mes.problemas[0], 'O mês ou o ano está errado: o texto diz 12 de outubro de 2026, mas hoje é 18 de novembro de 2026.')
   assert.equal(mes.nova, '18 de novembro de 2026')
-  assert.equal(fraseAntesDeAssinar(mes), 'Data errada: o texto diz 12 de outubro de 2026, mas hoje é 18 de novembro de 2026.')
+  assert.equal(fraseAntesDeAssinar(mes), 'Data: o texto diz 12 de outubro de 2026, mas hoje é 18 de novembro de 2026.')
   assert.equal(conferirData(linha('18 de novembro de 2025'), HOJE).errada, true)
   assert.match(conferirData(linha('20 de novembro de 2026'), HOJE).problemas[0], /ainda não chegou/)
-  assert.equal(conferirData(linha('17 de novembro de 2026'), HOJE, { passouConta: true }).errada, true)
+  assert.equal(conferirData(linha('17 de novembro de 2026'), HOJE).errada, true)
   assert.equal(conferirData([p('<p>Sem data</p>')], HOJE), null)
 })
 
 test('data fora do padrão: zero, º, mês maiúsculo, ponto final', () => {
   const um = new Date(2026, 11, 1)
-  const zero = conferirData([p('<p>Palmas, 06 de novembro de 2026.</p>')], HOJE)
+  const zero = conferirData([p('<p>Palmas, 06 de novembro de 2026.</p>')], new Date(2026, 10, 6))
   assert.equal(zero.errada, false)
   assert.deepEqual(zero.problemas, ['Escreva o dia sem o zero na frente ("6 de", não "06 de").'])
   assert.equal(zero.nova, '6 de novembro de 2026')
@@ -81,7 +86,7 @@ test('corrige a data no HTML: hoje quando errada, padrão quando só fora do pad
   const conferido = conferirData([p(ateste)], HOJE)
   assert.equal(corrigirData(ateste, conferido), '<p class="IFTO_Alin_direita_sem_espaço" data-c="31">Palmas, 18&nbsp;de novembro de 2026.</p>')
   const zero = '<p>Palmas, <strong>06 de Novembro de 2026</strong>.</p>'
-  assert.equal(corrigirData(zero, conferirData([p(zero)], HOJE)), '<p>Palmas, <strong>6 de novembro de 2026</strong>.</p>')
+  assert.equal(corrigirData(zero, conferirData([p(zero)], new Date(2026, 10, 6))), '<p>Palmas, <strong>6 de novembro de 2026</strong>.</p>')
   const titulo = '<p>PORTARIA Nº 12/2026/PAL/REI/IFTO, DE 28 DE ABRIL DE 2026</p>'
   assert.equal(corrigirData(titulo, conferirData([p(titulo)], new Date(2026, 11, 1))), '<p>PORTARIA Nº 12/2026/PAL/REI/IFTO, DE 1º DE DEZEMBRO DE 2026</p>')
   assert.equal(corrigirData('<p>outro</p>', conferido), null)

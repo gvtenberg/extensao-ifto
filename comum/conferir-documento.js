@@ -129,21 +129,22 @@
   // v0.26.3 (D2): pergunta antes de assinar. v0.26.9 (etapa 8): recebe a lista de problemas do documento
   // (número do processo e data), mostrados como linhas na janela.
   function perguntaAntesDeAssinar (problemas) {
-    return (problemas.length === 1 ? 'Este documento tem um erro.' : 'Este documento tem erros.') + ' Assinar mesmo assim?'
+    return (problemas.length === 1 ? 'Este documento tem uma possível divergência.' : 'Este documento tem possíveis divergências.') + ' Assinar mesmo assim?'
   }
-  const fraseDoProcesso = conferido => `Número do processo errado: o documento está no processo ${conferido.processo}, mas o texto diz ${conferido.escrito}.`
+  const fraseDoProcesso = conferido => `Número do processo: o documento está no processo ${conferido.processo}, mas o texto diz ${conferido.escrito}.`
 
   // v0.26.9 (etapa 8): o que para a assinatura de um documento (frases; lista vazia = nada errado): número do
   // processo e data errada (mês ou ano, dia que não chegou). Data só fora do padrão não para; documento já
-  // assinado por alguém não tem a data conferida (pedido do usuário, 18/11/2026).
+  // assinado por alguém não tem nada conferido (v0.34.2, pedido do usuário; antes, só a data ficava de fora).
   const regrasDaData = () => typeof module !== 'undefined' && module.exports ? require('./data-documento.js') : (raiz.ExtensaoIFTO || {}).dataDocumento
   function problemasParaAssinar (html, opcoes = {}, hoje = new Date()) {
+    if (estaAssinado(html)) return []
     const secoes = [{ nome: 'pagina', html }]
     const problemas = []
     const processo = opcoes.conferirProcesso ? conferirProcesso(secoes) : null
     if (processo && !processo.certo) problemas.push(fraseDoProcesso(processo))
     const datas = regrasDaData()
-    const data = opcoes.conferirData && datas && !estaAssinado(html) ? datas.conferirData(secoes, hoje) : null
+    const data = opcoes.conferirData && datas ? datas.conferirData(secoes, hoje) : null
     if (data && data.errada) problemas.push(datas.fraseAntesDeAssinar(data))
     return problemas
   }
@@ -178,6 +179,19 @@
   // Seção (do editor) que tem o timbre ou o rodapé.
   function secaoCom (secoes, eh) {
     return (secoes || []).find(secao => paragrafos(secao.html).some(([, atributos]) => eh(classeDe(atributos)))) || null
+  }
+
+  // v0.34.2 (pedido do usuário): a linha "Reitoria" no timbre não é divergência (antes era, D12): fica onde a
+  // pessoa a pôs, depois da linha que já estava acima dela.
+  function comReitoria (esperado, linhas) {
+    const novo = esperado.filter(linha => !ehReitoria(linha))
+    linhas.forEach((linha, i) => {
+      if (!ehReitoria(linha)) return
+      const acima = linhas.slice(0, i).reverse().find(outra => novo.some(certa => mesmaLinha(certa, outra)))
+      const lugar = acima === undefined ? 0 : novo.length - [...novo].reverse().findIndex(certa => mesmaLinha(certa, acima))
+      novo.splice(lugar, 0, 'Reitoria')
+    })
+    return novo
   }
 
   // Linhas que o timbre deve ter: as fixas e as do setor da unidade. Unidade sem cadastro: as fixas e as
@@ -223,7 +237,7 @@
   function conferirTimbre (secoes, unidade, sigla) {
     const linhas = linhasDoTimbre(secoes)
     if (!linhas.length) return null
-    const esperado = timbreEsperado(linhas, unidade, sigla).map(comMaiusculas)
+    const esperado = comReitoria(timbreEsperado(linhas, unidade, sigla), linhas).map(comMaiusculas)
     const faltam = esperado.filter(linha => !linhas.some(outra => mesmaLinha(outra, linha)))
     const sobram = linhas.filter(linha => !esperado.some(outra => mesmaLinha(outra, linha)))
     const igual = linhas.length === esperado.length && linhas.every((linha, i) => mesmaLinha(linha, esperado[i]))

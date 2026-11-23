@@ -107,12 +107,12 @@
   const valor = data => data.ano * 10000 + data.mes * 100 + data.dia
 
   // Confere as datas (só em documento ainda não assinado; a comparação é com hoje). Errada: mês ou ano
-  // diferentes dos de hoje, ou um dia que ainda não chegou; com "passouConta" (Ofício e Portaria, v0.23.0),
-  // também qualquer dia que já passou. Fora do padrão: zero na frente do dia, "1" sem "º", "º" em outro dia
+  // diferentes dos de hoje, um dia que ainda não chegou ou que já passou (v0.34.2: em todo tipo de documento;
+  // antes, só no Ofício e na Portaria). Fora do padrão: zero na frente do dia, "1" sem "º", "º" em outro dia
   // e, na linha "Cidade, data", mês com letra maiúscula ou sem o ponto final.
   // Devolve null (sem data), a primeira data com problema { certo: false, errada, problemas, escrita, hoje,
   // nova, … } ou, se todas estão certas, a primeira { certo: true, … }.
-  function conferirData (secoes, hoje = new Date(), { passouConta = false } = {}) {
+  function conferirData (secoes, hoje = new Date()) {
     const datas = datasDoDocumento(secoes)
     if (!datas.length) return null
     const atual = dataDeHoje(hoje)
@@ -123,7 +123,7 @@
       let errada = true
       if (data.ano !== atual.ano || data.mes !== atual.mes) problemas.push(`O mês ou o ano está errado: o texto diz ${escrita}, mas hoje é ${hojeEscrito}.`)
       else if (valor(data) > valor(atual)) problemas.push(`A data ainda não chegou: o texto diz ${escrita}, mas hoje é ${hojeEscrito}.`)
-      else if (passouConta && valor(data) < valor(atual)) problemas.push(`A data já passou: o texto diz ${escrita}, mas hoje é ${hojeEscrito}.`)
+      else if (valor(data) < valor(atual)) problemas.push(`A data já passou: o texto diz ${escrita}, mas hoje é ${hojeEscrito}.`)
       else errada = false
       if (/^0/.test(data.diaEscrito)) problemas.push(`Escreva o dia sem o zero na frente ("${data.dia} de", não "${data.diaEscrito} de").`)
       if (data.dia === 1 && data.ordinal !== 'º') problemas.push('No primeiro dia do mês, escreva "1º de".')
@@ -138,7 +138,7 @@
   }
 
   // Frase curta para a janela antes de assinar (só quando a data está errada, não só fora do padrão).
-  const fraseAntesDeAssinar = conferido => `Data errada: o texto diz ${conferido.escrita}, mas hoje é ${conferido.hoje}.`
+  const fraseAntesDeAssinar = conferido => `Data: o texto diz ${conferido.escrita}, mas hoje é ${conferido.hoje}.`
 
   // Corrige a data conferida no HTML da seção: a de hoje (se estava errada) ou a mesma data no padrão; "DE"
   // e mês em maiúsculas continuam assim (títulos); na linha "Cidade, data" põe o ponto final que faltava.

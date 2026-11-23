@@ -72,7 +72,7 @@
     const errados = resultados.filter(r => r && r.problemas && r.problemas.length)
     if (errados.length) {
       const linhas = errados.map(r => `Documento ${r.numero || '?'}: ${r.problemas.join(' ')}`)
-      const titulo = errados.length === 1 ? 'Este documento do bloco tem erro. Assinar mesmo assim?' : 'Estes documentos do bloco têm erros. Assinar mesmo assim?'
+      const titulo = errados.length === 1 ? 'Este documento do bloco tem possíveis divergências. Assinar mesmo assim?' : 'Estes documentos do bloco têm possíveis divergências. Assinar mesmo assim?'
       if (await janelaAssinar.perguntar(titulo, linhas, 'Não, corrigir antes') !== 'assinar') return
     }
     liberado = true
