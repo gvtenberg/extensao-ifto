@@ -28,12 +28,13 @@
     .botao.pequeno { min-height: 32px; padding: 0 12px; }
     .campo { display: grid; gap: 2px; font-size: 13px; color: var(--texto-2); margin: 4px 0 8px; }
     .campo input, .campo textarea, .campo select { font: inherit; color: var(--texto); padding: 6px 8px; border: 1px solid var(--borda-forte); border-radius: 6px; width: 100%; background: var(--cartao); }
+    .linha-direcao { display: grid; grid-template-columns: 1fr 2fr; gap: 0 8px; }
     .campo textarea { min-height: 60px; resize: vertical; }
     #gravado { position: fixed; right: 16px; bottom: 16px; }
     @media (max-width: 720px) {
       .pagina { grid-template-columns: 1fr; }
       nav { position: static; display: flex; flex-wrap: wrap; }
-      .unidade .linha { grid-template-columns: 1fr; }
+      .unidade .linha, .linha-direcao { grid-template-columns: 1fr; }
     }
   </style>
 </head>
@@ -262,6 +263,28 @@
           <label class="opcao"><input type="radio" name="listaAssinaturas" value="automatica"><span>Automática (só na Direção-geral)</span></label>
           <label class="opcao"><input type="radio" name="listaAssinaturas" value="sempre"><span>Sempre ligada, em qualquer unidade</span></label>
           <label class="opcao"><input type="radio" name="listaAssinaturas" value="desligada"><span>Desligada</span></label>
+        </div>
+        <!-- v0.35.0: lista de documentos para a direção assinar (spec lista-para-direcao). -->
+        <div class="cartao" id="listaParaDirecao">
+          <h1>Lista para a direção</h1>
+          <p class="apoio">Para o gabinete: monte no SEI a lista dos documentos que a direção vai assinar e copie o texto para o WhatsApp. Na árvore do processo, clique no ícone do documento e escolha "Adicionar à lista da direção". Só na Direção-geral. A lista fica guardada só neste navegador.</p>
+          <label class="opcao"><input type="checkbox" id="listaDirecao"><span>Usar a lista para a direção</span></label>
+          <p class="apoio"><strong>Quem assina.</strong> Digite abaixo, ou, com um processo aberto no SEI, use "Escolher quem assina" no painel da lista.</p>
+          <div class="linha-direcao">
+            <label class="campo">Matrícula do diretor<input data-config="direcaoDiretorMatricula"></label>
+            <label class="campo">Nome do diretor (como aparece na assinatura)<input data-config="direcaoDiretorNome"></label>
+            <label class="campo">Matrícula do substituto<input data-config="direcaoSubstitutoMatricula"></label>
+            <label class="campo">Nome do substituto<input data-config="direcaoSubstitutoNome"></label>
+            <label class="campo">Substituto a partir de (vazio = já está substituindo)<input type="date" data-config="direcaoSubstitutoInicio"></label>
+            <label class="campo">Substituto até (o último dia conta; sem esta data, vale o diretor)<input type="date" data-config="direcaoSubstitutoFim"></label>
+            <label class="campo">Matrícula da chefia de gabinete<input data-config="direcaoChefeMatricula"></label>
+            <label class="campo">Nome da chefia de gabinete<input data-config="direcaoChefeNome"></label>
+          </div>
+          <label class="opcao"><input type="checkbox" id="direcaoAtribuir"><span>Atribuir o processo a quem está assinando
+            <span class="dica">Desligada no início. Ligada, a extensão muda a atribuição do processo no SEI assim que você adiciona um documento dele à lista; esse clique é a confirmação. Se o processo estiver com outra pessoa, ela pergunta antes. Só funciona para a chefia de gabinete registrada acima (quem substitui a chefia registra a própria matrícula no seu navegador); para as outras pessoas, a opção não faz nada. Para isso, a extensão lê a tela "Atribuir Processo" do SEI e guarda só quem estava com o processo, para poder devolver. Desligada, a lista funciona do mesmo jeito e você atribui pelo SEI.</span></span></label>
+          <label class="opcao"><input type="checkbox" id="direcaoApagar"><span>Apagar sozinha as listas enviadas antigas
+            <span class="dica">Desligada, as listas enviadas ficam guardadas. Se você usa as listas no relatório do mês, escolha um prazo que passe do dia 10 do mês seguinte.</span></span></label>
+          <label class="campo">Apagar depois de quantos dias<input type="number" min="1" step="1" data-config="direcaoApagarDias"></label>
         </div>
         <!-- v0.22.0: marca MINUTA dos editais (spec minuta-edital). -->
         <div class="cartao" id="minuta">

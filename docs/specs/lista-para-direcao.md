@@ -2,9 +2,9 @@
 
 **Sections**: 1. Goal · 2. Out of scope · 3. Decisions to confirm · 4. Decided rules · 5. What changes · 6. Stages · 7. Manual tests
 
-- **Status:** ready to code stages 1 to 4; stage 5 needs a saved SEI page (section 5)
+- **Status:** stages 1 to 4 done (v0.35.0), README and rules written; stage 5 still needs the check with a document received in a block (saved page, section 5)
 - **Requested on:** 23/11/2026 · **Deadline or priority:** the user decides
-- **Planned version:** next middle number when stage 1 starts
+- **Version:** 0.35.0
 
 ## 1. Goal (what for)
 
@@ -64,11 +64,11 @@ All answered in the chat on 23/11/2026:
 
 ## 6. Stages
 
-- [ ] Stage 1 – Pure rules and Node tests: signable, signers, list, repeated items, copied text, who is signing on a date.
-- [ ] Stage 2 – Menu items (one, ciência, several) and storage.
-- [ ] Stage 3 – Panel (comment, remove, copy, "Já enviei", sent lists) and settings (on/off, director, substitute, period, deletion of old lists).
-- [ ] Stage 4 – Automatic assignment, undo and failures (critical test: writes to the SEI).
-- [ ] Stage 5 – Check with block documents, README, rules to `docs/regras/`.
+- [x] Stage 1 – Pure rules and Node tests: signable, signers, list, repeated items, copied text, who is signing on a date.
+- [x] Stage 2 – Menu items (one, ciência, several) and storage.
+- [x] Stage 3 – Panel (comment, remove, copy, "Já enviei", sent lists) and settings (on/off, director, substitute, period, deletion of old lists).
+- [x] Stage 4 – Automatic assignment, undo and failures (critical test: writes to the SEI).
+- [ ] Stage 5 – README and rules to `docs/regras/` (done, v0.35.0); check with block documents (pending).
 
 ## 7. Manual tests
 

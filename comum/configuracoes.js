@@ -25,6 +25,22 @@
     senhaReconhecidaPeloNavegador: true,
     // v0.2.0: "automatica" (só na Direção-geral, PAL/REI/IFTO), "sempre" ou "desligada"
     listaAssinaturas: 'automatica',
+    // v0.35.0 (spec lista-para-direcao): lista de documentos para a direção assinar, só na PAL/REI/IFTO. Quem
+    // assina (diretor, ou o substituto até a data final) e a chefia de gabinete ficam só neste navegador.
+    listaDirecao: true,
+    direcaoDiretorMatricula: '',
+    direcaoDiretorNome: '',
+    direcaoSubstitutoMatricula: '',
+    direcaoSubstitutoNome: '',
+    direcaoSubstitutoInicio: '',
+    direcaoSubstitutoFim: '',
+    direcaoChefeMatricula: '',
+    direcaoChefeNome: '',
+    // D8 e D9: atribuir o processo a quem assina; desligada, e só funciona com a chefia registrada acima.
+    direcaoAtribuir: false,
+    // D7: apagar listas enviadas antigas; desligada, com o prazo em dias.
+    direcaoApagar: false,
+    direcaoApagarDias: '60',
     // v0.10.0: SICAF automático: "automatica" (notas sem SICAF, só na CGOC), "sempre" (botão "Incluir SICAF"
     // em qualquer unidade) ou "desligada". v0.18.0: o botão "Incluir Sicaf, Consulta e Anexo" (documentos em
     // branco) saiu; o botão das notas faz tudo. "sempre" = só "Incluir SICAF" (equipe de licitação).

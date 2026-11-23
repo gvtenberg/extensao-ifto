@@ -152,6 +152,18 @@
     })
   }
 
+  // v0.35.0: "Escolher quem assina", no SEI, grava com esta página aberta: acompanha, para não gravar o antigo por cima.
+  navegador.storage.onChanged.addListener((mudou, area) => {
+    const novas = area === 'local' && mudou.configuracoes && mudou.configuracoes.newValue
+    if (!novas) return
+    for (const campo of document.querySelectorAll('[data-config^="direcao"]')) {
+      const chave = campo.dataset.config
+      if (!(chave in novas) || novas[chave] === configuracoes[chave]) continue
+      configuracoes[chave] = novas[chave]
+      campo.value = novas[chave]
+    }
+  })
+
   // v0.31.1: configurações apagadas em outra aba (voltar ao padrão, apagar dados): recarrega esta, para ela não
   // gravar de novo as escolhas antigas que ainda tem na memória.
   navegador.storage.onChanged.addListener((mudou, area) => {
@@ -164,7 +176,7 @@
     location.reload()
   })
   document.getElementById('apagarDados').addEventListener('click', async () => {
-    if (!confirm('Apagar todos os dados da extensão neste navegador? Serão apagadas as configurações, as versões dos documentos salvas automaticamente (o que não foi salvo no SEI será perdido), o conteúdo copiado, a lista de assinaturas e o restante. Feche antes as janelas do editor do SEI. Não dá para desfazer.')) return
+    if (!confirm('Apagar todos os dados da extensão neste navegador? Serão apagadas as configurações, as versões dos documentos salvas automaticamente (o que não foi salvo no SEI será perdido), o conteúdo copiado, a lista de assinaturas, a lista para a direção, as listas enviadas e o restante. Feche antes as janelas do editor do SEI. Não dá para desfazer.')) return
     await navegador.storage.local.clear()
     if (navegador.storage.session) await navegador.storage.session.clear().catch(() => {})
     location.reload()

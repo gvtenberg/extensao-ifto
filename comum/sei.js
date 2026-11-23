@@ -88,6 +88,13 @@
     // v0.16.0: ícones de ação do documento (link "Consultar/Alterar Documento Externo").
     const padraoAcoes = /Nos\[(\d+)\]\.acoes\s*=\s*'((?:[^'\\]|\\.)*)'/g
     while ((achado = padraoAcoes.exec(texto))) if (nos[achado[1]]) nos[achado[1]].acoes = achado[2]
+    // v0.35.0: quem já assinou cada documento ("Assinado por:\nNome\nCargo\nUnidade"), linha por linha.
+    const assinaturas = {}
+    const padraoAssinatura = /new infraArvoreAcao\("ASSINATURA",\s*"[^"]*",\s*"(\d+)",((?:"(?:[^"\\]|\\.)*"|[^"\n])*?)\);/g
+    while ((achado = padraoAssinatura.exec(texto))) {
+      const textoDaDica = lerArgumentos(achado[2].replace(/\\r?\\n|\\n/g, '\u2028')).find(valor => /^\s*(Assinado|Autenticado)/.test(valor || '')) || ''
+      assinaturas[achado[1]] = textoDaDica.split('\u2028').map(linha => linha.trim()).filter(Boolean)
+    }
     const lista = Object.values(nos)
     const processo = lista.find(no => no.tipo === 'PROCESSO')
     const documentos = lista.filter(no => no.tipo === 'DOCUMENTO').map(no => ({
@@ -100,10 +107,22 @@
       link: no.src.replace(/&amp;/g, '&'),
       // v0.20.0: página do documento na árvore (com os botões dele, como "Editar Conteúdo"), para o Compras IFTO.
       linkArvore: no.linkArvore.replace(/&amp;/g, '&'),
+      // v0.35.0: lista para a direção: só documentos que esta unidade pode assinar (feitos nela ou recebidos em bloco).
+      podeAssinar: /title="Assinar Documento"/.test(no.acoes || ''),
+      assinaturas: assinaturas[no.id] || [],
       // v0.16.0: alterar o documento externo (preencher Sicaf e Anexo em branco).
       linkAlterar: ((/href="(controlador\.php\?acao=documento_alterar_recebido[^"]*)"/.exec(no.acoes || '') || [])[1] || '').replace(/&amp;/g, '&')
     }))
-    return { idProcesso: processo ? processo.id : null, numero: processo ? processo.rotulo : null, documentos }
+    const link = padrao => ((padrao.exec(texto) || [])[1] || '').replace(/&amp;/g, '&')
+    const acoesDoProcesso = (processo && processo.acoes) || ''
+    return {
+      idProcesso: processo ? processo.id : null,
+      numero: processo ? processo.rotulo : null,
+      documentos,
+      // v0.35.0: "Atribuir Processo" (só com o processo aberto na unidade) e "Abrir todas as Pastas".
+      linkAtribuir: ((/href="(controlador\.php\?acao=procedimento_atribuicao_cadastrar[^"]*)"/.exec(acoesDoProcesso) || [])[1] || '').replace(/&amp;/g, '&'),
+      linkAbrirPastas: link(/infraArvoreAcao\("ABRIR_PASTAS",\s*"[^"]*",\s*"[^"]*",\s*"([^"]*)"/)
+    }
   }
 
   // v0.9.2: opção de uma função nas configurações: "automatica" (só na unidade dela), "sempre" ou

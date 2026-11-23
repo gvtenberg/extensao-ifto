@@ -510,3 +510,42 @@ E: A janela "Assinar mesmo assim?" não aparece e nenhuma correção é sugerida
 ### T231 – Reitoria no timbre (v0.34.2)
 F: Abra no editor um documento não assinado com "Reitoria" entre "Instituto Federal…" e "Campus Palmas".
 E: A extensão não avisa sobre "Reitoria"; se houver outra divergência, "Corrigir timbre" mantém essa linha.
+
+## Lista para a direção (v0.35.0)
+> Entre no SEI pela unidade PAL/REI/IFTO.
+### T232 – Adicionar um documento à lista da direção (v0.35.0)
+F: Na árvore de um processo, clique no ícone de um documento da sua unidade e em "Adicionar à lista da direção". Abra também uma pasta fechada e faça o mesmo num documento dela.
+E: O painel "Lista para a direção" abre com os documentos, e o botão no alto mostra a quantidade. As outras opções do menu continuam copiando.
+### T233 – Adicionar só para ciência (v0.35.0)
+F: Clique no ícone de um documento que a sua unidade não pode assinar (por exemplo, um PDF).
+E: O menu mostra "Adicionar só para ciência" e, na lista, o comentário já vem com "ciência".
+### T234 – Adicionar vários (v0.35.0)
+F: No menu do ícone ou no painel, clique em "Adicionar vários", marque alguns documentos e clique em "Adicionar".
+E: Aparecem só os documentos que podem ser assinados, na ordem da árvore, também os das pastas fechadas; os marcados entram na lista.
+### T235 – Documento repetido ou já assinado (v0.35.0)
+F: Adicione um documento que já está na lista, um de uma lista já enviada e um já assinado por quem está assinando.
+E: O primeiro não entra de novo; os outros dois perguntam antes de entrar.
+### T236 – Copiar e abrir no painel da direção (v0.35.0)
+F: Escreva um comentário, mude a ordem com ▲ e ▼, clique em "Copiar para o WhatsApp" e cole o texto na "Lista de assinaturas".
+E: Uma linha por processo, com os documentos e o comentário; a Lista de assinaturas abre os mesmos itens, sem linha em vermelho.
+### T237 – Já enviei e listas enviadas (v0.35.0)
+F: Clique em "Já enviei, começar outra" e depois em "Listas enviadas" > "Copiar de novo".
+E: A lista fica vazia e a enviada aparece com data, hora e quantidade; o texto copiado é o mesmo.
+### T238 – Escolher quem assina (v0.35.0)
+F: Com um processo da unidade aberto, clique em "Escolher quem assina", escolha diretor, substituto (com a data final) e chefia e clique em "Gravar". Confira em Configurações > Direção-geral.
+E: O painel mostra "Assinando agora:" com o substituto e a data; as configurações mostram os mesmos nomes. Com a data final já passada, vale o diretor.
+### T239 – Atribuir o processo ao adicionar (v0.35.0) (Crítico)
+F: Com a chefia registrada como você, ligue "Atribuir o processo a quem está assinando" em Configurações > Direção-geral. Num processo de teste aberto na unidade, adicione um documento e depois abra o processo no SEI.
+E: O painel mostra "Atribuído a" e o nome, e o SEI mostra o processo atribuído para a mesma pessoa.
+### T240 – Processo que está com outra pessoa (v0.35.0)
+F: Atribua um processo de teste a outra pessoa pelo SEI e adicione um documento dele; responda Cancelar e depois clique em "Tentar de novo".
+E: A extensão pergunta antes; com Cancelar, o documento entra, aparece "Não atribuído" e o SEI não muda.
+### T241 – Devolver a atribuição (v0.35.0) (Crítico)
+F: Tire da lista o único documento de um processo que a extensão atribuiu e clique em "Voltar a atribuição para…" (ou "Retirar a atribuição").
+E: Nada muda antes do clique; depois dele, o SEI mostra o processo com a pessoa de antes (ou sem ninguém).
+### T242 – Atribuição só pela chefia de gabinete (v0.35.0)
+F: Com a opção ligada, registre outra pessoa como chefia de gabinete e adicione um documento à lista.
+E: O documento entra na lista e a atribuição no SEI não muda.
+### T243 – Desligar a lista para a direção (v0.35.0)
+F: Em Configurações > Direção-geral, desmarque "Usar a lista para a direção" e recarregue o SEI; marque de novo. Troque também para outra unidade.
+E: Desligada ou em outra unidade, o botão e as opções do menu somem; ligada de novo, a lista continua guardada.
