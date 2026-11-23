@@ -6,7 +6,7 @@
 
 Summary to resume work (on another machine or by another person) without reading everything. Update at the end of each stage or round.
 
-- **Planned (23/11/2026), not started:** `specs/lista-para-direcao.md` (list of documents for the director to sign): all decisions answered; needs from the user, before stage 4, the saved "Atribuir Processo" page and, for stage 5, a process with a document received in a block.
+- **Planned (23/11/2026), not started:** `specs/lista-para-direcao.md` (list of documents for the director to sign): all decisions answered; "Atribuir Processo" page received; still needs from the user, for stage 5, a process with a document received in a block.
 - **Done, waiting for tests (v0.34.0, 19/11/2026):** "Blocos Internos" button in the Controle de Processos bar (no spec; rule in `regras/sei.md`). Test T225.
 - **Done, waiting for tests (v0.33.0, 19/11/2026):** process data on the process screen, "Público" in new processes, Capa de Processo check, timbre lowercase/blank lines, spacing fixed for the saved document (no spec; rules in `regras/sei.md` and `regras/conferir-documento.md`). Tests T217–T224 (T220, T222 critical: change the document text).
 - **Done, waiting for tests (v0.32.0, 19/11/2026):** drop a file on a blank external document page to attach it (no spec, small feature; rule in `regras/sei.md`). Tests T213 (critical: writes to the SEI) to T215.

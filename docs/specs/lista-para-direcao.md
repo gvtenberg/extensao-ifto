@@ -2,7 +2,7 @@
 
 **Sections**: 1. Goal · 2. Out of scope · 3. Decisions to confirm · 4. Decided rules · 5. What changes · 6. Stages · 7. Manual tests
 
-- **Status:** ready to code stages 1 to 3; stages 4 and 5 need saved SEI pages (section 5)
+- **Status:** ready to code stages 1 to 4; stage 5 needs a saved SEI page (section 5)
 - **Requested on:** 23/11/2026 · **Deadline or priority:** the user decides
 - **Planned version:** next middle number when stage 1 starts
 
@@ -31,6 +31,9 @@ All answered in the chat on 23/11/2026:
 - [x] D10 – Removing an item: offer to return the assignment.
 - [x] D11 – Assignment failed: add the item anyway and warn.
 - [x] D12 – Substitute: end date required, start date optional (blank = from today).
+- [x] D13 – Recording director, substitute and chief: both ways, chosen from the SEI's assignment list or typed in the settings.
+- [x] D14 – The chief of staff is recorded too; whoever replaces the chief on leave sets their own extension as the chief.
+- [x] D15 – Process with someone who is not the chief nor the person signing: ask before assigning.
 
 ## 4. Decided rules
 
@@ -44,6 +47,10 @@ All answered in the chat on 23/11/2026:
 - **Storage:** only in the browser, in its own keys, never mixed with the director's `listaAssinaturas`. Deletion of old sent lists: switch off by default + term in days (D7).
 - **Who is signing (D12):** settings keep matrícula and name of director and substitute, and the substitute's period. Outside the period the director is used; the end date counts as the last day.
 - **Automatic assignment (D8, D9):** switch off by default; the settings text says it changes the assignment in the SEI at the click (the click is the confirmation, like "Assinar e próximo"; exception to the CLAUDE.md rule, user 23/11/2026). Already assigned to that person: nothing is sent. Several documents: one assignment per process.
+- **Recording people (D13):** panel button "Escolher quem assina" (with a process open) shows the names of the SEI's assignment list; or type matrícula and name in the settings. Keep only the chosen people, never the whole list (contractors' login is their CPF).
+- **Who may assign (D9, D14):** only when the logged-in matrícula (SEI top bar) is the recorded chief's. Anyone else: the option does nothing and the settings text says so.
+- **Process with someone else (D15):** "O processo está com <nome>. Atribuir mesmo assim?". With the chief, unassigned or already with the person signing: no question. Answer no: item added, "não atribuído".
+- **How the SEI assigns:** link `acao=procedimento_atribuicao_cadastrar` ("Atribuir Processo") in the process's tree actions, with `arvore=1`; read the page, form `frmAtividadeAtribuir`: `selAtribuicao` (value = SEI internal id, text "matrícula - nome", `null` = nobody, `selected` = who has it now), `hdnIdProtocolo`, button `sbmSalvar`. Find the person by the matrícula in the text (not the internal id); check `hdnIdProtocolo` is this process; after sending, read the page again and confirm who is selected before showing "atribuído". No link (process not open in the unit) or person not in the list: D11.
 - **Undo (D10):** the previous person is kept with the item; removing the process's last item shows "Voltar a atribuição para <nome>" (or remove the assignment if it had none). Never by itself.
 - **Failure or SEI down (D11):** time limit; item marked "não atribuído" in red, with "Tentar de novo"; copying warns about these items. The list works without assignment.
 
@@ -53,7 +60,7 @@ All answered in the chat on 23/11/2026:
 - **Data:** reads the tree; stage 4 writes only the process assignment.
 - **Screens:** menu items, panel, settings.
 - **Code:** new `comum/lista-direcao.js` (pure rules) and `sites/sei/lista-direcao*.js`; reuse `comum/lista-assinaturas.js`, `comum/sei.js`, `sites/sei/sei-pedidos.js`.
-- **Pages the user needs to save (`ferramentas-de-teste/paginas-sei/`):** the SEI "Atribuir Processo" screen (stage 4); a process with a document received in a block, before and after the director signs (confirms the sign button rule; stage 5).
+- **Saved pages (`ferramentas-de-teste/paginas-sei/`):** `SEI - Atribuir Processo.html` received 23/11/2026 (opened from Controle de Processos; the process screen uses the same action with `arvore=1`, to be confirmed in the stage 4 critical test). Still needed for stage 5: a process with a document received in a block, before and after the director signs.
 
 ## 6. Stages
 
