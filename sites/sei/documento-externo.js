@@ -16,7 +16,7 @@
   const opcoes = await configuracoes.lerConfiguracoes()
 
   if (interno) {
-    if (!opcoes.preencherDocumentoExterno) return
+    if (!opcoes.preencherDocumentoExterno || regras.ehDuplicado(window)) return
     const publico = document.getElementById('optPublico')
     const niveis = ['optPublico', 'optRestrito', 'optSigiloso'].map(id => document.getElementById(id)).filter(Boolean)
     if (!publico || publico.disabled || niveis.some(opcao => opcao.checked)) return
@@ -156,22 +156,7 @@
     if (feito.length) avisar(`Pelo nome do arquivo, a extensão escolheu ${feito.join(' e ')}: confira antes de salvar.`, 'feito', 'documento-externo-arquivo')
   }
 
-  // Aviso no alto do formulário. nivel: "feito" (verde), "dica" (amarelo) ou "erro" (vermelho).
   function avisar (texto, nivel = 'feito', marca = 'documento-externo') {
-    const destino = document.getElementById('frmDocumentoCadastro')
-    if (!destino) return
-    const cores = {
-      feito: ['#E8F5EC', '#1E5631', '#B7DCC3'],
-      dica: ['#FFF1D6', '#7A4B00', '#F0D49A'],
-      erro: ['#FDECEC', '#8A1C1C', '#F2B8B8']
-    }[nivel] || ['#E8F5EC', '#1E5631', '#B7DCC3']
-    const nota = document.createElement('div')
-    nota.dataset.extensaoIfto = marca
-    nota.append(regras.montarPartes(Array.isArray(texto) ? texto : [texto], document))
-    Object.assign(nota.style, {
-      margin: '6px 0', padding: '6px 10px', borderRadius: '4px', maxWidth: '90%',
-      background: cores[0], color: cores[1], border: '1px solid ' + cores[2], fontWeight: '600', width: 'fit-content'
-    })
-    destino.prepend(nota)
+    regras.avisarNoFormulario(document, texto, nivel, marca)
   }
 })()

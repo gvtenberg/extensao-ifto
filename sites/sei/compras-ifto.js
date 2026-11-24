@@ -73,20 +73,8 @@
   }
 
   // ---------- Página "Incluir Documento" do processo: tipos e formulário de cada tipo ----------
-  async function abrirIncluir (lida) {
-    if (!lida.linkIncluir) throw new Error('Não achei "Incluir Documento" na árvore do processo.')
-    const inicio = await seiPedidos.pedir(new URL(lida.linkIncluir.replace(/&amp;/g, '&'), location.href).href)
-    const escolherTipo = seiPedidos.lerHtml(inicio.html).getElementById('frmDocumentoEscolherTipo')
-    if (!escolherTipo) throw new Error('O SEI não abriu "Incluir Documento". Confira se a sessão do SEI ainda está aberta.')
-    return { inicio, escolherTipo, tipos: regras.lerTipos(inicio.html) }
-  }
-  // Formulário do documento do tipo escolhido (o SEI só devolve a tela; nada é criado aqui).
-  async function formularioDoTipo (incluir, idTipo) {
-    const pagina = await seiPedidos.enviar(incluir.escolherTipo, incluir.inicio.endereco, { hdnIdSerie: idTipo })
-    const formulario = seiPedidos.lerHtml(pagina.html).getElementById('frmDocumentoCadastro')
-    if (!formulario) throw new Error('O SEI não abriu o formulário desse tipo de documento.')
-    return { pagina, formulario }
-  }
+  // v0.36.0: em sei-pedidos.js, também para duplicar documento.
+  const { abrirIncluir, formularioDoTipo } = seiPedidos
   const hipotesesDe = formulario => [...formulario.querySelectorAll('select[name="selHipoteseLegal"] option')]
     .map(opcao => ({ valor: opcao.getAttribute('value'), texto: opcao.textContent.trim() }))
     .filter(opcao => opcao.valor && opcao.valor !== 'null' && opcao.texto)

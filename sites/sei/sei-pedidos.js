@@ -109,6 +109,21 @@
     if (!formularioDoExterno(emBranco)) throw new Error('O SEI não abriu o documento externo.')
     return emBranco
   }
+  // Página "Incluir Documento" do processo: tipos e formulário de cada tipo (saiu de compras-ifto.js na v0.36.0).
+  async function abrirIncluir (lida) {
+    if (!lida.linkIncluir) throw new Error('Não achei "Incluir Documento" na árvore do processo.')
+    const inicio = await pedir(new URL(lida.linkIncluir.replace(/&amp;/g, '&'), location.href).href)
+    const escolherTipo = lerHtml(inicio.html).getElementById('frmDocumentoEscolherTipo')
+    if (!escolherTipo) throw new Error('O SEI não abriu "Incluir Documento". Confira se a sessão do SEI ainda está aberta.')
+    return { inicio, escolherTipo, tipos: ExtensaoIFTO.comprasIfto.lerTipos(inicio.html) }
+  }
+  // Formulário do documento do tipo escolhido (o SEI só devolve a tela; nada é criado aqui).
+  async function formularioDoTipo (incluir, idTipo) {
+    const pagina = await enviar(incluir.escolherTipo, incluir.inicio.endereco, { hdnIdSerie: idTipo })
+    const formulario = lerHtml(pagina.html).getElementById('frmDocumentoCadastro')
+    if (!formulario) throw new Error('O SEI não abriu o formulário desse tipo de documento.')
+    return { pagina, formulario }
+  }
   // v0.27.1: nomes da lista "Tipo do Documento" do documento externo deste processo.
   async function tiposDoExterno (lida) {
     const lista = formularioDoExterno(await abrirExternoNovo(lida)).querySelector('#selSerie')
@@ -252,5 +267,5 @@
     aberta.trocarBotoes([{ texto: 'Fechar', tipo: 'principal', aoClicar: j => j.fechar() }])
   }
 
-  ExtensaoIFTO.seiPedidos = { pedir, baixar, baixarPdf, lerHtml, camposDoFormulario, enviar, incluirExternos, anexarAoExterno, tiposDoExterno, incluirNaJanela, arvoreAberta, recarregarArvore }
+  ExtensaoIFTO.seiPedidos = { pedir, baixar, baixarPdf, lerHtml, camposDoFormulario, enviar, incluirExternos, anexarAoExterno, tiposDoExterno, abrirIncluir, formularioDoTipo, incluirNaJanela, arvoreAberta, recarregarArvore }
 })()

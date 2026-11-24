@@ -582,3 +582,23 @@ E: A confirmação mostra o texto já mudado. Com "Agora não", nada é guardado
 ### T252 – Padrão separado para cada unidade (v0.35.3)
 F: Guarde o padrão em duas unidades (o segundo com a página de configurações aberta) e veja "Minhas unidades" nas configurações.
 E: Cada unidade tem os seus dados; guardar uma não muda nem apaga a outra.
+## Duplicar documento (v0.36.0)
+> Entre no SEI com a extensão na versão 0.36.0 e abra um processo de teste da sua unidade.
+### T253 – Duplicar documento e salvar (v0.36.0) (Crítico)
+F: Num processo de teste, clique no ícone de um Despacho assinado na árvore e em "Duplicar documento"; confira e clique em Salvar. Repita com um Despacho não assinado.
+E: O formulário abre à direita, com o mesmo tipo e o número do original em "Documento Modelo". Depois de Salvar, o documento novo fica selecionado na árvore, o editor abre com o mesmo texto, e o número e a assinatura do original não são copiados.
+### T254 – Dados copiados no documento duplicado (v0.36.0)
+F: Duplique um documento com Descrição, Interessados, Destinatários e Assuntos, e outro sem Interessados e sem Assuntos; salve o primeiro e abra "Consultar/Alterar Documento".
+E: Os dados são iguais aos do original, sem repetidos; no segundo, as listas ficam vazias. "Número" e "Nome na Árvore" não são copiados.
+### T255 – Nível de acesso no documento duplicado (v0.36.0)
+F: Duplique um documento Público e um Restrito e espere uns segundos no formulário (não precisa salvar).
+E: O nível é o do original; no Restrito, a Hipótese Legal também. Dá para mudar antes de salvar.
+### T256 – Duplicar documento de outra unidade (v0.36.0)
+F: Duplique um documento feito por outra unidade, num processo aberto na sua.
+E: O formulário abre com o tipo e o modelo. Se o cadastro não puder ser lido, aparece um aviso e o nível de acesso fica sem marcar. Se o tipo não estiver na lista de "Incluir Documento" da sua unidade, só aparece o aviso e nada é aberto.
+### T257 – Opção só onde deve aparecer e chave nas configurações (v0.36.0)
+F: Clique no ícone de um documento externo e no de um feito no SEI (na PAL/REI/IFTO, veja também as opções da lista da direção); depois desligue "Duplicar documento" nas configurações (Documentos do SEI) e abra o menu de outro documento.
+E: A opção não aparece no externo; no feito no SEI ela vem antes das opções da lista da direção, que continuam funcionando. Desligada, não aparece.
+### T258 – Incluir Documento comum continua igual (v0.36.0)
+F: Duplique um documento, não salve, e depois use o "Incluir Documento" do SEI com o mesmo tipo.
+E: O formulário vem como antes: sem modelo, com o nível Público marcado pela extensão (se essa opção estiver ligada).

@@ -84,6 +84,8 @@
     copiarAssinaturas: true,
     // v0.30.0: menu de cópia do ícone do documento na árvore: todo clique copia, fecha 1 s depois, Esc e clique fora fecham.
     menuCopiar: true,
+    // v0.36.0 (spec duplicar-documento, D9): "Duplicar documento" no menu do ícone do documento na árvore.
+    duplicarDocumento: true,
     // v0.34.0: botão "Blocos Internos" na barra do Controle de Processos, depois de "Controle de Prazos".
     botaoBlocosInternos: true,
     unidades: Object.freeze([])

@@ -110,6 +110,8 @@
       // v0.35.0: lista para a direção: só documentos que esta unidade pode assinar (feitos nela ou recebidos em bloco).
       podeAssinar: /title="Assinar Documento"/.test(no.acoes || ''),
       assinaturas: assinaturas[no.id] || [],
+      // v0.36.0: "Consultar/Alterar Documento" do documento feito no SEI (duplicar documento, só leitura).
+      linkCadastro: ((/href="(controlador\.php\?acao=documento_alterar&[^"]*)"/.exec(no.acoes || '') || [])[1] || '').replace(/&amp;/g, '&'),
       // v0.16.0: alterar o documento externo (preencher Sicaf e Anexo em branco).
       linkAlterar: ((/href="(controlador\.php\?acao=documento_alterar_recebido[^"]*)"/.exec(no.acoes || '') || [])[1] || '').replace(/&amp;/g, '&')
     }))

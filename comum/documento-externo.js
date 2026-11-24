@@ -177,6 +177,35 @@
     return fragmento
   }
 
+  // Aviso no alto do formulário. nivel: "feito" (verde), "dica" (amarelo) ou "erro" (vermelho). v0.36.0: saiu de
+  // sites/sei/documento-externo.js, para servir também a duplicar documento.
+  function avisarNoFormulario (documento, texto, nivel, marca) {
+    const destino = documento.getElementById('frmDocumentoCadastro')
+    if (!destino) return
+    const cores = {
+      feito: ['#E8F5EC', '#1E5631', '#B7DCC3'],
+      dica: ['#FFF1D6', '#7A4B00', '#F0D49A'],
+      erro: ['#FDECEC', '#8A1C1C', '#F2B8B8']
+    }[nivel] || ['#E8F5EC', '#1E5631', '#B7DCC3']
+    const nota = documento.createElement('div')
+    nota.dataset.extensaoIfto = marca
+    nota.append(montarPartes(Array.isArray(texto) ? texto : [texto], documento))
+    Object.assign(nota.style, {
+      margin: '6px 0', padding: '6px 10px', borderRadius: '4px', maxWidth: '90%',
+      background: cores[0], color: cores[1], border: '1px solid ' + cores[2], fontWeight: '600', width: 'fit-content'
+    })
+    destino.prepend(nota)
+  }
+
+  // v0.36.0: formulário aberto por "Duplicar documento" (sites/sei/duplicar-documento.js marca a página
+  // principal ao abrir e o formulário ao carregar): o nível de acesso é o do original.
+  function ehDuplicado (janela) {
+    try {
+      if (janela.document.documentElement.dataset.extensaoIftoDuplicado) return true
+      return janela.top.document.documentElement.dataset.extensaoIftoDuplicar === janela.location.href
+    } catch (erro) { return false }
+  }
+
   // v0.32.0: documento externo em branco aberto à direita (endereço do quadro com id_documento): só se a árvore
   // diz que ele não tem arquivo e tem o link "Alterar Documento Externo". null se não for o caso.
   function externoEmBranco (documentos, enderecoDaPagina) {
@@ -188,7 +217,7 @@
     return { id, sei, rotulo: doc.rotulo, linkAlterar: doc.linkAlterar }
   }
 
-  const api = { externoEmBranco, prepararArquivo, montarPartes, ehDocumentoExternoNovo, ehDocumentoInternoNovo, ehProcessoNovo, dataDeHoje, oQuePreencher, semAcento, LIMITE_SEI, DICA_PDF_ACIMA, corrigirNomeDoArquivo, tamanhoEmTexto, avisosDoArquivo, lerRegras, regrasEmTexto, tipoPeloNome }
+  const api = { externoEmBranco, prepararArquivo, montarPartes, avisarNoFormulario, ehDuplicado, ehDocumentoExternoNovo, ehDocumentoInternoNovo, ehProcessoNovo, dataDeHoje, oQuePreencher, semAcento, LIMITE_SEI, DICA_PDF_ACIMA, corrigirNomeDoArquivo, tamanhoEmTexto, avisosDoArquivo, lerRegras, regrasEmTexto, tipoPeloNome }
   if (typeof module !== 'undefined' && module.exports) module.exports = api
   else raiz.ExtensaoIFTO = Object.assign(raiz.ExtensaoIFTO || {}, { documentoExterno: api })
 })(globalThis)

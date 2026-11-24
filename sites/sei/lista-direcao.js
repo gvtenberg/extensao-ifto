@@ -4,7 +4,7 @@
 (async function () {
   if (!(await globalThis.ExtensaoIFTO.sei.ligadaNoSei())) return
   if (window.top !== window) return
-  const { listaDirecao: regras, listaDirecaoAtribuir: atribuicao, configuracoes, barra, janela, seiPedidos, sei } = globalThis.ExtensaoIFTO
+  const { listaDirecao: regras, listaDirecaoAtribuir: atribuicao, configuracoes, barra, janela, seiPedidos, menuDocumento } = globalThis.ExtensaoIFTO
   const navegador = globalThis.browser || globalThis.chrome
   const { criar } = janela
   const CHAVE = 'listaDirecao'
@@ -62,26 +62,6 @@
   const podeAtribuir = () => regras.podeAtribuir(opcoes, matricula, new Date())
   const quando = em => new Date(em).toLocaleString('pt-BR', { day: '2-digit', month: '2-digit', year: 'numeric', hour: '2-digit', minute: '2-digit' })
   const quantos = n => n === 1 ? '1 documento' : `${n} documentos`
-
-  // ---------- Árvore ----------
-  // Documentos de pastas fechadas não vêm com a árvore: lê a árvore com todas as pastas abertas (só leitura).
-  async function arvoreCompleta (lida) {
-    if (!lida.linkAbrirPastas) return lida
-    const { html } = await seiPedidos.pedir(lida.linkAbrirPastas)
-    const completa = sei.lerArvore(html)
-    if (completa.idProcesso !== lida.idProcesso) return lida
-    return { ...lida, documentos: completa.documentos }
-  }
-  async function acharDocumento (id) {
-    let lida = seiPedidos.arvoreAberta()
-    if (!lida) return null
-    let documento = lida.documentos.find(doc => doc.id === id)
-    if (!documento) {
-      lida = await arvoreCompleta(lida)
-      documento = lida.documentos.find(doc => doc.id === id)
-    }
-    return documento ? { lida, documento } : null
-  }
 
   // ---------- Adicionar ----------
   // perguntas: já assinado por quem assina agora (D2) e já enviado em outra lista.
@@ -206,68 +186,20 @@
     }
   }
 
-  // ---------- Menu do ícone do documento na árvore ----------
-  function opcaoDoMenu (texto, documentoDaArvore, menu, aoClicar) {
-    const opcao = documentoDaArvore.createElement('a')
-    opcao.href = '#'
-    opcao.className = 'list-group-item d-flex flex-row clipboard-icon-focus'
-    opcao.dataset.extensaoIfto = 'lista-direcao'
-    const marca = documentoDaArvore.createElement('span')
-    marca.textContent = 'IFTO'
-    marca.style.cssText = 'background:#1E5E33;color:#fff;font-size:9px;font-weight:700;padding:1px 3px;border-radius:3px;margin-right:4px;align-self:center'
-    const rotulo = documentoDaArvore.createElement('span')
-    rotulo.className = 'align-self-center'
-    rotulo.textContent = texto
-    opcao.append(marca, rotulo)
-    opcao.addEventListener('click', evento => {
-      evento.preventDefault()
-      const fechar = menu.querySelector('.serialtip-close')
-      if (fechar) fechar.click()
-      seguro(aoClicar)()
+  // ---------- Menu do ícone do documento na árvore (v0.36.0: menu-documento.js) ----------
+  function porNoMenu () {
+    menuDocumento.registrar({
+      nome: 'lista-direcao',
+      ligada,
+      opcoes: (lida, documento) => !regras.numeroDoDocumento(documento.rotulo)
+        ? []
+        : [
+            documento.podeAssinar
+              ? { texto: 'Adicionar à lista da direção', aoClicar: seguro(() => adicionarDocumentos(lida, [documento], false)) }
+              : { texto: 'Adicionar só para ciência', aoClicar: seguro(() => adicionarDocumentos(lida, [documento], true)) },
+            { texto: 'Adicionar vários deste processo', aoClicar: seguro(adicionarVarios) }
+          ]
     })
-    return opcao
-  }
-  async function porOpcoes (menu, documentoDaArvore) {
-    const grupo = menu.querySelector('.list-group[tipo="DOCUMENTO"]')
-    const achado = /anchorImg(\d+)$/.exec(menu.getAttribute('data-serialtip-target') || '')
-    if (!grupo || !achado || menu.dataset.extensaoIftoDirecao) return
-    menu.dataset.extensaoIftoDirecao = '1'
-    let encontrado = null
-    try { encontrado = await acharDocumento(achado[1]) } catch (erro) {}
-    // Não deu para ler agora (SEI lento): tenta de novo na próxima vez que o menu abrir.
-    if (!encontrado) { delete menu.dataset.extensaoIftoDirecao; return }
-    const { lida, documento } = encontrado
-    if (!regras.numeroDoDocumento(documento.rotulo)) return
-    const opcoesNovas = [
-      documento.podeAssinar
-        ? opcaoDoMenu('Adicionar à lista da direção', documentoDaArvore, menu, () => adicionarDocumentos(lida, [documento], false))
-        : opcaoDoMenu('Adicionar só para ciência', documentoDaArvore, menu, () => adicionarDocumentos(lida, [documento], true)),
-      opcaoDoMenu('Adicionar vários deste processo', documentoDaArvore, menu, adicionarVarios)
-    ]
-    const fechar = grupo.querySelector('.li-fechar')
-    for (const opcao of opcoesNovas) grupo.insertBefore(opcao, fechar)
-  }
-  function vigiarArvore () {
-    const quadro = document.getElementById('ifrArvore')
-    if (!quadro) return
-    const preparar = () => {
-      let arvore = null
-      try { arvore = quadro.contentDocument } catch (erro) {}
-      if (!arvore || !arvore.documentElement || arvore.documentElement.dataset.extensaoIftoDirecao) return
-      arvore.documentElement.dataset.extensaoIftoDirecao = '1'
-      // O menu só é montado quando a pessoa clica no ícone (também nos documentos de pastas abertas depois).
-      const aoChegar = evento => {
-        const icone = evento.target.closest && evento.target.closest('[data-serialtip]')
-        if (!icone || !ligada()) return
-        const alvo = icone.getAttribute('data-serialtip')
-        const menu = [...arvore.querySelectorAll('[data-serialtip-target]')].find(m => m.getAttribute('data-serialtip-target') === alvo)
-        if (menu) porOpcoes(menu, arvore)
-      }
-      arvore.addEventListener('mousedown', aoChegar, true)
-      arvore.addEventListener('click', aoChegar, true)
-    }
-    quadro.addEventListener('load', preparar)
-    preparar()
   }
 
   // ---------- Adicionar vários ----------
@@ -277,7 +209,7 @@
     const aberta = janela.abrir({ titulo: 'Adicionar vários', conteudo: [criar('p', { textContent: 'Lendo os documentos do processo…' })] })
     try {
       let falhou = false
-      try { lida = await arvoreCompleta(lida) } catch (erro) { falhou = true }
+      try { lida = await menuDocumento.arvoreCompleta(lida) } catch (erro) { falhou = true }
       await ler()
       const documentos = lida.documentos.filter(doc => doc.podeAssinar && regras.numeroDoDocumento(doc.rotulo))
       const pessoa = assinante()
@@ -542,5 +474,5 @@
     await alterar(() => { enviadas = regras.enviadasNoPrazo(enviadas, opcoes, new Date()) })
   }
   desenhar()
-  vigiarArvore()
+  porNoMenu()
 })()

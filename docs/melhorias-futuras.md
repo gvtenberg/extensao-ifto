@@ -6,6 +6,7 @@
 
 Summary to resume work (on another machine or by another person) without reading everything. Update at the end of each stage or round.
 
+- **Done, waiting for tests (v0.36.0, 24/11/2026):** "Duplicar documento" (`specs/feitas/duplicar-documento.md`, rules in `regras/sei.md`). Tests T253–T258 (T253 critical: saves a document in the SEI).
 - **Done, waiting for tests (v0.35.3, 24/11/2026):** spacing with a box between the parts, blank lines around the signer, saving the unit's timbre and footer (no spec; rules in `regras/conferir-documento.md`). Tests T249–T252.
 - **Done, waiting for tests (v0.35.2, 24/11/2026):** director-general title and Campus/Campi in italics (no spec; rules in `regras/conferir-documento.md`). Tests T245–T248.
 - **Done, waiting for tests (v0.35.0, 23/11/2026):** `specs/lista-para-direcao.md` stages 1 to 4, README and rules (`regras/lista-direcao.md`). Tests T232–T243 (T239, T241 critical: change the assignment in the SEI). Pending in stage 5: check with a document received in a block (needs the saved process page, before and after the director signs), then spec to `specs/feitas/`.
@@ -40,14 +41,12 @@ Summary to resume work (on another machine or by another person) without reading
 - **Pending, to plan (19/11/2026, user):** the "Salvo no SEI hoje às hh:mm" text next to Salvar (auto-save, `sites/sei/salvamento-automatico.js`) makes the editor's first toolbar row very tall and hides "A versão deste computador foi apagada". Options: (a) only a small mark next to Salvar, full text in the button's tooltip (suggested: little code, nothing over the editor); (b) small floating window, movable, with close button and an on/off setting, fixed while the page scrolls, never over the editor icons, saying the document is also saved on this computer and can be restored if the SEI fails to save. Decide in `/planejar`.
 - **Planning (23/11/2026):** Instrumento de Cobrança in Contratos.gov.br, `specs/instrumento-cobranca.md`; D1–D8, D14–D17 answered, D9–D13, D18–D21 open (site was down: waiting for the user to describe the 6 tabs and copy `formulario.html`, `lista.html`, `ver.html`).
 - **Planning (24/11/2026):** `specs/empenho-substitutivo.md` (after the IC); **remind the user of the pages listed in its section 5**.
-- **Planned (24/11/2026):** `specs/duplicar-documento.md`, all decisions answered, stage 1 ready to code; before stage 2 ask for the saved page in its section 5.
 - **Planned (with spec):** lines marked **[spec]** below. **Not planned:** the other lines (ideas).
 
 ## Ideas
 
 One line per idea. When an idea is planned, it gets a spec in `docs/specs/` and the line points to it. When finished, the line leaves here and goes to `docs/historico.md`.
 
-- **[spec] Duplicate a SEI document** (24/11/2026, user): option in the document icon menu that opens the new document form with the clicked one as Documento Modelo. `specs/duplicar-documento.md`.
 - **Check "Interessado" and "Assunto"** (18/11/2026): like the process number, warn when they do not match the process (after `specs/feitas/conferir-documento.md`).
 - **Settings page smaller and clearer** (18/11/2026): today it is long with little information spread out; first round was stage 1 of `specs/feitas/conferir-documento.md`; later rounds as needed.
 - **Differences inside the document** (19/11/2026, T195): auto-save "Ver diferenças" shown in the text itself (green and struck-through red), instead of the side panel.
