@@ -13,7 +13,7 @@ Third CGOC payment document: register one Instrumento de Cobrança (IC) per invo
 ## 2. Out of scope
 
 - "Importar XML NFe" (later: needs the invoice XML, untested by the user).
-- Invoices without a known contract ID.
+- Invoices without a known contract ID: finding or creating the empenho substitutivo is `empenho-substitutivo.md`.
 - Reading the link from the main system (later, see D1). SIAFI appropriation (Finance does it).
 
 ## 3. Decisions to confirm
@@ -39,6 +39,7 @@ Third CGOC payment document: register one Instrumento de Cobrança (IC) per invo
 - [ ] D19 – Continuing contracts with two empenhos and different subelementos: each case when it comes up (user).
 - [ ] D20 – Link of an empenho substitutivo: each has its own ID (D5), so the process alone may not be enough. Suggestion: save the empenho number with the ID and choose the link by the empenho; a continuing contract is chosen by the contract number on the invoice when the process has more than one ID (D6).
 - [ ] D21 – Empenho named in the ateste or invoice not found in the process: red or yellow? Suggestion: yellow (it may be in another process), and the user confirms the number in the summary.
+- [x] D22 – Help with the step-by-step of adding an IC, so a newcomer can do it alone (24/11/2026): both a full help page in the extension and "Ajuda" buttons (SEI IC window and Contratos.gov.br pages) opening it at the current step. Includes the steps by hand of `empenho-substitutivo.md`.
 
 ## 4. Decided rules
 
@@ -74,7 +75,8 @@ Provisional, to review after the open decisions (continuing contracts first, as 
 - [ ] Stage 3b – Empenho substitutivo: items and totals per subelemento from the empenho (Crítico)
 - [ ] Stage 4 – Summary, save and find the new IC (Crítico)
 - [ ] Stage 5 – PDF into the SEI Anexo (Crítico)
-- [ ] Stage 6 – README, rules, tests, end of the improvement
+- [ ] Stage 6 – Help page and "Ajuda" buttons (D22)
+- [ ] Stage 7 – README, rules, tests, end of the improvement
 
 ## 7. Manual tests
 

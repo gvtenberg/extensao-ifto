@@ -37,6 +37,7 @@ Summary to resume work (on another machine or by another person) without reading
 - **Done, waiting for tests (v0.30.0):** faster copy menu on the document icon in the tree (second click works, closes 1 s after the last click, Esc and click outside close it; rules in `regras/sei.md`). Tests T190–T191.
 - **Pending, to plan (19/11/2026, user):** the "Salvo no SEI hoje às hh:mm" text next to Salvar (auto-save, `sites/sei/salvamento-automatico.js`) makes the editor's first toolbar row very tall and hides "A versão deste computador foi apagada". Options: (a) only a small mark next to Salvar, full text in the button's tooltip (suggested: little code, nothing over the editor); (b) small floating window, movable, with close button and an on/off setting, fixed while the page scrolls, never over the editor icons, saying the document is also saved on this computer and can be restored if the SEI fails to save. Decide in `/planejar`.
 - **Planning (23/11/2026):** Instrumento de Cobrança in Contratos.gov.br, `specs/instrumento-cobranca.md`; D1–D8, D14–D17 answered, D9–D13, D18–D21 open (site was down: waiting for the user to describe the 6 tabs and copy `formulario.html`, `lista.html`, `ver.html`).
+- **Planning (24/11/2026):** `specs/empenho-substitutivo.md` (after the IC); **remind the user of the pages listed in its section 5**.
 - **Planned (with spec):** lines marked **[spec]** below. **Not planned:** the other lines (ideas).
 
 ## Ideas
@@ -90,6 +91,10 @@ Marks: **[spec]** already has a spec.
      - Later: **own settings for the bidding team** (13/11/2026, user): today they use "Sempre ligada" (only "Incluir SICAF").
      - Later: attach the other PDFs automatically: TCU consolidated lookup (instead of the Simples in some processes; ask the user when).
      - **[spec]** Instrumento de Cobrança (Contratos.gov.br) registered and attached: `specs/instrumento-cobranca.md`. Left for later: "Importar XML NFe" (button on the site's list page; needs the invoice XML, so more steps; not tested by the user yet); contract IDs read from the main system through an API.
+     - **[spec]** Empenho substitutivo de contrato (find or create, add Campus Palmas): `specs/empenho-substitutivo.md`, after the Instrumento de Cobrança.
+     - Later (24/11/2026, user): **issue an empenho** (laborious today) and **top up an empenho** (simpler): first the credit breakdown (detalhamento de crédito) in SIAFI, then issue/top up in Contratos.gov.br; help with all of it. When issuing, remind the person to tick the "substitutivo de contrato" option.
+     - Later (24/11/2026, user): **Finance**: help the financeiro module of Contratos.gov.br (invoice and empenho data in the appropriation, sent to SIAFI). Details to learn from Finance, who will also use the extension.
+     - Later (24/11/2026, user): **links to the main systems** (SIAFI, Contratos.gov, SCDP…; several departments use them): each person chooses in the settings which links to see (and may add others) and where: extension bar in the SEI or icon window.
      - Later (23/11/2026, user): **late invoice warning** for continuing contracts. Most are billed monthly, each around its own day; sometimes the inspector is on vacation, the substitute is not told and nobody certifies the invoice. Warn the CGOC when a contract's invoice/bill of the month has not arrived or been certified by the expected date. To plan: expected day per contract (typed, or learned from earlier ICs), where the extension looks and where the warning appears.
      - Later: show the three-document button only for some process types (the user will say which).
      - Later (12/11/2026): in the CGOC settings, choose which document types the button creates (today Sicaf, Consulta, Anexo; maybe only two in the future).
