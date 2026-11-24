@@ -21,16 +21,18 @@ Third CGOC payment document: register one Instrumento de Cobrança (IC) per invo
 - [x] D1 – Where the link payment process → ID is saved? Answer (23/11/2026): in the extension now; later read from the main system through an API, possibly public without login (data already public in the Reitoria's Painel de Gestão). Never straight from the spreadsheet.
 - [x] D2 – Who saves the IC? Answer: the extension, after the user confirms a summary with all values.
 - [x] D3 – UASG? Answer: 158131 (Reitoria) for this contract; so saved per contract (others may be 158336).
-- [x] D4 – Value different from earlier months? Answer: higher = red, needs "Continuar mesmo assim" (possible aditivo/apostilamento); lower = yellow (possible glosa).
+- [x] D4 – Value different from earlier months? Answer: higher = red, two confirmations (D14; possible aditivo/apostilamento); lower = yellow (possible glosa).
 - [x] D5 – Empenho substitutivo: its own ID, one per empenho.
 - [x] D6 – More than one ID per process? Answer: yes; with more than one, the extension asks which for each invoice.
 - [x] D7 – Several invoices: one at a time (summary, click, save, next).
-- [x] D8 – Doubt (scanned invoice, missing field, value refused by the site): do not save; fill what is possible, highlight the doubt, leave the form open and the user clicks Salvar.
+- [x] D8 – Doubt (scanned invoice, missing field, value refused by the site; data that was read and differs follows D14): do not save; fill what is possible, highlight the doubt, leave the form open and the user clicks Salvar.
 - [ ] D9 – Fields of the 6 tabs: source of each value, fixed values and what varies by contract. (User will describe when the site is back.)
 - [ ] D10 – How to get the IC PDF (the user prints the "Ver" page today). Depends on `ver.html` and on what Firefox and Chrome allow.
 - [ ] D11 – Value check: which earlier ICs count (how many months, which Situação) and any tolerance for small differences. Depends on `lista.html`.
-- [ ] D12 – Duplicate found (same invoice number in the contract's ICs): stop, or offer to use that IC's PDF? Suggestion: offer its PDF, never register again.
-- [ ] D13 – Wrong UASG open on the site: warn and stop, or switch it? Suggestion: warn and stop.
+- [ ] D12 – Invoice already registered. Answer (23/11/2026): the site itself refuses a repeated invoice (unique numbering); the extension may check too (extra check). Never registers again. Open: offer that IC's PDF for the SEI (suggestion) or only warn?
+- [ ] D13 – UASG open on the site differs from the contract's: **to test**. User recalls every IC is made in the UASG that published the contract (today 158131); 3 contracts exclusive to Campus Palmas were registered in 158336 and published in 158131. Until tested: warn and stop (suggestion).
+- [x] D14 – Different value or wrong CNPJ (23/11/2026): never goes on by itself; the divergence is shown very clearly (both values side by side); to go on, the user confirms **twice** (the warning appears two times). Applies to invoice × ateste, invoice × contract CNPJ and value higher than earlier months.
+- [x] D15 – Same two confirmations in the SICAF/Simples search, for value or CNPJ (today one extra click). Update `regras/sicaf.md` when coded; the other red warnings there stay with one extra click.
 
 ## 4. Decided rules
 
@@ -54,7 +56,7 @@ Third CGOC payment document: register one Instrumento de Cobrança (IC) per invo
 Provisional, to review after D9–D13:
 
 - [ ] Stage 1 – Optional permission and process → ID links in the settings
-- [ ] Stage 2 – SEI button and checks (contract, value, duplicate), no writing
+- [ ] Stage 2 – SEI button and checks (contract, value, duplicate) with the double warning (D14), no writing; same double warning in the SICAF/Simples search (D15)
 - [ ] Stage 3 – Fill the 6 tabs without saving (Crítico)
 - [ ] Stage 4 – Summary, save and find the new IC (Crítico)
 - [ ] Stage 5 – PDF into the SEI Anexo (Crítico)
