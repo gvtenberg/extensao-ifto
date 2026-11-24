@@ -274,3 +274,18 @@ test('v0.35.2: cargo da diretora-geral, só na PAL/REI/IFTO', () => {
   assert.deepEqual(c.problemasParaAssinar(certo + '<p>Campus</p>', opcoes, new Date(), DG), [])
   assert.deepEqual(c.problemasParaAssinar(casos[0] + '<p>assinado eletronicamente por X</p>', opcoes, new Date(), DG), [])
 })
+
+test('v0.35.3: sugere guardar o timbre e o rodapé da unidade sem cadastro, só o que falta', () => {
+  const html = '<p class="IFTO_Cabeçalho_Novo">Reitoria</p><p class="IFTO_Cabeçalho_Novo"><i>Campus</i> Palmas</p><p class="IFTO_Cabeçalho_Novo">Diretoria de Administração e Planejamento</p>' + c.rodapeEsperado(null)
+  const secoes = [{ nome: 'a', html }]
+  const tudo = { linhas: ['Diretoria de Administração e Planejamento'], telefone: '63 3236-4000', email: 'palmas@ifto.edu.br' }
+  assert.deepEqual(c.sugerirUnidade(secoes, null), tudo)
+  assert.equal(c.linhasDaSugestao(tudo).length, 3)
+  assert.deepEqual(c.sugerirUnidade(secoes, { linhas: ['X'], telefone: '', email: '' }), { telefone: tudo.telefone, email: tudo.email })
+  assert.equal(c.sugerirUnidade(secoes, tudo), null)
+  assert.equal(c.sugerirUnidade(secoes, null, { timbre: false, rodape: false }), null)
+  // Cada unidade guarda os seus dados.
+  const unidades = c.limparUnidades([{ sigla: 'CGOC/PAL/REI/IFTO', linhas: ['X'] }, { sigla: 'DAP/PAL/REI/IFTO', ...tudo }])
+  assert.deepEqual(c.acharUnidade(unidades, 'CGOC/PAL/REI/IFTO').linhas, ['X'])
+  assert.deepEqual(c.acharUnidade(unidades, 'DAP/PAL/REI/IFTO').linhas, tudo.linhas)
+})

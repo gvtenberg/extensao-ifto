@@ -85,10 +85,14 @@
   }
   const jaTem = editor => secoes(editor).some(secao => regras().temEspacamento(editor.getData({ rootName: secao.nome })))
 
+  const secaoEditavel = (editor, secao) => secao.dom.getAttribute('contenteditable') === 'true' &&
+    !(typeof editor.isRootDisabled === 'function' && editor.isRootDisabled(secao.nome))
+
   function medirSecoes (editor, blocos, outras) {
     secoes(editor).forEach((secao, indice) => {
       const nome = secao.dom.getAttribute('aria-label') || secao.nome
-      ;[...secao.dom.children].forEach((filho, i) => blocos.push(medirBloco(filho, indice, nome, i + 1)))
+      const editavel = secaoEditavel(editor, secao)
+      ;[...secao.dom.children].forEach((filho, i) => blocos.push({ ...medirBloco(filho, indice, nome, i + 1), editavel }))
       for (const caixa of secao.dom.querySelectorAll('div, td, th, li, blockquote, figure')) {
         if (caixa.children.length > 1) outras.push([...caixa.children].map(descritor))
       }
@@ -124,8 +128,7 @@
   // o mantém); se não der, no primeiro parágrafo do corpo; se não, no primeiro de uma seção que dá para editar.
   function lugarDoBloco (editor) {
     const modelo = editor.model
-    const editaveis = secoes(editor).filter(secao => secao.dom.getAttribute('contenteditable') === 'true' &&
-      !(typeof editor.isRootDisabled === 'function' && editor.isRootDisabled(secao.nome)))
+    const editaveis = secoes(editor).filter(secao => secaoEditavel(editor, secao))
     const paragrafos = secao => [...modelo.createRangeIn(modelo.document.getRoot(secao.nome))]
       .map(({ item }) => item).filter(item => item.is('element', 'paragraph'))
     const semTexto = paragrafo => [...paragrafo.getChildren()].every(filho => !filho.is('$text') || !filho.data.replace(INVISIVEIS, ''))
@@ -161,6 +164,34 @@
     }
   }
 
+  // v0.35.3: põe as linhas em branco pedidas (regras em linhasQueFaltam), com o estilo do parágrafo vizinho,
+  // numa mudança só (um Ctrl+Z desfaz).
+  async function porLinhas (linhas) {
+    try {
+      const editor = await ajuda().acharEditor()
+      if (!editor) return { ok: false, erro: 'Não achei o editor do SEI.' }
+      const todas = secoes(editor)
+      const alvos = (linhas || []).map(linha => {
+        const secao = todas[linha.raiz]
+        const dom = secao && secaoEditavel(editor, secao) && secao.dom.children[linha.posicao - 1]
+        const vista = dom && editor.editing.view.domConverter.mapDomToView(dom)
+        return { linha, elemento: vista && editor.editing.mapper.toModelElement(vista) }
+      })
+      if (!alvos.length || alvos.some(({ elemento }) => !elemento)) return { ok: false, erro: 'Não achei no editor o lugar da linha em branco.' }
+      editor.model.change(escritor => {
+        for (const { linha, elemento } of alvos) {
+          const estiloDoVizinho = elemento.getAttribute('estilo')
+          const novo = escritor.createElement('paragraph', estiloDoVizinho ? { estilo: estiloDoVizinho } : {})
+          escritor.insertText('\u00a0', novo)
+          escritor.insert(novo, elemento, linha.onde === 'antes' ? 'before' : 'after')
+        }
+      })
+      return { ok: true }
+    } catch (erro) {
+      return { ok: false, erro: erro.message }
+    }
+  }
+
   async function tirar () {
     try {
       const editor = await ajuda().acharEditor()
@@ -177,5 +208,5 @@
     }
   }
 
-  raiz.ExtensaoIFTO = Object.assign(raiz.ExtensaoIFTO || {}, { editorEspacamento: { medir, por, tirar } })
+  raiz.ExtensaoIFTO = Object.assign(raiz.ExtensaoIFTO || {}, { editorEspacamento: { medir, por, porLinhas, tirar } })
 })(globalThis)

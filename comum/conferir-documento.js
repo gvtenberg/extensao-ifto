@@ -337,13 +337,20 @@
       `Palmas/TO — <a href="tel:+55${telefone}">${formatarTelefone(telefone)}</a><br>` +
       `<a href="https://palmas.ifto.edu.br">palmas.ifto.edu.br</a> — <a href="mailto:${escaparHtml(email)}">${escaparHtml(email)}</a></p>`
   }
+  // Telefone (só dígitos) e e-mail do campus que estão no rodapé ('' quando não há).
+  function contatoDoCampus (html) {
+    const texto = paragrafos(html).filter(([, atributos]) => ehDoRodape(classeDe(atributos))).map(([, , dentro]) => textoDoHtml(dentro)).join(' ')
+    const telefone = [...texto.matchAll(/(?:\+?55\s*)?\(?\d{2}\)?\s*\d{4,5}\s*-?\s*\d{4}/g)].map(a => digitosDoTelefone(a[0])).find(t => /^63323640\d\d$/.test(t))
+    const email = [...texto.matchAll(/[\w.+-]+@[\w-]+(?:\.[\w-]+)+/g)].map(a => a[0].toLowerCase()).find(e => /^([\w.+-]+\.)?palmas@ifto\.edu\.br$/.test(e))
+    return { telefone: telefone || '', email: email || '' }
+  }
   function corrigirRodape (html, unidade) {
     const lista = paragrafos(html).filter(([, atributos]) => ehDoRodape(classeDe(atributos)))
     if (!lista.length) return null
     // v0.26.7 (T142): sem cadastro, mantém o telefone e o e-mail do campus que já estão no rodapé.
-    const texto = lista.map(([, , dentro]) => textoDoHtml(dentro)).join(' ')
-    const telefoneDoCampus = !temTelefone(unidade) && [...texto.matchAll(/(?:\+?55\s*)?\(?\d{2}\)?\s*\d{4,5}\s*-?\s*\d{4}/g)].map(a => digitosDoTelefone(a[0])).find(t => /^63323640\d\d$/.test(t))
-    const emailDoCampus = !temEmail(unidade) && [...texto.matchAll(/[\w.+-]+@[\w-]+(?:\.[\w-]+)+/g)].map(a => a[0].toLowerCase()).find(e => /^([\w.+-]+\.)?palmas@ifto\.edu\.br$/.test(e))
+    const doCampus = contatoDoCampus(html)
+    const telefoneDoCampus = !temTelefone(unidade) && doCampus.telefone
+    const emailDoCampus = !temEmail(unidade) && doCampus.email
     if (telefoneDoCampus || emailDoCampus) unidade = { ...(unidade || {}), telefone: (unidade && unidade.telefone) || telefoneDoCampus || '', email: (unidade && unidade.email) || emailDoCampus || '' }
     let posto = false
     return String(html).replace(/<p\b([^>]*)>([\s\S]*?)<\/p>/gi, (tudo, attrs) => {
@@ -358,6 +365,29 @@
   // "Reitoria").
   function linhasDoSetor (secoes) {
     return linhasDoTimbre(secoes).filter(linha => !ehReitoria(linha) && !TIMBRE_FIXO.some(fixa => mesmaLinha(fixa, linha)))
+  }
+
+  // v0.35.3 (pedido do usuário, 24/11/2026): o que este documento tem e a unidade ainda não tem guardado em
+  // "Minhas unidades": linhas do setor, telefone e e-mail do campus. null quando não há nada a sugerir.
+  function sugerirUnidade (secoes, unidade, { timbre = true, rodape = true } = {}) {
+    const sugestao = {}
+    if (timbre && !(unidade && unidade.linhas && unidade.linhas.length)) {
+      const linhas = linhasDoSetor(secoes).map(comMaiusculas)
+      if (linhas.length) sugestao.linhas = linhas
+    }
+    const secao = rodape && secaoCom(secoes, ehDoRodape)
+    if (secao) {
+      const { telefone, email } = contatoDoCampus(secao.html)
+      if (telefone && !temTelefone(unidade)) sugestao.telefone = formatarTelefone(telefone)
+      if (email && !temEmail(unidade)) sugestao.email = email
+    }
+    return Object.keys(sugestao).length ? sugestao : null
+  }
+  function linhasDaSugestao (sugestao) {
+    const itens = (sugestao.linhas || []).map(linha => `Timbre: ${linha}`)
+    if (sugestao.telefone) itens.push(`Telefone do rodapé: ${sugestao.telefone}`)
+    if (sugestao.email) itens.push(`E-mail do rodapé: ${sugestao.email}`)
+    return itens
   }
 
   // v0.26.6 (D2): Bloco de assinatura. A página "Documentos do Bloco" guarda o endereço de cada documento
@@ -550,7 +580,7 @@
   // Documento já assinado: a página do documento mostra "Documento assinado eletronicamente por".
   const estaAssinado = html => /assinado\s+eletronicamente\s+por/i.test(textoDoHtml(html))
 
-  const api = { siglaDaUnidade, ehUnidadePalmas, limparUnidade, limparUnidades, acharUnidade, textoDoHtml, formatarProcesso, mesmoProcesso, processoDaReferencia, linhaDoProcesso, conferirProcesso, avisoDoProcesso, perguntaAntesDeAssinar, fraseDoProcesso, problemasParaAssinar, corrigirProcesso, estaAssinado, confereAoAssinar, conferirItalico, avisoDoItalico, corrigirItalico, conferirCargo, fraseDoCargo, corrigirCargo, CARGO_DA_DIRETORA, numeroSeiDoDocumento, aceitar, foiAceito, documentosDoBloco, idDoItemDoBloco, TIMBRE_FIXO, comMaiusculas, linhasVaziasDoTimbre, linhasDoTimbre, timbreEsperado, conferirTimbre, avisosDoTimbre, corrigirTimbre, secaoCom, ehDoTimbre, ehDoRodape, formatarTelefone, conferirRodape, rodapeEsperado, corrigirRodape, linhasDoSetor }
+  const api = { siglaDaUnidade, ehUnidadePalmas, limparUnidade, limparUnidades, acharUnidade, textoDoHtml, formatarProcesso, mesmoProcesso, processoDaReferencia, linhaDoProcesso, conferirProcesso, avisoDoProcesso, perguntaAntesDeAssinar, fraseDoProcesso, problemasParaAssinar, corrigirProcesso, estaAssinado, confereAoAssinar, conferirItalico, avisoDoItalico, corrigirItalico, conferirCargo, fraseDoCargo, corrigirCargo, CARGO_DA_DIRETORA, numeroSeiDoDocumento, aceitar, foiAceito, documentosDoBloco, idDoItemDoBloco, TIMBRE_FIXO, comMaiusculas, linhasVaziasDoTimbre, linhasDoTimbre, timbreEsperado, conferirTimbre, avisosDoTimbre, corrigirTimbre, secaoCom, ehDoTimbre, ehDoRodape, formatarTelefone, conferirRodape, rodapeEsperado, corrigirRodape, linhasDoSetor, sugerirUnidade, linhasDaSugestao }
   if (typeof module !== 'undefined' && module.exports) module.exports = api
   else raiz.ExtensaoIFTO = Object.assign(raiz.ExtensaoIFTO || {}, { conferirDocumento: api })
 })(globalThis)

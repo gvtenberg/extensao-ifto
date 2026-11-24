@@ -122,6 +122,45 @@
     avisoComBotao('conferir-italico', regras.avisoDoItalico(italico), trechos, 'Colocar em itálico', 'italico', '"Campus" e "Campi" em itálico.', italico.quantos > italico.travados)
   }
 
+  // v0.35.3: unidade sem timbre ou rodapé guardado: oferece guardar os deste documento, só para a unidade aberta.
+  // No clique lê o documento de novo (a pessoa pode ter mudado o texto depois do aviso).
+  const { sugestao } = verificado
+  if (sugestao) {
+    const rotulo = `Guardar como padrão da unidade ${sigla}`
+    const aviso = caixaEditor.criarCaixa('guardar-unidade', `A unidade ${sigla} ainda não tem estes dados em "Minhas unidades". Guardar os deste documento como padrão?`, rotulo)
+    const itens = caixaEditor.criar('ul')
+    const mostrarItens = atual => itens.replaceChildren(...regras.linhasDaSugestao(atual).map(textContent => caixaEditor.criar('li', { textContent })))
+    mostrarItens(sugestao)
+    const depois = caixaEditor.criar('button', { type: 'button', className: 'secundario', textContent: 'Agora não' })
+    const erro = caixaEditor.criar('p', { className: 'erro' })
+    aviso.botao.before(itens)
+    aviso.botao.after(depois, erro)
+    depois.addEventListener('click', () => aviso.remover())
+    aviso.botao.addEventListener('click', async () => {
+      aviso.botao.disabled = true
+      erro.textContent = ''
+      try {
+        const agora = await verificar()
+        if (!agora || !agora.ok) throw new Error((agora && agora.erro) || '')
+        if (!agora.sugestao) {
+          erro.textContent = 'Este documento não tem mais dados para guardar.'
+          return
+        }
+        mostrarItens(agora.sugestao)
+        if (!window.confirm(`Guardar como padrão da unidade ${sigla}?\n\n${regras.linhasDaSugestao(agora.sugestao).join('\n')}`)) return
+        const atuais = await configuracoes.lerConfiguracoes()
+        const unidade = regras.acharUnidade(atuais.unidades, sigla) || { sigla }
+        atuais.unidades = regras.limparUnidades([...atuais.unidades, { ...unidade, ...agora.sugestao }])
+        await configuracoes.gravarConfiguracoes(atuais)
+        aviso.mostrar('ok', `Guardado em "Minhas unidades" para a unidade ${sigla}. Para mudar, abra as configurações da extensão.`)
+      } catch (falha) {
+        erro.textContent = 'Não consegui guardar. ' + (falha.message || '')
+      } finally {
+        aviso.botao.disabled = false
+      }
+    })
+  }
+
   // v0.26.5: timbre e rodapé: uma caixa no canto de baixo, à esquerda (as outras caixas ficam à direita).
   const timbreErrado = timbre && !timbre.certo
   const rodapeErrado = rodape && !rodape.certo
@@ -158,7 +197,7 @@
   if (timbreErrado) botao('Corrigir timbre', corrigirParte('timbre', 'Corrigir timbre', 'Timbre corrigido.'))
   if (rodapeErrado) botao('Corrigir rodapé', corrigirParte('rodape', 'Corrigir rodapé', 'Rodapé corrigido.'))
   // D3: as linhas do setor deste documento passam a ser as da unidade em "Minhas unidades" (com confirmação).
-  if (timbreErrado) {
+  if (timbreErrado && !(sugestao && sugestao.linhas)) {
     botao('Usar este timbre como padrão da unidade', async elemento => {
       const lido = await caixaEditor.pedirAoFundo('conferirLinhasDoSetor')
       const linhas = (lido && lido.ok && lido.linhas) || []

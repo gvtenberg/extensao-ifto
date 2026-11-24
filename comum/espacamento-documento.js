@@ -96,6 +96,48 @@
     return blocos.filter(bloco => !fantasmas.has(bloco.raiz))
   }
 
+  // v0.35.3 (Solicitação de nota de empenho 3396459): no documento salvo o SEI põe uma caixa vazia (<div
+  // style="counter-reset…">) depois da seção que usa itens numerados, e às vezes o rodapé dentro de uma caixa.
+  // Com ela no meio o seletor "anterior+bloco" não acerta: a mesma regra vai também com a caixa.
+  function variantesDoSalvo (partes, blocos, outras) {
+    const caixa = { tag: 'div', classes: [] }
+    const variantes = []
+    for (let m = 1; m < partes.length; m++) {
+      if (partes[m].raiz === partes[m - 1].raiz || ehDoTimbre(partes[m - 1])) continue
+      const comCaixa = [...partes.slice(0, m), caixa, ...partes.slice(m)]
+      if (acertos(comCaixa, blocos).length || outras.some(irmaos => acertos(comCaixa, irmaos).length)) continue
+      variantes.push(comCaixa.map(seletorDe).join('+'))
+    }
+    const ultimo = partes[partes.length - 1]
+    if ((ultimo.classes || []).some(regrasConferir().ehDoRodape)) {
+      variantes.push([...partes.slice(0, -1), caixa].map(seletorDe).join('+') + ' ' + seletorDe(ultimo))
+    }
+    return variantes
+  }
+
+  // v0.35.3 (pedido do usuário, 24/11/2026): linha em branco que falta entre a data e o nome de quem assina e
+  // entre a última linha de quem assina e o rodapé. Qualquer linha em branco que já esteja lá basta, mesmo
+  // fina. Só em parte que dá para editar. Devolve [{ raiz, posicao, onde: 'antes' | 'depois', antes, depois }].
+  const ehDeQuemAssina = bloco => (bloco.classes || []).some(classe => /^IFTO_Assinatura|^IFTO_Centralizado$/i.test(classe))
+  function linhasQueFaltam (documento) {
+    const blocos = semFantasmas((documento && documento.blocos) || [])
+    const fim = inicioDoRodape(blocos)
+    const faltam = []
+    // Espaço de uma linha dentro dos próprios parágrafos (quebra de linha no começo ou no fim) também é linha.
+    const temLinhaDentro = (cima, baixo) => (cima.abaixo || 0) + (baixo.acima || 0) >= (Number(baixo.fonte) || 16)
+    for (let i = 1; i < fim; i++) {
+      const [data, nome] = [blocos[i - 1], blocos[i]]
+      if (data.vazio || nome.vazio || data.outro || nome.outro || nome.editavel === false) continue
+      if (!data.textoFim || !regrasData().ehLinhaDaData(data.textoFim) || !ehDeQuemAssina(nome) || temLinhaDentro(data, nome)) continue
+      faltam.push({ raiz: nome.raiz, posicao: nome.posicao, onde: 'antes', antes: data.textoFim, depois: nome.texto || '' })
+    }
+    const [cargo, rodape] = [blocos[fim - 1], blocos[fim]]
+    if (cargo && rodape && !cargo.vazio && !cargo.outro && cargo.editavel !== false && ehDeQuemAssina(cargo) && !temLinhaDentro(cargo, rodape)) {
+      faltam.push({ raiz: cargo.raiz, posicao: cargo.posicao, onde: 'depois', antes: cargo.textoFim || '', depois: rodape.texto || '' })
+    }
+    return faltam
+  }
+
   function planejarEspacamento (documento) {
     const blocos = semFantasmas((documento && documento.blocos) || [])
     const outras = (documento && documento.outras) || []
@@ -141,12 +183,12 @@
       let partes = [antes, bloco]
       if (!valido(partes)) partes = antes2 && !antes2.vazio && !antes2.outro ? [antes2, antes, bloco] : null
       if (!partes || !valido(partes)) continue
-      lacunas.push({ ...lacuna, seletor: partes.map(seletorDe).join('+') })
+      lacunas.push({ ...lacuna, seletor: partes.map(seletorDe).join('+'), variantes: variantesDoSalvo(partes, blocos, outras) })
     }
     if (!lacunas.length) return { lacunas, css: '', bloco: '' }
 
     const finais = new Map()
-    for (const lacuna of lacunas) finais.set(lacuna.seletor, Math.max(lacuna.margem, finais.get(lacuna.seletor) || 0))
+    for (const lacuna of lacunas) for (const seletor of [lacuna.seletor, ...lacuna.variantes]) finais.set(seletor, Math.max(lacuna.margem, finais.get(seletor) || 0))
     // No editor cada seção é uma caixa separada: a regra é pelo nome da seção e pela posição do bloco nela (só
     // vale no editor; no documento salvo não há essas caixas). Regra separada, porque o gerador do PDF ignora
     // a regra inteira quando não entende um dos seletores.
@@ -177,7 +219,7 @@
     return seletores.every(seletor => Math.abs(atuais.get(seletor) - novas.get(seletor)) <= 0.1)
   }
 
-  const api = { seletoresDoBloco, mesmoEspacamento, semFantasmas, MARCA, LIMITE, LINHA, temEspacamento, tirarEspacamento, escapar, seletorDe, acertos, planejarEspacamento }
+  const api = { seletoresDoBloco, mesmoEspacamento, semFantasmas, MARCA, LIMITE, LINHA, temEspacamento, tirarEspacamento, escapar, seletorDe, acertos, linhasQueFaltam, planejarEspacamento }
   if (doNode) module.exports = api
   else raiz.ExtensaoIFTO = Object.assign(raiz.ExtensaoIFTO || {}, { espacamentoDocumento: api })
 })(globalThis)

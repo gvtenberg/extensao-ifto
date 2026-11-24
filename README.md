@@ -132,7 +132,7 @@ Para abrir: clique no ícone da extensão e em **Configurações**. Cada escolha
 
 **Minhas unidades**
 
-Cadastre as unidades em que você trabalha no SEI (sigla, telefone, e-mail e as linhas do setor que ficam abaixo de "Campus Palmas" no timbre). A extensão usa esses dados para conferir o timbre e o rodapé. Ficam guardados só no navegador.
+Cadastre as unidades em que você trabalha no SEI (sigla, telefone, e-mail e as linhas do setor que ficam abaixo de "Campus Palmas" no timbre). A extensão usa esses dados para conferir o timbre e o rodapé. Quando a unidade aberta (do Campus Palmas) ainda não tem esses dados, o editor do SEI oferece guardar os do documento, só para aquela unidade. Ficam guardados só no navegador.
 
 **Por unidade**
 

@@ -156,6 +156,12 @@
   navegador.storage.onChanged.addListener((mudou, area) => {
     const novas = area === 'local' && mudou.configuracoes && mudou.configuracoes.newValue
     if (!novas) return
+    // v0.35.3: unidade guardada pelo editor do SEI com esta página aberta (o mesmo cuidado).
+    if (JSON.stringify(novas.unidades || []) !== JSON.stringify(configuracoes.unidades)) {
+      configuracoes.unidades = novas.unidades || []
+      listaUnidades.replaceChildren()
+      for (const unidade of configuracoes.unidades) mostrarUnidade(unidade)
+    }
     for (const campo of document.querySelectorAll('[data-config^="direcao"]')) {
       const chave = campo.dataset.config
       if (!(chave in novas) || novas[chave] === configuracoes[chave]) continue

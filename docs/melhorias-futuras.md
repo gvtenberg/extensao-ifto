@@ -6,6 +6,7 @@
 
 Summary to resume work (on another machine or by another person) without reading everything. Update at the end of each stage or round.
 
+- **Done, waiting for tests (v0.35.3, 24/11/2026):** spacing with a box between the parts, blank lines around the signer, saving the unit's timbre and footer (no spec; rules in `regras/conferir-documento.md`). Tests T249–T252.
 - **Done, waiting for tests (v0.35.2, 24/11/2026):** director-general title and Campus/Campi in italics (no spec; rules in `regras/conferir-documento.md`). Tests T245–T248.
 - **Done, waiting for tests (v0.35.0, 23/11/2026):** `specs/lista-para-direcao.md` stages 1 to 4, README and rules (`regras/lista-direcao.md`). Tests T232–T243 (T239, T241 critical: change the assignment in the SEI). Pending in stage 5: check with a document received in a block (needs the saved process page, before and after the director signs), then spec to `specs/feitas/`.
 - **Done, waiting for tests (v0.34.0, 19/11/2026):** "Blocos Internos" button in the Controle de Processos bar (no spec; rule in `regras/sei.md`). Test T225.

@@ -568,3 +568,17 @@ E: O aviso diz quantos estão sem itálico (o timbre também conta; maiúsculas 
 ### T248 – Corrigir timbre com Campus em itálico (v0.35.2)
 F: Num documento não assinado com o timbre errado, clique em "Corrigir timbre" no editor.
 E: O timbre fica certo e "Campus" fica em itálico.
+
+## Espaço, linhas em branco e padrão da unidade (v0.35.3)
+### T249 – Espaço antes da data na Solicitação de nota de empenho (v0.35.3)
+F: Na DAP/PAL/REI/IFTO, abra no editor uma Solicitação de nota de empenho não assinada, clique em Salvar e veja o documento na árvore.
+E: Há uma linha de espaço entre "Ordenador de Despesas" e a data.
+### T250 – Linha em branco antes e depois de quem assina (v0.35.3)
+F: Num documento não assinado, apague a linha em branco entre a data e o nome e entre o cargo e o rodapé, salve e abra o editor de novo; clique em "Adicionar as linhas em branco" e em Salvar.
+E: O aviso mostra os dois lugares e só muda o texto com o clique. Onde já há linha em branco, nada é oferecido.
+### T251 – Guardar o timbre e o rodapé da unidade (v0.35.3)
+F: Numa unidade do Campus Palmas sem cadastro em "Minhas unidades", abra o editor; com o aviso aberto, mude o timbre ou o telefone do rodapé (63 3236-40xx) e clique em "Guardar como padrão da unidade".
+E: A confirmação mostra o texto já mudado. Com "Agora não", nada é guardado e o aviso volta na próxima vez.
+### T252 – Padrão separado para cada unidade (v0.35.3)
+F: Guarde o padrão em duas unidades (o segundo com a página de configurações aberta) e veja "Minhas unidades" nas configurações.
+E: Cada unidade tem os seus dados; guardar uma não muda nem apaga a outra.

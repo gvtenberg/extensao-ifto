@@ -1,6 +1,6 @@
 const { test } = require('node:test')
 const assert = require('node:assert/strict')
-const { MARCA, mesmoEspacamento, seletoresDoBloco, temEspacamento, tirarEspacamento, escapar, seletorDe, acertos, planejarEspacamento } = require('../comum/espacamento-documento.js')
+const { MARCA, mesmoEspacamento, seletoresDoBloco, temEspacamento, tirarEspacamento, escapar, seletorDe, acertos, linhasQueFaltam, planejarEspacamento } = require('../comum/espacamento-documento.js')
 const { ehLinhaDaData, conferirData } = require('../comum/data-documento.js')
 
 // Bloco medido (px, letra de 16px). "grudado": distância de quase nada até a linha de cima.
@@ -237,4 +237,34 @@ test('Notificação: uma linha e meia depois do timbre e uma linha inteira entre
   assert.equal(mesmoEspacamento(plano.bloco, plano), true)
   assert.equal(mesmoEspacamento(plano.bloco.replace('2.01em', '1.52em'), plano), false)
   assert.equal(mesmoEspacamento(plano.bloco.replace('2.01em', '2.05em'), plano), true)
+})
+
+// v0.35.3: Solicitação de nota de empenho 3396459.
+function solicitacao (semLinhas) {
+  posicoes = {}
+  const vazia = () => semLinhas ? [] : [bloco(2, 'Nome', 'IFTO_Assinatura', '', { altura: 1.6 })]
+  return [
+    bloco(0, 'Corpo', 'Texto_Justificado', 'Ordenador de Despesas: NOEMI'),
+    bloco(1, 'Data', 'IFTO_Alin_direita_sem_espaço', 'Palmas, 24 de novembro de 2026.'),
+    ...vazia(),
+    bloco(2, 'Nome', 'IFTO_Assinatura', 'SILBERTO', { acima: -8 }),
+    bloco(2, 'Nome', 'IFTO_Assinatura', 'Diretor', { acima: -8, abaixo: -8 }),
+    ...vazia(),
+    bloco(3, 'Rodapé', 'IFTO_Centralizado_rodape', 'Quadra 310 Sul')
+  ]
+}
+test('espaço também quando o SEI põe uma caixa entre as partes do documento salvo', () => {
+  const { css } = planejarEspacamento({ blocos: solicitacao(true), outras: [] })
+  assert.match(css, /p\.Texto_Justificado\+div\+p\.IFTO_Alin_direita_sem_espa\\0000e7o\{margin-top/)
+  assert.match(css, /p\.IFTO_Assinatura\+div p\.IFTO_Centralizado_rodape\{margin-top/)
+})
+test('linha em branco antes e depois de quem assina: só onde não há nenhuma', () => {
+  const faltam = linhasQueFaltam({ blocos: solicitacao(true) })
+  assert.deepEqual(faltam.map(f => [f.raiz, f.posicao, f.onde, f.antes, f.depois]), [
+    [2, 1, 'antes', 'Palmas, 24 de novembro de 2026.', 'SILBERTO'],
+    [2, 2, 'depois', 'Diretor', 'Quadra 310 Sul']
+  ])
+  assert.deepEqual(linhasQueFaltam({ blocos: solicitacao(false) }), [])
+  assert.deepEqual(linhasQueFaltam({ blocos: solicitacao(true).map(b => ({ ...b, editavel: false })) }), [])
+  assert.deepEqual(linhasQueFaltam(null), [])
 })

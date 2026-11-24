@@ -84,6 +84,8 @@ function tratarRecado (recado, remetente) {
     case 'estilosVerificar': return rodarNoEditor(remetente)(globalThis.ExtensaoIFTO.editorLer).then(lido => lido.ok ? { ok: true, usa: (lido.secoes || []).some(secao => globalThis.ExtensaoIFTO.todosOsEstilos.temBloco(secao.html)) } : lido)
     case 'espacamentoMedir': return espacamentoNoEditor(remetente, 'medir')
     case 'espacamentoPor': return espacamentoNoEditor(remetente, 'por', recado.bloco, recado.substituir)
+    // v0.35.3: linhas em branco antes e depois de quem assina (só com o clique da pessoa).
+    case 'espacamentoLinhas': return espacamentoNoEditor(remetente, 'porLinhas', recado.linhas)
     case 'espacamentoDesfazer': return espacamentoNoEditor(remetente, 'tirar')
     // v0.26.2 (spec conferir-documento): conferir o documento no editor (número do processo).
     case 'conferirVerificar': return conferirNoEditor(remetente, { sigla: recado.sigla })
@@ -628,6 +630,8 @@ async function conferirNoEditor (remetente, recado) {
     timbre: palmas && opcoes.conferirTimbre ? regras.conferirTimbre(secoes, unidade, sigla) : null,
     rodape: palmas && opcoes.conferirRodape ? regras.conferirRodape(secoes, unidade) : null,
     capa: opcoes.conferirProcesso ? capaDe(secoes) : null,
+    // v0.35.3: o que dá para guardar em "Minhas unidades" (unidade sem timbre ou sem rodapé guardado).
+    sugestao: palmas ? regras.sugerirUnidade(secoes, unidade, { timbre: opcoes.conferirTimbre, rodape: opcoes.conferirRodape }) : null,
     // v0.35.2: cargo da diretora-geral (só PAL/REI/IFTO) e "Campus"/"Campi" em itálico (toda unidade).
     cargo: opcoes.conferirCargo ? regras.conferirCargo(secoes, sigla) : null,
     italico: opcoes.conferirItalico ? regras.conferirItalico(secoes) : null
