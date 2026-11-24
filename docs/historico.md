@@ -2,6 +2,7 @@
 
 One or two lines per version, with the date (dd/mm/yyyy). Number 0.STAGE.FIX.
 
+- v0.35.2 (24/11/2026): unsigned documents: director-general's title below the name (PAL/REI/IFTO; also asks before signing) and "Campus"/"Campi" in italics (every unit; notice only), with correction buttons and switches; "Corrigir timbre" writes Campus in italics. T245–T248.
 - v0.35.1 (23/11/2026): document page: opening the editor (notice button or the SEI "Editar Conteúdo") closes the notices there, since the editor shows its own. T244.
 - v0.35.0 (23/11/2026): list of documents for the director to sign (spec `lista-para-direcao`): document icon menu, panel, copy for WhatsApp, sent lists, who is signing, optional automatic assignment of the process with undo. T232 to T243.
 - v0.34.2 (23/11/2026): spacing: 1.5 lines after the timbre, 1 line after the number, own block turned off while measuring, old block replaced when the size differs; date: a past day is wrong in every unsigned document (Notificação 3394735); signing window says "possíveis divergências"; signed documents never checked; "Reitoria" in the timbre accepted. T227 to T231.

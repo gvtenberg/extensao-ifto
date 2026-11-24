@@ -605,7 +605,8 @@ async function minutaNoEditor (remetente, remover) {
 // de novo. Nunca salva. 'processo': troca o número só na linha "Processo nº:". v0.26.5: 'timbre' e 'rodape'
 // (só em unidades do Campus Palmas; dados da unidade em "Minhas unidades").
 // v0.33.0: 'capa' (Data de Autuação, Tipo, Especificação e Interessados da Capa de Processo).
-// Devolve { ok, erro, processo, timbre, rodape, capa } (cada um null quando não há o que conferir).
+// v0.35.2: 'cargo' e 'italico'.
+// Devolve { ok, erro, processo, timbre, rodape, capa, cargo, italico } (cada um null quando não há o que conferir).
 async function conferirNoEditor (remetente, recado) {
   const regras = globalThis.ExtensaoIFTO.conferirDocumento
   const opcoes = await globalThis.ExtensaoIFTO.configuracoes.lerConfiguracoes()
@@ -626,7 +627,10 @@ async function conferirNoEditor (remetente, recado) {
     processo: opcoes.conferirProcesso ? regras.conferirProcesso(secoes) : null,
     timbre: palmas && opcoes.conferirTimbre ? regras.conferirTimbre(secoes, unidade, sigla) : null,
     rodape: palmas && opcoes.conferirRodape ? regras.conferirRodape(secoes, unidade) : null,
-    capa: opcoes.conferirProcesso ? capaDe(secoes) : null
+    capa: opcoes.conferirProcesso ? capaDe(secoes) : null,
+    // v0.35.2: cargo da diretora-geral (só PAL/REI/IFTO) e "Campus"/"Campi" em itálico (toda unidade).
+    cargo: opcoes.conferirCargo ? regras.conferirCargo(secoes, sigla) : null,
+    italico: opcoes.conferirItalico ? regras.conferirItalico(secoes) : null
   })
   const lido = await rodar(globalThis.ExtensaoIFTO.editorLer)
   if (!lido.ok) return { ok: false, erro: lido.erro }
@@ -648,12 +652,19 @@ async function conferirNoEditor (remetente, recado) {
     secao = regras.secaoCom(lido.secoes, regras.ehDoRodape)
     novo = secao && regras.corrigirRodape(secao.html, unidade)
   }
-  if (!secao || !secao.editavel || !novo) return { ok: false, erro: 'Essa parte do documento não dá para mudar no editor.' }
-  const gravado = await rodar(globalThis.ExtensaoIFTO.editorGravar, [{ [secao.nome]: novo }])
+  if (qual === 'cargo') {
+    secao = lido.secoes.find(outra => outra.nome === antes.cargo.secao)
+    novo = secao && regras.corrigirCargo(secao.html, antes.cargo)
+  }
+  // O itálico pode estar em várias partes do documento.
+  const mudancas = qual === 'italico' ? regras.corrigirItalico(lido.secoes) : (secao && secao.editavel && novo ? { [secao.nome]: novo } : {})
+  if (!Object.keys(mudancas).length) return { ok: false, erro: 'Essa parte do documento não dá para mudar no editor.' }
+  const gravado = await rodar(globalThis.ExtensaoIFTO.editorGravar, [mudancas])
   if (!gravado.ok) return { ok: false, erro: gravado.erro }
   const depois = await rodar(globalThis.ExtensaoIFTO.editorLer)
   const conferido = depois.ok ? conferir(depois.secoes) : null
-  if (!conferido || !conferido[qual] || !conferido[qual].certo) return { ok: false, erro: 'O editor não ficou com o texto novo.' }
+  const ficou = conferido && conferido[qual] && (conferido[qual].certo || (qual === 'italico' && conferido.italico.quantos === conferido.italico.travados))
+  if (!ficou) return { ok: false, erro: 'O editor não ficou com o texto novo.' }
   return { ok: true, ...conferido }
 }
 

@@ -156,7 +156,7 @@
   // ler (SEI lento) fica de fora: nunca trava a lista.
   async function conferirProcessosDoIntervalo (novos, documentos) {
     const { conferirDocumento: conferir, janelaAssinar, seiPedidos } = globalThis.ExtensaoIFTO
-    if ((!opcoes.conferirProcesso && !opcoes.conferirData) || !conferir || !janelaAssinar || !seiPedidos) return
+    if (!conferir || !conferir.confereAoAssinar(opcoes) || !janelaAssinar || !seiPedidos) return
     const numeros = new Set(novos.map(novo => novo.documento))
     const errados = []
     for (const doc of documentos) {
@@ -165,7 +165,7 @@
       try {
         const limite = new Promise((resolve, recusar) => setTimeout(() => recusar(new Error('tempo')), 20000))
         const { html } = await Promise.race([seiPedidos.pedir(doc.link), limite])
-        const problemas = conferir.problemasParaAssinar(html, opcoes, new Date())
+        const problemas = conferir.problemasParaAssinar(html, opcoes, new Date(), unidade)
         if (problemas.length) errados.push({ numero, rotulo: doc.rotulo, problemas })
       } catch (erro) {}
     }

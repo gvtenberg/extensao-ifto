@@ -133,11 +133,15 @@
   }
   const fraseDoProcesso = conferido => `Número do processo: o documento está no processo ${conferido.processo}, mas o texto diz ${conferido.escrito}.`
 
+  // v0.35.2: alguma conferência ligada pode parar a assinatura.
+  const confereAoAssinar = opcoes => Boolean(opcoes.conferirProcesso || opcoes.conferirData || opcoes.conferirCargo)
+
   // v0.26.9 (etapa 8): o que para a assinatura de um documento (frases; lista vazia = nada errado): número do
   // processo e data errada (mês ou ano, dia que não chegou). Data só fora do padrão não para; documento já
   // assinado por alguém não tem nada conferido (v0.34.2, pedido do usuário; antes, só a data ficava de fora).
   const regrasDaData = () => typeof module !== 'undefined' && module.exports ? require('./data-documento.js') : (raiz.ExtensaoIFTO || {}).dataDocumento
-  function problemasParaAssinar (html, opcoes = {}, hoje = new Date()) {
+  // v0.35.2: e o cargo da diretora-geral (sigla: unidade aberta no SEI).
+  function problemasParaAssinar (html, opcoes = {}, hoje = new Date(), sigla = '') {
     if (estaAssinado(html)) return []
     const secoes = [{ nome: 'pagina', html }]
     const problemas = []
@@ -146,6 +150,8 @@
     const datas = regrasDaData()
     const data = opcoes.conferirData && datas ? datas.conferirData(secoes, hoje) : null
     if (data && data.errada) problemas.push(datas.fraseAntesDeAssinar(data))
+    const cargo = opcoes.conferirCargo ? conferirCargo(secoes, sigla) : null
+    if (cargo && !cargo.certo) problemas.push(fraseDoCargo(cargo))
     return problemas
   }
 
@@ -259,13 +265,14 @@
 
   const escaparHtml = texto => String(texto).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;')
 
-  // Timbre corrigido: o parágrafo do brasão fica; as linhas de texto viram as esperadas, com a mesma classe.
+  // Timbre corrigido: o parágrafo do brasão fica; as linhas de texto viram as esperadas, com a mesma classe
+  // (v0.35.2: "Campus" em itálico).
   function corrigirTimbre (html, esperado) {
     const lista = paragrafos(html).filter(([, atributos]) => ehDoTimbre(classeDe(atributos)))
     const comTexto = lista.filter(([, , dentro]) => textoDoHtml(dentro))
     if (!comTexto.length) return null
     const atributos = comTexto[0][1]
-    const novas = esperado.map(linha => `<p${atributos}>${escaparHtml(linha)}</p>`).join('')
+    const novas = esperado.map(linha => `<p${atributos}>${porItalico(escaparHtml(linha))}</p>`).join('')
     let posto = false
     const novo = String(html).replace(/<p\b([^>]*)>([\s\S]*?)<\/p>/gi, (tudo, attrs, dentro) => {
       if (!ehDoTimbre(classeDe(attrs))) return tudo
@@ -394,10 +401,156 @@
     return trocado ? novo : null
   }
 
+  // ---- v0.35.2: "Campus" e "Campi" em itálico (toda unidade) ----
+  // Só texto em maiúsculas fica de fora (decisão do usuário, 24/11/2026): timbre e nomes de evento contam.
+  // Também ficam de fora e-mails e endereços de internet.
+  const PEDACOS = /<!--[\s\S]*?-->|<(style|script)\b[\s\S]*?<\/\1\s*>|<[^>]+>|[^<]+/gi
+  const SEM_FIM = /^(br|img|hr|input|col|wbr|meta|link|source)$/i
+  const PALAVRA = /(?<![\p{L}\p{N}_])(?:campus|campi)(?![\p{L}\p{N}_])/giu
+  const estiloDe = atributos => (/\sstyle\s*=\s*"([^"]*)"/i.exec(atributos) || /\sstyle\s*=\s*'([^']*)'/i.exec(atributos) || [])[1] || ''
+
+  // Percorre o HTML chamando aoTexto(texto, { italico, maiusculas }); o que ela devolve fica no lugar do texto.
+  function percorrerTexto (html, aoTexto) {
+    const abertas = []
+    return String(html || '').replace(PEDACOS, pedaco => {
+      const agora = abertas[abertas.length - 1] || { italico: false, maiusculas: false }
+      if (pedaco[0] !== '<') return aoTexto(pedaco, agora)
+      const marca = /^<(\/?)([a-z][\w-]*)([\s\S]*?)(\/?)>$/i.exec(pedaco)
+      if (!marca || /^<(style|script)\b/i.test(pedaco)) return pedaco
+      const nome = marca[2].toLowerCase()
+      if (marca[1]) {
+        const onde = abertas.map(aberta => aberta.nome).lastIndexOf(nome)
+        if (onde >= 0) abertas.length = onde
+      } else if (!marca[4] && !SEM_FIM.test(nome)) {
+        const estilo = estiloDe(marca[3])
+        const fonte = (/(?:^|;)\s*font-style\s*:\s*(\w+)/i.exec(estilo) || [])[1]
+        // O SEI mostra a citação (blockquote) toda em itálico.
+        const italico = fonte ? /italic|oblique/i.test(fonte) : /^(i|em|blockquote)$/.test(nome) || agora.italico
+        const caixa = (/(?:^|;)\s*text-transform\s*:\s*(\w+)/i.exec(estilo) || [])[1]
+        const classe = /mai(ú|&uacute;|u)sculas/i.test((/\sclass\s*=\s*["']([^"']*)/i.exec(marca[3]) || [])[1] || '')
+        const maiusculas = caixa ? /uppercase/i.test(caixa) : classe || agora.maiusculas
+        abertas.push({ nome, italico, maiusculas })
+      }
+      return pedaco
+    })
+  }
+
+  // Troca cada "Campus"/"Campi" que deveria estar em itálico pelo que aoAchar devolver.
+  function semItalico (html, aoAchar) {
+    return percorrerTexto(html, (texto, { italico, maiusculas }) => {
+      if (italico || maiusculas) return texto
+      return texto.replace(PALAVRA, (palavra, posicao) => {
+        if (palavra === palavra.toUpperCase()) return palavra
+        const antes = texto.slice(0, posicao).split(/\s|&nbsp;| /).pop()
+        const depois = texto.slice(posicao + palavra.length).split(/\s|&nbsp;| /)[0]
+        if (/@|:\/\/|www\.|\.(br|com|org|net)\b/i.test(antes + palavra + depois)) return palavra
+        return aoAchar(palavra)
+      })
+    })
+  }
+  const porItalico = html => semItalico(html, palavra => `<i>${palavra}</i>`)
+
+  // { certo, quantos, trechos (até 3), travados (em partes que o editor não deixa mudar) }
+  function conferirItalico (secoes) {
+    let quantos = 0
+    let travados = 0
+    const trechos = []
+    for (const secao of secoes || []) {
+      // Marca as palavras com caracteres de uso privado, para mostrar o trecho em volta delas.
+      const marcado = textoDoHtml(semItalico(secao.html, palavra => { quantos++; if (secao.editavel === false) travados++; return '' + palavra }).replace(/<\/(p|td|th|li|div|h\d)>/gi, ''))
+      for (const bloco of marcado.split('')) {
+        for (const parte of bloco.matchAll(/(?:\S+\s+){0,2}\S*\S+(?:\s+\S+){0,2}/g)) if (trechos.length < 3) trechos.push(parte[0].replace(//g, ''))
+      }
+    }
+    return { certo: !quantos, quantos, trechos, travados }
+  }
+  function avisoDoItalico (conferido) {
+    return conferido.quantos === 1 ? 'A palavra "Campus" ou "Campi" está sem itálico em 1 lugar:' : `As palavras "Campus" ou "Campi" estão sem itálico em ${conferido.quantos} lugares:`
+  }
+  // Mudanças para o editor: { nomeDaSecao: html } (só as partes que dá para mudar e que precisam).
+  function corrigirItalico (secoes) {
+    const mudancas = {}
+    for (const secao of secoes || []) {
+      if (secao.editavel === false) continue
+      const novo = porItalico(secao.html)
+      if (novo !== secao.html) mudancas[secao.nome] = novo
+    }
+    return mudancas
+  }
+
+  // ---- v0.35.2: cargo da diretora-geral abaixo do nome (só na Direção-geral, PAL/REI/IFTO) ----
+  const UNIDADE_DA_DIRECAO = 'PAL/REI/IFTO'
+  const NOME_DA_DIRETORA = 'noemi barreto sales zukowski'
+  const CARGO_DA_DIRETORA = 'Diretora-Geral do Campus Palmas'
+  const CARGO_EM_HTML = 'Diretora-Geral do <i>Campus</i> Palmas'
+  const soNome = html => textoDoHtml(html).toLowerCase().replace(/[.,]$/, '') === NOME_DA_DIRETORA
+  const QUEBRA = /<br\b[^>]*>/i
+
+  // Linhas do documento, na ordem: cada parágrafo dividido nas quebras de linha.
+  function linhasDaSecao (html) {
+    const linhas = []
+    for (const achado of String(html || '').matchAll(/(<p\b[^>]*>)([\s\S]*?)<\/p>/gi)) {
+      let inicio = achado.index + achado[1].length
+      let italicoAberto = ''
+      for (const trecho of achado[2].split(/(<br\b[^>]*>)/i)) {
+        if (!QUEBRA.test(trecho)) {
+          linhas.push({ inicio, fim: inicio + trecho.length, html: trecho, comItalico: italicoAberto + trecho, texto: textoDoHtml(trecho) })
+          // O itálico que começa numa linha pode continuar na seguinte.
+          for (const marca of trecho.matchAll(/<(\/?)(i|em)\b[^>]*>/gi)) italicoAberto = marca[1] ? '' : marca[0]
+        }
+        inicio += trecho.length
+      }
+    }
+    return linhas
+  }
+
+  // null se não há o nome sozinho numa linha ou se a unidade não é a Direção-geral.
+  function conferirCargo (secoes, sigla) {
+    if (siglaDaUnidade(sigla) !== UNIDADE_DA_DIRECAO) return null
+    let achado = null
+    for (const secao of secoes || []) {
+      const linhas = linhasDaSecao(secao.html)
+      linhas.forEach((linha, i) => {
+        if (!soNome(linha.html)) return
+        const abaixo = linhas.slice(i + 1).find(outra => outra.texto)
+        // Só é cargo se for curto e falar em direção: outra frase abaixo do nome não é trocada.
+        const cargo = abaixo && abaixo.texto.length <= 100 && /diretora?\b|pro tempore/i.test(abaixo.texto) ? abaixo : null
+        const problemas = []
+        if (!cargo) problemas.push(`Falta "${CARGO_DA_DIRETORA}" abaixo do nome.`)
+        else if (cargo.texto !== CARGO_DA_DIRETORA) problemas.push(`Está "${cargo.texto}"; o certo é "${CARGO_DA_DIRETORA}".`)
+        else if (porItalico(cargo.comItalico) !== cargo.comItalico) problemas.push('A palavra "Campus" deve ficar em itálico.')
+        // Com o nome em mais de um lugar, o errado vem primeiro.
+        if (!achado || (achado.certo && problemas.length)) achado = { certo: !problemas.length, problemas, secao: secao.nome, editavel: secao.editavel !== false, nome: { fim: linha.fim }, cargo: cargo && { inicio: cargo.inicio, fim: cargo.fim, html: cargo.html } }
+      })
+    }
+    return achado
+  }
+  const fraseDoCargo = conferido => 'Cargo da diretora-geral: ' + conferido.problemas.join(' ')
+
+  // Troca só a linha do cargo (ou põe uma, se não há). As marcas (negrito…) que começam ou acabam na linha ficam,
+  // menos o itálico, para só "Campus" ficar em itálico.
+  function corrigirCargo (html, conferido) {
+    const { cargo, nome } = conferido
+    if (!cargo) return html.slice(0, nome.fim) + '<br>' + CARGO_EM_HTML + html.slice(nome.fim)
+    let posto = false
+    let nova = cargo.html.replace(/<[^>]+>|[^<]+/g, pedaco => {
+      if (pedaco[0] === '<') return pedaco
+      if (posto || !textoDoHtml(pedaco)) return ''
+      posto = true
+      return CARGO_EM_HTML
+    })
+    // Itálico inteiro dentro da linha sai; o de "Campus" volta.
+    const aberturas = (cargo.html.match(/<(i|em)\b[^>]*>/gi) || []).length
+    const fechos = (cargo.html.match(/<\/(i|em)>/gi) || []).length
+    if (aberturas === fechos) nova = nova.replace(/<\/?(i|em)\b[^>]*>/gi, '').replace('Campus', '<i>Campus</i>')
+    nova = nova.replace(/<(span|strong|b|u)\b[^>]*><\/\1>/gi, '')
+    return html.slice(0, cargo.inicio) + nova + html.slice(cargo.fim)
+  }
+
   // Documento já assinado: a página do documento mostra "Documento assinado eletronicamente por".
   const estaAssinado = html => /assinado\s+eletronicamente\s+por/i.test(textoDoHtml(html))
 
-  const api = { siglaDaUnidade, ehUnidadePalmas, limparUnidade, limparUnidades, acharUnidade, textoDoHtml, formatarProcesso, mesmoProcesso, processoDaReferencia, linhaDoProcesso, conferirProcesso, avisoDoProcesso, perguntaAntesDeAssinar, fraseDoProcesso, problemasParaAssinar, corrigirProcesso, estaAssinado, numeroSeiDoDocumento, aceitar, foiAceito, documentosDoBloco, idDoItemDoBloco, TIMBRE_FIXO, comMaiusculas, linhasVaziasDoTimbre, linhasDoTimbre, timbreEsperado, conferirTimbre, avisosDoTimbre, corrigirTimbre, secaoCom, ehDoTimbre, ehDoRodape, formatarTelefone, conferirRodape, rodapeEsperado, corrigirRodape, linhasDoSetor }
+  const api = { siglaDaUnidade, ehUnidadePalmas, limparUnidade, limparUnidades, acharUnidade, textoDoHtml, formatarProcesso, mesmoProcesso, processoDaReferencia, linhaDoProcesso, conferirProcesso, avisoDoProcesso, perguntaAntesDeAssinar, fraseDoProcesso, problemasParaAssinar, corrigirProcesso, estaAssinado, confereAoAssinar, conferirItalico, avisoDoItalico, corrigirItalico, conferirCargo, fraseDoCargo, corrigirCargo, CARGO_DA_DIRETORA, numeroSeiDoDocumento, aceitar, foiAceito, documentosDoBloco, idDoItemDoBloco, TIMBRE_FIXO, comMaiusculas, linhasVaziasDoTimbre, linhasDoTimbre, timbreEsperado, conferirTimbre, avisosDoTimbre, corrigirTimbre, secaoCom, ehDoTimbre, ehDoRodape, formatarTelefone, conferirRodape, rodapeEsperado, corrigirRodape, linhasDoSetor }
   if (typeof module !== 'undefined' && module.exports) module.exports = api
   else raiz.ExtensaoIFTO = Object.assign(raiz.ExtensaoIFTO || {}, { conferirDocumento: api })
 })(globalThis)

@@ -12,7 +12,9 @@
   if (!(await globalThis.ExtensaoIFTO.sei.ligadaNoSei())) return
   const { configuracoes, conferirDocumento: regras, janelaAssinar, seiPedidos } = globalThis.ExtensaoIFTO
   const opcoes = await configuracoes.lerConfiguracoes()
-  if ((!opcoes.conferirProcesso && !opcoes.conferirData) || !seiPedidos) return
+  if (!regras.confereAoAssinar(opcoes) || !seiPedidos) return
+  // v0.35.2: unidade aberta, para o cargo da diretora-geral.
+  const sigla = await globalThis.ExtensaoIFTO.sei.unidadeAberta().catch(() => '')
   const naListaDeBlocos = /[?&]acao=bloco_assinatura_listar/.test(location.href)
   const tempo = ms => new Promise((resolve, recusar) => setTimeout(() => recusar(new Error('tempo')), ms))
 
@@ -21,7 +23,7 @@
   function conferirDocumento (link) {
     if (!lidos.has(link)) {
       const leitura = Promise.race([seiPedidos.pedir(link), tempo(20000)])
-        .then(({ html }) => ({ problemas: regras.problemasParaAssinar(html, opcoes, new Date()), numero: regras.numeroSeiDoDocumento(html) }))
+        .then(({ html }) => ({ problemas: regras.problemasParaAssinar(html, opcoes, new Date(), sigla), numero: regras.numeroSeiDoDocumento(html) }))
         .catch(() => null)
       lidos.set(link, leitura)
     }

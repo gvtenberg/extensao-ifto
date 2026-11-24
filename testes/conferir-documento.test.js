@@ -219,3 +219,58 @@ test('timbre: palavra em minúscula (menos ligação e depois do hífen) e linha
   assert.ok(novo.includes('<img src="x">'))
   assert.equal(c.conferirTimbre([{ nome: 'a', html: novo }], cgoc, cgoc.sigla).certo, true)
 })
+
+// v0.35.2: "Campus"/"Campi" em itálico.
+test('v0.35.2: Campus e Campi sem itálico', () => {
+  const s = html => [{ nome: 'a', html }]
+  assert.equal(c.conferirItalico(s('<p>o <i>Campus&nbsp;</i>Palmas e os <em>campi</em></p>')).certo, true)
+  assert.equal(c.conferirItalico(s('<p><i><strong>Campus</strong></i> <span style="font-style:italic;">Campi</span></p><blockquote><p>Campus</p></blockquote>')).certo, true)
+  assert.equal(c.conferirItalico(s('<p>CAMPUS PALMAS, campus.palmas@ifto.edu.br, https://ifto.edu.br/campus, intercampi</p><p class="Texto_Centralizado_Maiúsculas">Campus</p>')).certo, true)
+  const r = c.conferirItalico(s('<p class="IFTO_Cabeçalho_Novo">Campus Palmas</p><p>no evento Campus Party, os campi e o<br>campus.</p>'))
+  assert.equal(r.quantos, 4)
+  assert.deepEqual(r.trechos.slice(0, 2), ['Campus Palmas', 'no evento Campus Party, os'])
+  assert.equal(c.conferirItalico(s('<i>a <span style="font-style:normal">Campus</span></i>')).quantos, 1)
+  assert.deepEqual(c.corrigirItalico([{ nome: 'a', html: '<style>.Campus{}</style><p title="Campus">do&nbsp;Campus Palmas</p>' }, { nome: 'b', html: '<p>Campus</p>', editavel: false }, { nome: 'c', html: '<p>x</p>' }]),
+    { a: '<style>.Campus{}</style><p title="Campus">do&nbsp;<i>Campus</i> Palmas</p>' })
+  assert.equal(c.conferirItalico([{ nome: 'b', html: '<p>Campus</p>', editavel: false }]).travados, 1)
+})
+
+test('v0.35.2: corrigir o timbre deixa Campus em itálico', () => {
+  assert.equal(c.corrigirTimbre('<p class="IFTO_Cabeçalho_Novo">x</p>', ['Campus Palmas']), '<p class="IFTO_Cabeçalho_Novo"><i>Campus</i> Palmas</p>')
+})
+
+test('v0.35.2: cargo da diretora-geral, só na PAL/REI/IFTO', () => {
+  const s = html => [{ nome: 'a', html }]
+  const DG = 'PAL/REI/IFTO'
+  const nome = 'NOEMI BARRETO&nbsp;SALES ZUKOWSKI'
+  const certo = `<p>${nome}<br>Diretora-Geral do <i>Campus</i> Palmas</p>`
+  assert.equal(c.conferirCargo(s(certo), DG).certo, true)
+  assert.equal(c.conferirCargo(s(certo.replace('<br>', '</p><p>')), DG).certo, true)
+  const casos = [
+    `<p>${nome}<br>Diretora-Geral <i>Pro Tempore</i></p>`,
+    `<p>${nome}</p><p>Diretora-geral</p><p>&nbsp;</p>`,
+    `<p><strong>${nome}<br>Diretora-Geral</strong></p>`,
+    `<p>${nome}<br><em>Diretora-Geral do Campus</em> Palmas</p>`,
+    `<p>${nome}<br>Diretora-Geral do Campus Palmas</p>`,
+    `<p>${nome}</p>`,
+    `<p>${nome}</p><p>Outra frase.</p>`
+  ]
+  for (const html of casos.filter(caso => !caso.includes('<em>'))) {
+    const errado = c.conferirCargo(s(html), DG)
+    assert.equal(errado.certo, false, html)
+    const novo = c.corrigirCargo(html, errado)
+    assert.equal(c.conferirCargo(s(novo), DG).certo, true, novo)
+    assert.equal(c.conferirItalico(s(novo)).certo, true, novo)
+  }
+  assert.equal(c.corrigirCargo(casos[0], c.conferirCargo(s(casos[0]), DG)), certo)
+  assert.ok(c.corrigirCargo(casos[6], c.conferirCargo(s(casos[6]), DG)).endsWith('<p>Outra frase.</p>'))
+  // Outra unidade, sem o nome ou nome no meio de uma frase: nada a conferir.
+  assert.equal(c.conferirCargo(s(casos[0]), 'CGOC/PAL/REI/IFTO'), null)
+  assert.equal(c.conferirCargo(s('<p>Outra Pessoa<br>Diretora-Geral</p>'), DG), null)
+  assert.equal(c.conferirCargo(s('<p>A Noemi Barreto Sales Zukowski, Diretora-Geral Pro Tempore</p>'), DG), null)
+  // Antes de assinar: o cargo pergunta, o itálico não; assinado não confere.
+  const opcoes = { conferirCargo: true, conferirItalico: true }
+  assert.equal(c.problemasParaAssinar(casos[0] + '<p>Campus</p>', opcoes, new Date(), DG).length, 1)
+  assert.deepEqual(c.problemasParaAssinar(certo + '<p>Campus</p>', opcoes, new Date(), DG), [])
+  assert.deepEqual(c.problemasParaAssinar(casos[0] + '<p>assinado eletronicamente por X</p>', opcoes, new Date(), DG), [])
+})

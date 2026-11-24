@@ -9,7 +9,7 @@
   if (window.top !== window) return
   const { configuracoes, caixaEditor, conferirDocumento: regras, janelaAssinar, dataDocumento } = globalThis.ExtensaoIFTO
   const opcoes = await configuracoes.lerConfiguracoes()
-  if (!opcoes.conferirProcesso && !opcoes.conferirTimbre && !opcoes.conferirRodape && !opcoes.conferirData) return
+  if (!opcoes.conferirProcesso && !opcoes.conferirTimbre && !opcoes.conferirRodape && !opcoes.conferirData && !opcoes.conferirCargo && !opcoes.conferirItalico) return
   const sigla = regras.siglaDaUnidade(await caixaEditor.unidadeAberta())
   const verificar = () => caixaEditor.pedirAoFundo('conferirVerificar', { sigla })
   const corrigir = qual => caixaEditor.pedirAoFundo('conferirCorrigir', { sigla, qual })
@@ -21,7 +21,7 @@
   let liberado = false
   let conferindo = false
   async function antesDeAssinar (evento) {
-    if (liberado || (!opcoes.conferirProcesso && !opcoes.conferirData)) return
+    if (liberado || !regras.confereAoAssinar(opcoes)) return
     const botao = botaoAssinar()
     if (!botao) return
     evento.preventDefault()
@@ -38,6 +38,7 @@
     const problemas = []
     if (opcoes.conferirProcesso && agora && agora.ok && agora.processo && !agora.processo.certo) problemas.push(regras.fraseDoProcesso(agora.processo))
     if (data && data.ok && data.conferido && data.conferido.errada && dataDocumento) problemas.push(dataDocumento.fraseAntesDeAssinar(data.conferido))
+    if (agora && agora.ok && agora.cargo && !agora.cargo.certo) problemas.push(regras.fraseDoCargo(agora.cargo))
     if (problemas.length) {
       const resposta = await janelaAssinar.perguntar(regras.perguntaAntesDeAssinar(problemas), problemas, 'Não, corrigir antes')
       if (resposta !== 'assinar') return
@@ -92,6 +93,33 @@
       if (!resultado || !resultado.ok) return caixaCapa.mostrar('erro', 'Não consegui corrigir. ' + ((resultado && resultado.erro) || '') + ' Nada foi salvo.')
       caixaCapa.mostrar('ok', 'Capa corrigida com os dados do processo.' + DESFAZER)
     })
+  }
+
+  // v0.35.2: cargo da diretora-geral (Direção-geral) e "Campus"/"Campi" em itálico (toda unidade).
+  function avisoComBotao (nome, texto, linhas, rotulo, qual, pronto, editavel) {
+    const aviso = caixaEditor.criarCaixa(nome, texto, rotulo)
+    const itens = caixaEditor.criar('ul')
+    for (const linha of linhas) itens.append(caixaEditor.criar('li', { textContent: linha }))
+    aviso.botao.before(itens)
+    if (!editavel) {
+      aviso.botao.replaceWith(caixaEditor.criar('p', { className: 'aviso', textContent: 'Essa parte do documento não dá para mudar no editor.' }))
+      return
+    }
+    aviso.botao.addEventListener('click', async () => {
+      aviso.botao.disabled = true
+      aviso.botao.textContent = 'Corrigindo…'
+      const resultado = await corrigir(qual)
+      if (!resultado || !resultado.ok) return aviso.mostrar('erro', 'Não consegui corrigir. ' + ((resultado && resultado.erro) || '') + ' Nada foi salvo.')
+      aviso.mostrar('ok', pronto + DESFAZER)
+    })
+  }
+  const { cargo, italico } = verificado
+  if (cargo && !cargo.certo) {
+    avisoComBotao('conferir-cargo', 'Confira o cargo da diretora-geral:', cargo.problemas, `Corrigir para "${regras.CARGO_DA_DIRETORA}"`, 'cargo', 'Cargo corrigido.', cargo.editavel)
+  }
+  if (italico && !italico.certo) {
+    const trechos = italico.quantos > italico.trechos.length ? [...italico.trechos, '…'] : italico.trechos
+    avisoComBotao('conferir-italico', regras.avisoDoItalico(italico), trechos, 'Colocar em itálico', 'italico', '"Campus" e "Campi" em itálico.', italico.quantos > italico.travados)
   }
 
   // v0.26.5: timbre e rodapé: uma caixa no canto de baixo, à esquerda (as outras caixas ficam à direita).

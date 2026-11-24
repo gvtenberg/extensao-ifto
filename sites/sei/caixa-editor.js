@@ -119,21 +119,8 @@
     return Promise.race([pedido, limite])
   }
 
-  // O editor não mostra a unidade: vem do número no endereço (gravado pelas páginas do SEI) ou da janela
-  // do SEI que abriu o editor (v0.22.0, em minuta-edital.js; v0.26.5 aqui, também na página do documento).
-  async function unidadeAberta () {
-    const sei = raiz.ExtensaoIFTO.sei
-    const numero = sei.numeroDaUnidade(location.href)
-    const { unidadesSei = {} } = await navegador.storage.local.get('unidadesSei')
-    if (numero && unidadesSei[numero]) return unidadesSei[numero]
-    for (const janela of [window.opener, window.top]) {
-      try {
-        const campo = janela && janela.top.document.getElementById('lnkInfraUnidade')
-        if (campo) return campo.textContent.trim()
-      } catch (erro) {}
-    }
-    return ''
-  }
+  // v0.35.2: a leitura da unidade fica em comum/sei.js.
+  const unidadeAberta = () => raiz.ExtensaoIFTO.sei.unidadeAberta()
 
   // v0.31.1: as ajudas que se ligam ao editor (tabelas, números longos, ★) entram nesta lista. Quando o editor é
   // montado de novo (restaurar ou colar uma versão salva), todas se ligam de novo, sem uma lista à parte para cada ajuda.

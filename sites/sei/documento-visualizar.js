@@ -43,6 +43,13 @@
     if (editar) caixa.botao.addEventListener('click', () => editar.click())
     else caixa.botao.replaceWith(caixaEditor.criar('p', { className: 'aviso', textContent: 'Clique em "Editar Conteúdo" na barra do SEI para corrigir.' }))
   }
+  function avisoDaPagina (nome, texto, linhas) {
+    const caixa = caixaEditor.criarCaixa(nome, texto, 'Abrir o editor para corrigir')
+    const lista = caixaEditor.criar('ul')
+    for (const linha of linhas) lista.append(caixaEditor.criar('li', { textContent: linha }))
+    caixa.botao.before(lista)
+    botaoDoEditor(caixa)
+  }
   if (configuracoes.conferirProcesso) {
     const processo = regras.conferirProcesso(secoes)
     if (processo && !processo.certo) {
@@ -54,16 +61,24 @@
   if (configuracoes.conferirData && globalThis.ExtensaoIFTO.dataDocumento) {
     const data = globalThis.ExtensaoIFTO.dataDocumento.conferirData(secoes, new Date())
     if (data && !data.certo) {
-      const caixa = caixaEditor.criarCaixa('conferir-data', 'Confira a data do documento:', 'Abrir o editor para corrigir')
-      const lista = caixaEditor.criar('ul')
-      for (const problema of data.problemas) lista.append(caixaEditor.criar('li', { textContent: problema }))
-      caixa.botao.before(lista)
-      botaoDoEditor(caixa)
+      avisoDaPagina('conferir-data', 'Confira a data do documento:', data.problemas)
     }
   }
-  if (!configuracoes.conferirTimbre && !configuracoes.conferirRodape) return
+  // v0.35.2: "Campus"/"Campi" sem itálico (toda unidade). Só o texto do documento: os comentários do SEI ficam de fora.
+  if (configuracoes.conferirItalico) {
+    const conteudos = [...document.querySelectorAll('.conteudo')].map(parte => parte.innerHTML)
+    const italico = regras.conferirItalico([{ nome: 'pagina', html: conteudos.length ? conteudos.join('') : html }])
+    if (!italico.certo) {
+      const trechos = italico.quantos > italico.trechos.length ? [...italico.trechos, '…'] : italico.trechos
+      avisoDaPagina('conferir-italico', regras.avisoDoItalico(italico), trechos)
+    }
+  }
+  if (!configuracoes.conferirTimbre && !configuracoes.conferirRodape && !configuracoes.conferirCargo) return
   const sigla = regras.siglaDaUnidade(await caixaEditor.unidadeAberta())
   if (!regras.ehUnidadePalmas(sigla)) return
+  // v0.35.2: cargo da diretora-geral (só na Direção-geral).
+  const cargo = configuracoes.conferirCargo ? regras.conferirCargo(secoes, sigla) : null
+  if (cargo && !cargo.certo && !editorAberto) avisoDaPagina('conferir-cargo', 'Confira o cargo da diretora-geral:', cargo.problemas)
   const unidade = regras.acharUnidade(configuracoes.unidades, sigla)
   const timbre = configuracoes.conferirTimbre ? regras.conferirTimbre(secoes, unidade, sigla) : null
   const rodape = configuracoes.conferirRodape ? regras.conferirRodape(secoes, unidade) : null
@@ -72,9 +87,5 @@
   const avisos = [...(timbre && !timbre.certo ? regras.avisosDoTimbre(timbre) : []), ...(rodape && !rodape.certo ? rodape.avisos : [])]
   if (!avisos.length) return
   const partes = [timbre && !timbre.certo && 'o timbre', rodape && !rodape.certo && 'o rodapé'].filter(Boolean).join(' e ')
-  const caixa = caixaEditor.criarCaixa('conferir-timbre', `Confira ${partes} desta unidade (${sigla}):`, 'Abrir o editor para corrigir')
-  const lista = caixaEditor.criar('ul')
-  for (const aviso of avisos) lista.append(caixaEditor.criar('li', { textContent: aviso }))
-  caixa.botao.before(lista)
-  botaoDoEditor(caixa)
+  avisoDaPagina('conferir-timbre', `Confira ${partes} desta unidade (${sigla}):`, avisos)
 })()

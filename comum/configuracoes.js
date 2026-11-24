@@ -70,6 +70,9 @@
     conferirRodape: true,
     // v0.26.9 (etapa 8): data do documento ainda não assinado (mês ou ano errado, dia que não chegou, padrão).
     conferirData: true,
+    // v0.35.2: cargo da diretora-geral abaixo do nome (só na PAL/REI/IFTO) e "Campus"/"Campi" em itálico (toda unidade).
+    conferirCargo: true,
+    conferirItalico: true,
     espacamentoDocumento: true,
     // v0.29.2 (spec todos-os-estilos, D4): todos os estilos em todos os documentos (texto principal), todas as unidades.
     todosOsEstilos: true,

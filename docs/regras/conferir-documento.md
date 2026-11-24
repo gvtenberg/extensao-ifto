@@ -1,6 +1,6 @@
 # Check SEI documents (process number, timbre, footer, date, spacing)
 
-**Sections**: Where and when · Process number · Before signing · Timbre and footer · Capa de Processo · Date · Spacing between parts · Settings
+**Sections**: Where and when · Process number · Before signing · Timbre and footer · Capa de Processo · Date · Spacing between parts · Director-general title and Campus in italics · Settings
 
 Decided in `specs/feitas/conferir-documento.md` (v0.26.0 to v0.26.9 and stage 7, 18/11/2026). Code: `comum/conferir-documento.js`, `comum/data-documento.js`, `comum/espacamento-documento.js` (pure rules, Node tests) and `sites/sei/` (`conferir-documento.js`, `data-documento.js`, `espacamento-documento.js`, `editor-espacamento.js`, `documento-visualizar.js`, `assinar-conferir.js`, `lista-assinaturas.js`, `bloco-assinatura.js`).
 
@@ -8,7 +8,7 @@ Decided in `specs/feitas/conferir-documento.md` (v0.26.0 to v0.26.9 and stage 7,
 
 - Document page in the process tree, only if not signed yet ("Documento assinado eletronicamente" absent), and the editor window (`acao=editor_montar`). Signed documents are never checked nor touched, not even before signing (v0.34.2).
 - Nothing is saved by the extension: it changes the editor text only after a click (spacing: automatically, see below) and the person clicks Salvar.
-- Process number and date: every unit. Timbre and footer: only Campus Palmas units (SEI sigla with `/PAL/`).
+- Process number, date and italics: every unit. Director-general title: only PAL/REI/IFTO. Timbre and footer: only Campus Palmas units (SEI sigla with `/PAL/`).
 
 ## Process number
 
@@ -19,7 +19,7 @@ Decided in `specs/feitas/conferir-documento.md` (v0.26.0 to v0.26.9 and stage 7,
 ## Before signing
 
 - All four places (D2): "Assinar Documento" in the tree, "Assinar" in the editor (and Ctrl+Shift+A), the signature list ("Assinar e próximo" and ranges) and SEI's Bloco de assinatura. One window: "Assinar mesmo assim?"; list and Bloco: one window listing every wrong document.
-- Only a wrong process number or a **wrong** date stops signing (a date only out of pattern does not). v0.34.2: never for a document someone already signed (tree, list, Bloco); the window lists each divergence ("possíveis divergências", not "errado"). If the check fails or is slow, the SEI signs normally (never blocks).
+- Only a wrong process number, a **wrong** date or a wrong director-general title (v0.35.2) stops signing (a date only out of pattern does not). v0.34.2: never for a document someone already signed (tree, list, Bloco); the window lists each divergence ("possíveis divergências", not "errado"). If the check fails or is slow, the SEI signs normally (never blocks).
 
 ## Timbre and footer
 
@@ -46,6 +46,14 @@ Decided in `specs/feitas/conferir-documento.md` (v0.26.0 to v0.26.9 and stage 7,
 - Added automatically; a box lists where and offers "Desfazer" (removes the block; nothing is remembered, so the next time the editor opens it is offered again, D23). Saved only when the person clicks Salvar. v0.33.0: a document that already has the block is measured again; if the saved-document rules differ (gaps missing in the old block), the block is replaced and the box says "atualizou"; "Desfazer" then removes all the spacing.
 - With the editor open the document is never signed (the SEI removes the signature when the editor of a signed document is opened, D22): no check there.
 
+## Director-general title and Campus in italics
+
+Decided by the user on 24/11/2026 (v0.35.2).
+
+- Title (only when the open SEI unit is PAL/REI/IFTO): the line below "Noemi Barreto Sales Zukowski" (name alone on its line) must be exactly "Diretora-Geral do *Campus* Palmas", with Campus in italics; missing, "Pro Tempore" or only "Diretora-Geral" are warned. Name and title are fixed in `comum/conferir-documento.js`: change them when the direction changes. A line that does not speak of direction is never replaced (the title is inserted after the name).
+- Italics (every unit): each "Campus"/"Campi" (any case) outside italics, timbre and event names ("Campus Party") included. Not flagged: text in capitals (typed or by style), e-mails and web addresses. Notice only, never stops signing.
+- Corrected only by click in the editor; "Corrigir timbre" also writes Campus in italics.
+
 ## Settings
 
-- Switches (all on by default, D10): "Número do processo", "Timbre", "Rodapé", "Data do documento" (also the editor button "Corrigir para …": data-documento D4), "Espaço entre as partes do documento"; "Copiar o nome de quem assinou" (D15). "Minhas unidades": sigla, phone, e-mail and sector lines, saved only in the browser.
+- Switches (all on by default, D10): "Número do processo", "Timbre", "Rodapé", "Data do documento" (also the editor button "Corrigir para …": data-documento D4), "Campus e Campi em itálico", "Cargo da diretora-geral" (v0.35.2), "Espaço entre as partes do documento"; "Copiar o nome de quem assinou" (D15). "Minhas unidades": sigla, phone, e-mail and sector lines, saved only in the browser.

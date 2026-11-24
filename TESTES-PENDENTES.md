@@ -554,3 +554,17 @@ E: Desligada ou em outra unidade, o botão e as opções do menu somem; ligada d
 ### T244 – Avisos fecham ao abrir o editor (v0.35.1)
 F: Na árvore, abra um documento não assinado que mostre "Avisos da extensão" e abra o editor pelo botão do aviso; repita com "Editar Conteúdo" do SEI.
 E: Nos dois casos, os avisos da página do documento fecham e ficam só os do editor.
+
+## Cargo da diretora-geral e Campus em itálico (v0.35.2)
+### T245 – Cargo da diretora-geral no editor (v0.35.2)
+F: Na unidade PAL/REI/IFTO, num documento de teste não assinado com "Diretora-Geral Pro Tempore" abaixo do nome da diretora-geral, abra o documento e depois o editor; clique em "Corrigir para…". Repita só com "Diretora-Geral" e sem cargo abaixo do nome.
+E: O aviso aparece na página do documento e no editor; o botão deixa "Diretora-Geral do Campus Palmas", com só Campus em itálico. Nada é salvo sem clicar em Salvar. Em outra unidade, o aviso do cargo não aparece.
+### T246 – Cargo da diretora-geral antes de assinar (v0.35.2)
+F: Na PAL/REI/IFTO, com o cargo errado, clique em Assinar na árvore, no editor, na lista de assinaturas e no Bloco de assinatura; responda "Não, corrigir antes".
+E: Aparece "Assinar mesmo assim?" com o cargo errado. Só a falta de itálico em outras partes do texto não pergunta.
+### T247 – Campus e Campi em itálico (v0.35.2)
+F: Em qualquer unidade, num documento não assinado, escreva "Campus" e "campi" sem itálico (texto e tabela) e "CAMPUS" em maiúsculas, salve e abra o documento; no editor, clique em "Colocar em itálico" e depois Ctrl+Z.
+E: O aviso diz quantos estão sem itálico (o timbre também conta; maiúsculas não); o botão corrige todos e o Ctrl+Z desfaz. Documento assinado não mostra aviso.
+### T248 – Corrigir timbre com Campus em itálico (v0.35.2)
+F: Num documento não assinado com o timbre errado, clique em "Corrigir timbre" no editor.
+E: O timbre fica certo e "Campus" fica em itálico.

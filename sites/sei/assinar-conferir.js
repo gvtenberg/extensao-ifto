@@ -7,7 +7,7 @@
   if (!(await globalThis.ExtensaoIFTO.sei.ligadaNoSei())) return
   const { configuracoes, conferirDocumento: regras, janelaAssinar } = globalThis.ExtensaoIFTO
   const opcoes = await configuracoes.lerConfiguracoes()
-  if (!opcoes.conferirProcesso && !opcoes.conferirData) return
+  if (!regras.confereAoAssinar(opcoes)) return
   // v0.26.6: as listas do Bloco de assinatura têm a sua própria conferência (sites/sei/bloco-assinatura.js).
   if (/[?&]acao=(bloco_assinatura_listar|rel_bloco_protocolo_listar)/.test(location.href)) return
 
@@ -19,6 +19,10 @@
   lerAceitos()
   navegador.storage.onChanged.addListener(mudou => { if (mudou.assinarAceitos) lerAceitos() })
 
+  // v0.35.2: unidade aberta (cargo da diretora-geral), lida antes pelo mesmo motivo.
+  let sigla = ''
+  if (opcoes.conferirCargo) globalThis.ExtensaoIFTO.sei.unidadeAberta().then(lida => { sigla = lida }).catch(() => {})
+
   function lerDocumentoAberto () {
     try {
       const quadros = [...document.querySelectorAll('iframe')]
@@ -26,7 +30,7 @@
       const quadro = document.getElementById('ifrArvoreHtml') || document.getElementById('ifrSeiConteudo') || quadros.find(q => /documento_visualizar/.test(q.src))
       const html = quadro && quadro.contentDocument && quadro.contentDocument.body ? quadro.contentDocument.body.innerHTML : ''
       if (!html || regras.foiAceito(aceitos, regras.numeroSeiDoDocumento(html), new Date())) return null
-      return regras.problemasParaAssinar(html, opcoes, new Date())
+      return regras.problemasParaAssinar(html, opcoes, new Date(), sigla)
     } catch (erro) {
       return null
     }

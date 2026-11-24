@@ -143,6 +143,21 @@
     return (espaco > 0 ? cortado.slice(0, espaco) : limpo.slice(0, maximo)).replace(/[\s.,;:-]+$/, '')
   }
 
+  // O endereço pode ter só o número da unidade (nome gravado pelas páginas do SEI); senão, vem da página do SEI em
+  // volta ou da janela que abriu o editor (v0.22.0; v0.35.2: veio de caixa-editor.js, para a conferência ao assinar).
+  async function unidadeAberta () {
+    const numero = numeroDaUnidade(location.href)
+    const { unidadesSei = {} } = await navegador().storage.local.get('unidadesSei')
+    if (numero && unidadesSei[numero]) return unidadesSei[numero]
+    for (const janela of [window.opener, window.top]) {
+      try {
+        const campo = janela && janela.top.document.getElementById('lnkInfraUnidade')
+        if (campo) return campo.textContent.trim()
+      } catch (erro) {}
+    }
+    return ''
+  }
+
   // v0.22.0: unidade do SEI pelo número dela (infra_unidade_atual), lido no endereço ou no link da unidade.
   function numeroDaUnidade (texto) {
     const achado = /[?&;]infra_unidade_atual=(\d+)/.exec(String(texto || ''))
@@ -159,7 +174,7 @@
     return (partes.find(parte => !/^\d+$/.test(parte.trim())) || '').trim()
   }
 
-  const api = { tipoDoDocumento, versaoDoSei, VERSAO_SEI_TESTADA, seiTestado, estadoNoSei, estadoAtualNoSei, ligadaNoSei, gravarEscolhaNoSei, atributosDoCampoDeSenha, lerArvore, ligadaNaUnidade, nomeNaArvore, numeroDaUnidade, UNIDADE_DIRECAO_GERAL }
+  const api = { tipoDoDocumento, versaoDoSei, VERSAO_SEI_TESTADA, seiTestado, estadoNoSei, estadoAtualNoSei, ligadaNoSei, gravarEscolhaNoSei, atributosDoCampoDeSenha, lerArvore, ligadaNaUnidade, nomeNaArvore, numeroDaUnidade, UNIDADE_DIRECAO_GERAL, unidadeAberta }
   if (typeof module !== 'undefined' && module.exports) module.exports = api
   else raiz.ExtensaoIFTO = Object.assign(raiz.ExtensaoIFTO || {}, { sei: api })
 })(globalThis)

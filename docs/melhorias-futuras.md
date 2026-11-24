@@ -6,6 +6,7 @@
 
 Summary to resume work (on another machine or by another person) without reading everything. Update at the end of each stage or round.
 
+- **Done, waiting for tests (v0.35.2, 24/11/2026):** director-general title and Campus/Campi in italics (no spec; rules in `regras/conferir-documento.md`). Tests T245–T248.
 - **Done, waiting for tests (v0.35.0, 23/11/2026):** `specs/lista-para-direcao.md` stages 1 to 4, README and rules (`regras/lista-direcao.md`). Tests T232–T243 (T239, T241 critical: change the assignment in the SEI). Pending in stage 5: check with a document received in a block (needs the saved process page, before and after the director signs), then spec to `specs/feitas/`.
 - **Done, waiting for tests (v0.34.0, 19/11/2026):** "Blocos Internos" button in the Controle de Processos bar (no spec; rule in `regras/sei.md`). Test T225.
 - **Done, waiting for tests (v0.33.0, 19/11/2026):** process data on the process screen, "Público" in new processes, Capa de Processo check, timbre lowercase/blank lines, spacing fixed for the saved document (no spec; rules in `regras/sei.md` and `regras/conferir-documento.md`). Tests T217–T224 (T220, T222 critical: change the document text).
