@@ -1,8 +1,8 @@
 # Rules for programming projects
 
-**Sections**: How we work (small specs) · Chat reply after changing code · Texts shown to users · Tests · Version and git · Forks · Worktrees · GitHub Actions · External systems can be down · Reusing code · Same rules on every computer
+**Sections**: How we work (small specs) · Chat reply after changing code · Texts shown to users · Tests · Version and git · Forks · Worktrees · GitHub Actions · Dependabot · External systems can be down · Reusing code · Same rules on every computer
 
-Updated on 18/11/2026. Read at the start of every programming session (see `~/.claude/CLAUDE.md`). Model project: `/home/berg/Desktop/Sistema Gestão Orçamentária/sistema-orcamento-ifto`.
+Updated on 25/11/2026. Read at the start of every programming session (see `~/.claude/CLAUDE.md`). Model project: `/home/berg/Desktop/Sistema Gestão Orçamentária/sistema-orcamento-ifto`.
 
 ## How we work (small specs)
 1. **Plan** (`/planejar`): interview the user and create the spec with small stages (each fits in one conversation).
@@ -48,6 +48,13 @@ Every CODE change (a stage or a fix) is made in its own **git worktree**, create
 - Every workflow that checks, builds or publishes has `paths-ignore` on `push` and `pull_request`, e.g. `['**.md', 'docs/**', 'LICENSE', '.claude/**', 'apps-script/**', '.github/scripts/**', '.github/workflows/testes.yml']`. The test-cards workflow is the exception (runs exactly on the tests file).
 - `ferramentas-de-teste/` in `.gitignore`; keys in `.env.local` or GitHub secrets.
 - `.claude/commands/`: `/planejar`, `/etapa`, `/testes`. `.claude/settings.json`: allows the check commands and `git status/diff/log`; blocks reading `.env.local`.
+
+## Dependabot
+(25/11/2026) Only for projects that are on GitHub AND have third-party dependencies listed in a file it can read (package.json, requirements.txt, etc.) or use GitHub Actions. Does not apply to projects without code, without dependencies, or to forks (the original project decides).
+- Applies and there is no `.github/dependabot.yml`: propose it once (choice window: frequency and what to check); on "no", note it in the project's `CLAUDE.md` and do not ask again.
+- Suggested: monthly, small and medium updates grouped, major ones separate; never auto-merge.
+- Before accepting an update: run the project's tests; say if the merge publishes the system.
+- Add `.github/dependabot.yml` to `paths-ignore`.
 
 ## External systems can be down
 (18/11/2026) Every call to an outside system (government sites such as SICAF and Simples Nacional, APIs, Google, SEI) must expect it to be down, slow or answering with an error page: a time limit with a plain warning ("o site pode estar fora do ar"), buttons to skip that system and go on with the rest or to cancel at any moment, return to the previous screen keeping what the user chose, close what the program opened, and never leave a screen stuck. Plan and test the "system down" case.
