@@ -130,7 +130,7 @@
     return lista ? [...lista.options].filter(opcao => opcao.getAttribute('value') && opcao.getAttribute('value') !== 'null').map(opcao => opcao.textContent.trim()) : []
   }
 
-  async function incluirExternos (lida, itens, { aoAvancar = () => {}, deveParar = () => false, incluidos = [] } = {}) {
+  async function incluirExternos (lida, itens, { aoAvancar = () => {}, deveParar = () => false, incluidos = [], salvos = [] } = {}) {
     const regras = ExtensaoIFTO.documentosPagamento
     const sicaf = ExtensaoIFTO.sicaf
     // Só é pedido se algum item for novo (v0.16.0: os em branco são alterados).
@@ -143,6 +143,7 @@
       aoAvancar(posicao)
       if (existente) {
         await alterarExterno(existente, { tipo, nomeArvore, arquivo }, formularioDoExterno, regras, sicaf)
+        salvos.push({ id: existente.id })
         incluidos.push(tipo)
         continue
       }
@@ -173,6 +174,8 @@
       pagina = await enviar(doTipo, pagina.endereco, novos)
       // Se o SEI devolve o formulário de novo, não salvou.
       if (formularioDoExterno(pagina)) throw new Error(regras.mensagemDoSei(pagina.html) || `O SEI não salvou o documento "${tipo}".`)
+      // v0.36.1: para abrir o primeiro documento no fim (a resposta traz o link da árvore com ele).
+      salvos.push(ExtensaoIFTO.sei.linkDaArvoreComDocumento(pagina.html))
       incluidos.push(tipo)
     }
   }
@@ -237,6 +240,41 @@
     try { quadro.contentWindow.location.reload() } catch (erro) { quadro.setAttribute('src', quadro.getAttribute('src')) }
   }
 
+  // v0.36.1: depois de incluir, mostra a árvore nova e abre o primeiro documento incluído, para a pessoa conferir
+  // sem procurar na árvore. O link do SEI já abre a pasta e escolhe o documento; se a página dele não abrir à
+  // direita, clica no nome na árvore (espera o SEI terminar a escolha que ele mesmo faz, 300 ms depois).
+  const esperar = ms => new Promise(resolve => setTimeout(resolve, ms))
+  async function abrirIncluido (lida, salvos) {
+    const quadro = document.getElementById('ifrArvore')
+    let velha = null
+    try { velha = quadro.contentDocument } catch (erro) { /* só compara */ }
+    const antes = lida.documentos.map(doc => doc.id)
+    // O link com um documento que já existia não serve (só o de um documento novo). Se o do primeiro não veio,
+    // procura na árvore nova o que não existia antes.
+    const certos = salvos.map(salvo => salvo && salvo.link && antes.includes(salvo.id) ? null : salvo)
+    const conhecidos = certos.every(Boolean) ? certos : certos.slice(0, 1).filter(Boolean)
+    const primeiro = ExtensaoIFTO.sei.primeiroIncluido(conhecidos, antes, [])
+    if (primeiro && primeiro.link) quadro.contentWindow.location.href = new URL(primeiro.link, location.href).href
+    else recarregarArvore()
+    const fim = Date.now() + 20000
+    while (Date.now() < fim) {
+      await esperar(400)
+      let arvore = null
+      try { arvore = quadro.contentDocument } catch (erro) { continue }
+      const nova = arvore && arvore !== velha && arvore.readyState === 'complete' ? arvoreAberta() : null
+      if (!nova) continue
+      if (nova.idProcesso !== lida.idProcesso) return
+      const alvo = primeiro || ExtensaoIFTO.sei.primeiroIncluido([], antes, nova.documentos.map(doc => doc.id))
+      if (!alvo) return
+      await esperar(1000)
+      const direita = document.getElementById('ifrConteudoVisualizacao')
+      try { if (new URL(direita.contentWindow.location.href).searchParams.get('id_documento') === alvo.id) return } catch (erro) { /* clica */ }
+      const link = quadro.contentDocument && quadro.contentDocument.getElementById('anchor' + alvo.id)
+      if (link) { link.scrollIntoView({ block: 'nearest' }); link.click() }
+      return
+    }
+  }
+
   // v0.15.0 (saiu de sicaf.js na v0.27.1 para servir também aos arquivos arrastados): inclui os itens com a
   // janela da extensão aberta: andamento, botão Parar, árvore recarregada e o resumo no fim.
   async function incluirNaJanela (itens, aberta, nomeDoItem) {
@@ -245,6 +283,7 @@
     if (!lida) { aberta.trocarConteudo([criar('p', { className: 'aviso vermelho', textContent: 'Não consegui ler a árvore do processo. Espere o processo abrir e tente de novo.' })]); return }
     const andamento = { parar: false }
     const incluidos = []
+    const salvos = []
     const progresso = criar('p', { textContent: 'Incluindo…' })
     aberta.trocarConteudo([progresso])
     aberta.trocarBotoes([{ texto: 'Parar', aoClicar: () => { andamento.parar = true; progresso.textContent = 'Parando depois do documento da vez…' } }])
@@ -252,14 +291,21 @@
     try {
       await incluirExternos(lida, itens, {
         incluidos,
+        salvos,
         deveParar: () => andamento.parar,
         aoAvancar: posicao => { progresso.textContent = `Incluindo ${nomeDoItem(itens[posicao])} (${posicao + 1} de ${itens.length})…` }
       })
     } catch (falha) {
       erro = falha
     }
-    if (incluidos.length) recarregarArvore()
+    if (incluidos.length) abrirIncluido(lida, salvos).catch(() => {})
     const feitos = incluidos.length ? 'Incluídos: ' + ExtensaoIFTO.documentosPagamento.listaEmTexto(itens.slice(0, incluidos.length).map(nomeDoItem)) + '.' : 'Nenhum documento foi incluído.'
+    // v0.36.1: deu tudo certo: a janela fecha e só aparece a mensagem que some sozinha.
+    if (!erro && incluidos.length === itens.length) {
+      aberta.fechar()
+      ExtensaoIFTO.janela.mensagemRapida(feitos)
+      return
+    }
     aberta.trocarConteudo([
       erro || andamento.parar ? criar('p', { className: 'aviso vermelho', textContent: erro ? erro.message : 'Inclusão parada.' }) : criar('p', { className: 'aviso verde', textContent: 'Pronto.' }),
       criar('p', { textContent: feitos })

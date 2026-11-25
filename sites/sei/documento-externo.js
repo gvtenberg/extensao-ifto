@@ -153,6 +153,9 @@
       nomeArvore.value = achado.nomeArvore
       feito.push(`Nome na Árvore "${achado.nomeArvore}"`)
     }
+    if ((!lista.value || lista.value === 'null') && achado.sugestoes) {
+      avisar(`Escolha o tipo do documento. Os que combinam com o nome do arquivo: ${achado.sugestoes.join('; ')}.`, 'dica', 'documento-externo-arquivo')
+    }
     if (feito.length) avisar(`Pelo nome do arquivo, a extensão escolheu ${feito.join(' e ')}: confira antes de salvar.`, 'feito', 'documento-externo-arquivo')
   }
 

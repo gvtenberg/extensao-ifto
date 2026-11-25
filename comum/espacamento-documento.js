@@ -115,7 +115,7 @@
     return variantes
   }
 
-  // v0.35.3 (pedido do usuário, 24/11/2026): linha em branco que falta entre a data e o nome de quem assina e
+  // v0.35.3 (pedido do usuário, 24/11/2026): linha em branco que falta antes do nome de quem assina e
   // entre a última linha de quem assina e o rodapé. Qualquer linha em branco que já esteja lá basta, mesmo
   // fina. Só em parte que dá para editar. Devolve [{ raiz, posicao, onde: 'antes' | 'depois', antes, depois }].
   const ehDeQuemAssina = bloco => (bloco.classes || []).some(classe => /^IFTO_Assinatura|^IFTO_Centralizado$/i.test(classe))
@@ -125,14 +125,36 @@
     const faltam = []
     // Espaço de uma linha dentro dos próprios parágrafos (quebra de linha no começo ou no fim) também é linha.
     const temLinhaDentro = (cima, baixo) => (cima.abaixo || 0) + (baixo.acima || 0) >= (Number(baixo.fonte) || 16)
+    const ehNome = bloco => Boolean(bloco) && !bloco.vazio && !bloco.outro && ehDeQuemAssina(bloco)
+    // v0.36.1 (usuário, 25/11/2026): a linha de cima vale para o que vier antes de quem assina (no Despacho é o
+    // texto, não a data). "Primeira linha" de quem assina: a de depois da data e a do grupo do fim do documento
+    // (as linhas seguidas, mais as separadas por linha em branco no estilo de assinatura: várias pessoas).
+    const primeiras = new Set()
     for (let i = 1; i < fim; i++) {
-      const [data, nome] = [blocos[i - 1], blocos[i]]
-      if (data.vazio || nome.vazio || data.outro || nome.outro || nome.editavel === false) continue
-      if (!data.textoFim || !regrasData().ehLinhaDaData(data.textoFim) || !ehDeQuemAssina(nome) || temLinhaDentro(data, nome)) continue
-      faltam.push({ raiz: nome.raiz, posicao: nome.posicao, onde: 'antes', antes: data.textoFim, depois: nome.texto || '' })
+      const data = blocos[i - 1]
+      if (ehNome(blocos[i]) && !data.vazio && !data.outro && data.textoFim && regrasData().ehLinhaDaData(data.textoFim)) primeiras.add(i)
+    }
+    let ultima = fim - 1
+    while (ultima >= 0 && blocos[ultima].vazio) ultima--
+    const ehAssinatura = bloco => (bloco.classes || []).some(classe => /^IFTO_Assinatura/i.test(classe))
+    if (ehNome(blocos[ultima])) {
+      let k = ultima
+      for (;;) {
+        while (ehNome(blocos[k - 1]) && !(ehAssinatura(blocos[k]) && !ehAssinatura(blocos[k - 1]))) k--
+        primeiras.add(k)
+        let acima = k - 1
+        while (acima >= 0 && blocos[acima].vazio) acima--
+        if (acima === k - 1 || !ehNome(blocos[acima]) || !ehAssinatura(blocos[acima]) || !ehAssinatura(blocos[k])) break
+        k = acima
+      }
+    }
+    for (const i of [...primeiras].sort((a, b) => a - b)) {
+      const [acima, nome] = [blocos[i - 1], blocos[i]]
+      if (!acima || acima.vazio || nome.editavel === false || temLinhaDentro(acima, nome)) continue
+      faltam.push({ raiz: nome.raiz, posicao: nome.posicao, onde: 'antes', antes: acima.textoFim || '', depois: nome.texto || '' })
     }
     const [cargo, rodape] = [blocos[fim - 1], blocos[fim]]
-    if (cargo && rodape && !cargo.vazio && !cargo.outro && cargo.editavel !== false && ehDeQuemAssina(cargo) && !temLinhaDentro(cargo, rodape)) {
+    if (rodape && ehNome(cargo) && cargo.editavel !== false && !temLinhaDentro(cargo, rodape)) {
       faltam.push({ raiz: cargo.raiz, posicao: cargo.posicao, onde: 'depois', antes: cargo.textoFim || '', depois: rodape.texto || '' })
     }
     return faltam

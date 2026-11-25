@@ -32,33 +32,51 @@
 
   // Área de soltar arquivos num documento da página (v0.32.0: serve à árvore e ao documento em branco).
   // podeSoltar() diz se este lugar aceita os arquivos agora; se não, o navegador faz o de sempre.
+  // v0.36.1: com o arquivo em cima, o navegador avisa sem parar (dragover). Quando os avisos param (o arquivo foi
+  // para outra parte da tela, onde a saída nem sempre é avisada), a área some sozinha; e tem botão de fechar.
+  const SEM_ARQUIVO_MS = 900
   function ligarSoltura (doc, texto, podeSoltar, aoSoltar) {
     let aviso = null
+    let relogio = null
+    let fechada = false // fechada no botão: só volta quando outro arquivo for arrastado
     const temArquivos = evento => evento.dataTransfer && [...evento.dataTransfer.types].includes('Files')
-    const mostrar = sim => {
-      if (sim && !aviso) {
-        aviso = doc.createElement('div')
-        aviso.textContent = texto
-        Object.assign(aviso.style, {
-          position: 'fixed', inset: '4px', zIndex: '2147483000', display: 'flex', alignItems: 'center', justifyContent: 'center',
-          textAlign: 'center', padding: '12px', border: '3px dashed #1E5E33', borderRadius: '10px', background: 'rgba(231,242,234,.92)',
-          color: '#1E5E33', font: '600 14px/1.4 system-ui, sans-serif', pointerEvents: 'none'
-        })
-        ;(doc.body || doc.documentElement).append(aviso)
-      } else if (!sim && aviso) {
-        aviso.remove()
-        aviso = null
-      }
+    const esconder = () => {
+      if (aviso) aviso.remove()
+      aviso = null
+    }
+    const saiu = () => { clearTimeout(relogio); relogio = null; esconder(); fechada = false }
+    const mostrar = () => {
+      if (aviso || fechada) return
+      aviso = doc.createElement('div')
+      aviso.dataset.extensaoIfto = 'soltar'
+      aviso.textContent = texto
+      Object.assign(aviso.style, {
+        position: 'fixed', inset: '4px', zIndex: '2147483000', display: 'flex', alignItems: 'center', justifyContent: 'center',
+        textAlign: 'center', padding: '12px', border: '3px dashed #1E5E33', borderRadius: '10px', background: 'rgba(231,242,234,.92)',
+        color: '#1E5E33', font: '600 14px/1.4 system-ui, sans-serif', pointerEvents: 'none'
+      })
+      const fechar = doc.createElement('button')
+      fechar.type = 'button'
+      fechar.textContent = '× Fechar'
+      Object.assign(fechar.style, {
+        position: 'absolute', top: '6px', right: '6px', padding: '4px 10px', border: '1px solid #1E5E33', borderRadius: '6px',
+        background: '#fff', color: '#1E5E33', font: '600 13px/1.4 system-ui, sans-serif', cursor: 'pointer', pointerEvents: 'auto'
+      })
+      fechar.addEventListener('click', evento => { evento.preventDefault(); evento.stopPropagation(); fechada = relogio !== null; esconder() })
+      aviso.append(fechar)
+      ;(doc.body || doc.documentElement).append(aviso)
     }
     doc.addEventListener('dragover', evento => {
       if (!temArquivos(evento) || !podeSoltar()) return
       evento.preventDefault()
       evento.dataTransfer.dropEffect = 'copy'
-      mostrar(true)
+      mostrar()
+      clearTimeout(relogio)
+      relogio = setTimeout(saiu, SEM_ARQUIVO_MS)
     })
-    doc.addEventListener('dragleave', evento => { if (!evento.relatedTarget) mostrar(false) })
+    doc.addEventListener('dragleave', evento => { if (!evento.relatedTarget) saiu() })
     doc.addEventListener('drop', evento => {
-      mostrar(false)
+      saiu()
       if (!temArquivos(evento) || !podeSoltar()) return
       evento.preventDefault()
       const arquivos = [...evento.dataTransfer.files]
@@ -84,13 +102,21 @@
     alvoGuardado = lida ? regras.externoEmBranco(lida.documentos, endereco) : null
     return alvoGuardado
   }
+  // v0.36.1: formulário do SEI aberto à direita (Incluir ou Alterar documento externo): o arquivo é do campo
+  // "Anexar Arquivo..." do próprio SEI, mesmo que o documento escolhido na árvore esteja em branco.
+  function formularioAberto (quadro) {
+    let doc
+    try { doc = quadro.contentDocument } catch (erro) { return false }
+    if (!doc) return false
+    return !!doc.getElementById('frmDocumentoCadastro') || [...doc.querySelectorAll('iframe')].some(formularioAberto)
+  }
   function ligarQuadro (quadro) {
     let doc
     try { doc = quadro.contentDocument } catch (erro) { return }
     if (!doc || !doc.documentElement) return
     if (!doc.documentElement.dataset.extensaoIftoAnexar) {
       doc.documentElement.dataset.extensaoIftoAnexar = 'sim'
-      ligarSoltura(doc, 'Solte aqui para anexar o arquivo a este documento em branco (você confere antes)', () => !!documentoEmBranco(), confirmarAnexo)
+      ligarSoltura(doc, 'Solte aqui para anexar o arquivo a este documento em branco (você confere antes)', () => !formularioAberto(quadroDocumento) && !!documentoEmBranco(), confirmarAnexo)
     }
     for (const filho of doc.querySelectorAll('iframe')) {
       if (!filho.dataset.extensaoIftoAnexar) {
@@ -150,8 +176,8 @@
       alvoGuardado = undefined
       seiPedidos.recarregarArvore()
       try { quadroDocumento.contentWindow.location.reload() } catch (falha) { /* a árvore recarregada já mostra */ }
-      j.trocarConteudo([criar('p', { className: 'aviso verde', textContent: `Pronto: "${pronto.nome}" foi anexado ao documento ${alvo.sei || alvo.rotulo}.` })])
-      j.trocarBotoes([{ texto: 'Fechar', tipo: 'principal', aoClicar: k => k.fechar() }])
+      j.fechar()
+      janela.mensagemRapida(`Pronto: "${pronto.nome}" foi anexado ao documento ${alvo.sei || alvo.rotulo}.`)
     }
   }
 
@@ -212,7 +238,13 @@
         return cartao
       }
       // Tipo: lista do SEI; sem tipo reconhecido, fica "Escolha o tipo" (a extensão pergunta).
-      const lista = criar('select', {}, [criar('option', { value: '', textContent: 'Escolha o tipo…' }), ...tipos.map(tipo => criar('option', { value: tipo, textContent: tipo }))])
+      // v0.36.1: nome que serve a mais de um tipo ("portaria_"): os que combinam vêm primeiro.
+      const opcao = tipo => criar('option', { value: tipo, textContent: tipo })
+      const combinam = linha.sugestoes
+      const lista = criar('select', {}, [
+        criar('option', { value: '', textContent: 'Escolha o tipo…' }),
+        ...(combinam.length ? [criar('optgroup', { label: 'Combinam com o nome' }, combinam.map(opcao)), criar('optgroup', { label: 'Todos os tipos' }, tipos.filter(tipo => !combinam.includes(tipo)).map(opcao))] : tipos.map(opcao))
+      ])
       lista.value = linha.tipo || ''
       lista.addEventListener('change', () => { linha.tipo = lista.value || null; atualizar() })
       const nome = criar('input', { type: 'text', value: linha.nomeArvore, maxLength: 50, placeholder: 'Nome na Árvore (opcional)' })

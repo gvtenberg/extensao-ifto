@@ -99,30 +99,44 @@
   }
   const regrasEmTexto = regras => (regras || []).map(regra => `${regra.contem} = ${regra.tipo}`).join('\n')
 
+  // v0.36.1: onde termina, no começo do nome do arquivo, o nome do tipo (0 = não começa com ele). Não faz
+  // diferença maiúscula, acento, "-", "_" ou outro sinal entre as palavras, nem a letra com acento estragada pela
+  // codificação do Windows ("RelatÃ³rio", "Relat¢rio", "Relat?rio"). Depois do nome vem o fim, algo que não é
+  // letra ("Nota Fiscal 123", "portaria_") ou uma maiúscula logo depois de minúscula ("ConsultaOptantes", T170).
+  const LETRAS = { a: 'aáàâãä', e: 'eéèêë', i: 'iíìîï', o: 'oóòôõö', u: 'uúùûü', c: 'cç', n: 'nñ' }
+  function fimDoComeco (nome, tipo) {
+    const padrao = (String(tipo || '').normalize('NFC').toLowerCase().match(/[\p{L}\p{N}]+/gu) || []).map(palavra => [...palavra].map(letra => {
+      const base = semAcento(letra)
+      const iguais = LETRAS[base] ? '[' + LETRAS[base] + ']' : base
+      return letra === base ? iguais : '(?:' + iguais + '|' + base + '[^\\x00-\\x7f]{1,3}|[^\\x00-\\x7f]{1,4}|[?_])'
+    }).join('')).join('[^\\p{L}\\p{N}]+')
+    if (!padrao) return 0
+    const achado = new RegExp('^' + padrao, 'iu').exec(nome)
+    if (!achado) return 0
+    const fim = achado[0].length
+    const junto = /\p{Ll}$/u.test(achado[0]) && /^\p{Lu}/u.test(nome.slice(fim))
+    return /^\p{L}/u.test(nome.slice(fim)) && !junto ? 0 : fim
+  }
+
   // D14: tipo do documento pelo nome do arquivo. Ordem: 1º o nome de tipo do SEI MAIS LONGO que começa o
   // nome do arquivo ("Nota Fiscal 123.pdf" → "Nota fiscal", não "Nota"); 2º as regras da pessoa; 3º o tipo
   // padrão. tipos: nomes da lista "Tipo do Documento" do SEI. Devolve { tipo, origem, nomeArvore } (tipo
   // null: nada reconhecido). D7: "Nome na Árvore" = o resto do nome ("123") ou o nome sem a extensão.
   function tipoPeloNome (nomeDoArquivo, tipos, { regras = [], padrao = '' } = {}) {
-    const semExtensao = String(nomeDoArquivo || '').replace(/\.[^./\\]{1,5}$/, '').replace(/_/g, ' ').replace(/\s+/g, ' ').trim()
+    // v0.36.1: sinal no começo não conta ("_portaria"); acento em letra separada (Mac) vira uma letra só.
+    const bruto = String(nomeDoArquivo || '').replace(/\.[^./\\]{1,5}$/, '').normalize('NFC').replace(/^[\x00-\x2f:-@[-`{-\x7f\s]+/, '')
+    const limpar = texto => texto.replace(/_/g, ' ').replace(/\s+/g, ' ').trim()
+    const semExtensao = limpar(bruto)
     const alvo = semAcento(semExtensao)
-    // v0.29.3 (T170): mesmas letras de "alvo", mas com maiúsculas, para aceitar nomes juntos com maiúscula no
-    // meio ("ConsultaOptantes_…" → "Consulta", como o arquivo do Simples Nacional).
-    const comMaiusculas = String(semExtensao).normalize('NFD').replace(/[\u0300-\u036f]/g, '')
     const achar = nome => (tipos || []).find(tipo => semAcento(tipo) === semAcento(nome)) || null
     let melhor = null
+    let fimDoMelhor = 0
     for (const tipo of tipos || []) {
-      const t = semAcento(tipo)
-      if (!t || !alvo.startsWith(t)) continue
-      // Depois do nome do tipo vem o fim, algo que não é letra ("Nota Fiscal 123", "Sicaf-empresa") ou uma
-      // maiúscula logo depois de minúscula ("ConsultaOptantes").
-      const depois = alvo.charAt(t.length)
-      const juntoComMaiuscula = /[a-z]/.test(comMaiusculas.charAt(t.length - 1)) && /[A-Z]/.test(comMaiusculas.charAt(t.length))
-      if (depois && /[a-z]/.test(depois) && !juntoComMaiuscula) continue
-      if (!melhor || t.length > semAcento(melhor).length) melhor = tipo
+      const fim = fimDoComeco(bruto, tipo)
+      if (fim && (!melhor || semAcento(tipo).length > semAcento(melhor).length)) { melhor = tipo; fimDoMelhor = fim }
     }
     if (melhor) {
-      const resto = semExtensao.slice(semAcento(melhor).length).replace(/^[\s\-–—.,;:]+/, '')
+      const resto = limpar(bruto.slice(fimDoMelhor)).replace(/^[\s\-–—.,;:]+/, '')
       return { tipo: melhor, origem: 'nome', nomeArvore: nomeNaArvore(resto) }
     }
     const nomeArvore = nomeNaArvore(semExtensao)
@@ -132,7 +146,14 @@
       if (tipo) return { tipo, origem: 'regra', nomeArvore }
     }
     const tipo = padrao ? achar(padrao) : null
-    return { tipo, origem: tipo ? 'padrao' : null, nomeArvore }
+    if (tipo) return { tipo, origem: 'padrao', nomeArvore }
+    // v0.36.1 (usuário, 25/11/2026): o nome só diz o começo ("portaria_12" e o SEI tem quatro portarias): nada é
+    // escolhido, mas esses tipos são mostrados primeiro.
+    const sugestoes = (tipos || []).filter(item => {
+      const primeira = (String(item).match(/[\p{L}\p{N}]+/u) || [''])[0]
+      return primeira.length > 2 && fimDoComeco(bruto, primeira)
+    })
+    return sugestoes.length ? { tipo: null, origem: null, nomeArvore, sugestoes } : { tipo: null, origem: null, nomeArvore }
   }
 
   // v0.27.1 (etapa 3): arquivo arrastado para a árvore, pronto para a lista de conferência. arquivo: { nome,
@@ -156,6 +177,7 @@
       bloqueado: avisos.some(aviso => aviso.nivel === 'erro'),
       tipo: achado.tipo,
       origem: achado.origem,
+      sugestoes: achado.sugestoes || [],
       nomeArvore: opcoes.externoNomeArvore === false ? '' : achado.nomeArvore,
       data
     }

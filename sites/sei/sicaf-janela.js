@@ -141,5 +141,25 @@
     return elemento
   }
 
-  ExtensaoIFTO.janela = { abrir, criar }
+  // v0.36.1: mensagem rápida, que some sozinha (depois de incluir documentos, no lugar da janela com botão).
+  let ultimaMensagem = null
+  function mensagemRapida (texto, segundos = 6) {
+    if (ultimaMensagem) ultimaMensagem.remove()
+    const hospedeiro = document.createElement('div')
+    ultimaMensagem = hospedeiro
+    hospedeiro.dataset.extensaoIfto = 'mensagem'
+    hospedeiro.setAttribute('role', 'status')
+    const raiz = hospedeiro.attachShadow({ mode: 'open' })
+    const caixa = criar('div', { textContent: texto })
+    Object.assign(caixa.style, {
+      position: 'fixed', zIndex: '2147483000', right: '16px', top: '70px', maxWidth: 'min(420px, calc(100vw - 32px))', boxSizing: 'border-box',
+      padding: '10px 14px', borderRadius: '8px', border: '1px solid #B7DCC3', background: '#E7F2EA', color: '#1E5E33',
+      font: '600 14px/1.4 system-ui, sans-serif', boxShadow: '0 4px 16px rgba(0,0,0,.2)', overflowWrap: 'anywhere', pointerEvents: 'none'
+    })
+    raiz.append(caixa)
+    document.body.append(hospedeiro)
+    setTimeout(() => hospedeiro.remove(), segundos * 1000)
+  }
+
+  ExtensaoIFTO.janela = { abrir, criar, mensagemRapida }
 })()

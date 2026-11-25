@@ -6,6 +6,7 @@
 
 Summary to resume work (on another machine or by another person) without reading everything. Update at the end of each stage or round.
 
+- **Done, waiting for tests (v0.36.1, 25/11/2026):** external documents (open the first, message, type by name, drop area) and blank lines around the signer (no spec; rules in `regras/sei.md` and `regras/conferir-documento.md`). Tests T259–T266 (T259 critical). Still open: why the editor sometimes asked again for the blank lines (T266).
 - **Done, waiting for tests (v0.36.0, 24/11/2026):** "Duplicar documento" (`specs/feitas/duplicar-documento.md`, rules in `regras/sei.md`). Tests T253–T258 (T253 critical: saves a document in the SEI).
 - **Done, waiting for tests (v0.35.3, 24/11/2026):** spacing with a box between the parts, blank lines around the signer, saving the unit's timbre and footer (no spec; rules in `regras/conferir-documento.md`). Tests T249–T252.
 - **Done, waiting for tests (v0.35.2, 24/11/2026):** director-general title and Campus/Campi in italics (no spec; rules in `regras/conferir-documento.md`). Tests T245–T248.

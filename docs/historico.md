@@ -2,6 +2,7 @@
 
 One or two lines per version, with the date (dd/mm/yyyy). Number 0.STAGE.FIX.
 
+- v0.36.1 (25/11/2026): first included external document opens, message that closes by itself instead of the window (also SICAF), type by file name (uppercase, symbols, broken accents; ambiguous names show the matching types first), drop area closes by itself and has a button, blank line before the signer whatever comes before. T259 to T266.
 - v0.36.0 (24/11/2026): "Duplicar documento" in the document icon menu (spec `duplicar-documento`): opens the SEI's new document form with the same type, the original as Documento Modelo and its registration data; never saves. Menu options and Incluir Documento moved to shared files. T253 to T258.
 - v0.35.3 (24/11/2026): spacing also works when the saved document has a box (`div`) between the parts or around the footer; the editor offers the blank line missing before and after the signer, and saving timbre and footer as the standard of a unit that has none. T249–T252.
 - v0.35.2 (24/11/2026): unsigned documents: director-general's title below the name (PAL/REI/IFTO; also asks before signing) and "Campus"/"Campi" in italics (every unit; notice only), with correction buttons and switches; "Corrigir timbre" writes Campus in italics. T245–T248.

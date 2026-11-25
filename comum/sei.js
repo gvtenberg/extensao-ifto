@@ -74,6 +74,22 @@
     while ((achado = padrao.exec(texto))) valores.push(achado[1] !== undefined ? achado[1].replace(/\\(.)/g, '$1') : (achado[2] === 'null' ? null : achado[2]))
     return valores
   }
+  // v0.36.1: link da árvore do processo já com um documento escolhido (o SEI o devolve depois de salvar).
+  function linkDaArvoreComDocumento (html) {
+    const achado = /controlador\.php\?acao=procedimento_visualizar[^"'\s<>\\]*?[?&](?:amp;)?id_documento=(\d+)[^"'\s<>\\]*/.exec(html || '')
+    return achado ? { id: achado[1], link: achado[0].replace(/&amp;/g, '&') } : null
+  }
+  // Qual documento abrir depois de incluir vários: o primeiro da árvore (número interno menor, o mais antigo).
+  // salvos: [{ id, link }]; sem nenhum, o primeiro da árvore nova que não existia antes (antes e depois: ids).
+  function primeiroIncluido (salvos, antes, depois) {
+    const numero = id => Number(id) || 0
+    const comId = (salvos || []).filter(salvo => salvo && numero(salvo.id))
+    if (comId.length) return comId.reduce((a, b) => numero(b.id) < numero(a.id) ? b : a)
+    const maior = Math.max(0, ...(antes || []).map(numero))
+    const novo = (depois || []).find(id => numero(id) > maior)
+    return novo ? { id: novo } : null
+  }
+
   function lerArvore (textoDoScript) {
     const texto = textoDoScript || ''
     const nos = {}
@@ -176,7 +192,7 @@
     return (partes.find(parte => !/^\d+$/.test(parte.trim())) || '').trim()
   }
 
-  const api = { tipoDoDocumento, versaoDoSei, VERSAO_SEI_TESTADA, seiTestado, estadoNoSei, estadoAtualNoSei, ligadaNoSei, gravarEscolhaNoSei, atributosDoCampoDeSenha, lerArvore, ligadaNaUnidade, nomeNaArvore, numeroDaUnidade, UNIDADE_DIRECAO_GERAL, unidadeAberta }
+  const api = { linkDaArvoreComDocumento, primeiroIncluido, tipoDoDocumento, versaoDoSei, VERSAO_SEI_TESTADA, seiTestado, estadoNoSei, estadoAtualNoSei, ligadaNoSei, gravarEscolhaNoSei, atributosDoCampoDeSenha, lerArvore, ligadaNaUnidade, nomeNaArvore, numeroDaUnidade, UNIDADE_DIRECAO_GERAL, unidadeAberta }
   if (typeof module !== 'undefined' && module.exports) module.exports = api
   else raiz.ExtensaoIFTO = Object.assign(raiz.ExtensaoIFTO || {}, { sei: api })
 })(globalThis)

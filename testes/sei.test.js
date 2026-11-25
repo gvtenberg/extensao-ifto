@@ -74,3 +74,14 @@ test('estadoNoSei: versão nova pergunta; a escolha vale só para a mesma versã
   assert.equal(estadoNoSei('9.1.0.3', { versao: '9.1.0', ligada: false }), 'desligada')
   assert.equal(estadoNoSei('9.2.0.0', { versao: '9.1.0', ligada: false }), 'perguntar')
 })
+
+// v0.36.1: abrir o primeiro documento incluído.
+test('primeiro documento incluído', () => {
+  const { linkDaArvoreComDocumento, primeiroIncluido } = require('../comum/sei.js')
+  const link = "var l = 'controlador.php?acao=procedimento_visualizar&acao_origem=arvore_visualizar&id_procedimento=9&id_documento=77&infra_hash=ab';"
+  assert.deepEqual(linkDaArvoreComDocumento(link), { id: '77', link: 'controlador.php?acao=procedimento_visualizar&acao_origem=arvore_visualizar&id_procedimento=9&id_documento=77&infra_hash=ab' })
+  assert.equal(linkDaArvoreComDocumento(link.replace('=77', '=')), null)
+  assert.equal(primeiroIncluido([{ id: '80' }, { id: '77', link: 'x' }], [], []).id, '77')
+  assert.equal(primeiroIncluido([], ['5', '70'], ['5', '70', '71', '72']).id, '71')
+  assert.equal(primeiroIncluido([], ['5', '70'], ['5', '70']), null)
+})

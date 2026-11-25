@@ -131,3 +131,24 @@ test('documento externo em branco aberto à direita', () => {
   assert.equal(pronto.bloqueado, false)
   assert.equal(prepararArquivo({ nome: 'a.pdf', tamanho: 11 * 1024 * 1024 }, [], {}).bloqueado, true)
 })
+
+// v0.36.1: maiúsculas, sinais e acentos estragados no nome do arquivo.
+test('tipo pelo nome: maiúsculas, sinais e letra acentuada estragada', () => {
+  const tipos = ['Relatório', 'Relatório Parcial', 'Portaria de Pessoal', 'Portaria Normativa', 'Relatório de Viagem - FAPTO', 'Certidão', 'Ata']
+  const tipo = nome => tipoPeloNome(nome, tipos).tipo
+  for (const nome of ['RELATÓRIO.pdf', 'RelaTóRio_final.pdf', 'relatorio-', 'RELATORIO_-_2026.pdf', '_Relatório.pdf', '(Relatório) x.pdf', 'Relatório'.normalize('NFD') + '_1.pdf',
+    'RelatÃ³rio 3.pdf', 'Relat¢rio.pdf', 'Relat�rio_x.pdf', 'Relatório.pdf', 'Relat_rio 5.pdf', 'Relato╠ürio.pdf']) assert.equal(tipo(nome), 'Relatório', nome)
+  assert.equal(tipo('RELATÓRIO_PARCIAL-2.pdf'), 'Relatório Parcial')
+  assert.equal(tipo('Relatorio-de-viagem-fapto.pdf'), 'Relatório de Viagem - FAPTO')
+  assert.equal(tipo('PORTARIA_NORMATIVA_3.pdf'), 'Portaria Normativa')
+  assert.equal(tipo('CertidÃ£o.pdf'), 'Certidão')
+  for (const nome of ['Relatórios.pdf', 'Atas.pdf', 'Ataíde.pdf', 'RELATORIOFINAL.pdf']) assert.equal(tipo(nome), null, nome)
+  assert.equal(tipoPeloNome('RELATÓRIO_-_obra.pdf', tipos).nomeArvore, 'obra')
+})
+test('tipo pelo nome: nome que serve a mais de um tipo só sugere', () => {
+  const tipos = ['Portaria de Pessoal', 'Portaria Normativa', 'Nota']
+  assert.deepEqual(tipoPeloNome('portaria_.pdf', tipos).sugestoes, ['Portaria de Pessoal', 'Portaria Normativa'])
+  assert.equal(tipoPeloNome('PORTARIA 12.pdf', tipos).tipo, null)
+  assert.equal(tipoPeloNome('portaria_12.pdf', tipos, { padrao: 'Nota' }).tipo, 'Nota')
+  assert.equal(tipoPeloNome('outra coisa.pdf', tipos).sugestoes, undefined)
+})

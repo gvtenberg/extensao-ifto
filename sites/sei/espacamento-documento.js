@@ -20,7 +20,7 @@
     const rotulo = faltam.length > 1 ? 'Adicionar as linhas em branco' : 'Adicionar a linha em branco'
     const caixa = caixaEditor.criarCaixa('linhas-em-branco', 'Falta uma linha em branco perto de quem assina. Adicionar?', rotulo)
     const lista = caixaEditor.criar('ul')
-    for (const linha of faltam) lista.append(caixaEditor.criar('li', { textContent: `Entre "${curto(linha.antes)}" e "${curto(linha.depois)}"` }))
+    for (const linha of faltam) lista.append(caixaEditor.criar('li', { textContent: linha.antes ? `Entre "${curto(linha.antes)}" e "${curto(linha.depois)}"` : `Antes de "${curto(linha.depois)}"` }))
     caixa.botao.before(lista)
     caixa.botao.addEventListener('click', async () => {
       caixa.botao.disabled = true

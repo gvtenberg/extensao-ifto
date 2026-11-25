@@ -268,3 +268,30 @@ test('linha em branco antes e depois de quem assina: só onde não há nenhuma',
   assert.deepEqual(linhasQueFaltam({ blocos: solicitacao(true).map(b => ({ ...b, editavel: false })) }), [])
   assert.deepEqual(linhasQueFaltam(null), [])
 })
+
+// v0.36.1: no Despacho o que vem antes de quem assina é o texto, não a data.
+test('linha em branco antes de quem assina, venha o que vier antes', () => {
+  const montar = (antes, depois, classe = 'IFTO_Assinatura') => {
+    posicoes = {}
+    const vazia = raiz => bloco(raiz, 'x', classe, '', { altura: 1.6 })
+    return [
+      bloco(0, 'Data', 'IFTO_Alin_direita', 'Palmas, 24 de novembro de 2026.'),
+      bloco(1, 'Corpo', 'IFTO_padrao_Alin_Justificado', 'Encaminho o processo.', { abaixo: 8 }),
+      ...(antes ? [vazia(2)] : []),
+      bloco(2, 'Identificação', classe, 'FULANO'), bloco(2, 'Identificação', classe, 'Diretor'),
+      ...(depois ? [vazia(2)] : []),
+      bloco(3, 'Rodapé', 'IFTO_Centralizado_rodape', 'Quadra 310 Sul')
+    ]
+  }
+  const onde = blocos => linhasQueFaltam({ blocos }).map(f => [f.onde, f.posicao])
+  for (const classe of ['IFTO_Assinatura', 'IFTO_Centralizado']) {
+    assert.deepEqual(onde(montar(false, false, classe)), [['antes', 1], ['depois', 2]])
+    assert.deepEqual(onde(montar(false, true, classe)), [['antes', 1]])
+    assert.deepEqual(onde(montar(true, false, classe)), [['depois', 3]])
+    assert.deepEqual(onde(montar(true, true, classe)), [])
+  }
+  // Duas pessoas separadas por linha em branco: só falta a de cima da primeira.
+  const dupla = montar(false, true)
+  dupla.splice(4, 0, bloco(2, 'x', 'IFTO_Assinatura', 'Cargo 1'), bloco(2, 'x', 'IFTO_Assinatura', ''), bloco(2, 'x', 'IFTO_Assinatura', 'BELTRANO'))
+  assert.deepEqual(onde(dupla), [['antes', 1]])
+})

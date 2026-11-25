@@ -602,3 +602,29 @@ E: A opção não aparece no externo; no feito no SEI ela vem antes das opções
 ### T258 – Incluir Documento comum continua igual (v0.36.0)
 F: Duplique um documento, não salve, e depois use o "Incluir Documento" do SEI com o mesmo tipo.
 E: O formulário vem como antes: sem modelo, com o nível Público marcado pela extensão (se essa opção estiver ligada).
+## Documentos externos e linhas de quem assina (v0.36.1)
+> Entre no SEI com a extensão na versão 0.36.1 e abra um processo de teste da sua unidade.
+### T259 – Abrir o primeiro documento incluído (v0.36.1) (Crítico)
+F: Arraste um PDF para a árvore e inclua; depois arraste três de uma vez e inclua.
+E: A janela fecha sozinha e uma mensagem verde some em uns 6 segundos. O documento incluído (dos três, o primeiro na árvore) abre à direita e fica marcado na árvore.
+### T260 – Documentos do SICAF também abrem (v0.36.1)
+F: Inclua o SICAF de um CNPJ num processo de teste.
+E: Só aparece a mensagem que some sozinha e o primeiro documento incluído abre.
+### T261 – Mensagem ao anexar em documento em branco e erro na inclusão (v0.36.1)
+F: Solte um PDF na página de um documento externo em branco e clique em "Anexar"; em outra vez, inclua três arquivos e clique em "Parar" no meio.
+E: Ao anexar, a mensagem some sozinha e o documento abre com o arquivo. Ao parar, a janela continua aberta com o aviso.
+### T262 – Tipo pelo nome com maiúsculas, sinais e acento estragado (v0.36.1)
+F: Arraste para a árvore arquivos como "RELATÓRIO.pdf", "Relatorio_-_obra.pdf" e "RelatÃ³rio.pdf" (não precisa incluir).
+E: O tipo "Relatório" já vem escolhido em todos.
+### T263 – Nome que serve a vários tipos (v0.36.1)
+F: Arraste "portaria_12.pdf" para a árvore; depois escolha o mesmo arquivo em "Incluir Documento › Externo".
+E: Na lista, as portarias vêm primeiro, em "Combinam com o nome". Na tela do SEI, um aviso amarelo mostra as portarias. Nada é escolhido sozinho (se você não tiver regra nem tipo padrão nas configurações).
+### T264 – Área de soltar some sozinha e tem botão de fechar (v0.36.1)
+F: Em "Incluir Documento › Externo", arraste um arquivo passando por cima da árvore e solte no botão "Anexar Arquivo..."; repita passando pela árvore e saindo da janela, e apertando Esc.
+E: A área verde aparece só com o arquivo em cima da árvore e some em até 1 segundo. O arquivo é anexado no formulário do SEI. A área tem o botão "× Fechar". O mesmo na página de um documento externo em branco.
+### T265 – Formulário do SEI com documento em branco escolhido (v0.36.1)
+F: Clique num documento externo em branco na árvore, depois em "Consultar/Alterar Documento Externo", e solte um arquivo no "Anexar Arquivo..." do SEI.
+E: O arquivo vai para o campo do SEI; a área verde da extensão não aparece no formulário.
+### T266 – Linhas antes e depois de quem assina no Despacho (v0.36.1)
+F: Num Despacho não assinado sem linhas em branco perto do nome, abra o editor, clique em "Adicionar as linhas em branco", salve, feche e abra de novo. Repita com uma das linhas já no documento.
+E: Fica uma linha antes do nome e uma depois do cargo, sem repetir a que já existia. Ao abrir de novo, o aviso das linhas não volta.
