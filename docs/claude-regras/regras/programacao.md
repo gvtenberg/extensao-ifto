@@ -48,6 +48,7 @@ Texts shown to people who use the system or the extension are written for them (
 3. **Copilot not available** (not enabled, no quota, error or no answer in ~10 minutes): a new Claude subagent reviews, always (see Code review). A risky change (see Security) gets the subagent even when Copilot reviewed.
 4. **Squash merge:** when the checks pass and the review is resolved, ask (choice window), saying if it publishes; on "yes", `gh pr merge <n> --squash --delete-branch`, title in the commit format. The user tests before that, in the worktree folder. Never merge with a failed check.
 5. Then update the main folder (`git switch main && git pull --ff-only`), never discarding someone's changes.
+- **Docs get no review** (25/11/2026, every programming project): a pull request that only changes documents (`.md` files, `docs/`, rules included) skips steps 2 and 3; with any code, script, workflow or setting in it, it is reviewed.
 - Several issues or stages in a row: only when asked, one subagent and one worktree each, up to the number the user gives; stop on a doubt, a failed test or a critical test. Never an endless loop.
 
 ## Forks

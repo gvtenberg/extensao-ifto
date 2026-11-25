@@ -36,7 +36,7 @@ jobs:
       - name: Baixar o código
         uses: actions/checkout@v5
         with:
-          fetch-depth: ${{ github.event_name == 'pull_request' && 0 || 1 }} # pull request: história toda, para a conferência abaixo
+          fetch-depth: ${{ github.event_name == 'pull_request' && '0' || '1' }} # pull request: história toda, para a conferência abaixo
 
       # 18/11/2026: pull request de fork desatualizado, com versão fora da sequência, número de teste repetido ou
       # mudando as regras gerais do dono é recusado com mensagem clara (.github/scripts/conferir-pull-request.js).
