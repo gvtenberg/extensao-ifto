@@ -30,11 +30,17 @@
   // Botão "Editar Conteúdo" da barra do SEI, no quadro de cima (mesmo site).
   let editar = null
   try { editar = window.parent.document.querySelector('a[onclick*="editarConteudo"]') } catch (erro) {}
-  // Ao abrir o editor (pelo aviso ou pelo botão do SEI), os avisos daqui fecham: o editor mostra os dele, e duas
+  // Ao abrir o editor (pelo aviso ou pelo botão do SEI), os avisos daqui fecham (viram o ícone): o editor mostra os dele, e duas
   // janelas confundiam. Abrir o documento de novo na árvore confere outra vez.
   let editorAberto = false
   if (editar) {
-    const aoAbrirEditor = () => { editorAberto = true; caixaEditor.fecharAvisos() }
+    const aoAbrirEditor = () => {
+      editorAberto = true
+      caixaEditor.fecharAvisos()
+      // v0.36.2: editor deste documento já aberto: confere de novo e mostra os avisos lá (caixa-editor.js).
+      const documento = new URL(location.href).searchParams.get('id_documento')
+      if (documento) (globalThis.browser || globalThis.chrome).runtime.sendMessage({ tipo: 'editorConferirDeNovo', documento }).catch(() => {})
+    }
     editar.addEventListener('click', aoAbrirEditor)
     // A barra do SEI continua na tela quando o quadro do documento recarrega.
     window.addEventListener('pagehide', () => editar.removeEventListener('click', aoAbrirEditor), { once: true })

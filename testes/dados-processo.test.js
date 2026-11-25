@@ -49,9 +49,22 @@ test('Capa de Processo: confere com os dados do processo e corrige só o que est
   assert.deepEqual(conferido.diferencas.map(item => item.campo), ['tipo', 'interessados'])
   assert.match(d.avisosDaCapa(conferido)[0], /^Tipo de Processo: a capa diz "Gestão de Contrato: Processo de Pagamento", mas o processo tem/)
   const novo = d.corrigirCapa(CAPA, dados, conferido)
-  assert.ok(novo.includes('<p class="Texto_Justificado"><strong>Interessado(s):</strong>&nbsp;Campus Palmas</p><p class="Texto_Justificado">C2A SERVICOS</p>'))
+  assert.ok(novo.includes('<p class="Texto_Justificado"><strong>Interessado(s):</strong>&nbsp;Campus Palmas; C2A SERVICOS</p>'))
   assert.equal(d.conferirCapa(d.lerCapa([{ nome: 'Corpo', html: novo }]), dados).certo, true)
   assert.equal(d.lerCapa([{ nome: 'Corpo', html: '<p>Processo nº: 1</p>' }]), null)
+})
+
+test('Capa: interessados na mesma linha ou um por linha valem; a correção junta tudo numa linha (v0.36.2)', () => {
+  const dados = { ...d.lerDados(PAGINA), tipo: 'Gestão de Contrato: Processo de Pagamento', interessados: ['Campus Palmas', 'Fundação - FAPTO', 'Professor X - Deputado'] }
+  const com = linhas => CAPA.replace('<i>Campus </i>Palmas</p>', linhas + '</p>')
+  const certo = html => d.conferirCapa(d.lerCapa([{ nome: 'Corpo', html }]), dados).certo
+  assert.equal(certo(com('Campus Palmas; Fundação - FAPTO; Professor X - Deputado')), true)
+  assert.equal(certo(com('Campus Palmas</p><p>Fundação - FAPTO</p><p>Professor X - Deputado')), true)
+  const antiga = com('Campus Palmas</p><p>Outro')
+  const novo = d.corrigirCapa(antiga, dados, d.conferirCapa(d.lerCapa([{ nome: 'Corpo', html: antiga }]), dados))
+  assert.ok(novo.includes('&nbsp;Campus Palmas; Fundação - FAPTO; Professor X - Deputado</p>'))
+  assert.ok(!novo.includes('Outro'))
+  assert.equal(certo(novo), true)
 })
 
 test('Capa: Data de Autuação diferente é trocada na mesma linha do número', () => {

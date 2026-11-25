@@ -318,7 +318,7 @@
       copiar.disabled = true
       const lido = await pedirAoFundo('salvamentoLer', { desde: false })
       copiar.disabled = false
-      const caixa = caixaEditor.criarCaixa('copia-manual', '', 'Fechar')
+      const caixa = caixaEditor.criarCaixa('copia-manual', '', 'Fechar', { passageiro: true })
       caixa.botao.addEventListener('click', () => caixa.remover())
       if (!lido.ok) return caixa.mostrar('erro', 'Não consegui copiar: ' + lido.erro, caixa.botao)
       try {
@@ -330,7 +330,7 @@
     })
     colar.addEventListener('click', async () => {
       const { copiaManual } = await armazem.get('copiaManual')
-      const caixa = caixaEditor.criarCaixa('copia-manual', '', 'Fechar')
+      const caixa = caixaEditor.criarCaixa('copia-manual', '', 'Fechar', { passageiro: true })
       caixa.botao.addEventListener('click', () => caixa.remover())
       if (!copiaManual) return caixa.mostrar('aviso', 'Não há conteúdo copiado. Clique antes em "Copiar conteúdo" na outra janela deste documento.', caixa.botao)
       if (copiaManual.id !== id) return caixa.mostrar('aviso', 'O conteúdo copiado é de outro documento (' + copiaManual.titulo + '). Só é possível colar no mesmo documento.', caixa.botao)

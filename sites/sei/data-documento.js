@@ -12,22 +12,33 @@
   if (!opcoes.conferirData) return
 
   const titulo = document.title
-  const verificado = await caixaEditor.pedirAoFundo('dataVerificar', { titulo })
-  const conferido = verificado && verificado.ok && verificado.conferido
-  if (!conferido || conferido.certo) return
-
-  const caixa = caixaEditor.criarCaixa('data-documento', 'Confira a data do documento:', `Corrigir para "${conferido.nova}"`)
-  const lista = caixaEditor.criar('ul')
-  for (const problema of conferido.problemas) lista.append(caixaEditor.criar('li', { textContent: problema }))
-  caixa.botao.before(lista)
-  caixa.botao.addEventListener('click', async () => {
-    caixa.botao.disabled = true
-    caixa.botao.textContent = 'Corrigindo…'
-    const resultado = await caixaEditor.pedirAoFundo('dataAtualizar', { titulo })
-    if (!resultado || !resultado.ok) {
-      caixa.mostrar('erro', 'Não consegui corrigir a data. ' + ((resultado && resultado.erro) || '') + ' Nada foi salvo.')
-      return
-    }
-    caixa.mostrar('ok', `Data trocada para ${resultado.nova}. Confira o documento e clique em Salvar no editor. Para desfazer, use Ctrl+Z ou feche o editor sem salvar.`)
-  })
+  // v0.36.2: confere de novo quando a pessoa clica em "Abrir o editor para corrigir" com o editor já aberto.
+  // Devolve true (há aviso), false (nada a corrigir) ou null (não deu para conferir).
+  async function conferir () {
+    const verificado = await caixaEditor.pedirAoFundo('dataVerificar', { titulo })
+    if (!verificado || !verificado.ok) return null
+    const conferido = verificado.conferido
+    caixaEditor.tirarAviso('data-documento')
+    if (!conferido || conferido.certo) return false
+    avisar(conferido)
+    return true
+  }
+  function avisar (conferido) {
+    const caixa = caixaEditor.criarCaixa('data-documento', 'Confira a data do documento:', `Corrigir para "${conferido.nova}"`)
+    const lista = caixaEditor.criar('ul')
+    for (const problema of conferido.problemas) lista.append(caixaEditor.criar('li', { textContent: problema }))
+    caixa.botao.before(lista)
+    caixa.botao.addEventListener('click', async () => {
+      caixa.botao.disabled = true
+      caixa.botao.textContent = 'Corrigindo…'
+      const resultado = await caixaEditor.pedirAoFundo('dataAtualizar', { titulo })
+      if (!resultado || !resultado.ok) {
+        caixa.mostrar('erro', 'Não consegui corrigir a data. ' + ((resultado && resultado.erro) || '') + ' Nada foi salvo.')
+        return
+      }
+      caixa.mostrar('ok', `Data trocada para ${resultado.nova}. Confira o documento e clique em Salvar no editor. Para desfazer, use Ctrl+Z ou feche o editor sem salvar.`)
+    })
+  }
+  caixaEditor.quandoConferirDeNovo(conferir)
+  await conferir()
 })()

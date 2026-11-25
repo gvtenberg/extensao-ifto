@@ -99,6 +99,22 @@ test('separador que o SEI não salva não conta como espaço; linha em branco sa
   assert.ok(planejarEspacamento(documento).lacunas.some(lacuna => lacuna.depois === 'Encaminhamos o processo'))
 })
 
+// v0.36.2 (Despacho 3397868): na primeira abertura do documento novo, o separador depois da caixa do processo tem
+// uma linha em branco; o SEI a tira ao salvar e o destinatário ficava grudado em "Assunto".
+test('Despacho novo: o separador entre "Assunto" e o destinatário não conta como espaço', () => {
+  const documento = despacho()
+  const separador = { ...documento.blocos[5], raiz: 3.5, secao: 'Separador de seção2', editavel: false, semNada: false }
+  documento.blocos.splice(4, 0, separador)
+  documento.blocos.find(outro => outro.raiz === 5).editavel = false
+  const plano = planejarEspacamento(documento)
+  assert.equal(plano.lacunas.find(lacuna => lacuna.depois === 'Ao Diretor de Administração').seletor, 'div+p.IFTO_padrao_Alin_Esquerda_sem_espa\\0000e7o')
+  // O separador antes do corpo é salvo: continua contando como espaço.
+  assert.ok(!plano.lacunas.some(lacuna => lacuna.depois.startsWith('Em resposta')))
+  // Linha em branco que a pessoa pôs numa parte que dá para editar: conta.
+  separador.editavel = true
+  assert.ok(!planejarEspacamento(documento).lacunas.some(lacuna => lacuna.depois.startsWith('Ao Diretor')))
+})
+
 test('Capa de Processo: espaço entre o timbre e "Processo:" (o separador depois do timbre não é salvo)', () => {
   posicoes = {}
   const timbre = bloco(0, 'Cabeçalho', 'IFTO_Cabeçalho_Novo', 'Coordenação de Gestão Orçamentária e Contratos', { abaixo: -7 })

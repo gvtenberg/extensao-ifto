@@ -411,3 +411,23 @@ test('aproveitarEmBranco: Sicaf sem PDF do fornecedor recebe o PDF e o nome ofic
   assert.deepEqual(item.emBranco, { id: '4', sei: '3385000', linkAlterar: 'a4' })
   assert.equal(item.nomeArvore, 'CHC SOLUCOES LTDA')
 })
+
+// v0.36.2: conferir se os sites respondem antes da busca e pular os que não respondem.
+test('site responde: qualquer resposta menos erro do próprio site', () => {
+  for (const status of [200, 302, 403, 404]) assert.equal(sicaf.siteRespondeu({ status }), true)
+  assert.equal(sicaf.siteRespondeu({ type: 'opaqueredirect', status: 0 }), true)
+  assert.equal(sicaf.siteRespondeu({ status: 503 }), false)
+  assert.equal(sicaf.siteRespondeu(null), false)
+})
+test('pular antes da busca: o site não abre e cada CNPJ fica com o motivo', () => {
+  const nova = () => ({ fase: 'sicaf', faltam: ['1'], erros: {}, simplesFaltam: ['1', '2'], simplesErros: {} })
+  const semSicaf = sicaf.pularAntes(nova(), ['sicaf'])
+  assert.equal(semSicaf.fase, 'simples')
+  assert.deepEqual(semSicaf.faltam, [])
+  assert.match(semSicaf.erros['1'], /SICAF não estava respondendo/)
+  assert.deepEqual(semSicaf.simplesFaltam, ['1', '2'])
+  const semSimples = sicaf.pularAntes(nova(), ['simples'])
+  assert.equal(semSimples.fase, 'sicaf')
+  assert.deepEqual(semSimples.simplesFaltam, [])
+  assert.deepEqual(Object.keys(semSimples.simplesErros), ['1', '2'])
+})

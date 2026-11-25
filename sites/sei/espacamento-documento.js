@@ -56,6 +56,7 @@
     ? 'A extensão atualizou o espaço entre as partes do documento. Agora há uma linha de espaço antes de:'
     : 'As partes do documento estavam grudadas: a extensão pôs uma linha de espaço antes de:'
   const caixa = caixaEditor.criarCaixa('espacamento', frase, 'Desfazer')
+  caixa.resolver() // só informa: não conta no número do ícone (v0.36.2)
   const lista = caixaEditor.criar('ul')
   for (const lacuna of plano.lacunas) lista.append(caixaEditor.criar('li', { textContent: `"${curto(lacuna.depois)}"` }))
   const dica = caixaEditor.criar('p', { textContent: 'Confira e clique em Salvar no editor. Sem Salvar, nada muda no documento.' })

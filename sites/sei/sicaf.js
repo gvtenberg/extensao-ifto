@@ -116,6 +116,34 @@
   const pararVigia = () => { clearInterval(vigia); vigia = null }
   const pedirAoFundo = recado => navegador.runtime.sendMessage(recado).catch(() => null)
 
+  // v0.36.2 (pedido do usuário, 25/11/2026): antes de abrir as abas, confere se os sites respondem. Devolve a
+  // lista dos sites a pular ([] = buscar em todos) ou null (a pessoa cancelou ou fechou a janela).
+  async function conferirSites (grupos, aberta, voltar) {
+    const NOMES = { sicaf: 'SICAF', simples: 'Simples Nacional' }
+    const sites = [grupos.some(grupo => grupo.precisaSicaf) && 'sicaf', grupos.some(grupo => grupo.precisaSimples) && 'simples'].filter(Boolean)
+    const cancelar = { texto: voltar ? 'Cancelar e voltar' : 'Cancelar', aoClicar: j => { j.fechar(); if (voltar) voltar() } }
+    aberta.trocarConteudo([criar('p', { textContent: `Conferindo se ${sites.length > 1 ? 'os sites respondem' : 'o site responde'} (até ${regras.LIMITE_DA_RESPOSTA_MS / 1000} segundos)…` })])
+    aberta.trocarBotoes([cancelar])
+    const limite = new Promise(resolve => setTimeout(() => resolve(null), regras.LIMITE_DA_RESPOSTA_MS + 5000))
+    const respostas = await Promise.race([pedirAoFundo({ tipo: 'sitesRespondem', sites }), limite])
+    if (!aberta.corpo.isConnected) return null
+    const fora = sites.filter(site => respostas && respostas[site] === false)
+    if (!fora.length) return []
+    const nomes = fora.map(site => 'o ' + NOMES[site]).join(' e ')
+    const varios = fora.length > 1
+    return new Promise(resolve => {
+      aberta.trocarConteudo([
+        criar('p', { className: 'aviso amarelo', textContent: `${nomes[0].toUpperCase() + nomes.slice(1)} não ${varios ? 'estão' : 'está'} respondendo agora. ${varios ? 'Os sites podem' : 'O site pode'} estar fora do ar, ou a internet caiu.` }),
+        criar('p', { className: 'apoio', textContent: 'Você pode tentar assim mesmo, pular (o que faltar não será buscado) ou cancelar e tentar mais tarde.' })
+      ])
+      aberta.trocarBotoes([
+        { ...cancelar, aoClicar: j => { resolve(null); cancelar.aoClicar(j) } },
+        { texto: varios ? 'Pular os dois' : 'Pular o ' + NOMES[fora[0]], aoClicar: () => resolve(fora) },
+        { texto: 'Tentar assim mesmo', tipo: 'principal', aoClicar: () => resolve([]) }
+      ])
+    })
+  }
+
   async function buscarNoSicaf (grupos, resultado, aberta, quais, voltar) {
     const permissao = await pedirAoFundo({ tipo: 'sicafPermissao' })
     if (!permissao || !permissao.permitido) {
@@ -130,6 +158,8 @@
       ])
       return
     }
+    const pular = await conferirSites(grupos, aberta, voltar)
+    if (!pular) return
     pedidoAtual = { grupos, resultado, quais, voltar }
     janelaDaBusca = aberta
     const sites = quais === 'sicaf' ? 'O SICAF abre' : quais === 'simples' ? 'O Simples Nacional abre' : 'O SICAF e o Simples Nacional abrem'
@@ -180,7 +210,8 @@
     const resposta = await pedirAoFundo({
       tipo: 'sicafBuscar',
       cnpjs: grupos.filter(grupo => grupo.precisaSicaf).map(grupo => grupo.cnpj),
-      cnpjsSimples: grupos.filter(grupo => grupo.precisaSimples).map(grupo => grupo.cnpj)
+      cnpjsSimples: grupos.filter(grupo => grupo.precisaSimples).map(grupo => grupo.cnpj),
+      pular
     })
     if (!resposta || resposta.erro) pararComAviso('Não consegui abrir a busca' + (resposta && resposta.erro ? ': ' + resposta.erro : '. Tente de novo.'))
   }

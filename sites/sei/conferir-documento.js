@@ -53,168 +53,185 @@
     if (evento.ctrlKey && evento.shiftKey && !evento.altKey && (evento.key === 'A' || evento.key === 'a')) antesDeAssinar(evento)
   }, true)
 
-  const verificado = await verificar()
-  if (!verificado || !verificado.ok) return
-  const { processo, timbre, rodape } = verificado
+  // v0.36.2: confere de novo quando a pessoa clica em "Abrir o editor para corrigir" com o editor já aberto.
+  // Devolve true (há aviso), false (nada a corrigir) ou null (não deu para conferir).
+  const AVISOS = ['conferir-processo', 'conferir-capa', 'conferir-cargo', 'conferir-italico', 'conferir-timbre']
+  async function conferirTudo (deNovo) {
+    const verificado = await verificar()
+    if (!verificado || !verificado.ok) return null
+    for (const nome of AVISOS) caixaEditor.tirarAviso(nome)
+    mostrarAvisos(verificado, deNovo)
+    const { processo, capa, cargo, italico, timbre, rodape } = verificado
+    return [processo, capa, cargo, italico, timbre, rodape].some(parte => parte && !parte.certo)
+  }
+  function mostrarAvisos (verificado, deNovo) {
+    const { processo, timbre, rodape } = verificado
 
-  // Número do processo: caixa no alto.
-  if (processo && !processo.certo) {
-    const caixa = caixaEditor.criarCaixa('conferir-processo', regras.avisoDoProcesso(processo), 'Corrigir o número do processo')
-    if (processo.link || !processo.editavel) {
-      caixa.botao.remove()
-      caixa.corpo.append(caixaEditor.criar('p', {
-        className: 'aviso',
-        textContent: processo.link
-          ? 'O número está num link do SEI: apague-o e coloque o link do processo certo; depois clique em Salvar.'
-          : 'Essa parte do documento não dá para mudar no editor.'
-      }))
-    } else {
-      caixa.botao.addEventListener('click', async () => {
-        caixa.botao.disabled = true
-        caixa.botao.textContent = 'Corrigindo…'
-        const resultado = await corrigir('processo')
-        if (!resultado || !resultado.ok) return caixa.mostrar('erro', 'Não consegui corrigir. ' + ((resultado && resultado.erro) || '') + ' Nada foi salvo.')
-        caixa.mostrar('ok', `Número trocado para ${processo.processo}.` + DESFAZER)
+    // Número do processo: caixa no alto.
+    if (processo && !processo.certo) {
+      const caixa = caixaEditor.criarCaixa('conferir-processo', regras.avisoDoProcesso(processo), 'Corrigir o número do processo')
+      if (processo.link || !processo.editavel) {
+        caixa.botao.remove()
+        caixa.corpo.append(caixaEditor.criar('p', {
+          className: 'aviso',
+          textContent: processo.link
+            ? 'O número está num link do SEI: apague-o e coloque o link do processo certo; depois clique em Salvar.'
+            : 'Essa parte do documento não dá para mudar no editor.'
+        }))
+      } else {
+        caixa.botao.addEventListener('click', async () => {
+          caixa.botao.disabled = true
+          caixa.botao.textContent = 'Corrigindo…'
+          const resultado = await corrigir('processo')
+          if (!resultado || !resultado.ok) return caixa.mostrar('erro', 'Não consegui corrigir. ' + ((resultado && resultado.erro) || '') + ' Nada foi salvo.')
+          caixa.mostrar('ok', `Número trocado para ${processo.processo}.` + DESFAZER)
+        })
+      }
+    }
+
+    // v0.33.0: Capa de Processo com dados de outro processo (Data de Autuação, Tipo, Especificação, Interessados).
+    const { capa } = verificado
+    if (capa && !capa.certo) {
+      const caixaCapa = caixaEditor.criarCaixa('conferir-capa', 'A capa não confere com os dados do processo:', 'Corrigir a capa')
+      const itens = caixaEditor.criar('ul')
+      for (const aviso of capa.avisos) itens.append(caixaEditor.criar('li', { textContent: aviso }))
+      caixaCapa.botao.before(itens)
+      caixaCapa.botao.addEventListener('click', async () => {
+        caixaCapa.botao.disabled = true
+        caixaCapa.botao.textContent = 'Corrigindo…'
+        const resultado = await corrigir('capa')
+        if (!resultado || !resultado.ok) return caixaCapa.mostrar('erro', 'Não consegui corrigir. ' + ((resultado && resultado.erro) || '') + ' Nada foi salvo.')
+        caixaCapa.mostrar('ok', 'Capa corrigida com os dados do processo.' + DESFAZER)
       })
     }
-  }
 
-  // v0.33.0: Capa de Processo com dados de outro processo (Data de Autuação, Tipo, Especificação, Interessados).
-  const { capa } = verificado
-  if (capa && !capa.certo) {
-    const caixaCapa = caixaEditor.criarCaixa('conferir-capa', 'A capa não confere com os dados do processo:', 'Corrigir a capa')
-    const itens = caixaEditor.criar('ul')
-    for (const aviso of capa.avisos) itens.append(caixaEditor.criar('li', { textContent: aviso }))
-    caixaCapa.botao.before(itens)
-    caixaCapa.botao.addEventListener('click', async () => {
-      caixaCapa.botao.disabled = true
-      caixaCapa.botao.textContent = 'Corrigindo…'
-      const resultado = await corrigir('capa')
-      if (!resultado || !resultado.ok) return caixaCapa.mostrar('erro', 'Não consegui corrigir. ' + ((resultado && resultado.erro) || '') + ' Nada foi salvo.')
-      caixaCapa.mostrar('ok', 'Capa corrigida com os dados do processo.' + DESFAZER)
-    })
-  }
-
-  // v0.35.2: cargo da diretora-geral (Direção-geral) e "Campus"/"Campi" em itálico (toda unidade).
-  function avisoComBotao (nome, texto, linhas, rotulo, qual, pronto, editavel) {
-    const aviso = caixaEditor.criarCaixa(nome, texto, rotulo)
-    const itens = caixaEditor.criar('ul')
-    for (const linha of linhas) itens.append(caixaEditor.criar('li', { textContent: linha }))
-    aviso.botao.before(itens)
-    if (!editavel) {
-      aviso.botao.replaceWith(caixaEditor.criar('p', { className: 'aviso', textContent: 'Essa parte do documento não dá para mudar no editor.' }))
-      return
-    }
-    aviso.botao.addEventListener('click', async () => {
-      aviso.botao.disabled = true
-      aviso.botao.textContent = 'Corrigindo…'
-      const resultado = await corrigir(qual)
-      if (!resultado || !resultado.ok) return aviso.mostrar('erro', 'Não consegui corrigir. ' + ((resultado && resultado.erro) || '') + ' Nada foi salvo.')
-      aviso.mostrar('ok', pronto + DESFAZER)
-    })
-  }
-  const { cargo, italico } = verificado
-  if (cargo && !cargo.certo) {
-    avisoComBotao('conferir-cargo', 'Confira o cargo da diretora-geral:', cargo.problemas, `Corrigir para "${regras.CARGO_DA_DIRETORA}"`, 'cargo', 'Cargo corrigido.', cargo.editavel)
-  }
-  if (italico && !italico.certo) {
-    const trechos = italico.quantos > italico.trechos.length ? [...italico.trechos, '…'] : italico.trechos
-    avisoComBotao('conferir-italico', regras.avisoDoItalico(italico), trechos, 'Colocar em itálico', 'italico', '"Campus" e "Campi" em itálico.', italico.quantos > italico.travados)
-  }
-
-  // v0.35.3: unidade sem timbre ou rodapé guardado: oferece guardar os deste documento, só para a unidade aberta.
-  // No clique lê o documento de novo (a pessoa pode ter mudado o texto depois do aviso).
-  const { sugestao } = verificado
-  if (sugestao) {
-    const rotulo = `Guardar como padrão da unidade ${sigla}`
-    const aviso = caixaEditor.criarCaixa('guardar-unidade', `A unidade ${sigla} ainda não tem estes dados em "Minhas unidades". Guardar os deste documento como padrão?`, rotulo)
-    const itens = caixaEditor.criar('ul')
-    const mostrarItens = atual => itens.replaceChildren(...regras.linhasDaSugestao(atual).map(textContent => caixaEditor.criar('li', { textContent })))
-    mostrarItens(sugestao)
-    const depois = caixaEditor.criar('button', { type: 'button', className: 'secundario', textContent: 'Agora não' })
-    const erro = caixaEditor.criar('p', { className: 'erro' })
-    aviso.botao.before(itens)
-    aviso.botao.after(depois, erro)
-    depois.addEventListener('click', () => aviso.remover())
-    aviso.botao.addEventListener('click', async () => {
-      aviso.botao.disabled = true
-      erro.textContent = ''
-      try {
-        const agora = await verificar()
-        if (!agora || !agora.ok) throw new Error((agora && agora.erro) || '')
-        if (!agora.sugestao) {
-          erro.textContent = 'Este documento não tem mais dados para guardar.'
-          return
-        }
-        mostrarItens(agora.sugestao)
-        if (!window.confirm(`Guardar como padrão da unidade ${sigla}?\n\n${regras.linhasDaSugestao(agora.sugestao).join('\n')}`)) return
-        const atuais = await configuracoes.lerConfiguracoes()
-        const unidade = regras.acharUnidade(atuais.unidades, sigla) || { sigla }
-        atuais.unidades = regras.limparUnidades([...atuais.unidades, { ...unidade, ...agora.sugestao }])
-        await configuracoes.gravarConfiguracoes(atuais)
-        aviso.mostrar('ok', `Guardado em "Minhas unidades" para a unidade ${sigla}. Para mudar, abra as configurações da extensão.`)
-      } catch (falha) {
-        erro.textContent = 'Não consegui guardar. ' + (falha.message || '')
-      } finally {
-        aviso.botao.disabled = false
-      }
-    })
-  }
-
-  // v0.26.5: timbre e rodapé: uma caixa no canto de baixo, à esquerda (as outras caixas ficam à direita).
-  const timbreErrado = timbre && !timbre.certo
-  const rodapeErrado = rodape && !rodape.certo
-  if (!timbreErrado && !rodapeErrado) return
-  const partes = [timbreErrado && 'o timbre', rodapeErrado && 'o rodapé'].filter(Boolean).join(' e ')
-  const caixa = caixaEditor.criarCaixa('conferir-timbre', `Confira ${partes} desta unidade (${sigla}):`, 'Corrigir')
-  caixa.botao.remove()
-  const lista = caixaEditor.criar('ul')
-  for (const aviso of [...(timbreErrado ? regras.avisosDoTimbre(timbre) : []), ...(rodapeErrado ? rodape.avisos : [])]) lista.append(caixaEditor.criar('li', { textContent: aviso }))
-  caixa.corpo.append(lista)
-  const resultadoTexto = caixaEditor.criar('p')
-  function botao (rotulo, acao) {
-    const novo = caixaEditor.criar('button', { type: 'button', className: 'principal', textContent: rotulo })
-    novo.style.marginBottom = '6px'
-    novo.addEventListener('click', () => acao(novo))
-    caixa.corpo.append(novo)
-    return novo
-  }
-  const corrigirParte = (qual, rotulo, pronto) => async elemento => {
-    elemento.disabled = true
-    elemento.textContent = 'Corrigindo…'
-    const resultado = await corrigir(qual)
-    if (!resultado || !resultado.ok) {
-      elemento.textContent = rotulo
-      elemento.disabled = false
-      resultadoTexto.className = 'erro'
-      resultadoTexto.textContent = 'Não consegui corrigir. ' + ((resultado && resultado.erro) || '') + ' Nada foi salvo.'
-      return
-    }
-    elemento.remove()
-    resultadoTexto.className = 'ok'
-    resultadoTexto.textContent = pronto + DESFAZER
-  }
-  if (timbreErrado) botao('Corrigir timbre', corrigirParte('timbre', 'Corrigir timbre', 'Timbre corrigido.'))
-  if (rodapeErrado) botao('Corrigir rodapé', corrigirParte('rodape', 'Corrigir rodapé', 'Rodapé corrigido.'))
-  // D3: as linhas do setor deste documento passam a ser as da unidade em "Minhas unidades" (com confirmação).
-  if (timbreErrado && !(sugestao && sugestao.linhas)) {
-    botao('Usar este timbre como padrão da unidade', async elemento => {
-      const lido = await caixaEditor.pedirAoFundo('conferirLinhasDoSetor')
-      const linhas = (lido && lido.ok && lido.linhas) || []
-      if (!linhas.length) {
-        resultadoTexto.className = 'erro'
-        resultadoTexto.textContent = 'Este timbre não tem linhas do setor abaixo de "Campus Palmas".'
+    // v0.35.2: cargo da diretora-geral (Direção-geral) e "Campus"/"Campi" em itálico (toda unidade).
+    function avisoComBotao (nome, texto, linhas, rotulo, qual, pronto, editavel) {
+      const aviso = caixaEditor.criarCaixa(nome, texto, rotulo)
+      const itens = caixaEditor.criar('ul')
+      for (const linha of linhas) itens.append(caixaEditor.criar('li', { textContent: linha }))
+      aviso.botao.before(itens)
+      if (!editavel) {
+        aviso.botao.replaceWith(caixaEditor.criar('p', { className: 'aviso', textContent: 'Essa parte do documento não dá para mudar no editor.' }))
         return
       }
-      if (!window.confirm(`Guardar estas linhas como o timbre da unidade ${sigla}?\n\n${linhas.join('\n')}`)) return
-      const atuais = await configuracoes.lerConfiguracoes()
-      const unidade = regras.acharUnidade(atuais.unidades, sigla) || { sigla }
-      atuais.unidades = regras.limparUnidades([...atuais.unidades, { ...unidade, linhas }])
-      await configuracoes.gravarConfiguracoes(atuais)
+      aviso.botao.addEventListener('click', async () => {
+        aviso.botao.disabled = true
+        aviso.botao.textContent = 'Corrigindo…'
+        const resultado = await corrigir(qual)
+        if (!resultado || !resultado.ok) return aviso.mostrar('erro', 'Não consegui corrigir. ' + ((resultado && resultado.erro) || '') + ' Nada foi salvo.')
+        aviso.mostrar('ok', pronto + DESFAZER)
+      })
+    }
+    const { cargo, italico } = verificado
+    if (cargo && !cargo.certo) {
+      avisoComBotao('conferir-cargo', 'Confira o cargo da diretora-geral:', cargo.problemas, `Corrigir para "${regras.CARGO_DA_DIRETORA}"`, 'cargo', 'Cargo corrigido.', cargo.editavel)
+    }
+    if (italico && !italico.certo) {
+      const trechos = italico.quantos > italico.trechos.length ? [...italico.trechos, '…'] : italico.trechos
+      avisoComBotao('conferir-italico', regras.avisoDoItalico(italico), trechos, 'Colocar em itálico', 'italico', '"Campus" e "Campi" em itálico.', italico.quantos > italico.travados)
+    }
+
+    // v0.35.3: unidade sem timbre ou rodapé guardado: oferece guardar os deste documento, só para a unidade aberta.
+    // No clique lê o documento de novo (a pessoa pode ter mudado o texto depois do aviso).
+    const { sugestao } = verificado
+    // Só ao abrir o editor: ao conferir de novo não volta a pergunta que a pessoa já respondeu.
+    if (sugestao && !deNovo) {
+      const rotulo = `Guardar como padrão da unidade ${sigla}`
+      const aviso = caixaEditor.criarCaixa('guardar-unidade', `A unidade ${sigla} ainda não tem estes dados em "Minhas unidades". Guardar os deste documento como padrão?`, rotulo)
+      const itens = caixaEditor.criar('ul')
+      const mostrarItens = atual => itens.replaceChildren(...regras.linhasDaSugestao(atual).map(textContent => caixaEditor.criar('li', { textContent })))
+      mostrarItens(sugestao)
+      const depois = caixaEditor.criar('button', { type: 'button', className: 'secundario', textContent: 'Agora não' })
+      const erro = caixaEditor.criar('p', { className: 'erro' })
+      aviso.botao.before(itens)
+      aviso.botao.after(depois, erro)
+      depois.addEventListener('click', () => aviso.remover())
+      aviso.botao.addEventListener('click', async () => {
+        aviso.botao.disabled = true
+        erro.textContent = ''
+        try {
+          const agora = await verificar()
+          if (!agora || !agora.ok) throw new Error((agora && agora.erro) || '')
+          if (!agora.sugestao) {
+            erro.textContent = 'Este documento não tem mais dados para guardar.'
+            return
+          }
+          mostrarItens(agora.sugestao)
+          if (!window.confirm(`Guardar como padrão da unidade ${sigla}?\n\n${regras.linhasDaSugestao(agora.sugestao).join('\n')}`)) return
+          const atuais = await configuracoes.lerConfiguracoes()
+          const unidade = regras.acharUnidade(atuais.unidades, sigla) || { sigla }
+          atuais.unidades = regras.limparUnidades([...atuais.unidades, { ...unidade, ...agora.sugestao }])
+          await configuracoes.gravarConfiguracoes(atuais)
+          aviso.mostrar('ok', `Guardado em "Minhas unidades" para a unidade ${sigla}. Para mudar, abra as configurações da extensão.`)
+        } catch (falha) {
+          erro.textContent = 'Não consegui guardar. ' + (falha.message || '')
+        } finally {
+          aviso.botao.disabled = false
+        }
+      })
+    }
+
+    // v0.26.5: timbre e rodapé: uma caixa no canto de baixo, à esquerda (as outras caixas ficam à direita).
+    const timbreErrado = timbre && !timbre.certo
+    const rodapeErrado = rodape && !rodape.certo
+    if (!timbreErrado && !rodapeErrado) return
+    const partes = [timbreErrado && 'o timbre', rodapeErrado && 'o rodapé'].filter(Boolean).join(' e ')
+    const caixa = caixaEditor.criarCaixa('conferir-timbre', `Confira ${partes} desta unidade (${sigla}):`, 'Corrigir')
+    caixa.botao.remove()
+    const lista = caixaEditor.criar('ul')
+    for (const aviso of [...(timbreErrado ? regras.avisosDoTimbre(timbre) : []), ...(rodapeErrado ? rodape.avisos : [])]) lista.append(caixaEditor.criar('li', { textContent: aviso }))
+    caixa.corpo.append(lista)
+    const resultadoTexto = caixaEditor.criar('p')
+    function botao (rotulo, acao) {
+      const novo = caixaEditor.criar('button', { type: 'button', className: 'principal', textContent: rotulo })
+      novo.style.marginBottom = '6px'
+      novo.addEventListener('click', () => acao(novo))
+      caixa.corpo.append(novo)
+      return novo
+    }
+    const faltam = new Set([timbreErrado && 'timbre', rodapeErrado && 'rodape'].filter(Boolean))
+    const corrigirParte = (qual, rotulo, pronto) => async elemento => {
+      elemento.disabled = true
+      elemento.textContent = 'Corrigindo…'
+      const resultado = await corrigir(qual)
+      if (!resultado || !resultado.ok) {
+        elemento.textContent = rotulo
+        elemento.disabled = false
+        resultadoTexto.className = 'erro'
+        resultadoTexto.textContent = 'Não consegui corrigir. ' + ((resultado && resultado.erro) || '') + ' Nada foi salvo.'
+        return
+      }
       elemento.remove()
+      faltam.delete(qual)
+      if (!faltam.size) caixa.resolver()
       resultadoTexto.className = 'ok'
-      resultadoTexto.textContent = 'Guardado em "Minhas unidades". Feche e abra o editor para conferir de novo.'
-    })
+      resultadoTexto.textContent = pronto + DESFAZER
+    }
+    if (timbreErrado) botao('Corrigir timbre', corrigirParte('timbre', 'Corrigir timbre', 'Timbre corrigido.'))
+    if (rodapeErrado) botao('Corrigir rodapé', corrigirParte('rodape', 'Corrigir rodapé', 'Rodapé corrigido.'))
+    // D3: as linhas do setor deste documento passam a ser as da unidade em "Minhas unidades" (com confirmação).
+    if (timbreErrado && !(sugestao && sugestao.linhas)) {
+      botao('Usar este timbre como padrão da unidade', async elemento => {
+        const lido = await caixaEditor.pedirAoFundo('conferirLinhasDoSetor')
+        const linhas = (lido && lido.ok && lido.linhas) || []
+        if (!linhas.length) {
+          resultadoTexto.className = 'erro'
+          resultadoTexto.textContent = 'Este timbre não tem linhas do setor abaixo de "Campus Palmas".'
+          return
+        }
+        if (!window.confirm(`Guardar estas linhas como o timbre da unidade ${sigla}?\n\n${linhas.join('\n')}`)) return
+        const atuais = await configuracoes.lerConfiguracoes()
+        const unidade = regras.acharUnidade(atuais.unidades, sigla) || { sigla }
+        atuais.unidades = regras.limparUnidades([...atuais.unidades, { ...unidade, linhas }])
+        await configuracoes.gravarConfiguracoes(atuais)
+        elemento.remove()
+        resultadoTexto.className = 'ok'
+        resultadoTexto.textContent = 'Guardado em "Minhas unidades". Feche e abra o editor para conferir de novo.'
+      })
+    }
+    caixa.corpo.append(resultadoTexto)
   }
-  caixa.corpo.append(resultadoTexto)
+  caixaEditor.quandoConferirDeNovo(() => conferirTudo(true))
+  await conferirTudo(false)
 })()

@@ -63,6 +63,8 @@
   const rotuloDe = linha => ROTULOS.find(item => item.campo !== 'autuacao' && item.rotulo.test(linha))
   const depoisDoRotulo = (linha, rotulo) => linha.replace(rotulo, '').trim()
 
+  const separar = linha => linha.split(';').map(nome => nome.trim()).filter(Boolean)
+
   // A Capa tem "Tipo de Processo:" e "Data de Autuação:". Devolve { secao, tipo, especificacao, interessados,
   // autuacao } ou null.
   function lerCapa (secoes) {
@@ -77,10 +79,11 @@
         const item = rotuloDe(linha)
         if (!item) continue
         if (item.campo === 'interessados') {
-          // Um interessado por linha: a do rótulo e as seguintes, até a linha em branco ou outro rótulo.
+          // A linha do rótulo e as seguintes, até a linha em branco ou outro rótulo.
+          // v0.36.2: todos na mesma linha, separados por ";" (um por linha, como antes, também vale).
           const primeiro = depoisDoRotulo(linha, item.rotulo)
-          if (primeiro) capa.interessados.push(primeiro)
-          for (let j = i + 1; j < linhas.length && linhas[j] && !rotuloDe(linhas[j]); j++) capa.interessados.push(linhas[j])
+          capa.interessados.push(...separar(primeiro))
+          for (let j = i + 1; j < linhas.length && linhas[j] && !rotuloDe(linhas[j]); j++) capa.interessados.push(...separar(linhas[j]))
         } else if (item.campo !== 'classificacao') capa[item.campo] = depoisDoRotulo(linha, item.rotulo)
       }
       return capa
@@ -89,7 +92,11 @@
   }
 
   const comparavel = valor => texto(valor).replace(/\s+/g, ' ').trim().toLowerCase()
-  const listaIgual = (a, b) => a.length === b.length && a.map(comparavel).sort().join('|') === b.map(comparavel).sort().join('|')
+  // Os nomes dos dois lados são separados do mesmo jeito (um interessado do SEI pode ter ";" no nome).
+  const listaIgual = (a, b) => {
+    const [um, outro] = [a, b].map(lista => lista.flatMap(separar).map(comparavel).sort())
+    return um.length === outro.length && um.join('|') === outro.join('|')
+  }
 
   // Confere a Capa com os dados do processo. Devolve { certo, diferencas: [{ campo, nome, escrito, certo }] }.
   function conferirCapa (capa, dados) {
@@ -133,9 +140,9 @@
       }
       if (!item || !campos.has(item.campo)) return tudo
       mudou = true
-      const valores = item.campo === 'interessados' ? dados.interessados : [dados[item.campo]]
       if (item.campo === 'interessados') pulando = true
-      return valores.map((valor, i) => `<p${atributos}>${i ? '' : `<strong>${item.nome}:</strong>&nbsp;`}${escapar(valor)}</p>`).join('')
+      const valor = item.campo === 'interessados' ? dados.interessados.join('; ') : dados[item.campo]
+      return `<p${atributos}><strong>${item.nome}:</strong>&nbsp;${escapar(valor)}</p>`
     })
     return mudou ? novo : null
   }

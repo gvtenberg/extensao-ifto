@@ -49,7 +49,10 @@ function tratarRecado (recado, remetente) {
     case 'sicafCnpj': return levarParaOSei({ ...recado, valido: regras.cnpjValido(recado.cnpj) }, aba)
     case 'sicafPermissao': return temPermissao().then(sim => ({ permitido: sim }))
     case 'abrirConfiguracoes': return navegador.tabs.create({ url: navegador.runtime.getURL('configuracoes/index.html#sicaf') }).then(() => ({ ok: true }))
-    case 'sicafBuscar': return iniciarBusca(recado.cnpjs || [], aba, recado.cnpjsSimples)
+    case 'sicafBuscar': return iniciarBusca(recado.cnpjs || [], aba, recado.cnpjsSimples, recado.pular)
+    case 'sitesRespondem': return sitesRespondem(recado.sites || [])
+    // v0.36.2: "Abrir o editor para corrigir" com o editor já aberto: avisa o editor daquele documento.
+    case 'editorConferirDeNovo': return avisarEditores(recado)
     case 'sicafCancelar': return cancelarBusca()
     case 'sicafAndamento': return lerTarefa().then(tarefa => regras.andamentoDaBusca(tarefa))
     case 'sicafPular': return pularBusca()
@@ -141,7 +144,8 @@ async function gravarTarefa (tarefa) {
 
 // v0.17.6: SICAF e Simples Nacional podem ter listas diferentes (cnpjs = SICAF; cnpjsSimples = Simples;
 // sem cnpjsSimples, os mesmos do SICAF). Botões de um só ("Incluir SICAF", "Incluir Simples Nacional").
-async function iniciarBusca (cnpjs, abaSei, cnpjsSimples) {
+// v0.36.2: "pular" = sites que não responderam e a pessoa mandou pular.
+async function iniciarBusca (cnpjs, abaSei, cnpjsSimples, pular) {
   if (!await temPermissao()) return { semPermissao: true }
   const doSicaf = [...new Set(cnpjs.filter(regras.cnpjValido))]
   const doSimples = cnpjsSimples ? [...new Set(cnpjsSimples.filter(regras.cnpjValido))] : doSicaf
@@ -155,11 +159,44 @@ async function iniciarBusca (cnpjs, abaSei, cnpjsSimples) {
     fase: faltam.length ? 'sicaf' : 'simples', simplesFaltam, simplesPosicao: 0, simplesPesquisado: false, simplesMatriz: false, simplesErros: {}
   }
   if (!faltam.length && !simplesFaltam.length) return { ok: true, faltam: 0 }
+  if (pular && pular.length) {
+    regras.pularAntes(tarefa, pular)
+    if (!tarefa.faltam.length && !tarefa.simplesFaltam.length) {
+      await terminar(tarefa)
+      return { ok: true, faltam: 0 }
+    }
+  }
   const endereco = tarefa.fase === 'sicaf' ? regras.URL_CONSULTA_SICAF : simples.URL_CONSULTA_SIMPLES
   const aba = await navegador.tabs.create({ url: endereco, windowId: abaSei.windowId, index: abaSei.index + 1, active: true })
   tarefa.idAbaSicaf = aba.id
   await gravarTarefa(tarefa)
-  return { ok: true, faltam: faltam.length + simplesFaltam.length }
+  return { ok: true, faltam: tarefa.faltam.length + tarefa.simplesFaltam.length }
+}
+
+// v0.36.2 (pedido do usuário, 25/11/2026): os sites da busca respondem? Um pedido simples, sem a entrada da
+// pessoa (credentials: 'omit') e com tempo limite; só diz se há resposta. Devolve { sicaf: true|false, … }.
+async function sitesRespondem (sites) {
+  const enderecos = { sicaf: regras.URL_INICIO_SICAF, simples: simples.URL_CONSULTA_SIMPLES }
+  const pares = await Promise.all(sites.filter(site => enderecos[site]).map(async site => {
+    const controle = new AbortController()
+    const relogio = setTimeout(() => controle.abort(), regras.LIMITE_DA_RESPOSTA_MS)
+    try {
+      const resposta = await fetch(enderecos[site], { credentials: 'omit', cache: 'no-store', redirect: 'manual', signal: controle.signal })
+      return [site, regras.siteRespondeu(resposta)]
+    } catch (erro) {
+      return [site, false]
+    } finally {
+      clearTimeout(relogio)
+      controle.abort() // o texto da página não interessa
+    }
+  }))
+  return Object.fromEntries(pares)
+}
+
+async function avisarEditores ({ documento }) {
+  const abas = await navegador.tabs.query({ url: PAGINAS_DO_SEI })
+  await Promise.all(abas.map(aba => Promise.resolve(navegador.tabs.sendMessage(aba.id, { tipo: 'editorConferirDeNovo', documento }, { frameId: 0 })).catch(() => {})))
+  return { ok: true }
 }
 
 // v0.18.5 (pedido de 18/11/2026: o SICAF fora do ar travou a busca): a pessoa pode, a qualquer momento,

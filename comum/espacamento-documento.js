@@ -91,8 +91,12 @@
     for (const bloco of blocos) porSecao.set(bloco.raiz, [...(porSecao.get(bloco.raiz) || []), bloco])
     // Também a seção só de linhas em branco logo depois do timbre (Capa de Processo, 19/11/2026: o SEI não a salva).
     const secoes = [...porSecao]
+    // v0.36.2 (Despacho 3397868): e a que vem depois da caixa "Processo/Interessado/Assunto", que a pessoa não edita:
+    // no documento novo ela tem uma linha em branco na primeira abertura, e o SEI a tira ao salvar.
+    const ehCaixa = bloco => bloco.tag === 'div' && !bloco.vazio && !bloco.outro && !(bloco.classes || []).length
+    const some = (lista, antes) => antes.some(ehDoTimbre) || (ehCaixa(antes[antes.length - 1]) && lista.every(bloco => bloco.editavel === false))
     const fantasmas = new Set(secoes.filter(([, lista], i) => lista.every(bloco => bloco.vazio && bloco.semNada) ||
-      (i > 0 && lista.every(bloco => bloco.vazio) && secoes[i - 1][1].some(ehDoTimbre))).map(([raiz]) => raiz))
+      (i > 0 && lista.every(bloco => bloco.vazio) && some(lista, secoes[i - 1][1]))).map(([raiz]) => raiz))
     return blocos.filter(bloco => !fantasmas.has(bloco.raiz))
   }
 

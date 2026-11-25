@@ -559,6 +559,26 @@
     tarefa.simplesMatriz = false
     return 'fim'
   }
+  // v0.36.2 (pedido do usuário, 25/11/2026): antes de abrir as abas, a extensão confere se os sites respondem.
+  // Qualquer resposta vale (até pedir login ou recusar a visita); erro do próprio site (500 a 599), não.
+  const LIMITE_DA_RESPOSTA_MS = 10000
+  function siteRespondeu (resposta) {
+    return Boolean(resposta) && (resposta.type === 'opaqueredirect' || resposta.status < 500)
+  }
+  // Site que não respondeu e a pessoa escolheu pular antes da busca: nem abre, e cada CNPJ fica com o motivo.
+  function pularAntes (tarefa, sites) {
+    const motivo = nome => `Não consultado: o ${nome} não estava respondendo e você pulou.`
+    if (sites.includes('sicaf')) {
+      for (const cnpj of tarefa.faltam) tarefa.erros[cnpj] = motivo('SICAF')
+      tarefa.faltam = []
+      tarefa.fase = 'simples'
+    }
+    if (sites.includes('simples')) {
+      for (const cnpj of tarefa.simplesFaltam) tarefa.simplesErros[cnpj] = motivo('Simples Nacional')
+      tarefa.simplesFaltam = []
+    }
+    return tarefa
+  }
   // Houve CNPJ sem PDF (site fora do ar, pulado, não encontrado): a aba aberta pela extensão é fechada.
   function buscaComErro (tarefa) {
     return Object.keys(tarefa.erros || {}).length + Object.keys(tarefa.simplesErros || {}).length > 0
@@ -571,6 +591,7 @@
   }
 
   const api = {
+    LIMITE_DA_RESPOSTA_MS, siteRespondeu, pularAntes,
     UNIDADE_CGOC, CNPJ_CAMPUS_PALMAS, funcaoLigada, ehCgoc,
     soDigitos, raizDoCnpj, cnpjValido, formatarCnpj, ehDoIfto, cnpjMatriz, acharCnpjs, cnpjDaSelecao,
     normalizar, mesmoNumero, textoDoHtml, nomesParecidos,

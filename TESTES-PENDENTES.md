@@ -628,3 +628,23 @@ E: O arquivo vai para o campo do SEI; a área verde da extensão não aparece no
 ### T266 – Linhas antes e depois de quem assina no Despacho (v0.36.1)
 F: Num Despacho não assinado sem linhas em branco perto do nome, abra o editor, clique em "Adicionar as linhas em branco", salve, feche e abra de novo. Repita com uma das linhas já no documento.
 E: Fica uma linha antes do nome e uma depois do cargo, sem repetir a que já existia. Ao abrir de novo, o aviso das linhas não volta.
+## Avisos, capa e sites fora do ar (v0.36.2)
+> Entre no SEI com a extensão na versão 0.36.2 e use documentos de teste não assinados da sua unidade.
+### T267 – Interessados da capa numa linha só (v0.36.2) (Crítico)
+F: Num processo com três interessados, clique no número do processo, abra a Capa de Processo no editor com um interessado faltando e clique em "Corrigir a capa". Salve.
+E: Os interessados ficam na mesma linha, separados por "; ", sem ";" no final. Ao abrir de novo, não há aviso da capa. Uma capa certa com um interessado por linha também não dá aviso.
+### T268 – Corrigir com o editor já aberto (v0.36.2)
+F: Abra no editor um documento com "Campus" sem itálico e deixe o editor aberto. Volte ao processo, clique no documento e em "Abrir o editor para corrigir". Corrija, não salve, e repita.
+E: O editor vem para a frente com o aviso e o botão "Colocar em itálico". Na segunda vez, aparece "Nada a corrigir…" lembrando de clicar em Salvar.
+### T269 – Ícone dos avisos no documento e no editor (v0.36.2)
+F: No documento e depois no editor, feche a janela de avisos no ×, arraste o ícone, clique nele e feche de novo. Feche também um aviso só e clique em "Mostrar 1 fechado".
+E: A janela vira um ícone verde no mesmo lugar, com o número do que há a corrigir. Arrastar não abre; o clique abre a janela com os avisos.
+### T270 – Ícone sem erro e fechar o ícone (v0.36.2)
+F: No editor, com só o aviso do espaço ("Desfazer"), feche a janela, clique no ícone, feche de novo e clique no × do ícone. Feche e abra o editor.
+E: O ícone aparece sem número e o "Desfazer" continua na janela. O × tira o ícone sem abrir a janela. Ao abrir o editor de novo, os avisos voltam se ainda houver algo a avisar.
+### T271 – Site fora do ar antes da busca (v0.36.2)
+F: Clique para buscar SICAF e Simples com um dos sites fora do ar. Se os dois estiverem no ar, só confira se a busca começa normalmente.
+E: Em até 10 segundos aparece qual site não está respondendo, com "Cancelar", "Pular" e "Tentar assim mesmo". Pular segue com o outro site. Com os dois no ar, a busca abre sozinha.
+### T272 – Espaço entre "Assunto" e o destinatário no Despacho novo (v0.36.2)
+F: Crie um Despacho, abra o editor pela primeira vez, espere o aviso do espaço, clique em Salvar e veja o documento, sem abrir o editor de novo.
+E: Há uma linha de espaço entre "Assunto" e o destinatário, e as outras partes continuam com o espaço certo.
