@@ -22,7 +22,7 @@ Changing the SEI's own styles (server side). Showing every style in every docume
 
 ## 4. Decided rules
 
-Moved to `docs/regras/sei.md` ("Long numbers in edital items").
+Moved to `docs/regras/sei-editor.md` ("Long numbers in edital items").
 
 ## 5. What changes
 

@@ -197,4 +197,4 @@ Não envie senhas nem informações sigilosas de processos.
 
 Licença GPL-3.0 (arquivo `LICENSE`). A leitura de PDF usa o **pdf.js** da Mozilla (https://github.com/mozilla/pdf.js, Apache-2.0, pasta `bibliotecas/pdfjs`). Partes do código vêm do **SEI++** (Jonatas Evaristo, https://github.com/jonatasrs/sei, GPL-3.0); o **SEI Pro** (https://github.com/SEI-Pro/sei-pro, AGPL-3.0) é usado como referência, e trechos aproveitados dele mantêm a licença de origem, indicada no próprio arquivo.
 
-Para quem for trabalhar no código da extensão: as orientações estão em `CLAUDE.md` e na pasta `docs/`.
+Para quem for trabalhar no código da extensão: as orientações estão em `AGENTS.md` e na pasta `docs/`.

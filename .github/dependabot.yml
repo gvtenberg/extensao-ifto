@@ -1,0 +1,24 @@
+# Dependabot: uma vez por mês, o GitHub confere se há versões novas das dependências e abre pull requests.
+# Nada é aceito sozinho: aceitar (merge no master) não muda a versão nem assina a extensão; conferir npm test e npm run conferir antes.
+# Para desligar: apagar este arquivo.
+version: 2
+updates:
+  # Pacotes de desenvolvimento (package.json): atualizações pequenas e médias juntas; as grandes vêm separadas
+  - package-ecosystem: npm
+    directory: /
+    schedule:
+      interval: monthly
+      timezone: America/Araguaina
+    groups:
+      pequenas-e-medias:
+        update-types: [minor, patch]
+
+  # Passos prontos usados nos workflows (ex.: actions/checkout)
+  - package-ecosystem: github-actions
+    directory: /
+    schedule:
+      interval: monthly
+      timezone: America/Araguaina
+    groups:
+      pequenas-e-medias:
+        update-types: [minor, patch]

@@ -1,12 +1,13 @@
 # How to organize a project
 
-**Sections**: CLAUDE.md of the project · docs folder · Writing .md files · Git
+**Sections**: AGENTS.md and CLAUDE.md of the project · docs folder · Writing .md files · Git
 
-Updated on 17/11/2026. Read only when creating or reorganizing a project, or creating a new `.md` file. Model: `/home/berg/Desktop/Sistema Gestão Orçamentária/sistema-orcamento-ifto` (CLAUDE.md, docs/, .claude/).
+Updated on 25/11/2026. Read only when creating or reorganizing a project, or creating a new `.md` file. Model: `/home/berg/Desktop/Sistema Gestão Orçamentária/sistema-orcamento-ifto` (AGENTS.md, docs/, .claude/).
 
-## CLAUDE.md of the project
-- Short (it is loaded in every message). Sections: Language · Economical reading · Documentation · How we work · Who the user is · Reply after changing code · Tests · Version and git · Commands · Conventions (drop the ones that do not apply).
-- Programming project: first line after the title `@~/.claude/regras/programacao.md` (imports the programming rules). Project without code: say "no code: do not read `~/.claude/regras/programacao.md`".
+## AGENTS.md and CLAUDE.md of the project
+- **Programming project** (25/11/2026): the rules go in `AGENTS.md`, which the other AIs also read, so anyone can collaborate with any tool; `CLAUDE.md` has only the line `@AGENTS.md`. `AGENTS.md` uses paths inside the repository (other people do not have `~/.claude`) and tells the AI to read `docs/claude-regras/regras/programacao.md` at the start of a programming session. Existing project with only `CLAUDE.md`: propose the change (`git mv CLAUDE.md AGENTS.md`).
+- **Project without code:** only `CLAUDE.md`, saying "no code: do not read `~/.claude/regras/programacao.md`".
+- Short (it is loaded in every message; aim for up to ~1,500 words, details go to `docs/`). Sections: Language · Economical reading · Documentation · How we work · Who the user is · Reply after changing code · Tests · Version and git · Commands · Conventions (drop the ones that do not apply).
 - Say exactly what to read at the start (ideally one status file) and where each subject is.
 
 ## docs folder

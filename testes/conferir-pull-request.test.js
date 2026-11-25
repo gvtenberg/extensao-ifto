@@ -19,3 +19,13 @@ test('pull request: só textos não mudam a versão; arquivo da extensão muda',
   assert.deepEqual(['README.md', 'docs/a.md', '.github/scripts/testes-pendentes.js', 'LICENSE', 'fundo/fundo.js', 'manifest.json'].map(a => SO_TEXTOS.test(a)),
     [true, true, true, true, false, false])
 })
+
+// 25/11/2026: o dono também trabalha por pull request; Dependabot e workflows não mudam a versão.
+test('pull request: só o dono muda as regras gerais; Dependabot e workflows não pedem versão', () => {
+  const { regrasProibidas, SO_TEXTOS } = require('../.github/scripts/conferir-pull-request.js')
+  const mudados = ['docs/claude-regras/CLAUDE.md', 'README.md']
+  assert.deepEqual(regrasProibidas(mudados, false), ['docs/claude-regras/CLAUDE.md'])
+  assert.deepEqual(regrasProibidas(mudados, true), [])
+  assert.ok(['package.json', 'package-lock.json', '.github/dependabot.yml', '.github/workflows/assinar.yml'].every(a => SO_TEXTOS.test(a)))
+  assert.equal(SO_TEXTOS.test('sites/package.json'), false)
+})
