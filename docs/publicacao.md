@@ -22,10 +22,10 @@ Firefox only installs an extension permanently if Mozilla has signed it. We use 
 
 ## Publish a new version
 
-1. On the development computer, after the commit (Claude commits but does not push), send it to GitHub: in the terminal, inside the `extensao-ifto` folder, type `git push`.
+1. Work goes on a branch with a pull request (Claude opens it). Test with `npm run rodar-sei`, wait for the green check "assinar" and answer "yes" when Claude asks to merge: the merge into `master` starts the signing.
 2. On GitHub, **Actions** tab: follow "Assinar extensão" (a few minutes; Mozilla checks the package).
 3. Done: the `.xpi` and the Chrome `.zip` show up in **Releases** (right side of the repository page).
-- (v0.9.4; 15/11/2026) A push that only changes text files (`.md`, `docs/`, `LICENSE`, `.claude/`) or the test-card files (`testes.yml` and its scripts in `.github/scripts/`, not `baixar-assinada.js`) does not start "Assinar extensão" (`paths-ignore`). Pull requests always run it (only the checks, never the signing; 18/11/2026). Most of the run time (about 4 minutes) is Mozilla's own review queue: it cannot be shortened on our side; pushing several versions together signs only the latest one.
+- (v0.9.4; 15/11/2026) A push that only changes text files (`.md`, `docs/`, `LICENSE`, `.claude/`) the workflows, `dependabot.yml` or the test-card scripts in `.github/scripts/` (not `baixar-assinada.js`) does not start "Assinar extensão" (`paths-ignore`). Pull requests always run it (only the checks, never the signing; 18/11/2026). Most of the run time (about 4 minutes) is Mozilla's own review queue: it cannot be shortened on our side; pushing several versions together signs only the latest one.
 
 ## Install on a computer (Firefox)
 

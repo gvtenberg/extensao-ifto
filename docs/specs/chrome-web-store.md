@@ -19,7 +19,7 @@ Colleagues on Chrome (and Edge) install the extension from a store link and get 
 ## 3. Decisions to confirm
 
 - [x] D1 – Account: personal Google account (the IFTO account cannot use the store), one-time US$5 fee, visibility "unlisted" (user, 18/11/2026).
-- [ ] D2 – The US$5 breaks the "no costs" rule (`CLAUDE.md`, "How it works"). Write an exception there? Suggestion: yes, "one-time fee for the Chrome store, paid by the owner".
+- [ ] D2 – The US$5 breaks the "no costs" rule (`AGENTS.md`, "How it works"). Write an exception there? Suggestion: yes, "one-time fee for the Chrome store, paid by the owner".
 - [ ] D3 – Where the privacy page lives: (a) page in the GitHub repository (`PRIVACIDADE.md`, public link) (b) GitHub Pages site. Suggestion: (a), no extra setup.
 - [ ] D4 – Upload of each new version: (a) by hand in the store dashboard (b) automatic by GitHub Actions (Chrome Web Store API, keys in GitHub secrets). Suggestion: (a) at first; (b) later if it becomes tiring.
 - [ ] D5 – Keep offering the developer-mode `.zip` in Releases after the store version exists? Suggestion: yes for a while, then remove from the README.

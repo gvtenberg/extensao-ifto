@@ -5,7 +5,12 @@
 const { execSync } = require('node:child_process')
 
 const REPO = 'https://github.com/gvtenberg/extensao-ifto.git'
-const SO_TEXTOS = /(\.md$|^docs\/|^LICENSE$|^\.claude\/|^\.github\/workflows\/testes\.yml$|^\.github\/scripts\/(apagar-testes|ler-resultados|testes-para-cartoes|testes-pendentes)\.js$)/
+const SO_TEXTOS = /(\.md$|^docs\/|^LICENSE$|^\.claude\/|^\.github\/|^testes\/|^package(-lock)?\.json$)/
+
+// Regras gerais mudadas por quem não é o dono (25/11/2026: o dono também usa pull request e pode mudá-las).
+function regrasProibidas (mudados, doDono) {
+  return doDono ? [] : mudados.filter(a => a.startsWith('docs/claude-regras/'))
+}
 
 // Versões aceitas logo depois da do master: último número +1, ou número do meio +1 (melhoria nova).
 function versoesAceitas (doMaster) {
@@ -29,14 +34,14 @@ function conferir () {
   const sh = c => execSync(c, { encoding: 'utf8', maxBuffer: 64 * 1024 * 1024 })
   const ler = (rev, arq) => { try { return sh(`git show ${rev}:${arq}`) } catch { return '' } }
   const erros = []
-  const atualizar = `git fetch ${REPO} master && git merge FETCH_HEAD (resolva os conflitos, rode npm test, faça o commit e o push no fork)`
+  const atualizar = `git fetch ${REPO} master && git merge FETCH_HEAD (resolva os conflitos, rode npm test, faça o commit e o push no seu branch)`
 
   try { sh('git merge-base --is-ancestor HEAD^1 HEAD^2') } catch {
-    erros.push(`O fork está desatualizado: falta o master mais novo do gvtenberg/extensao-ifto. Atualize antes de tudo: ${atualizar}. Depois confira de novo a versão e os números dos testes (regras no CLAUDE.md, "Colleague's fork and pull requests").`)
+    erros.push(`O branch está desatualizado: falta o master mais novo do gvtenberg/extensao-ifto. Atualize antes de tudo: ${atualizar}. Depois confira de novo a versão e os números dos testes (regras em CONTRIBUTING.md).`)
   }
 
   const mudados = sh('git diff --name-only HEAD^1 HEAD').split('\n').filter(Boolean)
-  const regras = mudados.filter(a => a.startsWith('docs/claude-regras/'))
+  const regras = regrasProibidas(mudados, process.env.DO_DONO === 'true')
   if (regras.length) {
     erros.push(`O pull request altera as regras gerais do dono (${regras.join(', ')}). Desfaça essa parte: git checkout FETCH_HEAD -- docs/claude-regras (depois de "git fetch ${REPO} master"). Regra útil para todos: escreva como sugestão no texto do pull request.`)
   }
@@ -45,10 +50,10 @@ function conferir () {
   const doMaster = versao(ler('HEAD^1', 'manifest.json'))
   const doPr = versao(ler('HEAD', 'manifest.json'))
   const aceitas = versoesAceitas(doMaster)
-  // Só textos (os mesmos do paths-ignore do assinar.yml): a versão não muda.
+  // Só textos, arquivos do GitHub e pacotes de desenvolvimento: a versão não muda.
   const soTextos = mudados.every(a => SO_TEXTOS.test(a))
   if (soTextos && doPr !== doMaster) {
-    erros.push(`Este pull request só muda textos: a versão fica a do master (${doMaster}), não ${doPr}.`)
+    erros.push(`Este pull request só muda textos ou arquivos que não vão na extensão: a versão fica a do master (${doMaster}), não ${doPr}.`)
   } else if (soTextos) {
     // nada a conferir na versão
   } else if (!aceitas.includes(doPr)) {
@@ -70,4 +75,4 @@ function conferir () {
 }
 
 if (require.main === module) conferir()
-module.exports = { versoesAceitas, maioresNumeros, numerosNovos, SO_TEXTOS }
+module.exports = { regrasProibidas, versoesAceitas, maioresNumeros, numerosNovos, SO_TEXTOS }

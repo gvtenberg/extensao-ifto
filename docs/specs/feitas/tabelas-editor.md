@@ -22,7 +22,7 @@ Pasting into another document or window (works as before); "10.10." in Item nív
 
 ## 4. Decided rules
 
-Moved to `docs/regras/sei.md` ("Tables in the editor").
+Moved to `docs/regras/sei-editor.md` ("Tables in the editor").
 
 ## 5. What changes
 
