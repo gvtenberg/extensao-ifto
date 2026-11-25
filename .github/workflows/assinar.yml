@@ -7,13 +7,13 @@
 # AMO_JWT_ISSUER e AMO_JWT_SECRET.
 name: Assinar extensão
 
-# Envio que só muda textos (README, docs, lista de testes, licença) ou os arquivos dos cartões de teste não roda:
+# Envio que só muda textos (README, docs, lista de testes, licença) os workflows, o Dependabot ou os arquivos dos cartões de teste não roda:
 # não há o que conferir nem assinar (nem versão nova).
 # Se o envio tiver também algum arquivo da extensão, roda normalmente.
 on:
   push:
     branches: [master]
-    paths-ignore: ['**.md', 'docs/**', 'LICENSE', '.claude/**', '.github/workflows/testes.yml', '.github/scripts/apagar-testes.js', '.github/scripts/ler-resultados.js', '.github/scripts/testes-para-cartoes.js', '.github/scripts/testes-pendentes.js']
+    paths-ignore: ['**.md', 'docs/**', 'LICENSE', '.claude/**', '.github/workflows/**', '.github/dependabot.yml', '.github/scripts/apagar-testes.js', '.github/scripts/ler-resultados.js', '.github/scripts/testes-para-cartoes.js', '.github/scripts/testes-pendentes.js']
   pull_request:
     branches: [master]
     # sem paths-ignore: a conferência do pull request roda sempre (só confere, nunca assina), senão o merge fica travado
@@ -42,6 +42,9 @@ jobs:
       # mudando as regras gerais do dono é recusado com mensagem clara (.github/scripts/conferir-pull-request.js).
       - name: Conferir o pull request (master em dia, versão e números de teste)
         if: github.event_name == 'pull_request'
+        env:
+          # Só o branch do próprio dono, neste repositório, pode mudar as regras gerais (25/11/2026).
+          DO_DONO: ${{ github.event.pull_request.user.login == github.repository_owner && github.event.pull_request.head.repo.full_name == github.repository }}
         run: node .github/scripts/conferir-pull-request.js
 
       - name: Instalar o Node.js
@@ -91,7 +94,7 @@ jobs:
             echo "Envio à Mozilla: tentativa $TENTATIVA de 3."
             npx web-ext sign --channel unlisted --approval-timeout 1800000 \
               --ignore-files "testes/**" "docs/**" "ferramentas-de-teste/**" ".github/**" "scripts/**" \
-              package.json package-lock.json CLAUDE.md TESTES-PENDENTES.md 2>&1 | tee "$LOG"
+              package.json package-lock.json AGENTS.md CLAUDE.md CONTRIBUTING.md TESTES-PENDENTES.md 2>&1 | tee "$LOG"
             ENVIO=${PIPESTATUS[0]}
             [ "$ENVIO" -eq 0 ] && exit 0
             echo "O envio falhou; vendo se a Mozilla já recebeu a versão $VERSAO."

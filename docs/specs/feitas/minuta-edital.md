@@ -25,7 +25,7 @@ All answered by the user on 18/11/2026:
 
 ## 4. Decided rules
 
-In `regras/sei.md`, section "MINUTA mark in editais (v0.22.0)".
+In `regras/sei-editor.md`, section "MINUTA mark in editais (v0.22.0)".
 
 ## 5. What changes
 

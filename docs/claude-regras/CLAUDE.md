@@ -21,14 +21,15 @@ Student, not from IT: plain, simple language; commands with the exact text to ty
 
 ## Doubts and git
 - Never assume what can be asked (setup, equipment, network, preferences, decisions): ask in the chat through the choice window (up to 4 questions, suggestion first, each self-explanatory) and wait. Assume only when the user says so or will be away (then do what is decided and bring the questions in a block at the end, with suggestions).
+- **Always suggest** (25/11/2026): end every reply about work done with 1 to 3 short, creative suggestions (something to improve, learn or try), even if not asked; the user is a beginner who wants to learn. Only suggest: nothing is done without a yes.
 - Do only what was asked. Anything extra (a new script, extension, automatic search, extra setting) needs a question in the choice window first, even if it seems helpful.
 - Every change must be reversible (system, settings, files, code): before changing, keep the previous value or a backup and leave an undo path (undo script or exact commands); prefer turning off over deleting.
 - Batch changes (every project, forks included): don't update `.md` files, the version or commit after each small step or follow-up fix; leave the changes uncommitted, let the user test, and write/commit once, after the user confirms it works or at the end of the session. One commit per real change: no extra commits like "translate comments" or "move the list" for work not yet pushed (fold them into the change).
-- Keys and passwords never in git. Never remove lines from `.gitignore` without permission. Never `git push` without being asked.
+- Keys and passwords never in git. Never remove lines from `.gitignore` without permission. Projects on GitHub (not forks): never commit on or push to `main`/`master`; branch and pull request without asking, **ask before each merge** (`programacao.md`, "Pull requests"). Forks and other repositories: never `git push` without being asked. A project's own flow (its `AGENTS.md` or memory) wins.
 
 ## Theme files
 Read only when needed (they are NOT loaded automatically):
-- `~/.claude/regras/programacao.md`: projects with code (system, site, extension, app): small specs, tests and GitHub cards, version numbers, commits, worktrees, GitHub Actions, reusing code, chat reply after changing code, keeping these rules equal on every computer. **Read it at the start of every programming session** (unless the project's `CLAUDE.md` imports it with `@`). Never in projects without code.
+- `~/.claude/regras/programacao.md`: projects with code (system, site, extension, app): small specs, tests and GitHub cards, version numbers, commits, worktrees, GitHub Actions, reusing code, chat reply after changing code, keeping these rules equal on every computer. **Read it at the start of every programming session** (unless already loaded; repositories carry a copy in `docs/claude-regras/`). Never in projects without code.
 - `~/.claude/regras/organizacao-projeto.md`: how to organize a project (`CLAUDE.md`, `docs/`, `.md` files). Read only when creating or reorganizing a project, or creating a new `.md` file. New project or one without this organization: propose applying it.
 
 ## Improvements for several projects

@@ -8,7 +8,7 @@ name: Pacote Chrome e Edge
 
 on:
   push:
-    paths-ignore: ['**.md', 'docs/**', 'LICENSE', '.claude/**', '.github/workflows/testes.yml', '.github/scripts/**']
+    paths-ignore: ['**.md', 'docs/**', 'LICENSE', '.claude/**', '.github/workflows/**', '.github/dependabot.yml', '.github/scripts/**']
   workflow_dispatch: # permite rodar à mão na aba Actions
 
 permissions:
