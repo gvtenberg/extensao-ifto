@@ -46,7 +46,8 @@
     }
     // Seleção: o botão escolhido; menu do botão direito: tudo na CGOC, só o SICAF nas outras unidades.
     // v0.26.10: "Sempre ligada" = só o Sicaf, também na CGOC.
-    const quais = ['tudo', 'sicaf', 'simples'].includes(recado.quais) ? recado.quais : (regras.ehCgoc(unidade) && opcoes.incluirSicaf === 'automatica' ? 'tudo' : 'sicaf')
+    const padrao = regras.ehCgoc(unidade) && opcoes.incluirSicaf === 'automatica' ? 'tudo' : 'sicaf'
+    const quais = ['tudo', 'sicaf', 'simples'].includes(recado.quais) ? recado.quais : padrao
     janelaDoCnpj(recado.cnpj ? regras.formatarCnpj(recado.cnpj) : recado.texto || '', quais)
   })
 
@@ -162,11 +163,12 @@
     if (!pular) return
     pedidoAtual = { grupos, resultado, quais, voltar }
     janelaDaBusca = aberta
-    const sites = quais === 'sicaf' ? 'O SICAF abre' : quais === 'simples' ? 'O Simples Nacional abre' : 'O SICAF e o Simples Nacional abrem'
+    const sites = { sicaf: 'O SICAF abre', simples: 'O Simples Nacional abre' }[quais] || 'O SICAF e o Simples Nacional abrem'
+    const titulo = { sicaf: 'Buscando no SICAF:', simples: 'Consultando no Simples Nacional:' }[quais] || 'Buscando no SICAF e no Simples Nacional:'
     const daVez = criar('p', { className: 'apoio', textContent: 'Abrindo o site…' })
     const alerta = criar('p', { className: 'aviso amarelo', hidden: true })
     aberta.trocarConteudo([
-      criar('p', { textContent: quais === 'simples' ? 'Consultando no Simples Nacional:' : quais === 'sicaf' ? 'Buscando no SICAF:' : 'Buscando no SICAF e no Simples Nacional:' }),
+      criar('p', { textContent: titulo }),
       criar('ul', {}, grupos.map(grupo => criar('li', { textContent: regras.formatarCnpj(grupo.cnpj) + (grupo.nome ? ' – ' + grupo.nome : '') }))),
       daVez,
       alerta,
@@ -273,7 +275,9 @@
         for (const fornecedor of fornecedores) {
           if (!fornecedor.notas.length && analise) fornecedor.notas = analise.situacao.notas.filter(nota => nota.cnpj === fornecedor.cnpj && !nota.anexoFeito)
         }
-      } catch (erro) {}
+      } catch (erro) {
+        console.warn('[extensão IFTO] Não consegui ler as notas do processo:', erro.message)
+      }
     }
     // v0.18.2: última conferência, com a árvore de agora: Sicaf ou Consulta que já está no processo com o
     // CNPJ deste fornecedor não é incluído de novo.
@@ -294,7 +298,9 @@
     const paraIncluir = regras.documentosParaIncluir(fornecedores, oQue)
     for (const item of paraIncluir) {
       const fornecedor = fornecedores.find(outro => outro.cnpj === item.cnpj)
-      item.semPdfDoProcesso = item.tipo === 'Sicaf' ? fornecedor.sicafSemPdf : item.tipo === 'Consulta' ? fornecedor.consultaSemPdf : null
+      item.semPdfDoProcesso = null
+      if (item.tipo === 'Sicaf') item.semPdfDoProcesso = fornecedor.sicafSemPdf
+      if (item.tipo === 'Consulta') item.semPdfDoProcesso = fornecedor.consultaSemPdf
     }
     const itens = regras.aproveitarEmBranco(paraIncluir, lida ? lida.documentos : [])
     for (const item of itens) {
@@ -304,18 +310,28 @@
       if (item.tipo === 'Consulta') item.arquivo = { bytes: fornecedor.simplesBytes, nome: fornecedor.simplesArquivo }
     }
     const nomeDoItem = item => item.tipo + (item.nomeArvore ? ' ' + item.nomeArvore : '')
+    const linhaDaBusca = (site, erro, salvo, bytes) => {
+      if (erro) return criar('p', { className: 'aviso vermelho', textContent: `${site}: ${erro}` })
+      return criar('p', {}, [`PDF do ${site} obtido agora` + (salvo ? ' (cópia na pasta Downloads). ' : '. '), linkDoPdf(bytes)])
+    }
+    const doEmBranco = item => {
+      if (!item.emBranco) return ''
+      return item.nomeArvore || item.arquivo ? ` – no ${item.tipo} em branco ${item.emBranco.sei}` : ` – já existe em branco (${item.emBranco.sei})`
+    }
+    const textoDoItem = item => nomeDoItem(item) + (item.arquivo ? ' (com o PDF)' : '') +
+      (item.semPdf ? ' – sem PDF (complete depois, para manter a ordem)' : '') + doEmBranco(item)
     const cartoes = fornecedores.map(fornecedor => {
       const doFornecedor = itens.filter(item => item.cnpj === fornecedor.cnpj)
       return criar('div', { className: 'cartao' }, [
         criar('h2', { textContent: regras.formatarCnpj(fornecedor.cnpj) + (fornecedor.nomeNoSicaf ? ' – ' + fornecedor.nomeNoSicaf : '') }),
-        !fornecedor.pediuSicaf ? null : fornecedor.erro ? criar('p', { className: 'aviso vermelho', textContent: 'SICAF: ' + fornecedor.erro }) : criar('p', {}, ['PDF do SICAF obtido agora' + (fornecedor.salvo ? ' (cópia na pasta Downloads). ' : '. '), linkDoPdf(fornecedor.bytes)]),
-        !fornecedor.pediuSimples ? null : fornecedor.simplesErro ? criar('p', { className: 'aviso vermelho', textContent: 'Simples Nacional: ' + fornecedor.simplesErro }) : criar('p', {}, ['PDF do Simples Nacional obtido agora' + (fornecedor.simplesSalvo ? ' (cópia na pasta Downloads). ' : '. '), linkDoPdf(fornecedor.simplesBytes)]),
+        fornecedor.pediuSicaf ? linhaDaBusca('SICAF', fornecedor.erro, fornecedor.salvo, fornecedor.bytes) : null,
+        fornecedor.pediuSimples ? linhaDaBusca('Simples Nacional', fornecedor.simplesErro, fornecedor.simplesSalvo, fornecedor.simplesBytes) : null,
         fornecedor.jaTemSicaf ? criar('p', { className: 'aviso verde', textContent: 'O Sicaf deste fornecedor já está no processo: não será incluído de novo.' }) : null,
         fornecedor.jaTemConsulta ? criar('p', { className: 'aviso verde', textContent: 'A Consulta do Simples Nacional deste fornecedor já está no processo: não será incluída de novo.' }) : null,
         fornecedor.outraUnidade ? criar('p', { className: 'aviso vermelho', textContent: `O ${fornecedor.sicafSemPdf && fornecedor.sicafSemPdf.outraUnidade ? 'Sicaf' : 'Consulta do Simples Nacional'} sem PDF desta empresa foi criado por outra unidade; só ela pode anexar o PDF. Nada será incluído para esta empresa.` }) : null,
         ...fornecedor.avisos.map(aviso => criar('p', { className: 'aviso ' + aviso.nivel, textContent: aviso.texto })),
         doFornecedor.length ? criar('p', { className: 'apoio', textContent: 'Será incluído:' }) : null,
-        doFornecedor.length ? criar('ul', {}, doFornecedor.map(item => criar('li', { textContent: nomeDoItem(item) + (item.arquivo ? ' (com o PDF)' : '') + (item.semPdf ? ' – sem PDF (complete depois, para manter a ordem)' : '') + (item.emBranco ? (item.nomeArvore || item.arquivo ? ` – no ${item.tipo} em branco ${item.emBranco.sei}` : ` – já existe em branco (${item.emBranco.sei})`) : '') }))) : null
+        doFornecedor.length ? criar('ul', {}, doFornecedor.map(item => criar('li', { textContent: textoDoItem(item) }))) : null
       ])
     })
     // Sicaf ou Consulta do processo que não abriu: não dá para saber de quem é; a pessoa confere.
@@ -436,7 +452,6 @@
   }
 
   // ---------- Aviso na barra ----------
-  let atual = null
   let vez = 0
   async function atualizar () {
     if (!avisoLigado()) { barra.mostrar(ID, false); return }
@@ -444,7 +459,6 @@
     let resultado = null
     try { resultado = await analisar() } catch (erro) { resultado = null }
     if (minhaVez !== vez) return
-    atual = resultado
     avisarSemPdf(resultado ? resultado.nomeados.filter(achado => achado.antesDaFolha) : [])
     const pendentes = resultado ? resultado.situacao.pendentes : []
     if (!pendentes.length) { barra.mostrar(ID, false); return }
@@ -597,7 +611,7 @@
       // v0.18.5: ao voltar à janela, o CNPJ digitado antes continua no campo.
       const digitado = nota.cnpjEscolhido && !nota.opcoes.includes(nota.cnpjEscolhido)
       const outro = criar('input', { type: 'text', placeholder: nota.opcoes.length ? 'outro CNPJ' : 'digite ou cole o CNPJ', value: digitado ? regras.formatarCnpj(nota.cnpjEscolhido) : '' })
-      const opcoes = nota.opcoes.map((cnpj, posicao) => {
+      const opcoes = nota.opcoes.map(cnpj => {
         const marca = criar('input', { type: 'radio', name: nome, value: cnpj, checked: cnpj === nota.cnpjEscolhido })
         marca.addEventListener('change', () => { if (marca.checked) { nota.cnpjEscolhido = cnpj; outro.value = '' } })
         const origem = cnpj === (nota.ateste && nota.ateste.cnpj) && cnpj !== nota.cnpj ? 'do ateste' : 'da nota'
@@ -624,7 +638,7 @@
     const botao = criar('button', { type: 'button', className: 'pequeno', textContent: 'Ver a nota', title: nota.sei ? `Abrir a nota (SEI ${nota.sei})` : 'Abrir a nota' })
     botao.addEventListener('click', () => {
       let ancora = null
-      try { ancora = quadroArvore.contentDocument.getElementById('anchor' + nota.id) } catch (erro) {}
+      try { ancora = quadroArvore.contentDocument.getElementById('anchor' + nota.id) } catch (erro) { /* árvore fechada */ }
       if (ancora) ancora.click()
       else window.open(nota.link, '_blank', 'noopener')
     })

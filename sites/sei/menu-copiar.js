@@ -42,7 +42,8 @@
     aviso.className = 'msgGeral msgSucesso'
     aviso.setAttribute('role', 'alert')
     const tipo = opcao.getAttribute('tipo')
-    aviso.textContent = tipo === 'link' ? 'Link para o editor copiado.' : tipo === 'url' ? 'Link para acesso direto copiado.' : 'Texto copiado.'
+    const frases = { link: 'Link para o editor copiado.', url: 'Link para acesso direto copiado.' }
+    aviso.textContent = frases[tipo] || 'Texto copiado.'
     let antes = 0
     for (let irmao = opcao.previousElementSibling; irmao; irmao = irmao.previousElementSibling) antes++
     Object.assign(aviso.style, { position: 'absolute', zIndex: 1000, top: (antes * 25) + 'px' })

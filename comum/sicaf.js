@@ -435,10 +435,12 @@
       const anexos = (fornecedor.jaTemSicaf || fornecedor.temPdf || fornecedor.jaTemConsulta || fornecedor.temSimples)
         ? (fornecedor.notas || []).filter(nota => !nota.anexoFeito).map(nota => ({ tipo: 'Anexo', nomeArvore: nomeDoAnexo(nota.numero, nota.fornecedor), cnpj: fornecedor.cnpj, nota: nota.numero }))
         : []
-      const consulta = fornecedor.temSimples ? { tipo: 'Consulta', nomeArvore: fornecedor.nomeConsulta || '', cnpj: fornecedor.cnpj }
-        : !temConsulta && anexos.length ? { tipo: 'Consulta', nomeArvore: fornecedor.nomeConsulta || '', cnpj: fornecedor.cnpj, semPdf: true } : null
-      const sicafItem = fornecedor.temPdf ? { tipo: 'Sicaf', nomeArvore: nomeSicaf, cnpj: fornecedor.cnpj }
-        : !temSicaf && (consulta || anexos.length) ? { tipo: 'Sicaf', nomeArvore: nomeSicaf, cnpj: fornecedor.cnpj, semPdf: true } : null
+      let consulta = null
+      if (fornecedor.temSimples) consulta = { tipo: 'Consulta', nomeArvore: fornecedor.nomeConsulta || '', cnpj: fornecedor.cnpj }
+      else if (!temConsulta && anexos.length) consulta = { tipo: 'Consulta', nomeArvore: fornecedor.nomeConsulta || '', cnpj: fornecedor.cnpj, semPdf: true }
+      let sicafItem = null
+      if (fornecedor.temPdf) sicafItem = { tipo: 'Sicaf', nomeArvore: nomeSicaf, cnpj: fornecedor.cnpj }
+      else if (!temSicaf && (consulta || anexos.length)) sicafItem = { tipo: 'Sicaf', nomeArvore: nomeSicaf, cnpj: fornecedor.cnpj, semPdf: true }
       itens.push(...[sicafItem, consulta].filter(Boolean), ...anexos)
     }
     return itens

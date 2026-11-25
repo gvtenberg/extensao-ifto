@@ -103,7 +103,7 @@
         }
         const aoAbrir = () => {
           let dentro = null
-          try { dentro = quadro.contentDocument } catch (erro) {}
+          try { dentro = quadro.contentDocument } catch (erro) { /* quadro em outra página: confere quando ela abrir */ }
           const campo = dentro && dentro.getElementById('hdnIdProcedimento')
           const serie = dentro && dentro.getElementById('hdnIdSerie')
           const certo = campo && campo.value === lida.idProcesso && serie && serie.value === tipo.id && dentro.getElementById('optProtocoloDocumentoTextoBase')

@@ -20,7 +20,10 @@
   }
   const temConteudo = p => Boolean(textoDe(p).replace(INVISIVEIS, '')) || Boolean(p.querySelector('img'))
   // v0.33.0: tem algo que o SEI salva (até um espaço ou uma quebra de linha), além da linha vazia do editor.
-  const bruto = no => no.nodeType === Node.TEXT_NODE ? no.data : no.nodeName === 'STYLE' ? '' : [...no.childNodes].map(bruto).join('')
+  function bruto (no) {
+    if (no.nodeType === Node.TEXT_NODE) return no.data
+    return no.nodeName === 'STYLE' ? '' : [...no.childNodes].map(bruto).join('')
+  }
   const temAlgo = elemento => Boolean(bruto(elemento).replace(/[\u200b-\u200d\u2060\ufeff]/g, '')) || Boolean(elemento.querySelector('img, br:not([data-cke-filler])'))
 
   // Alto da primeira linha e baixo da última (letras e imagens; a altura de linha de 10% não conta).
@@ -47,7 +50,8 @@
   function medirBloco (elemento, raizDoTexto, secao, posicao) {
     const bloco = { ...descritor(elemento), raiz: raizDoTexto, secao, posicao, vazio: false, outro: false }
     const embrulho = bloco.tag === 'div' && !bloco.classes.length
-    const paragrafos = bloco.tag === 'p' ? [elemento] : embrulho ? [...elemento.children] : []
+    const filhos = embrulho ? [...elemento.children] : []
+    const paragrafos = bloco.tag === 'p' ? [elemento] : filhos
     if (!paragrafos.length || paragrafos.some(p => p.tagName !== 'P')) return { ...bloco, outro: true }
     const comTexto = paragrafos.filter(temConteudo)
     // v0.33.0: linha em branco: altura e margens (contam no documento salvo); semNada = só a linha vazia que o

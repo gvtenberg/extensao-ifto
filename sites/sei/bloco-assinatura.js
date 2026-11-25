@@ -43,7 +43,8 @@
   async function documentosDoClique (alvo) {
     const clique = alvo.getAttribute('onclick') || ''
     const item = (/acaoAssinar\('([^']+)'\)/.exec(clique) || [])[1]
-    const itens = alvo.id === 'btnAssinar' ? marcados() : (item ? [item] : [])
+    const doItem = item ? [item] : []
+    const itens = alvo.id === 'btnAssinar' ? marcados() : doItem
     if (!naListaDeBlocos) {
       const ids = new Set(itens.map(regras.idDoItemDoBloco))
       return documentosDaPagina.filter(doc => ids.has(doc.id))
@@ -68,7 +69,9 @@
     try {
       const documentos = await Promise.race([documentosDoClique(alvo), tempo(25000)])
       resultados = await Promise.all(documentos.map(doc => conferirDocumento(doc.link)))
-    } catch (erro) {}
+    } catch (erro) {
+      console.warn('[extensão IFTO] Não consegui conferir os documentos do bloco:', erro && erro.message)
+    }
     document.documentElement.style.cursor = ''
     conferindo = false
     const errados = resultados.filter(r => r && r.problemas && r.problemas.length)

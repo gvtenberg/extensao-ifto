@@ -130,9 +130,11 @@
     const lida = arvore && arvore.body ? sei.lerArvore([...arvore.scripts].map(script => script.textContent).join('\n')) : null
     const rotulos = lida ? lida.documentos.map(doc => doc.rotulo).concat([...arvore.querySelectorAll('a')].map(link => link.textContent)) : []
     // A árvore precisa ser do processo do item (sem processo: a que tem o primeiro documento).
-    const certa = lida && (item.processo
-      ? (lida.numero ? lida.numero === item.processo : arvore.body.textContent.includes(item.processo))
-      : rotulos.some(rotulo => regras.numeroDoRotulo(rotulo) === item.documento))
+    const doItem = () => {
+      if (!item.processo) return rotulos.some(rotulo => regras.numeroDoRotulo(rotulo) === item.documento)
+      return lida.numero ? lida.numero === item.processo : arvore.body.textContent.includes(item.processo)
+    }
+    const certa = lida && doItem()
     if (!certa) {
       if (pedidoPeloUsuario) { aviso = 'Abra o processo deste item ("Abrir de novo") e espere a árvore aparecer.'; desenhar() }
       return
@@ -167,7 +169,9 @@
         const { html } = await Promise.race([seiPedidos.pedir(doc.link), limite])
         const problemas = conferir.problemasParaAssinar(html, opcoes, new Date(), unidade)
         if (problemas.length) errados.push({ numero, rotulo: doc.rotulo, problemas })
-      } catch (erro) {}
+      } catch (erro) {
+        console.warn('[extensão IFTO] Não consegui conferir o documento da lista:', erro.message)
+      }
     }
     if (!errados.length) return
     const linhas = errados.map(e => `${e.rotulo}: ${e.problemas.join(' ')}`)
@@ -256,6 +260,33 @@
     await irPara(0)
   }
 
+  // Partes do painel que mudam com o tipo do item.
+  const frasesDaEspera = {
+    ciencia: 'Aguardando a ciência no SEI (confirme no OK)…',
+    assinar: 'Aguardando a assinatura no SEI… Se a senha não aparecer preenchida, digite e aperte Enter.'
+  }
+  function documentoDoItem (item) {
+    if (item.ate) {
+      return [el('div', {}, el('span', { class: 'rotulo' }, 'Documentos '), el('strong', {}, `${item.documento} a ${item.ate}`)),
+        el('div', { class: 'apoio' }, 'Ao abrir o processo, a extensão separa um item para cada documento dele nesse intervalo.')]
+    }
+    if (!item.documento) return el('div', { class: 'apoio' }, 'Sem documento: abre o processo.')
+    return el('div', {}, el('span', { class: 'rotulo' }, 'Documento '), el('strong', {}, item.documento),
+      item.doIntervalo ? el('span', { class: 'apoio' }, ` (de ${item.doIntervalo})`) : null)
+  }
+  function botaoPrincipal (item) {
+    const botao = (texto, aoClicar, dica) => el('button', { type: 'button', class: 'botao principal', ...(dica ? { title: dica } : {}), onclick: aoClicar }, texto)
+    if (item.ate) return botao('Conferir de novo', () => conferirIntervalo(true))
+    if (item.ciencia) return botao('Dar ciência e próximo', () => agirEAvancar('ciencia'), 'Clica em "Ciência" no SEI; depois de você confirmar, abre o próximo')
+    if (item.documento) return botao('Assinar e próximo', () => agirEAvancar('assinar'), 'Assina com a senha guardada no Firefox e abre o próximo')
+    return botao('✓ Feito e próximo', feitoEProximo)
+  }
+  function linkDeFeito (item) {
+    if (item.feito) return el('button', { type: 'button', class: 'link', onclick: desmarcarFeito }, 'Desmarcar feito')
+    if (item.ate || !(item.documento || item.ciencia)) return null
+    return el('button', { type: 'button', class: 'link', onclick: feitoEProximo }, 'Marcar feito e ir ao próximo')
+  }
+
   // v0.3.0: "Feito e próximo" (v0.5.0: "Assinar e próximo"), lista completa, ciência em destaque, minimizar.
   function desenharNavegar () {
     const item = estado.itens[estado.posicao]
@@ -276,13 +307,7 @@
           item.ciencia ? el('span', { class: 'etiqueta ciencia' }, 'Só dar ciência') : el('span', { class: 'etiqueta' }, 'Assinar'),
           item.feito ? el('span', { class: 'etiqueta feito' }, '✓ Feito') : null),
         item.processo ? el('div', {}, el('span', { class: 'rotulo' }, 'Processo '), el('strong', {}, item.processo)) : null,
-        item.ate
-          ? [el('div', {}, el('span', { class: 'rotulo' }, 'Documentos '), el('strong', {}, `${item.documento} a ${item.ate}`)),
-              el('div', { class: 'apoio' }, 'Ao abrir o processo, a extensão separa um item para cada documento dele nesse intervalo.')]
-          : item.documento
-            ? el('div', {}, el('span', { class: 'rotulo' }, 'Documento '), el('strong', {}, item.documento),
-              item.doIntervalo ? el('span', { class: 'apoio' }, ` (de ${item.doIntervalo})`) : null)
-            : el('div', { class: 'apoio' }, 'Sem documento: abre o processo.'),
+        documentoDoItem(item),
         item.comentario ? el('div', { class: 'comentario' }, item.comentario) : null),
       aviso ? el('div', { class: 'erros' }, aviso) : null,
       el('div', { class: 'acoes' },
@@ -290,22 +315,12 @@
         el('button', { type: 'button', class: 'botao', title: 'Alt+→', disabled: estado.posicao === total - 1, onclick: () => irPara(estado.posicao + 1) }, 'Próximo ▶')),
       // v0.5.0: o botão principal assina (ou dá ciência) e avança. Sem documento e sem ciência, só marca
       // como feito, porque "Assinar" precisa de um documento aberto.
-      estado.pendente ? el('div', { class: 'aguardando' }, estado.pendente.tipo === 'ciencia'
-        ? 'Aguardando a ciência no SEI (confirme no OK)…'
-        : 'Aguardando a assinatura no SEI… Se a senha não aparecer preenchida, digite e aperte Enter.') : null,
-      item.ate
-        ? el('button', { type: 'button', class: 'botao principal', onclick: () => conferirIntervalo(true) }, 'Conferir de novo')
-        : item.ciencia
-        ? el('button', { type: 'button', class: 'botao principal', title: 'Clica em "Ciência" no SEI; depois de você confirmar, abre o próximo', onclick: () => agirEAvancar('ciencia') }, 'Dar ciência e próximo')
-        : item.documento
-          ? el('button', { type: 'button', class: 'botao principal', title: 'Assina com a senha guardada no Firefox e abre o próximo', onclick: () => agirEAvancar('assinar') }, 'Assinar e próximo')
-          : el('button', { type: 'button', class: 'botao principal', onclick: feitoEProximo }, '✓ Feito e próximo'),
+      estado.pendente ? el('div', { class: 'aguardando' }, frasesDaEspera[estado.pendente.tipo] || frasesDaEspera.assinar) : null,
+      botaoPrincipal(item),
       el('div', { class: 'links' },
         el('button', { type: 'button', class: 'link', onclick: () => { verLista = !verLista; desenhar() } }, verLista ? 'Esconder a lista' : `Lista completa (${total})`),
         el('button', { type: 'button', class: 'link', onclick: () => irPara(estado.posicao) }, 'Abrir de novo'),
-        item.feito
-          ? el('button', { type: 'button', class: 'link', onclick: desmarcarFeito }, 'Desmarcar feito')
-          : (item.documento || item.ciencia) && !item.ate ? el('button', { type: 'button', class: 'link', onclick: feitoEProximo }, 'Marcar feito e ir ao próximo') : null,
+        linkDeFeito(item),
         estado.pendente ? el('button', { type: 'button', class: 'link', onclick: cancelarPendente }, 'Cancelar a espera') : null,
         el('button', { type: 'button', class: 'link', onclick: voltarAoLugarPadrao }, 'Lugar padrão'),
         el('button', { type: 'button', class: 'link perigo', onclick: limpar }, 'Limpar lista')),
