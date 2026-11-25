@@ -1,6 +1,6 @@
 # Rules for programming projects
 
-**Sections**: How we work (small specs) · Chat reply after changing code · Texts shown to users · Tests · Code review · Version and git · Forks · Worktrees · GitHub Actions · Dependabot · External systems can be down · Reusing code · Same rules on every computer
+**Sections**: How we work (small specs) · Chat reply after changing code · Texts shown to users · Tests · Code review · Version and git · Forks · Worktrees · GitHub Actions · Dependabot · External systems can be down · Reusing code · Engineering principles · Code style · Security · Same rules on every computer
 
 Updated on 25/11/2026. Read at the start of every programming session (see `~/.claude/CLAUDE.md`). Model project: `/home/berg/Desktop/Sistema Gestão Orçamentária/sistema-orcamento-ifto`.
 
@@ -28,7 +28,7 @@ Texts shown to people who use the system or the extension are written for them (
 - **Never test with screenshots** without an explicit request.
 
 ## Code review
-(25/11/2026) Every code review (security, architecture or simple review) is done by a **new subagent**, never by the agent that wrote the code, so that it is as impartial as possible. This is the user's standing request for that subagent (the exception to "No subagents"); it does not mean reviewing every change, only that whenever a review is done it is done this way.
+(25/11/2026) Every code review (security, architecture or simple review) is done by a **new subagent**, never by the agent that wrote the code, so that it is as impartial as possible. This is the user's standing request for that subagent (the exception to "No subagents"); it does not mean reviewing every change (only the risky ones, see Security), only that whenever a review is done it is done this way.
 - Always a fresh one, with no memory of the conversation: never a fork (it inherits the context) nor one already used in the programming; a new review, another new subagent.
 - Tell it only what to review (files or commits), the type of review, what the change must do and the project's rules; not the programmer's reasoning or defense of the code. It only reads and reports, it does not change the code.
 - Bring its findings to the user without softening or leaving any out; if the programming agent disagrees with one, say so and why.
@@ -68,6 +68,30 @@ Every CODE change (a stage or a fix) is made in its own **git worktree**, create
 
 ## Reusing code
 Before writing a new function, look for one that already does it; a rule used by two features goes to a shared file instead of being copied.
+
+## Engineering principles
+(25/11/2026) New or touched code only; never rewrite old code just for this. The user is learning: when one of these decides something, explain it in one plain sentence.
+- KISS: the simplest solution that works. YAGNI: build only what is needed now. DRY: see Reusing code.
+- High cohesion: one purpose per file and function. SOLID where it helps; composition over inheritance.
+- Design by contract: validate data where it enters; make clear what a function requires and returns.
+- Layers (screen, business rules, data access): screens hold no rules and no direct data access. Small projects: only the layers that make sense.
+- File over ~800 lines: propose splitting it when a task touches it.
+- Bug fix: first a test that reproduces it.
+
+## Code style
+(25/11/2026) New or touched code only.
+- No nested ternaries.
+- Choosing among 4+ options by an id: map of id to function.
+- No `any` in new code; clear names; short functions; return early instead of deep nesting.
+- Never swallow errors: plain warning for the person, details for the programmer.
+
+## Security
+(25/11/2026)
+- Check permission on the server, not only on screen.
+- Least access for each key; no keys or personal data in logs or error messages.
+- Outside text never goes in as HTML without cleaning.
+- New dependency: ask first (why, maintained, known flaws).
+- Risky change (login, permission, money, writing data): review by a new subagent before the push (see Code review).
 
 ## Same rules on every computer
 - `~/.claude/CLAUDE.md` and `~/.claude/regras/` are the general memory of the computer. Each project's memory (`~/.claude/projects/…/memory/`) keeps only what belongs to that project.
