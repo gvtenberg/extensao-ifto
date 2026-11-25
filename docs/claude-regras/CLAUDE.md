@@ -2,7 +2,7 @@
 
 **Sections**: Who the user is · Language · Economical reading · Doubts and git · Theme files · Improvements for several projects
 
-Updated on 22/11/2026. Only what applies to EVERY project is here (this file is loaded in every message). The rest is in the theme files below: read one only when the task needs it.
+Updated on 25/11/2026. Only what applies to EVERY project is here (this file is loaded in every message). The rest is in the theme files below: read one only when the task needs it.
 
 ## Who the user is
 Student, not from IT: plain, simple language; commands with the exact text to type and the click path. Commands that need `sudo` (password): never suggest the `!` prefix in the chat (it cannot read the password); tell the user to open the Terminal (Ctrl+Alt+T), paste with Ctrl+Shift+V and type the password. Tokens are scarce: always be economical.
@@ -14,7 +14,7 @@ Student, not from IT: plain, simple language; commands with the exact text to ty
 ## Economical reading
 - At the start read only what the project's `CLAUDE.md` says. Then only what the task needs, only the needed part; never re-read in the same session.
 - Files with several sections have the "**Sections**" index on line 3: read the first 5 lines and search for the title.
-- No subagents unless I ask: search with `grep` yourself (subagents cost a lot; when one is needed it runs on Sonnet, `CLAUDE_CODE_SUBAGENT_MODEL` in `~/.claude/settings.json`).
+- No subagents unless I ask (exception: code review, see `programacao.md`): search with `grep` yourself (subagents cost a lot; when one is needed it runs on Sonnet, `CLAUDE_CODE_SUBAGENT_MODEL` in `~/.claude/settings.json`).
 - Large files (saved pages, spreadsheets, PDFs): search the excerpt (`grep`, scripts); never read them whole.
 - Never read base64 images (`data:image…`, e.g. in saved web pages), unless the user explicitly asks; cut them out with a script before reading.
 - Short replies, no recap of what the user already knows. Long conversation (many rounds, many files read, or after an automatic summary): leave everything committed and noted and end with "⚠️ The conversation is long: I recommend starting a new one. Type `/clear` (everything is already saved)."
