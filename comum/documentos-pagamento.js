@@ -75,7 +75,21 @@
     return achado[1].replace(/<[^>]*>/g, ' ').replace(/&nbsp;/g, ' ').replace(/\s+/g, ' ').trim()
   }
 
-  const api = { UNIDADE_CGOC, TIPOS, funcaoLigada, lerArvore, ehDoTipo, documentosEmBranco, acharOpcao, listaEmTexto, textoDaConfirmacao, codificarLatin1, montarCorpo, trocarCampos, mensagemDoSei }
+  // v0.36.4: o SEI também avisa por janela (alert) na página devolvida. As mensagens fixas do formulário
+  // (checagens do Salvar) já estão na página antes do envio; a nova é o motivo de não ter salvo.
+  const textosDeAlerta = html => [...(html || '').matchAll(/alert\(\s*'((?:[^'\\]|\\.)*)'\s*\)/g)]
+    .map(achado => achado[1].replace(/\\n/g, ' ').replace(/\\(.)/g, '$1').replace(/\s+/g, ' ').trim()).filter(Boolean)
+  function alertaNovo (htmlDepois, htmlAntes) {
+    const antes = new Set(textosDeAlerta(htmlAntes))
+    return textosDeAlerta(htmlDepois).find(texto => !antes.has(texto)) || ''
+  }
+
+  // v0.36.4: alguns tipos de documento externo exigem o Número (o SEI marca o rótulo como obrigatório no
+  // formulário do tipo); sem ele, o SEI não salva.
+  const numeroObrigatorio = html => /<label[^>]*id="lblNumero"[^>]*class="[^"]*infraLabelObrigatorio/i.test(html || '') ||
+    /<label[^>]*class="[^"]*infraLabelObrigatorio[^"]*"[^>]*id="lblNumero"/i.test(html || '')
+
+  const api = { UNIDADE_CGOC, TIPOS, funcaoLigada, lerArvore, ehDoTipo, documentosEmBranco, acharOpcao, listaEmTexto, textoDaConfirmacao, codificarLatin1, montarCorpo, trocarCampos, mensagemDoSei, alertaNovo, numeroObrigatorio }
   if (typeof module !== 'undefined' && module.exports) module.exports = api
   else raiz.ExtensaoIFTO = Object.assign(raiz.ExtensaoIFTO || {}, { documentosPagamento: api })
 })(globalThis)
