@@ -251,7 +251,7 @@
       nome.addEventListener('input', () => { linha.nomeArvore = nome.value })
       // v0.36.5: Enter no Nome na Árvore = clicar em "Incluir no processo" (nada acontece se o botão está apagado).
       nome.addEventListener('keydown', evento => {
-        if (evento.key !== 'Enter' || evento.isComposing) return
+        if (evento.key !== 'Enter' || evento.isComposing || evento.keyCode === 229) return
         evento.preventDefault()
         const botao = esta.botoes[0]
         if (!botao.disabled) botao.click()
