@@ -5,6 +5,7 @@ Older versions: `historico/v0.20-a-v0.29.md` and `historico/ate-v0.20.0.md` (`gr
 One or two lines per version, with the date (dd/mm/yyyy). Number 0.STAGE.FIX.
 
 - v0.36.4 (26/11/2026): dragging files into the tree: external document types that require "Número" are stopped with a clear message (the extension does not fill it); when the SEI refuses with a pop-up, its message is shown. T275.
+- v0.36.5 (26/11/2026): window for dragged files: Enter in "Nome na Árvore" does the same as clicking "Incluir no processo" (nothing while a file has no type). T281.
 - v0.36.3 (25/11/2026): code style only, nothing changes on screen: no nested conditionals, no silent errors (details in the console), repeated code joined. T273, T274.
 - v0.36.2 (25/11/2026): Capa: Interessados on one line separated by "; "; "Abrir o editor para corrigir" with the editor already open checks again; notices window becomes a draggable icon with a count; SICAF/Simples: checks if the sites answer before the search (T267–T271). Spacing: new Despacho, the separator between "Assunto" and the addressee no longer counts as space (T272).
 - v0.36.1 (25/11/2026): first included external document opens, message that closes by itself instead of the window (also SICAF), type by file name (uppercase, symbols, broken accents; ambiguous names show the matching types first), drop area closes by itself and has a button, blank line before the signer whatever comes before. T259 to T266.

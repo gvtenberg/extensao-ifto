@@ -659,3 +659,9 @@ E: Aparecem os PDFs obtidos, os avisos e a lista "Será incluído" como antes.
 ### T275 – Arrastar vários arquivos: motivo quando o SEI não salva (v0.36.4)
 F: Arraste para a árvore os 4 PDFs de antes (nota fiscal, documento, nota fiscal, documento), escolha os tipos e clique em "Incluir no processo".
 E: Ou os 4 entram, ou a mensagem diz o motivo (por exemplo, que o tipo exige o "Número"), e não só "O SEI não salvou o documento".
+
+## Enter na janela de arrastar arquivos (v0.36.5)
+> Entre no SEI com a extensão na versão 0.36.5 e abra um processo de teste da sua unidade.
+### T281 – Enter no Nome na Árvore inclui o documento (v0.36.5)
+F: Arraste um arquivo para a árvore, clique no campo "Nome na Árvore" e aperte Enter (com um arquivo sem tipo, aperte Enter antes de escolher o tipo).
+E: Com o tipo escolhido, o Enter faz o mesmo que "Incluir no processo"; sem tipo, nada acontece e o aviso pede para escolher o tipo.
