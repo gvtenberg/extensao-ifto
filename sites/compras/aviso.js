@@ -48,6 +48,8 @@
   document.documentElement.append(hospedeiro)
 
   const esperar = ms => new Promise(pronto => setTimeout(pronto, ms))
+  // Passos no console (F12), para saber onde parou se o SICAF não abrir.
+  const registrar = passo => console.info('[extensão IFTO] Área de Trabalho:', passo)
   // Tenta várias vezes (as páginas montam os botões aos poucos).
   async function tentar (achar, vezes = 20) {
     for (let vez = 0; vez < vezes; vez++) {
@@ -102,7 +104,17 @@
     // A página pode avisar mais de uma vez que terminou de abrir: só uma tentativa por página.
     if (!globalThis.extensaoIftoAbrindoSicaf) {
       globalThis.extensaoIftoAbrindoSicaf = true
-      peloMenu()
+      if (!dados.direto) { peloMenu(); return }
+      // v0.37.0 (usuário, 26/11/2026): chegar à Área de Trabalho já quer dizer que o login deu certo: abre o
+      // SICAF na hora, sem esperar o botão com o nome.
+      Promise.resolve().then(async () => {
+        registrar('abrindo a consulta do SICAF')
+        location.assign(dados.direto)
+        // Ainda aqui depois de 25 segundos (o SICAF não respondeu): para de esperar e tenta pelo menu.
+        await esperar(25000)
+        window.stop()
+        peloMenu()
+      })
     }
   } else {
     escrever(TEXTOS[dados.modo] ? dados.modo : 'naoAbriu')
@@ -124,8 +136,6 @@
     if (window.wrappedJSObject && typeof exportFunction === 'function') window.wrappedJSObject.open = exportFunction(abrirAqui, window)
     else window.open = abrirAqui
   }
-  // Passos no console (F12), para saber onde parou se o SICAF não abrir.
-  const registrar = passo => console.info('[extensão IFTO] Área de Trabalho:', passo)
 
   // Menu do usuário (botão com o nome, no alto à direita) › SICAF.
   async function abrirSicafPeloMenu () {
@@ -138,7 +148,14 @@
     if (!menu) { registrar('botão com o nome não apareceu'); return false }
     await esperar(1000)
     if (!itemDoSicaf()) menu.click()
-    const item = await tentar(itemDoSicaf, 20)
+    // A lista de sistemas do menu tem rolagem própria: rola aos poucos até o "SICAF" aparecer.
+    const item = await tentar(() => {
+      const achado = itemDoSicaf()
+      const lista = document.querySelector('.systems')
+      if (!achado && lista) lista.scrollTop = lista.scrollTop + lista.clientHeight >= lista.scrollHeight ? 0 : lista.scrollTop + 150
+      if (achado) achado.scrollIntoView({ block: 'nearest' })
+      return achado
+    }, 30)
     if (!item) { registrar('item SICAF não apareceu no menu'); return false }
     // O clique vale no próprio item (ou no link/botão em volta dele), não num botão de dentro (ex.: favoritar).
     const clicavel = item.closest('a, button') || item
