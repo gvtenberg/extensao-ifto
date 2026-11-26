@@ -11,6 +11,9 @@
   if (!opcoes.espacamentoDocumento) return
 
   const curto = texto => texto.length > 60 ? texto.slice(0, 57) + '…' : texto
+  // v0.37.0 (T272): o clique em "Adicionar" espera o espaço automático terminar; antes, clicando cedo, o espaço
+  // antigo era posto depois da linha nova e os dois somavam.
+  let automatico = Promise.resolve()
 
   // v0.35.3 (pedido do usuário, 24/11/2026): linha em branco antes e depois de quem assina, só onde não há
   // nenhuma e só com o clique. No clique mede de novo (a pessoa pode ter mudado o texto depois do aviso).
@@ -25,6 +28,7 @@
     caixa.botao.addEventListener('click', async () => {
       caixa.botao.disabled = true
       caixa.botao.textContent = 'Adicionando…'
+      await automatico
       const agora = await caixaEditor.pedirAoFundo('espacamentoMedir')
       const linhas = agora && agora.ok ? regras.linhasQueFaltam(agora.documento) : []
       if (agora && agora.ok && !linhas.length) return caixa.mostrar('ok', 'As linhas em branco já estão no documento.')
@@ -49,7 +53,8 @@
   const plano = regras.planejarEspacamento(medido.documento)
   if (medido.jaTem ? regras.mesmoEspacamento(medido.atual, plano) : !plano.lacunas.length) return
   if (medido.jaTem && !plano.lacunas.length) return
-  const posto = await caixaEditor.pedirAoFundo('espacamentoPor', { bloco: plano.bloco, substituir: medido.jaTem })
+  automatico = caixaEditor.pedirAoFundo('espacamentoPor', { bloco: plano.bloco, substituir: medido.jaTem })
+  const posto = await automatico
   if (!posto || !posto.ok || posto.jaTinha) return
 
   const frase = medido.jaTem

@@ -584,3 +584,8 @@ E: O comentário aparece na lista com seu nome; depois de remover, ele some do p
 ### T294 – Fora da CCL e documento sem marcas (v0.37.0)
 F: Com a opção em Automática, abra um documento numa unidade que não é a CCL; depois, na CCL, abra um Despacho comum.
 E: Nos dois casos não aparece "Remover Formatação da AGU".
+## Correções da rodada de testes de 26/11 (v0.37.0)
+> Entre no SEI com a extensão na versão 0.37.0 e use documentos de teste não assinados da sua unidade.
+### T295 – Linha depois da última pessoa que assina e sem espaço duplo (v0.37.0)
+F: Abra no editor a Solicitação de nota de empenho 3399442 (duas pessoas assinam), clique em "Adicionar as linhas em branco", salve, feche e abra de novo. Repita num Despacho, clicando logo que o aviso aparecer.
+E: Fica uma linha em branco antes do primeiro nome e outra depois de "Ordenador de despesa" (antes do rodapé). Nenhum lugar fica com dois espaços, e ao abrir de novo a extensão não muda nada.

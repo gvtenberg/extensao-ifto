@@ -53,6 +53,8 @@
     const filhos = embrulho ? [...elemento.children] : []
     const paragrafos = bloco.tag === 'p' ? [elemento] : filhos
     if (!paragrafos.length || paragrafos.some(p => p.tagName !== 'P')) return { ...bloco, outro: true }
+    // v0.37.0: classes dos parágrafos de dentro da caixa (rodapé dentro de <div>, T249).
+    if (embrulho) bloco.classesDentro = [...new Set(filhos.flatMap(filho => descritor(filho).classes))]
     const comTexto = paragrafos.filter(temConteudo)
     // v0.33.0: linha em branco: altura e margens (contam no documento salvo); semNada = só a linha vazia que o
     // editor mostra (<br data-cke-filler>): a seção feita só disso não é salva.

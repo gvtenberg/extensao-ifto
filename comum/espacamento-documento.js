@@ -62,9 +62,11 @@
   }
 
   // Início do rodapé: a seção que tem o parágrafo do rodapé, e tudo depois dela, fica de fora.
+  // v0.37.0 (Solicitação de nota de empenho 3399442, T249): o SEI às vezes põe o rodapé dentro de uma caixa
+  // (<div><p class="IFTO_Centralizado_rodape">); vale também a classe dos parágrafos de dentro (classesDentro).
   function inicioDoRodape (blocos) {
     const ehDoRodape = regrasConferir().ehDoRodape
-    let i = blocos.findIndex(bloco => (bloco.classes || []).some(ehDoRodape))
+    let i = blocos.findIndex(bloco => [...(bloco.classes || []), ...(bloco.classesDentro || [])].some(ehDoRodape))
     if (i < 0) return blocos.length
     while (i > 0 && blocos[i - 1].raiz === blocos[i].raiz) i--
     return i
@@ -186,6 +188,9 @@
       // Sequência no documento salvo: bloco de cima, linhas em branco, bloco de baixo. "resto" é tudo menos a
       // margem logo acima do bloco de baixo (a que o espaço novo troca).
       const sequencia = blocos.slice(indiceDoUltimo, i + 1)
+      // v0.37.0 (T272): linha em branco salva no estilo de quem assina conta como espaço, mesmo fina (altura de
+      // linha de 30%), a mesma regra de linhasQueFaltam; senão as duas partes somavam dois espaços.
+      if (sequencia.some(b => b.vazio && !b.semNada && ehDeQuemAssina(b))) continue
       let resto = (ultimo.abaixo || 0) + (bloco.acima || 0)
       for (let k = 1; k < sequencia.length; k++) {
         if (k < sequencia.length - 1) resto += (sequencia[k].altura || 0) + Math.max(sequencia[k - 1].margemBaixo || 0, sequencia[k].margemTopo || 0)
