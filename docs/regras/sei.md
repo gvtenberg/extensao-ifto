@@ -14,6 +14,7 @@ Creating and including documents: `sei-documentos.md`. Editor: `sei-editor.md`. 
 - (12/11/2026) The IFTO SEI was updated to **SEI 5** (scripts with `?5.0.4-2.45.1`). Features built for the old SEI need to be tested again.
 - (v0.22.2) New **internal** document page: `acao=documento_gerar` (existing one: `documento_alterar`). Same access-level fields `#optPublico`/`#optRestrito`/`#optSigiloso` in `frmDocumentoCadastro`; the extension marks Público only when no level is marked (Edital Gabinete came with no level marked), never the format, never Salvar.
 - SEI++ details (versions, how to build the package, license): `../referencias/seipp.md`.
+- External document form (v0.36.4): some types mark "Número" as required (label `lblNumero` with class `infraLabelObrigatorio`); the extension does not fill it and stops with a message. Refusals on save may come as an `alert(...)` in the returned page: the new alert (not in the form before saving) is the reason.
 
 ## Login and signing
 
