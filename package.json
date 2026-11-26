@@ -12,6 +12,6 @@
     "empacotar": "web-ext build --overwrite-dest --ignore-files \"testes/**\" \"docs/**\" \"ferramentas-de-teste/**\" \".github/**\" \"scripts/**\" package.json package-lock.json AGENTS.md CLAUDE.md CONTRIBUTING.md TESTES-PENDENTES.md"
   },
   "devDependencies": {
-    "web-ext": "^8.10.0"
+    "web-ext": "^10.8.0"
   }
 }

@@ -26,10 +26,10 @@ jobs:
     timeout-minutes: 15
     steps:
       - name: Baixar o código
-        uses: actions/checkout@v5
+        uses: actions/checkout@v7
 
       - name: Instalar o Node.js
-        uses: actions/setup-node@v5
+        uses: actions/setup-node@v7
         with:
           node-version: 22
           cache: npm
@@ -53,7 +53,7 @@ jobs:
 
       # O artefato baixa como .zip; dentro dele está a pasta pronta para "Carregar sem compactação".
       - name: Guardar o pacote na execução (Artifacts)
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v7
         with:
           name: ${{ steps.pacote.outputs.nome }}-${{ github.ref_name }}
           path: web-ext-artifacts/chrome/${{ steps.pacote.outputs.nome }}/
