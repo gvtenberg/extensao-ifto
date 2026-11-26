@@ -71,7 +71,7 @@
     {
       "matches": ["*://sei.ifto.edu.br/*controlador.php?acao=editor_montar*"],
       "run_at": "document_idle",
-      "js": ["comum/sei.js", "comum/configuracoes.js", "comum/minuta-edital.js", "comum/data-documento.js", "sites/sei/caixa-editor.js", "sites/sei/minuta-edital.js", "sites/sei/data-documento.js", "sites/sei/tabelas.js", "sites/sei/numeracao-edital.js", "sites/sei/painel-revisao.js", "sites/sei/numeracao-caixas.js", "comum/conferir-documento.js", "comum/espacamento-documento.js", "sites/sei/janela-assinar.js", "sites/sei/conferir-documento.js", "sites/sei/espacamento-documento.js", "sites/sei/todos-os-estilos.js", "comum/todos-os-estilos.js", "comum/salvamento-automatico.js", "sites/sei/salvamento-automatico.js"]
+      "js": ["comum/sei.js", "comum/configuracoes.js", "comum/minuta-edital.js", "comum/data-documento.js", "sites/sei/caixa-editor.js", "sites/sei/minuta-edital.js", "sites/sei/data-documento.js", "sites/sei/tabelas.js", "sites/sei/numeracao-edital.js", "sites/sei/painel-revisao.js", "sites/sei/numeracao-caixas.js", "comum/formatacao-agu.js", "sites/sei/formatacao-agu.js", "comum/conferir-documento.js", "comum/espacamento-documento.js", "sites/sei/janela-assinar.js", "sites/sei/conferir-documento.js", "sites/sei/espacamento-documento.js", "sites/sei/todos-os-estilos.js", "comum/todos-os-estilos.js", "comum/salvamento-automatico.js", "sites/sei/salvamento-automatico.js"]
     },
     {
       "matches": ["*://sei.ifto.edu.br/*controlador.php?acao=*"],

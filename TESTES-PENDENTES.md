@@ -660,9 +660,9 @@ E: Aparecem os PDFs obtidos, os avisos e a lista "Será incluído" como antes.
 F: Arraste para a árvore os 4 PDFs de antes (nota fiscal, documento, nota fiscal, documento), escolha os tipos e clique em "Incluir no processo".
 E: Ou os 4 entram, ou a mensagem diz o motivo (por exemplo, que o tipo exige o "Número"), e não só "O SEI não salvou o documento".
 
-## Enter na janela de arrastar arquivos (v0.36.5)
-> Entre no SEI com a extensão na versão 0.36.5 e abra um processo de teste da sua unidade.
-### T281 – Enter no Nome na Árvore inclui o documento (v0.36.5)
+## Enter na janela de arrastar arquivos (v0.37.0)
+> Entre no SEI com a extensão na versão 0.37.0 e abra um processo de teste da sua unidade.
+### T281 – Enter no Nome na Árvore inclui o documento (v0.37.0)
 F: Arraste um arquivo para a árvore, clique no campo "Nome na Árvore" e aperte Enter (com um arquivo sem tipo, aperte Enter antes de escolher o tipo).
 E: Com o tipo escolhido, o Enter faz o mesmo que "Incluir no processo"; sem tipo, nada acontece e o aviso pede para escolher o tipo.
 ## Numeração em documentos de modelo antigo (v0.37.0)
@@ -686,3 +686,26 @@ E: Nenhum dos dois avisos novos aparece; "Corrigir a numeração" dos números l
 ### T287 – NF e RANFS no começo do nome do arquivo (v0.37.0)
 F: Num processo de teste, arraste para a árvore três arquivos: "NF 123.pdf", "NFS-e 45.pdf" e "RANFS 7 Empresa.pdf" (não precisa incluir; só veja a lista de conferência).
 E: Os dois primeiros vêm com o tipo Nota Fiscal e Nome na Árvore "123" e "45"; o terceiro vem com o tipo Documento e Nome na Árvore "RANFS 7 Empresa".
+## Remover Formatação da AGU (v0.37.0)
+> Entre no SEI com a extensão na versão 0.37.0, na CCL (ou ligue em Configurações › Licitação (CCL) › Remover Formatação da AGU › Sempre ligada). Use os documentos de teste (Edital 3399512, Minuta de Contrato 3399534, TR 3399829) e não salve, a não ser no T290.
+### T288 – Opção nas configurações (v0.37.0)
+F: Abra as Configurações da extensão e vá até "Licitação (CCL)".
+E: Há o cartão "Remover Formatação da AGU" com Automática (só na CCL), Sempre ligada e Desligada; a Automática vem marcada.
+### T289 – Aviso e lista só com o clique (v0.37.0)
+F: Abra o editor do Edital 3399512 e não clique em nada; depois clique em "Remover Formatação da AGU" na janela de avisos.
+E: O aviso conta os trechos riscados, as "Justificativa Modificação Item(ns)" e os trechos coloridos. A lista à esquerda só abre com o clique, com tudo marcado; clicar numa linha leva o texto até o trecho, com um contorno laranja.
+### T290 – Remover, conferir e salvar (v0.37.0) (Crítico)
+F: Na lista do Edital 3399512, desmarque um trecho riscado e clique em "Remover os marcados". Confira o texto e clique em Salvar; depois gere o PDF.
+E: O riscado sumiu sem juntar palavras ("modalidade PREGÃO ELETRÔNICO"); os parágrafos todo riscados e as "Justificativa…" sumiram; o texto ficou preto (links com a cor deles); o trecho desmarcado continua riscado. O documento salvo e o PDF ficam iguais ao editor.
+### T291 – Ctrl+Z desfaz tudo de uma vez (v0.37.0)
+F: No Edital 3399512, remova tudo e aperte Ctrl+Z uma vez (não salve).
+E: O texto volta inteiro como estava, com riscado, cores e "Justificativa…".
+### T292 – Texto em branco e marcas do Word (v0.37.0)
+F: Abra o editor da Minuta de Contrato 3399534 e clique em "Remover Formatação da AGU".
+E: A lista tem as linhas "trecho em branco (invisível) é apagado" e "marcas de comentário do Word saem". Depois de remover, o "1." escondido em branco não aparece no texto e o fundo amarelo das "Justificativa…" sumiu junto com elas.
+### T293 – Comentários do SEI (v0.37.0)
+F: Num documento de teste, ponha um comentário seu (botão de comentário do editor) num trecho, salve, abra o editor de novo e clique em "Remover Formatação da AGU".
+E: O comentário aparece na lista com seu nome; depois de remover, ele some do painel de comentários e, depois de Salvar e abrir de novo, não volta. Comentário de outra pessoa aparece apagado na lista e fica.
+### T294 – Fora da CCL e documento sem marcas (v0.37.0)
+F: Com a opção em Automática, abra um documento numa unidade que não é a CCL; depois, na CCL, abra um Despacho comum.
+E: Nos dois casos não aparece "Remover Formatação da AGU".

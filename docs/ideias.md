@@ -8,7 +8,6 @@ One line each. Status of what is done or pending: `melhorias-futuras.md`.
 
 One line per idea. When an idea is planned, it gets a spec in `docs/specs/` and the line points to it. When finished, the line leaves here and goes to `docs/historico.md`.
 
-- **"Remover Formatação da AGU" button in the SEI editor** (26/11/2026, user): removes struck text, colors and comments the AGU asks for, after a review list; setting in "Licitação (CCL)". **[spec]** `specs/remover-formatacao-agu.md`
 - **Copy bidding documents to Compras.gov** (26/11/2026, user: "em breve"): the extension copies some documents (e.g. Termo de Referência, after "Remover Formatação da AGU") to Compras.gov automatically.
 
 - **Check "Interessado" and "Assunto"** (18/11/2026): like the process number, warn when they do not match the process (after `specs/feitas/conferir-documento.md`).

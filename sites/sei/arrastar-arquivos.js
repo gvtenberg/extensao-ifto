@@ -249,7 +249,7 @@
       lista.addEventListener('change', () => { linha.tipo = lista.value || null; atualizar() })
       const nome = criar('input', { type: 'text', value: linha.nomeArvore, maxLength: 50, placeholder: 'Nome na Árvore (opcional)' })
       nome.addEventListener('input', () => { linha.nomeArvore = nome.value })
-      // v0.36.5: Enter no Nome na Árvore = clicar em "Incluir no processo" (nada acontece se o botão está apagado).
+      // v0.37.0: Enter no Nome na Árvore = clicar em "Incluir no processo" (nada acontece se o botão está apagado).
       nome.addEventListener('keydown', evento => {
         if (evento.key !== 'Enter' || evento.isComposing || evento.keyCode === 229) return
         evento.preventDefault()

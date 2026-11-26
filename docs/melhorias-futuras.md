@@ -6,10 +6,10 @@
 
 Summary to resume work (on another machine or by another person) without reading everything. Update at the end of each stage or round.
 
-- **Ready to code (26/11/2026):** "Remover Formatação da AGU", `specs/remover-formatacao-agu.md` (4 stages; reuses the review panel of v0.37.0; stage 3 needs a saved editor page with SEI comment balloons). No open decisions.
 - **Done, waiting for tests (v0.37.0, 26/11/2026):** numbering broken by hidden boxes and typed numbers (`specs/feitas/numeracao-caixas-ocultas.md`, rules in `regras/sei-editor.md`). Tests T282–T286 (T284 critical: the saved document and the PDF). Same version: NF/RANFS abbreviations in external document names (no spec; rule in `regras/sei-documentos.md`), T287.
+- **Done, waiting for tests (v0.37.0, 26/11/2026, same round):** "Remover Formatação da AGU" (`specs/feitas/remover-formatacao-agu.md`, rules in `regras/sei-editor.md`). Tests T288–T294 (T290 critical: changes the document text).
 - **Done, waiting for tests (v0.36.3, 25/11/2026):** code style, nothing changes on screen (no spec). Tests T273–T274.
-- **Done, waiting for tests (v0.36.5, 26/11/2026):** Enter in "Nome na Árvore" of the dragged-files window = "Incluir no processo" (no spec). Test T281.
+- **Done, waiting for tests (v0.37.0, 26/11/2026, same round):** Enter in "Nome na Árvore" of the dragged-files window = "Incluir no processo" (no spec). Test T281.
 - **Done, waiting for tests (v0.36.2, 25/11/2026):** Capa interessados, editor already open, notices icon, sites down before the search, spacing after "Assunto" in a new Despacho (no spec). Tests T267–T272 (T267 critical).
 - **Done, waiting for tests (v0.36.1, 25/11/2026):** external documents (open the first, message, type by name, drop area) and blank lines around the signer (no spec; rules in `regras/sei-documentos.md` and `regras/conferir-documento.md`). Tests T259–T266 (T259 critical). Still open: why the editor sometimes asked again for the blank lines (T266).
 - **Done, waiting for tests (v0.36.0, 24/11/2026):** "Duplicar documento" (`specs/feitas/duplicar-documento.md`, rules in `regras/sei-processo.md`). Tests T253–T258 (T253 critical: saves a document in the SEI).
