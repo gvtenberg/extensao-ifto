@@ -450,3 +450,14 @@ test('máscara do CNPJ ao digitar', () => {
   assert.equal(mascaraCnpj('CNPJ: 07.783.734/0001-33'), 'CNPJ: 07.783.734/0001-33')
   assert.equal(mascaraCnpj(''), '')
 })
+test('cnpjsPeloNome: PDF que não abriu conta pelo nome da nota, do ateste ou do texto da nota (v0.37.0)', () => {
+  const sicafDoc = { id: '9', rotulo: 'Sicaf RG SEGURANCA E VIGILANCIA LTDA (3400098)' }
+  const nota = { id: '1', fornecedor: '-1238 Outubro/2026', cnpj: null, ateste: null }
+  const textos = { 1: 'PRESTADOR RG SEGURANCA E VIGILANCIA LTDA CNPJ 13.019.295/0002-70' }
+  assert.deepEqual(sicaf.cnpjsPeloNome(sicafDoc, [nota], { cnpjsDasNotas: { 1: ['13019295000270'] }, textosDasNotas: textos }), ['13019295000270'])
+  const comAteste = { ...nota, cnpj: '13019295000270', ateste: { empresa: 'RG SEGURANÇA E VIGILÂNCIA', cnpj: '13019295000270' } }
+  assert.deepEqual(sicaf.cnpjsPeloNome(sicafDoc, [comAteste]), ['13019295000270'])
+  assert.deepEqual(sicaf.cnpjsPeloNome(sicafDoc, [nota], { textosDasNotas: { 1: 'OUTRA EMPRESA QUALQUER' } }), [])
+  assert.deepEqual(sicaf.cnpjsPeloNome({ id: '8', rotulo: 'Sicaf (3400100)' }, [comAteste]), [])
+  assert.equal(sicaf.nomeDoDocumento('Consulta Simples Nacional RG SEGURANCA LTDA (3400099)'), 'RG SEGURANCA LTDA')
+})

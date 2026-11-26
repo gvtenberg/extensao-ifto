@@ -99,7 +99,7 @@ function tratarRecado (recado, remetente) {
     // v0.26.5 (D3): linhas do setor do timbre aberto no editor, para "Usar este timbre como padrão da unidade".
     case 'conferirLinhasDoSetor': return rodarNoEditor(remetente)(globalThis.ExtensaoIFTO.editorLer).then(lido => lido.ok ? { ok: true, linhas: globalThis.ExtensaoIFTO.conferirDocumento.linhasDoSetor(lido.secoes) } : lido)
     // v0.17.5: texto de um PDF pedido pela página do SEI (no Firefox o pdf.js só funciona aqui).
-    case 'lerPdf': return globalThis.ExtensaoIFTO.pdfTexto ? globalThis.ExtensaoIFTO.pdfTexto.textoDoPdf(recado.bytes).then(texto => ({ texto })) : Promise.resolve({ erro: 'Leitura de PDF indisponível.' })
+    case 'lerPdf': return globalThis.ExtensaoIFTO.pdfTexto ? globalThis.ExtensaoIFTO.pdfTexto.textoDoPdf(recado.base64 ? globalThis.ExtensaoIFTO.sicaf.deBase64(recado.base64) : recado.bytes).then(texto => ({ texto })) : Promise.resolve({ erro: 'Leitura de PDF indisponível.' })
   }
 }
 

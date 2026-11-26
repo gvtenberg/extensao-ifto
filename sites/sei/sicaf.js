@@ -286,6 +286,16 @@
     for (const fornecedor of fornecedores) {
       fornecedor.jaTemSicaf = Boolean(existentes && existentes.cnpjsComSicaf.has(fornecedor.cnpj))
       fornecedor.jaTemConsulta = Boolean(existentes && existentes.raizesComConsulta.has(regras.raizDoCnpj(fornecedor.cnpj)))
+      // v0.37.0: Sicaf/Consulta cujo PDF não abriu, com o nome deste fornecedor na árvore, também conta.
+      if (existentes && existentes.naoLidos.length) {
+        const nomes = [fornecedor.nomeNoSicaf, fornecedor.nomeNoSimples, fornecedor.nome, ...(fornecedor.notas || []).map(nota => nota.fornecedor)].filter(Boolean)
+        const doNome = docs => docs.filter(doc => nomes.some(nome => regras.nomesParecidos(nome, regras.nomeDoDocumento(doc.rotulo))))
+        const sicafs = doNome(existentes.naoLidos.filter(doc => existentes.inicial.sicafs.includes(doc)))
+        const consultas = doNome(existentes.naoLidos.filter(doc => existentes.inicial.consultas.includes(doc)))
+        if (sicafs.length) fornecedor.jaTemSicaf = true
+        if (consultas.length) fornecedor.jaTemConsulta = true
+        for (const doc of [...sicafs, ...consultas]) existentes.peloNome.add(doc.id)
+      }
       fornecedor.temPdf = Boolean(fornecedor.bytes) && !fornecedor.jaTemSicaf
       fornecedor.temSimples = Boolean(fornecedor.simplesBytes) && !fornecedor.jaTemConsulta
       // v0.18.6 (spec sicaf-em-branco): Sicaf/Consulta sem PDF já no processo, deste fornecedor.
@@ -336,7 +346,11 @@
       ])
     })
     // Sicaf ou Consulta do processo que não abriu: não dá para saber de quem é; a pessoa confere.
-    if (naoLidos.length) cartoes.push(criar('p', { className: 'aviso amarelo', textContent: 'Não consegui abrir ' + naoLidos.map(doc => doc.rotulo).join(', ') + ' para ver de qual fornecedor é. Confira na árvore antes de incluir.' }))
+    // v0.37.0: o que foi contado pelo nome ganha um aviso próprio.
+    const contados = naoLidos.filter(doc => existentes.peloNome.has(doc.id))
+    const semDono = naoLidos.filter(doc => !existentes.peloNome.has(doc.id))
+    if (contados.length) cartoes.push(criar('p', { className: 'aviso amarelo', textContent: 'Não consegui abrir ' + contados.map(doc => doc.rotulo).join(', ') + '. Pelo nome na árvore, contei como já incluído para este fornecedor. Confira na árvore.' }))
+    if (semDono.length) cartoes.push(criar('p', { className: 'aviso amarelo', textContent: 'Não consegui abrir ' + semDono.map(doc => doc.rotulo).join(', ') + ' para ver de qual fornecedor é. Confira na árvore antes de incluir.' }))
     const botoesDeFechar = [{ texto: 'Fechar', tipo: 'principal', aoClicar: j => j.fechar() }]
     if (!lida) {
       janela.abrir({ titulo: TITULOS[quais], conteudo: [...cartoes, criar('p', { className: 'apoio', textContent: 'Para incluir no SEI, abra o processo e clique de novo.' })], botoes: botoesDeFechar })
@@ -420,6 +434,26 @@
     const naoLidos = []
     for (const doc of inicial.sicafs) { const cnpjs = await cnpjsDoDocumento(doc); if (cnpjs) cnpjsDosSicafs[doc.id] = cnpjs; else naoLidos.push(doc) }
     for (const doc of inicial.consultas) { const cnpjs = await cnpjsDoDocumento(doc); if (cnpjs) cnpjsDasConsultas[doc.id] = cnpjs; else naoLidos.push(doc) }
+    // v0.37.0 (decidido em 26/11/2026): PDF que não abriu conta pelo nome na árvore (nota, ateste ou texto da nota).
+    const peloNome = new Set()
+    if (naoLidos.length) {
+      const atestes = {}
+      for (const doc of inicial.atestes) atestes[doc.id] = await lerAteste(doc)
+      const cnpjsDasNotas = {}
+      const textosDasNotas = {}
+      for (const nota of inicial.notas) {
+        textosDasNotas[nota.id] = await textoDoDocumento(nota).catch(() => '')
+        cnpjsDasNotas[nota.id] = regras.cnpjsDaNota(textosDasNotas[nota.id])
+      }
+      const { notas } = regras.situacaoDoProcesso(lida.documentos, { atestes })
+      for (const doc of naoLidos) {
+        const cnpjs = regras.cnpjsPeloNome(doc, notas, { cnpjsDasNotas, textosDasNotas })
+        if (!cnpjs.length) continue
+        peloNome.add(doc.id)
+        if (inicial.sicafs.includes(doc)) cnpjsDosSicafs[doc.id] = cnpjs
+        else cnpjsDasConsultas[doc.id] = cnpjs
+      }
+    }
     // v0.18.6: Sicaf/Consulta sem PDF e com nome, em toda a árvore, com os CNPJs do vizinho que tem PDF.
     const nomeados = regras.semPdfNomeados(lida.documentos)
     const cnpjsDosVizinhos = { ...cnpjsDosSicafs, ...cnpjsDasConsultas }
@@ -431,6 +465,7 @@
       cnpjsDosSicafs,
       cnpjsDasConsultas,
       naoLidos,
+      peloNome,
       cnpjsComSicaf: new Set(Object.values(cnpjsDosSicafs).flat()),
       raizesComConsulta: new Set(Object.values(cnpjsDasConsultas).flat().map(regras.raizDoCnpj))
     }

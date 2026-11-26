@@ -472,10 +472,24 @@
       if ((tipo !== 'sicaf' && tipo !== 'consulta') || doc.temArquivo || doc.feitoNoSei || SEM_NOME.test(String(doc.rotulo || '').trim())) return
       const outro = tipo === 'sicaf' ? lista[posicao + 1] : lista[posicao - 1]
       const vizinho = outro && outro.temArquivo && tipoNaArvore(outro.rotulo) === (tipo === 'sicaf' ? 'consulta' : 'sicaf') ? outro : null
-      const nome = String(doc.rotulo).replace(/\s*\(?\d{6,}\)?\s*$/, '').replace(/^(Sicaf|Consulta)\s+(Simples Nacional\s+)?/i, '').trim()
+      const nome = nomeDoDocumento(doc.rotulo)
       achados.push({ tipo, doc, vizinho, nome, antesDaFolha: posicao < ultimaFolha, outraUnidade: !doc.linkAlterar })
     })
     return achados
+  }
+  // Nome da empresa no rótulo da árvore: "Sicaf RG SEGURANCA LTDA (3400098)" → "RG SEGURANCA LTDA".
+  const nomeDoDocumento = rotulo => String(rotulo || '').replace(/\s*\(?\d{6,}\)?\s*$/, '').replace(/^(Sicaf|Consulta)\s+(Simples Nacional\s+)?/i, '').trim()
+  // v0.37.0 (decidido em 26/11/2026): Sicaf ou Consulta com PDF que não abriu conta pelo nome na árvore.
+  // Vale a nota do trecho cujo rótulo, ateste ou texto do PDF tem esse nome (o rótulo da nota muitas vezes
+  // não traz a empresa: "Nota fiscal nº 2026-1238 Outubro/2026"). Devolve os CNPJs dessas notas (ateste e
+  // emitente); sem nome ou sem nota: []. notas: situacaoDoProcesso().notas (com atestes).
+  function cnpjsPeloNome (doc, notas, { cnpjsDasNotas = {}, textosDasNotas = {} } = {}) {
+    const nome = nomeDoDocumento(doc && doc.rotulo)
+    if (!palavras(nome).length || SEM_NOME.test(String(doc.rotulo || '').trim())) return []
+    const parecidas = (notas || []).filter(nota => (nota.fornecedor && nomesParecidos(nota.fornecedor, nome)) ||
+      (nota.ateste && nota.ateste.empresa && nomesParecidos(nota.ateste.empresa, nome)) ||
+      (textosDasNotas[nota.id] && nomeNoTexto(nome, textosDasNotas[nota.id])))
+    return [...new Set(parecidas.flatMap(nota => [nota.cnpj, (cnpjsDasNotas[nota.id] || [])[0]]).filter(Boolean))]
   }
   // O Sicaf ou a Consulta sem PDF de um fornecedor: pelo CNPJ do vizinho (raiz, a Consulta vale para a
   // empresa toda) ou, sem ele, pelo nome. cnpjsDosVizinhos: { idDoVizinho: [CNPJs do PDF] }.
@@ -627,7 +641,7 @@
     tipoNaArvore, numeroSei, lerRotuloDaNota, trechoPendente, lerAteste, situacaoDoProcesso, textoDoAviso, textoDaBusca,
     cnpjsDaNota, notaSemTexto, empenhosDoTexto, nomeNoTexto, conferirNota, agruparPorFornecedor,
     URL_CONSULTA_SICAF, URL_INICIO_SICAF, URL_LOGIN_COMPRAS, URL_AREA_DE_TRABALHO, ORIGENS_COMPRAS, ORIGENS_GOVBR, paginaDoCompras, nomeDoArquivo, lerLinhaDoResultado, lerPdfDoSicaf, paraBase64, deBase64,
-    nomeNaArvore, nomeDoSicaf, nomeDoAnexo, documentosParaIncluir, semPdfNomeados, doFornecedor, aproveitarEmBranco, lerRespostaDoUpload, enderecoDoUpload, lerUsuarioDoUpload, formatarTamanho, linhaDoAnexo,
+    nomeNaArvore, nomeDoSicaf, nomeDoAnexo, documentosParaIncluir, semPdfNomeados, nomeDoDocumento, cnpjsPeloNome, doFornecedor, aproveitarEmBranco, lerRespostaDoUpload, enderecoDoUpload, lerUsuarioDoUpload, formatarTamanho, linhaDoAnexo,
     SEM_RESPOSTA_MS, andamentoDaBusca, pularFase, buscaComErro
   }
   if (typeof module !== 'undefined' && module.exports) module.exports = api

@@ -631,3 +631,9 @@ E: O botão verde diz "Buscar SICAF e Simples de 1 empresa (2 notas)"; a busca f
 ### T310 – Textos do SICAF nas configurações (v0.37.0)
 F: Abra as configurações da extensão e leia a parte "SICAF e Simples Nacional".
 E: Os textos estão claros e formais; a opção do Gov.br diz "Selecionar automaticamente o certificado SerproID no login do Gov.br". Comente aqui qualquer frase que ainda pareça estranha.
+### T311 – PDFs do processo abrem no Firefox (v0.37.0)
+F: Abra o processo 23236.010039/2022-91 (nota da RG Segurança e Vigilância, com Sicaf 3400098 e Consulta 3400099 depois da última Folha) e clique no botão do SICAF na barra.
+E: A barra não pede Sicaf nem Consulta para essa nota; na janela das notas aparece "Este fornecedor já tem Sicaf neste trecho do processo." e o mesmo para a Consulta. No console (F12 > Console) não aparece "Permission denied". Se falhar: copie as linhas "Extensão IFTO: …" e cole aqui.
+### T312 – Sicaf ou Consulta que não abre conta pelo nome (v0.37.0)
+F: Só se o T311 ainda mostrar "Não consegui abrir…": faça a busca do SICAF dessa nota até a janela de incluir no SEI.
+E: A janela diz "Não consegui abrir … Pelo nome na árvore, contei como já incluído para este fornecedor. Confira na árvore." e não oferece incluir Sicaf nem Consulta de novo.
