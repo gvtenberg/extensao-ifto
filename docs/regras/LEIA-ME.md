@@ -9,7 +9,7 @@ Budget business rules (demands, commitments, contracts, commitment requests) liv
 | `geral.md` | Browsers, login and spreadsheet access, installation, costs |
 | `sei.md` | IFTO SEI: version, login and signing, tree and buttons |
 | `sei-documentos.md` | Creating and including documents (external, internal, dropped files) |
-| `sei-editor.md` | SEI editor: tables, long numbers, MINUTA mark, automatic save |
+| `sei-editor.md` | SEI editor: tables, long numbers, MINUTA mark, automatic save, hidden boxes and typed numbers |
 | `sei-processo.md` | New process, process screen, duplicate a document |
 | `sicaf.md` | Automatic SICAF: invoices without SICAF, invoice × ateste check, SICAF search, Sicaf/Consulta/Anexo in the SEI, selected CNPJ |
 | `compras-ifto.md` | Compras IFTO pieces into the SEI (CCL): site and permission, message format, list of pieces, type, access level, create, fill and save (never sign) |

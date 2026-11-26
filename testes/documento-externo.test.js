@@ -152,3 +152,16 @@ test('tipo pelo nome: nome que serve a mais de um tipo só sugere', () => {
   assert.equal(tipoPeloNome('portaria_12.pdf', tipos, { padrao: 'Nota' }).tipo, 'Nota')
   assert.equal(tipoPeloNome('outra coisa.pdf', tipos).sugestoes, undefined)
 })
+
+test('v0.37.0: siglas de nota fiscal no começo do nome viram Nota fiscal; RANFS vira Documento', () => {
+  const tipos = [...TIPOS, 'Documento']
+  for (const nome of ['NF 123.pdf', 'nf_123.pdf', 'DANFE 123.pdf', 'NFe 123.pdf', 'NF-e 123.pdf', 'NFC-e 123.pdf', 'NFCe_123.pdf', 'nfse 123.pdf', 'NFS 123.pdf', 'NFS-e 123.pdf']) {
+    assert.deepEqual(tipoPeloNome(nome, tipos), { tipo: 'Nota fiscal', origem: 'nome', nomeArvore: '123' }, nome)
+  }
+  assert.deepEqual(tipoPeloNome('RANFS 45 Empresa X.pdf', tipos), { tipo: 'Documento', origem: 'nome', nomeArvore: 'RANFS 45 Empresa X' })
+  // Palavra que só começa com as mesmas letras não é sigla; nome de tipo do SEI continua valendo primeiro.
+  assert.notEqual(tipoPeloNome('NFCONSULTA.pdf', tipos).tipo, 'Nota fiscal')
+  assert.equal(tipoPeloNome('Nota Fiscal NF 9.pdf', tipos).nomeArvore, 'NF 9')
+  // Sem "Documento" na lista do SEI, RANFS fica sem tipo.
+  assert.equal(tipoPeloNome('RANFS 45.pdf', TIPOS).tipo, null)
+})

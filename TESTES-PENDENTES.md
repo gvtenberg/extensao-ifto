@@ -665,3 +665,24 @@ E: Ou os 4 entram, ou a mensagem diz o motivo (por exemplo, que o tipo exige o "
 ### T281 – Enter no Nome na Árvore inclui o documento (v0.36.5)
 F: Arraste um arquivo para a árvore, clique no campo "Nome na Árvore" e aperte Enter (com um arquivo sem tipo, aperte Enter antes de escolher o tipo).
 E: Com o tipo escolhido, o Enter faz o mesmo que "Incluir no processo"; sem tipo, nada acontece e o aviso pede para escolher o tipo.
+## Numeração em documentos de modelo antigo (v0.37.0)
+> Use uma cópia da Minuta de Ata 3399532 (ou outro documento de modelo antigo) e só clique em Salvar quando o teste pedir.
+### T282 – Aviso das caixas escondidas (v0.37.0)
+F: Abra o editor da cópia da Minuta de Ata e espere a janela de avisos da extensão.
+E: Aparece "Parte do texto está dentro de … caixas escondidas…" com o botão "Tirar o texto das caixas". Num documento novo, feito com o modelo atual, esse aviso não aparece.
+### T283 – Tirar o texto das caixas (v0.37.0)
+F: Clique em "Tirar o texto das caixas". Depois mude o parágrafo "3.1. O órgão gerenciador…" para o estilo "Item_Nivel2" (apague o "3.1." digitado).
+E: O aviso diz "Pronto…". O parágrafo mostra 3.1 (não 3.3) e o texto não mudou de lugar nem de formatação. Ctrl+Z desfaz.
+### T284 – Converter os números digitados e salvar (v0.37.0) (Crítico)
+F: Clique em "Revisar e converter". Na lista à esquerda, clique numa linha laranja, desmarque um item, clique em "Converter os marcados" e depois em Salvar. Veja o documento e gere o PDF.
+E: A linha clicada leva o texto até o parágrafo, com um contorno laranja. Os marcados perderam o número digitado e mostram a numeração automática (4.2 digitado passa a 4.1); o desmarcado ficou igual. No documento salvo e no PDF os números são os mesmos do editor.
+### T285 – A lista não abre sozinha e fecha sem mudar nada (v0.37.0)
+F: Abra o editor e não clique em nada. Depois clique em "Revisar e converter" e feche a lista no ×.
+E: A lista só aparece depois do clique. Fechada no ×, nada muda no texto.
+### T286 – Documento sem caixas nem números digitados (v0.37.0)
+F: Abra o editor de um Edital ou Despacho comum.
+E: Nenhum dos dois avisos novos aparece; "Corrigir a numeração" dos números longos continua como antes.
+## Tipo do documento externo pela sigla (v0.37.0)
+### T287 – NF e RANFS no começo do nome do arquivo (v0.37.0)
+F: Num processo de teste, arraste para a árvore três arquivos: "NF 123.pdf", "NFS-e 45.pdf" e "RANFS 7 Empresa.pdf" (não precisa incluir; só veja a lista de conferência).
+E: Os dois primeiros vêm com o tipo Nota Fiscal e Nome na Árvore "123" e "45"; o terceiro vem com o tipo Documento e Nome na Árvore "RANFS 7 Empresa".

@@ -77,6 +77,7 @@ function tratarRecado (recado, remetente) {
     // v0.25.0 (spec numeracao-edital): números longos dos itens de edital.
     case 'numeracaoPreparar': return numeracaoNoEditor(remetente, false)
     case 'numeracaoCorrigir': return numeracaoNoEditor(remetente, true)
+    case 'caixasNoEditor': return caixasNoEditor(remetente, recado.acao, recado.dado)
     // v0.26.11 (spec conferir-documento, etapa 7): espaço entre as partes do documento.
     case 'estilosPreparar': return estilosNoEditor(remetente, recado.aprendidos)
     // v0.29.2 (R7): opção desligada: o documento já tem o bloco dos estilos extras?
@@ -587,6 +588,27 @@ async function numeracaoNoEditor (remetente, corrigir) {
   const alvo = { tabId: remetente.tab.id, frameIds: [remetente.frameId || 0] }
   if (!corrigir) await navegador.scripting.executeScript({ target: alvo, world: 'MAIN', files: ['comum/numeracao-edital.js', 'sites/sei/editor-numeracao.js'] })
   return rodarNoEditor(remetente)(fazer => fazer ? globalThis.ExtensaoIFTO.editorNumeracao.corrigir() : globalThis.ExtensaoIFTO.editorNumeracao.preparar(), [corrigir])
+}
+
+// v0.37.0 (spec numeracao-caixas-ocultas): põe na página do editor (world MAIN) as regras e o código das caixas
+// escondidas e dos números digitados (reusa acharEditor da numeração). "preparar" procura e fica de olho nas
+// mudanças; "tirar", "listar", "ir" e "converter" só com o clique da pessoa. Nunca salva.
+async function caixasNoEditor (remetente, acao, dado) {
+  const alvo = { tabId: remetente.tab.id, frameIds: [remetente.frameId || 0] }
+  if (acao === 'preparar') {
+    const [temNumeracao] = await navegador.scripting.executeScript({ target: alvo, world: 'MAIN', func: () => Boolean(globalThis.ExtensaoIFTO && globalThis.ExtensaoIFTO.editorNumeracao) })
+    const arquivos = ['comum/numeracao-digitada.js', 'sites/sei/editor-caixas.js']
+    if (!(temNumeracao && temNumeracao.result)) arquivos.unshift('sites/sei/editor-numeracao.js')
+    await navegador.scripting.executeScript({ target: alvo, world: 'MAIN', files: arquivos })
+  }
+  const acoes = ['preparar', 'tirar', 'listar', 'ir', 'converter']
+  if (!acoes.includes(acao)) return { ok: false, erro: 'Pedido desconhecido.' }
+  return rodarNoEditor(remetente)((qual, valor) => {
+    const caixas = globalThis.ExtensaoIFTO && globalThis.ExtensaoIFTO.editorCaixas
+    if (!caixas) return { ok: false, erro: 'A extensão ainda não estava pronta no editor. Feche o editor e abra de novo.' }
+    const mapa = { preparar: () => caixas.preparar(), tirar: () => caixas.tirar(), listar: () => caixas.listar(), ir: () => caixas.irPara(valor), converter: () => caixas.converter(valor) }
+    return mapa[qual]()
+  }, [acao, dado === undefined ? null : dado])
 }
 
 // v0.29.0 (spec todos-os-estilos): põe na página do editor (world MAIN) as regras e o código dos estilos extras
