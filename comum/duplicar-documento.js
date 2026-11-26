@@ -36,7 +36,8 @@
   // D3: nível do original. "0" público, "1" restrito (com hipótese legal); sigiloso e desconhecido não são copiados.
   function nivelACopiar (cadastro) {
     if (!cadastro) return ''
-    return cadastro.nivel === '0' ? 'publico' : cadastro.nivel === '1' ? 'restrito' : ''
+    if (cadastro.nivel === '0') return 'publico'
+    return cadastro.nivel === '1' ? 'restrito' : ''
   }
 
   const api = { podeDuplicar, acharTipo, lerLista, listaEmTexto, semRepetidos, nivelACopiar, numeroDoDocumento }

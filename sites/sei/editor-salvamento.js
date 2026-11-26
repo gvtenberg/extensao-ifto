@@ -109,13 +109,17 @@
           c.isContentDifferent = false
           delete c.updatedContentHash
         }
-      } catch (erro) {}
+      } catch (erro) {
+        console.warn('[extensão IFTO] Comentários do editor:', erro.message)
+      }
       // v0.31.3 (T195): o botão Salvar do SEI só liga quando o texto muda depois de abrir; o texto posto aqui
       // é diferente do que está salvo no SEI, então liga o botão (a pessoa confere e clica em Salvar).
       try {
         const salvar = novo.plugins.has('Salvar') && novo.plugins.get('Salvar')
         if (salvar && 'documentVersion' in salvar) salvar.documentVersion = (salvar.lastSaveDocumentVersion || 0) + 1
-      } catch (erro) {}
+      } catch (erro) {
+        console.warn('[extensão IFTO] Botão Salvar do editor:', erro.message)
+      }
       estado.editor = null
       vigiar(novo)
       return { ok: true, erro: '', secoes: Object.keys(usar).length, total: nomes.length }

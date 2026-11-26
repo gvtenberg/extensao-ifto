@@ -122,7 +122,9 @@
         const direita = guardadas.direita && guardadas.direita !== 'auto' ? guardadas.direita : '0'
         return { acima: lado('marginTop'), direita, abaixo: lado('marginBottom'), esquerda: lado('marginLeft') }
       }
-    } catch (erro) {}
+    } catch (erro) {
+      console.warn('[extensão IFTO] Não consegui medir as margens da tabela:', erro.message)
+    }
     return guardadas
   }
 

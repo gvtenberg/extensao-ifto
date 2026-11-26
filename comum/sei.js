@@ -71,7 +71,11 @@
     const valores = []
     const padrao = /"((?:[^"\\]|\\.)*)"|(null|true|false|-?\d+)/g
     let achado
-    while ((achado = padrao.exec(texto))) valores.push(achado[1] !== undefined ? achado[1].replace(/\\(.)/g, '$1') : (achado[2] === 'null' ? null : achado[2]))
+    while ((achado = padrao.exec(texto))) {
+      const [, entreAspas, solto] = achado
+      if (entreAspas !== undefined) valores.push(entreAspas.replace(/\\(.)/g, '$1'))
+      else valores.push(solto === 'null' ? null : solto)
+    }
     return valores
   }
   // v0.36.1: link da árvore do processo já com um documento escolhido (o SEI o devolve depois de salvar).
@@ -171,7 +175,9 @@
       try {
         const campo = janela && janela.top.document.getElementById('lnkInfraUnidade')
         if (campo) return campo.textContent.trim()
-      } catch (erro) {}
+      } catch (erro) {
+        // Janela de outro site ou já fechada: tenta a próxima.
+      }
     }
     return ''
   }

@@ -57,7 +57,7 @@
     for (const funcao of novas) postas.add(funcao.nome)
     marcar()
     let encontrado = null
-    try { encontrado = await acharDocumento(achado[1]) } catch (erro) {}
+    try { encontrado = await acharDocumento(achado[1]) } catch (erro) { console.warn('[extensão IFTO] Menu do documento:', erro.message) }
     // Não deu para ler agora (SEI lento): tenta de novo na próxima vez que o menu abrir.
     if (!encontrado) {
       const agora = new Set((menu.dataset.extensaoIftoMenu || '').split(' ').filter(Boolean))
@@ -79,7 +79,7 @@
     vigiando = true
     const preparar = () => {
       let arvore = null
-      try { arvore = quadro.contentDocument } catch (erro) {}
+      try { arvore = quadro.contentDocument } catch (erro) { /* quadro em outra página */ }
       if (!arvore || !arvore.documentElement || arvore.documentElement.dataset.extensaoIftoMenu) return
       arvore.documentElement.dataset.extensaoIftoMenu = '1'
       // O menu só é montado quando a pessoa clica no ícone (também nos documentos de pastas abertas depois).
