@@ -314,13 +314,15 @@ navegador.tabs.onUpdated.addListener(async (idDaAba, mudanca, aba) => {
     // de entrar antes de ir ao SICAF, e tenta direto duas vezes antes do menu.
     // v0.29.3 (T173, 3º pedido): a própria página abre o endereço do SICAF (como um clique nela) só depois de
     // o login terminar (aparece o botão com o nome da pessoa); antes ia por fora, com tempo fixo de 3 segundos.
-    // v0.37.0 (T299, pedido do usuário, 26/11/2026): a Área de Trabalho aberta = login feito; abre na mesma aba o mesmo endereço da
+    // v0.37.0 (T299, pedido do usuário, 26/11/2026): a Área de Trabalho aberta = login feito; quando ela termina de carregar, abre na mesma aba o mesmo endereço da
     // consulta do SICAF que a busca abriu no começo (o menu não rolava a lista até o "SICAF"). Se o SICAF
     // recusar, volta aqui no máximo duas vezes (acima); o menu fica só de reserva, se a página não sair daqui.
     if (areaEmAndamento.has(idDaAba)) return
     areaEmAndamento.add(idDaAba)
     // Página ainda carregando e o navegador recusou: tenta de novo quando ela terminar de abrir.
-    if (!(await injetar(idDaAba, ['sites/compras/aviso.js'], { modo: 'areaDeTrabalho', direto: regras.URL_CONSULTA_SICAF }))) areaEmAndamento.delete(idDaAba)
+    // A cada volta (o SICAF recusou), a página espera mais antes de ir ao SICAF.
+    const vez = (tarefa.idasAreaDeTrabalho || 0) + 1
+    if (!(await injetar(idDaAba, ['sites/compras/aviso.js'], { modo: 'areaDeTrabalho', direto: regras.URL_CONSULTA_SICAF, vez }))) areaEmAndamento.delete(idDaAba)
   } else {
     await injetar(idDaAba, ['comum/sei.js', 'comum/sicaf.js', 'sites/sicaf/consulta.js'])
   }
