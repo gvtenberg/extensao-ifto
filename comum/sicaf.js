@@ -599,6 +599,15 @@
   }
 
   // "1 nota sem SICAF" / "2 notas sem SICAF"
+  // v0.37.0 (usuário, 26/11/2026, 2º pedido): botão da janela das notas: SICAF e Simples são por empresa (CNPJ),
+  // o Instrumento de Cobrança é por nota. "Buscar SICAF e Simples de 1 empresa (2 notas)".
+  function textoDaBusca (marcadas) {
+    const lista = marcadas || []
+    const empresas = new Set(lista.map(nota => soDigitos(nota.cnpjEscolhido || nota.cnpj || '') || normalizar(nota.fornecedor) || nota.id)).size
+    const deEmpresas = empresas === 1 ? 'de 1 empresa' : `de ${empresas} empresas`
+    const notas = lista.length === 1 ? '1 nota' : `${lista.length} notas`
+    return `Buscar SICAF e Simples ${deEmpresas} (${notas})`
+  }
   // v0.37.0 (usuário, 26/11/2026): a busca é uma por empresa; com a lista de notas, o texto conta as empresas
   // (CNPJ do ateste ou da nota; sem CNPJ, o nome) e diz quantas notas, quando são mais que as empresas.
   function textoDoAviso (notas) {
@@ -615,7 +624,7 @@
     UNIDADE_CGOC, CNPJ_CAMPUS_PALMAS, funcaoLigada, ehCgoc,
     soDigitos, raizDoCnpj, cnpjValido, formatarCnpj, mascaraCnpj, ehDoIfto, cnpjMatriz, acharCnpjs, cnpjDaSelecao,
     normalizar, mesmoNumero, textoDoHtml, nomesParecidos,
-    tipoNaArvore, numeroSei, lerRotuloDaNota, trechoPendente, lerAteste, situacaoDoProcesso, textoDoAviso,
+    tipoNaArvore, numeroSei, lerRotuloDaNota, trechoPendente, lerAteste, situacaoDoProcesso, textoDoAviso, textoDaBusca,
     cnpjsDaNota, notaSemTexto, empenhosDoTexto, nomeNoTexto, conferirNota, agruparPorFornecedor,
     URL_CONSULTA_SICAF, URL_INICIO_SICAF, URL_LOGIN_COMPRAS, URL_AREA_DE_TRABALHO, ORIGENS_COMPRAS, ORIGENS_GOVBR, paginaDoCompras, nomeDoArquivo, lerLinhaDoResultado, lerPdfDoSicaf, paraBase64, deBase64,
     nomeNaArvore, nomeDoSicaf, nomeDoAnexo, documentosParaIncluir, semPdfNomeados, doFornecedor, aproveitarEmBranco, lerRespostaDoUpload, enderecoDoUpload, lerUsuarioDoUpload, formatarTamanho, linhaDoAnexo,

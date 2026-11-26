@@ -625,3 +625,6 @@ E: O SICAF abre sozinho. Se o SICAF não responder, em até uns 45 segundos a ex
 ### T308 – Nunca duas janelas iguais (v0.37.0)
 F: Comece uma busca de SICAF e Simples Nacional, feche as páginas do SICAF/Simples antes do fim, volte ao processo no SEI e comece a busca de novo, até o fim.
 E: Aparece só uma janela de cada (uma para buscar e uma com "Incluir no processo"), nunca duas iguais uma sobre a outra.
+### T309 – Botão da busca conta empresas (v0.37.0)
+F: Abra o processo da página processo-duas-faturas-extensao-2-sicafs (2 faturas da mesma empresa, mesmo CNPJ) e clique no botão do SICAF na barra.
+E: O botão verde diz "Buscar SICAF e Simples de 1 empresa (2 notas)"; a busca faz 1 Sicaf e 1 Consulta, e na hora de incluir aparecem 2 Anexos (um Instrumento de Cobrança por fatura).

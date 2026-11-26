@@ -93,6 +93,8 @@ test('situação: só depois da última Folha; Sicaf com o CNPJ no PDF; Anexo pe
   // v0.37.0: uma busca por empresa
   assert.equal(sicaf.textoDoAviso([{ cnpj: '1' }, { cnpj: '1' }]), '1 empresa sem SICAF ou Simples (2 notas)')
   assert.equal(sicaf.textoDoAviso([{ cnpj: '1' }, { cnpjNota: '2' }]), '2 empresas sem SICAF ou Simples')
+  assert.equal(sicaf.textoDaBusca([{ cnpjEscolhido: '07783734000133' }, { cnpjEscolhido: '07783734000133' }]), 'Buscar SICAF e Simples de 1 empresa (2 notas)')
+  assert.equal(sicaf.textoDaBusca([{ cnpjEscolhido: '1' }]), 'Buscar SICAF e Simples de 1 empresa (1 nota)')
   // Sem ateste: a nota fica pendente (o CNPJ vem do PDF da nota, na etapa 3).
   assert.equal(sicaf.situacaoDoProcesso(arvoreExemplo).pendentes.length, 2)
 })

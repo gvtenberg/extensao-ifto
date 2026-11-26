@@ -533,13 +533,12 @@
   function janelaDasNotas (notas, resultado) {
     // v0.29.3 (T160, T173): a caixa de marcar aparece sempre, até com uma nota só, para ficar claro que dá
     // para tirar uma nota da busca.
-    const escolher = notas.length > 1
     for (const nota of notas) if (nota.marcada === undefined) nota.marcada = true
     const marcadas = () => notas.filter(nota => nota.marcada)
     const alerta = criar('p', { className: 'aviso vermelho', hidden: true, textContent: 'Há diferenças em vermelho. Confira a nota e o ateste antes de continuar.' })
     let confirmouVermelho = false
     let aberta = null
-    const textoDoBotao = () => escolher ? `${BUSCAR.tudo} (${marcadas().length} de ${notas.length})` : BUSCAR.tudo
+    const textoDoBotao = () => marcadas().length ? regras.textoDaBusca(marcadas()) : BUSCAR.tudo
     const aoMarcar = () => {
       confirmouVermelho = false
       alerta.hidden = true
