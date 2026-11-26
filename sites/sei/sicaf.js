@@ -88,7 +88,7 @@
   // v0.18.2: com um processo aberto, confere antes o que já está nele (Sicaf e Consulta deste CNPJ).
   async function buscarCnpj (cnpj, aberta, quais) {
     const grupo = { cnpj, nome: '', notas: [], precisaSicaf: quais !== 'simples', precisaSimples: quais !== 'sicaf' }
-    const lida = quadroArvore ? seiPedidos.arvoreAberta() : null
+    const lida = await arvoreDoTrecho()
     if (lida) {
       aberta.trocarConteudo([criar('p', { textContent: 'Conferindo o que já está no processo…' })])
       const existentes = await jaNoProcesso(lida)
@@ -268,7 +268,7 @@
   // Sicaf (etapa 6). Nada é escrito no SEI antes do clique em "Incluir no processo".
   async function mostrarResultadoDoSicaf (fornecedores, pedido) {
     const quais = (pedido && pedido.quais) || (regras.ehCgoc(unidade) ? 'tudo' : 'sicaf')
-    const lida = quadroArvore ? seiPedidos.arvoreAberta() : null
+    const lida = await arvoreDoTrecho()
     // CNPJ escolhido na CGOC: as notas pendentes desse fornecedor ganham o Anexo.
     if (quais === 'tudo' && lida && !(pedido && pedido.resultado)) {
       try {
@@ -425,6 +425,21 @@
     return null
   })
 
+  // v0.37.0: processo longo vem em pastas e só a última fica aberta; sem Folha à vista, o trecho pendente pode
+  // começar numa pasta fechada (notas 9852 e 9853 do 23236.017252/2025-76 ficavam de fora). Lê então a árvore
+  // com todas as pastas abertas (só leitura), uma vez por árvore; se o SEI não responder, fica a aberta.
+  let ultimaCompleta = null
+  async function arvoreDoTrecho () {
+    const lida = quadroArvore ? seiPedidos.arvoreAberta() : null
+    if (!lida || !lida.linkAbrirPastas || lida.documentos.some(doc => regras.tipoNaArvore(doc.rotulo) === 'folha')) return lida
+    const chave = lida.idProcesso + ':' + lida.documentos.map(doc => doc.id).join(',')
+    if (!ultimaCompleta || ultimaCompleta.chave !== chave) {
+      ultimaCompleta = { chave, leitura: ExtensaoIFTO.menuDocumento.arvoreCompleta(lida).then(completa => completa.documentos) }
+      ultimaCompleta.leitura.catch(erro => { console.warn('[extensão IFTO] Não consegui abrir as pastas da árvore:', erro && erro.message); ultimaCompleta = null })
+    }
+    try { return { ...lida, documentos: await ultimaCompleta.leitura } } catch (erro) { return lida }
+  }
+
   // v0.18.2: Sicaf e Consulta com arquivo depois da última Folha, com os CNPJs de dentro de cada PDF.
   // Usado no aviso, no clique, no CNPJ selecionado e de novo logo antes de incluir.
   async function jaNoProcesso (lida) {
@@ -473,7 +488,7 @@
 
   // Situação do processo aberto: notas pendentes e o que já existe depois da última Folha.
   async function analisar () {
-    const lida = seiPedidos.arvoreAberta()
+    const lida = await arvoreDoTrecho()
     if (!lida) return null
     const existentes = await jaNoProcesso(lida)
     const { inicial, cnpjsDosSicafs, cnpjsDasConsultas, cnpjsComSicaf, raizesComConsulta, naoLidos, nomeados } = existentes

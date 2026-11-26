@@ -637,3 +637,6 @@ E: A barra não pede Sicaf nem Consulta para essa nota; na janela das notas apar
 ### T312 – Sicaf ou Consulta que não abre conta pelo nome (v0.37.0)
 F: Só se o T311 ainda mostrar "Não consegui abrir…": faça a busca do SICAF dessa nota até a janela de incluir no SEI.
 E: A janela diz "Não consegui abrir … Pelo nome na árvore, contei como já incluído para este fornecedor. Confira na árvore." e não oferece incluir Sicaf nem Consulta de novo.
+### T313 – Notas em pasta fechada da árvore (v0.37.0)
+F: Abra o processo 23236.017252/2025-76 (sem mexer nas pastas da árvore) e olhe o botão do SICAF na barra; depois faça o mesmo no 23236.001586/2022-85.
+E: No 23236.017252/2025-76 aparecem as 3 notas (9852 e 9853 da K.S. Artigos Esportivos, 4492 da G A da Costa Esportes), 2 empresas; no 23236.001586/2022-85 aparecem as notas 9583 e 9584. Se faltar alguma: copie as linhas "[extensão IFTO] …" do console (F12 > Console) e cole aqui.
