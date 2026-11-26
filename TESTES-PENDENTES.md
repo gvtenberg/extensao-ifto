@@ -655,3 +655,9 @@ E: Os botões e os textos são os de sempre ("Assinar e próximo", "Dar ciência
 ### T274 – SICAF e Simples iguais a antes (v0.36.3)
 F: Busque SICAF e Simples de um fornecedor e veja a janela "Incluir no processo" (não precisa incluir).
 E: Aparecem os PDFs obtidos, os avisos e a lista "Será incluído" como antes.
+
+## Enter na janela de arrastar arquivos (v0.36.5)
+> Entre no SEI com a extensão na versão 0.36.5 e abra um processo de teste da sua unidade.
+### T281 – Enter no Nome na Árvore inclui o documento (v0.36.5)
+F: Arraste um arquivo para a árvore, clique no campo "Nome na Árvore" e aperte Enter (com um arquivo sem tipo, aperte Enter antes de escolher o tipo).
+E: Com o tipo escolhido, o Enter faz o mesmo que "Incluir no processo"; sem tipo, nada acontece e o aviso pede para escolher o tipo.

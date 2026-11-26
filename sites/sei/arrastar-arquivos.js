@@ -249,6 +249,13 @@
       lista.addEventListener('change', () => { linha.tipo = lista.value || null; atualizar() })
       const nome = criar('input', { type: 'text', value: linha.nomeArvore, maxLength: 50, placeholder: 'Nome na Árvore (opcional)' })
       nome.addEventListener('input', () => { linha.nomeArvore = nome.value })
+      // v0.36.5: Enter no Nome na Árvore = clicar em "Incluir no processo" (nada acontece se o botão está apagado).
+      nome.addEventListener('keydown', evento => {
+        if (evento.key !== 'Enter' || evento.isComposing) return
+        evento.preventDefault()
+        const botao = esta.botoes[0]
+        if (!botao.disabled) botao.click()
+      })
       const remover = criar('button', { className: 'pequeno', type: 'button', textContent: 'Tirar da lista' })
       remover.addEventListener('click', () => { linha.removido = true; cartao.remove(); atualizar() })
       const origem = { nome: 'pelo nome do arquivo', regra: 'por uma regra sua', padrao: 'tipo padrão' }[linha.origem]
