@@ -92,6 +92,7 @@ Marks: **[spec]** already has a spec.
   - Simpler GitHub test cards: only version, commit and where (T262).
   - Screen in the settings to see and edit the unit data the extension saved (timbre, footer, signature) (T267).
   - #355: tooltip with the full name of a tree document (SEI and external); "R$ por extenso" keeps the bold of the value; "Duplicar documento" for external documents (without the attached file); new blank lines keep the formatting of the line above; style list opens scrolled to and showing the current style; signature data per unit in the settings.
+- Fatura and Nota fiscal: also add the "Folha de Encaminhamento" (and a real Instrumento de Cobrança, see `specs/instrumento-cobranca.md`), not only the blank Anexo (26/11/2026, user: later).
 - SEI background colour option (26/11/2026, user).
 - Make the project follow the LGPD (Brazil's data protection law) (#355, 26/11/2026).
 
