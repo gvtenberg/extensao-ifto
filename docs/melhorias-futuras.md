@@ -6,6 +6,7 @@
 
 Summary to resume work (on another machine or by another person) without reading everything. Update at the end of each stage or round.
 
+- **Round v0.37.0 (26/11/2026, branch `rodada/v0.37.0`, PR #363, one signing):** test round of 26/11 fixed (passed tests deleted, bugs fixed; tests T295–T304). Items to plan later: `ideias.md`, "To plan (tests round 26/11/2026)". Next: the user tests with `npm run rodar-sei`, then the merge.
 - **Done, waiting for tests (v0.37.0, 26/11/2026):** numbering broken by hidden boxes and typed numbers (`specs/feitas/numeracao-caixas-ocultas.md`, rules in `regras/sei-editor.md`). Tests T282–T286 (T284 critical: the saved document and the PDF). Same version: NF/RANFS abbreviations in external document names (no spec; rule in `regras/sei-documentos.md`), T287.
 - **Done, waiting for tests (v0.37.0, 26/11/2026, same round):** "Remover Formatação da AGU" (`specs/feitas/remover-formatacao-agu.md`, rules in `regras/sei-editor.md`). Tests T288–T294 (T290 critical: changes the document text).
 - **Done, waiting for tests (v0.36.3, 25/11/2026):** code style, nothing changes on screen (no spec). Tests T273–T274.

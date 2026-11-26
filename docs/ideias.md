@@ -85,3 +85,13 @@ Marks: **[spec]** already has a spec.
 - **"What's new" between published versions** (19/11/2026, user): for each version published on GitHub (Releases), a list of the features added or removed compared with the previous published version (not commit by commit), in plain Portuguese for users, e.g. "adicionada opção para remover MINUTA de edital".
 - When the extension leaves development: decide whether the "Procurar atualização" button leaves the icon window (12/11/2026).
 - Mozilla "unlisted" signing via GitHub, with automatic updates: prepared in v0.1.1 and v0.1.2 (`publicacao.md`); the user still has to create the keys. Later, maybe, for campus colleagues. Colleagues currently use SEI Pro.
+- **To plan (tests round 26/11/2026, user; run `/planejar` for each):**
+  - Settings pages clearer, with folded explanations, and a new title for "Lista para a direção" on every page (T243).
+  - Yellow warnings: new colour palette (T258).
+  - Notices that close by themselves: a bar on top that starts full and shrinks until the notice closes; pauses with the mouse over it; "×" closes now; only for success notices (errors and questions stay) (T259, T267).
+  - Simpler GitHub test cards: only version, commit and where (T262).
+  - Screen in the settings to see and edit the unit data the extension saved (timbre, footer, signature) (T267).
+  - #355: tooltip with the full name of a tree document (SEI and external); "R$ por extenso" keeps the bold of the value; "Duplicar documento" for external documents (without the attached file); new blank lines keep the formatting of the line above; style list opens scrolled to and showing the current style; signature data per unit in the settings.
+- SEI background colour option (26/11/2026, user).
+- Make the project follow the LGPD (Brazil's data protection law) (#355, 26/11/2026).
+
