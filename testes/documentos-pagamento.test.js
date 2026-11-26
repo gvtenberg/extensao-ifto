@@ -20,7 +20,7 @@ test('sempre ligada e desligada valem em qualquer unidade', () => {
 })
 
 // v0.8.0: leitura da árvore do processo (formato do SEI 5.0.4, quadro ifrArvore).
-const { lerArvore, documentosEmBranco, acharOpcao, listaEmTexto, textoDaConfirmacao, codificarLatin1, montarCorpo, trocarCampos, mensagemDoSei } = require('../comum/documentos-pagamento.js')
+const { lerArvore, documentosEmBranco, acharOpcao, listaEmTexto, textoDaConfirmacao, codificarLatin1, montarCorpo, trocarCampos, mensagemDoSei, alertaNovo, numeroObrigatorio } = require('../comum/documentos-pagamento.js')
 const arvore = [
   'Nos[0] = new infraArvoreNo("PROCESSO","3479546",null,"controlador.php?acao=arvore_visualizar","ifrVisualizacao","23236.012523/2026-88","Gestão","svg/processo.svg?25",null,null,true,true,null,null,null,null);',
   'Nos[1] = new infraArvoreNo("PASTA","PASTA2","3479546","javascript:abrirFecharPasta(\'PASTA2\')",null,"II","II",null,null,null,true,true,null,null,null);',
@@ -98,4 +98,13 @@ test('árvore guardada de um processo de pagamento com Sicaf, Consulta e Anexo e
   assert.equal(numero, '23236.023830/2025-11')
   // "Anexo Instrumento de Cobrança…" tem PDF e não conta.
   assert.deepEqual(documentosEmBranco(documentos).map(doc => doc.rotulo), ['Sicaf (3385221)', 'Consulta (3385222)', 'Anexo (3385223)'])
+})
+
+test('v0.36.4: motivo do SEI em janela e Número obrigatório', () => {
+  const formulario = "<script>function ok(){ alert('Informe o Número.'); }</script>"
+  assert.equal(alertaNovo(formulario + "<script>alert('Número já utilizado neste processo.');</script>", formulario), 'Número já utilizado neste processo.')
+  assert.equal(alertaNovo(formulario, formulario), '')
+  assert.equal(alertaNovo("<script>alert('Linha 1\\nLinha \\'2\\'');</script>", ''), "Linha 1 Linha '2'")
+  assert.equal(numeroObrigatorio('<label id="lblNumero" for="txtNumero" class="infraLabelObrigatorio">Número:</label>'), true)
+  assert.equal(numeroObrigatorio('<label id="lblNumero" for="txtNumero" class="infraLabelOpcional">Número:</label>'), false)
 })

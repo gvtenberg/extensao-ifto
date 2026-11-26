@@ -46,7 +46,8 @@
     porBarra()
     texto.textContent = curta || frase
     texto.title = frase
-    texto.style.color = tipo === 'erro' ? '#B3261E' : tipo === 'aviso' ? '#8A5A00' : '#5F6B64'
+    const cores = { erro: '#B3261E', aviso: '#8A5A00' }
+    texto.style.color = cores[tipo] || '#5F6B64'
     // Erro com frase curta: o clique mostra a frase inteira.
     if (!clique && curta && tipo === 'erro') clique = () => window.alert(frase)
     texto.style.cursor = clique ? 'pointer' : ''
@@ -74,7 +75,7 @@
       // D10: pouco espaço: apaga as cópias mais antigas de outros documentos e tenta de novo.
       for (const outro of regras.maisAntigas(await lerIndice(), id)) {
         await apagar(outro)
-        try { await gravar(); return true } catch (e) {}
+        try { await gravar(); return true } catch (e) { /* ainda sem espaço: apaga a próxima */ }
       }
       return false
     }
@@ -210,7 +211,8 @@
           if (++total > 300) return
           const item = criar('div', { className: 'item' })
           const onde = (nomes.length > 1 ? 'Parte ' + (indice + 1) + ', ' : '') + 'parágrafo ' + d.numero
-          const tipo = d.tipo === 'novo' ? 'só na versão salva' : d.tipo === 'removido' ? 'só no SEI' : d.soFormatacao ? 'mesmo texto, formatação ou imagem diferente' : 'mudou'
+          const tipos = { novo: 'só na versão salva', removido: 'só no SEI' }
+          const tipo = tipos[d.tipo] || (d.soFormatacao ? 'mesmo texto, formatação ou imagem diferente' : 'mudou')
           item.append(criar('div', { className: 'rotulo', textContent: onde + ' – ' + tipo }))
           if (d.antes && !d.soFormatacao) item.append(criar('div', { className: 'sai', textContent: d.antes }))
           if (d.depois) item.append(criar('div', { className: 'entra', textContent: d.depois }))

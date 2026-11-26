@@ -278,7 +278,9 @@
         tipo: 'principal',
         aoClicar: async j => {
           const temSubstituto = substituto.campo.value !== ''
-          const problema = temSubstituto && !fim.value ? 'Preencha até quando o substituto assina.' : temSubstituto && inicio.value > fim.value ? 'A data inicial do substituto está depois da final.' : ''
+          let problema = ''
+          if (temSubstituto && !fim.value) problema = 'Preencha até quando o substituto assina.'
+          else if (temSubstituto && inicio.value > fim.value) problema = 'A data inicial do substituto está depois da final.'
           erro.hidden = !problema
           erro.textContent = problema
           if (problema) return

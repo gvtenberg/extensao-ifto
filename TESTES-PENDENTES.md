@@ -648,3 +648,14 @@ E: Em até 10 segundos aparece qual site não está respondendo, com "Cancelar",
 ### T272 – Espaço entre "Assunto" e o destinatário no Despacho novo (v0.36.2)
 F: Crie um Despacho, abra o editor pela primeira vez, espere o aviso do espaço, clique em Salvar e veja o documento, sem abrir o editor de novo.
 E: Há uma linha de espaço entre "Assunto" e o destinatário, e as outras partes continuam com o espaço certo.
+## Nada mudou na tela (v0.36.3)
+### T273 – Lista de assinaturas igual a antes (v0.36.3)
+F: Na lista de assinaturas, passe por itens de assinar, de ciência, de intervalo e já feitos.
+E: Os botões e os textos são os de sempre ("Assinar e próximo", "Dar ciência e próximo", "Conferir de novo", "Desmarcar feito").
+### T274 – SICAF e Simples iguais a antes (v0.36.3)
+F: Busque SICAF e Simples de um fornecedor e veja a janela "Incluir no processo" (não precisa incluir).
+E: Aparecem os PDFs obtidos, os avisos e a lista "Será incluído" como antes.
+
+### T275 – Arrastar vários arquivos: motivo quando o SEI não salva (v0.36.4)
+F: Arraste para a árvore os 4 PDFs de antes (nota fiscal, documento, nota fiscal, documento), escolha os tipos e clique em "Incluir no processo".
+E: Ou os 4 entram, ou a mensagem diz o motivo (por exemplo, que o tipo exige o "Número"), e não só "O SEI não salvou o documento".

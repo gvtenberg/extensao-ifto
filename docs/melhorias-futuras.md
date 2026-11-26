@@ -6,6 +6,7 @@
 
 Summary to resume work (on another machine or by another person) without reading everything. Update at the end of each stage or round.
 
+- **Done, waiting for tests (v0.36.3, 25/11/2026):** code style, nothing changes on screen (no spec). Tests T273–T274.
 - **Done, waiting for tests (v0.36.2, 25/11/2026):** Capa interessados, editor already open, notices icon, sites down before the search, spacing after "Assunto" in a new Despacho (no spec). Tests T267–T272 (T267 critical).
 - **Done, waiting for tests (v0.36.1, 25/11/2026):** external documents (open the first, message, type by name, drop area) and blank lines around the signer (no spec; rules in `regras/sei-documentos.md` and `regras/conferir-documento.md`). Tests T259–T266 (T259 critical). Still open: why the editor sometimes asked again for the blank lines (T266).
 - **Done, waiting for tests (v0.36.0, 24/11/2026):** "Duplicar documento" (`specs/feitas/duplicar-documento.md`, rules in `regras/sei-processo.md`). Tests T253–T258 (T253 critical: saves a document in the SEI).

@@ -219,8 +219,18 @@ async function cancelarBusca () {
   return { ok: true }
 }
 async function fecharAbaDaBusca (tarefa) {
-  try { if (tarefa.idAbaSicaf != null) await navegador.tabs.remove(tarefa.idAbaSicaf) } catch (erro) {}
-  try { await navegador.tabs.update(tarefa.idAbaSei, { active: true }) } catch (erro) {}
+  // A aba pode já ter sido fechada pela pessoa: nos dois casos, nada a fazer.
+  try { if (tarefa.idAbaSicaf != null) await navegador.tabs.remove(tarefa.idAbaSicaf) } catch (erro) { /* aba já fechada */ }
+  try { await navegador.tabs.update(tarefa.idAbaSei, { active: true }) } catch (erro) { /* aba já fechada */ }
+}
+// Mostra a aba do SEI e a janela dela (a aba pode já ter sido fechada).
+async function trazerAbaParaFrente (idDaAba) {
+  try {
+    const aba = await navegador.tabs.update(idDaAba, { active: true })
+    if (aba && aba.windowId !== undefined) await navegador.windows.update(aba.windowId, { focused: true })
+  } catch (erro) {
+    // Aba ou janela já fechada pela pessoa: nada a fazer.
+  }
 }
 // A pessoa fechou a aba da busca: termina com o que já veio (antes a janela do SEI esperava para sempre).
 // Aba do SEI fechada: a busca não tem para onde voltar e é esquecida.
@@ -447,20 +457,21 @@ async function terminar (tarefa) {
   // v0.17.6: só a parte pedida de cada CNPJ (SICAF, Simples ou os dois).
   const doSicaf = tarefa.doSicaf || tarefa.pedidos
   const doSimples = tarefa.doSimples || tarefa.pedidos
-  const resultados = tarefa.pedidos.map(cnpj => ({
-    cnpj,
-    ...(!doSicaf.includes(cnpj) ? { semSicaf: true } : pdfs[cnpj]
-      ? { nome: pdfs[cnpj].nome, arquivo: pdfs[cnpj].arquivo, nomeDoArquivo: pdfs[cnpj].nomeDoArquivo, salvo: pdfs[cnpj].salvo }
-      : { erro: tarefa.erros[cnpj] || 'O SICAF não devolveu o PDF.' }),
-    simples: !doSimples.includes(cnpj) ? null : consultas[cnpj]
-      ? { nome: consultas[cnpj].nome, situacao: consultas[cnpj].situacao, arquivo: consultas[cnpj].arquivo, nomeDoArquivo: consultas[cnpj].nomeDoArquivo, salvo: consultas[cnpj].salvo }
-      : { erro: errosDoSimples[cnpj] || 'A consulta do Simples Nacional não foi feita.' }
-  }))
+  const resultadoDoSicaf = cnpj => {
+    if (!doSicaf.includes(cnpj)) return { semSicaf: true }
+    const pdf = pdfs[cnpj]
+    if (!pdf) return { erro: tarefa.erros[cnpj] || 'O SICAF não devolveu o PDF.' }
+    return { nome: pdf.nome, arquivo: pdf.arquivo, nomeDoArquivo: pdf.nomeDoArquivo, salvo: pdf.salvo }
+  }
+  const resultadoDoSimples = cnpj => {
+    if (!doSimples.includes(cnpj)) return null
+    const consulta = consultas[cnpj]
+    if (!consulta) return { erro: errosDoSimples[cnpj] || 'A consulta do Simples Nacional não foi feita.' }
+    return { nome: consulta.nome, situacao: consulta.situacao, arquivo: consulta.arquivo, nomeDoArquivo: consulta.nomeDoArquivo, salvo: consulta.salvo }
+  }
+  const resultados = tarefa.pedidos.map(cnpj => ({ cnpj, ...resultadoDoSicaf(cnpj), simples: resultadoDoSimples(cnpj) }))
   if (!await entregar(tarefa.idAbaSei, { tipo: 'sicafPronto', resultados })) return
-  try {
-    const aba = await navegador.tabs.update(tarefa.idAbaSei, { active: true })
-    if (aba && aba.windowId !== undefined) await navegador.windows.update(aba.windowId, { focused: true })
-  } catch (erro) {}
+  await trazerAbaParaFrente(tarefa.idAbaSei)
 }
 
 // ---------- Peças do Compras IFTO para o SEI (v0.19.0, spec compras-ifto-no-sei) ----------
@@ -481,7 +492,9 @@ if (navegador.permissions && navegador.permissions.onAdded) {
     try {
       const abas = await navegador.tabs.query({ url: compras.ORIGENS_COMPRAS })
       for (const aba of abas) porPonte(aba.id)
-    } catch (erro) {}
+    } catch (erro) {
+      console.warn('[extensão IFTO] Não consegui preparar as abas do Compras IFTO:', erro.message)
+    }
   })
 }
 
@@ -542,12 +555,9 @@ async function concluirEditor (resultado, fecharJanela) {
   const tarefa = await lerTarefaDoEditor()
   if (!tarefa) return
   await navegador.storage.local.remove(CHAVE_EDITOR)
-  if (fecharJanela) { try { await navegador.windows.remove(tarefa.idJanela) } catch (erro) {} }
+  if (fecharJanela) { try { await navegador.windows.remove(tarefa.idJanela) } catch (erro) { /* janela já fechada */ } }
   await entregar(tarefa.idAbaSei, { tipo: 'comprasResultado', idDocumento: tarefa.idDocumento, resultado })
-  try {
-    const aba = await navegador.tabs.update(tarefa.idAbaSei, { active: true })
-    if (aba && aba.windowId !== undefined) await navegador.windows.update(aba.windowId, { focused: true })
-  } catch (erro) {}
+  await trazerAbaParaFrente(tarefa.idAbaSei)
 }
 navegador.runtime.onStartup.addListener(() => navegador.storage.local.remove(CHAVE_EDITOR))
 
@@ -698,7 +708,9 @@ async function conferirNoEditor (remetente, recado) {
     novo = secao && regras.corrigirCargo(secao.html, antes.cargo)
   }
   // O itálico pode estar em várias partes do documento.
-  const mudancas = qual === 'italico' ? regras.corrigirItalico(lido.secoes) : (secao && secao.editavel && novo ? { [secao.nome]: novo } : {})
+  let mudancas = {}
+  if (qual === 'italico') mudancas = regras.corrigirItalico(lido.secoes)
+  else if (secao && secao.editavel && novo) mudancas = { [secao.nome]: novo }
   if (!Object.keys(mudancas).length) return { ok: false, erro: 'Essa parte do documento não dá para mudar no editor.' }
   const gravado = await rodar(globalThis.ExtensaoIFTO.editorGravar, [mudancas])
   if (!gravado.ok) return { ok: false, erro: gravado.erro }

@@ -29,7 +29,7 @@
   const secoes = [{ nome: 'pagina', html }]
   // Botão "Editar Conteúdo" da barra do SEI, no quadro de cima (mesmo site).
   let editar = null
-  try { editar = window.parent.document.querySelector('a[onclick*="editarConteudo"]') } catch (erro) {}
+  try { editar = window.parent.document.querySelector('a[onclick*="editarConteudo"]') } catch (erro) { /* quadro de cima ainda não abriu: fica sem o botão */ }
   // Ao abrir o editor (pelo aviso ou pelo botão do SEI), os avisos daqui fecham (viram o ícone): o editor mostra os dele, e duas
   // janelas confundiam. Abrir o documento de novo na árvore confere outra vez.
   let editorAberto = false

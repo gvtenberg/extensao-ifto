@@ -170,10 +170,13 @@
         if (listaNula && [...listaNula.options].some(item => item.getAttribute('value') === 'null')) novos[nome] = 'null'
       }
       if (nomeArvore) novos.txtNomeArvore = nomeArvore
+      // v0.36.4: tipo que exige o Número: avisa antes de enviar o arquivo (o SEI não salvaria).
+      if (regras.numeroObrigatorio(pagina.html)) throw new Error(`O tipo "${tipo}" exige o campo "Número" no SEI, que a extensão ainda não preenche. Inclua esse documento por "Incluir Documento › Externo".`)
+      const htmlDoTipo = pagina.html
       if (arquivo) novos.hdnAnexos = await enviarArquivo(paginaDoTipo, pagina, arquivo, sicaf)
       pagina = await enviar(doTipo, pagina.endereco, novos)
       // Se o SEI devolve o formulário de novo, não salvou.
-      if (formularioDoExterno(pagina)) throw new Error(regras.mensagemDoSei(pagina.html) || `O SEI não salvou o documento "${tipo}".`)
+      if (formularioDoExterno(pagina)) throw new Error(regras.mensagemDoSei(pagina.html) || regras.alertaNovo(pagina.html, htmlDoTipo) || `O SEI não salvou o documento "${tipo}".`)
       // v0.36.1: para abrir o primeiro documento no fim (a resposta traz o link da árvore com ele).
       salvos.push(ExtensaoIFTO.sei.linkDaArvoreComDocumento(pagina.html))
       incluidos.push(tipo)
@@ -198,7 +201,7 @@
       novos.hdnAnexos = atual ? atual + '¥' + linha : linha
     }
     const resposta = await enviar(formulario, pagina.endereco, novos)
-    if (formularioDoExterno(resposta)) throw new Error(regras.mensagemDoSei(resposta.html) || `O SEI não salvou o ${tipo} ${existente.sei}.`)
+    if (formularioDoExterno(resposta)) throw new Error(regras.mensagemDoSei(resposta.html) || regras.alertaNovo(resposta.html, pagina.html) || `O SEI não salvou o ${tipo} ${existente.sei}.`)
   }
 
   // v0.32.0: arquivo solto na página de um documento externo em branco: só anexa (tipo, data, acesso e nome

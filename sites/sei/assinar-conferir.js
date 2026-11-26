@@ -54,7 +54,7 @@
       return
     }
     // v0.26.4: a lista de assinaturas ("Assinar e próximo") deixa de esperar por esta assinatura.
-    try { window.top.postMessage({ extensaoIfto: 'assinar-recusado' }, location.origin) } catch (erro) {}
+    try { window.top.postMessage({ extensaoIfto: 'assinar-recusado' }, location.origin) } catch (erro) { /* sem a lista aberta: ninguém espera por este aviso */ }
     const editar = document.querySelector('a[onclick*="editarConteudo"]')
     if (editar) editar.click()
   }, true)
