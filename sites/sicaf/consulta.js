@@ -91,10 +91,10 @@
   // Pessoa Jurídica, CNPJ no campo e Pesquisar (como a pessoa faria).
   async function pesquisar () {
     // v0.37.0 (teste do usuário, 26/11/2026): logo depois do login, a página "Situação do Fornecedor" só funciona
-    // uns 2 segundos depois de terminar de carregar; mexer antes dá erro. Espera a página e mais 2,5 segundos.
+    // um pouco depois de terminar de carregar; mexer antes dá erro. Espera a página e mais 1 segundo (usuário).
     if (document.readyState !== 'complete') await new Promise(pronto => window.addEventListener('load', pronto, { once: true }))
-    console.info('[extensão IFTO] SICAF: página da consulta carregada, esperando 2,5 segundos antes do CNPJ')
-    await esperar(2500)
+    console.info('[extensão IFTO] SICAF: página da consulta carregada, esperando 1 segundo antes do CNPJ')
+    await esperar(1000)
     const juridica = document.getElementById('form:pesq:tipoPessoaPesquisa:0')
     if (juridica && !juridica.checked) { juridica.click(); await esperar(2000) }
     const campo = document.getElementById('form:pesq:cnpjPesquisa')
