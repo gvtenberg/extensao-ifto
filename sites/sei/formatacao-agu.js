@@ -31,9 +31,17 @@
   }
 
   const feito = () => Boolean(aviso && aviso.feito && aviso.item.isConnected)
+  const total = c => ['riscado', 'justificativa', 'cores', 'brancos', 'marcas', 'word', 'balao'].reduce((soma, chave) => soma + (Number(c[chave]) || 0), 0)
+  let restante = 0
 
   function mostrar (contas) {
-    if (ocupado || feito()) return
+    if (ocupado) return
+    // Depois do "Pronto", o aviso volta só se as marcas voltarem (Ctrl+Z ou texto colado).
+    if (feito()) {
+      if (total(contas) <= restante) return
+      aviso.remover()
+      aviso = null
+    }
     const partes = resumo(contas)
     if (!partes.length) { if (aviso) { aviso.remover(); aviso = null } return }
     const texto = `Este documento tem marcas da AGU: ${emLista(partes)}.`
@@ -53,8 +61,14 @@
 
   async function abrirRevisao (essa) {
     essa.botao.disabled = true
-    const lido = await pedir('listar')
-    essa.botao.disabled = false
+    let lido
+    try {
+      lido = await pedir('listar')
+    } catch (erro) {
+      lido = { ok: false, erro: erro.message }
+    } finally {
+      essa.botao.disabled = false
+    }
     if (!lido || !lido.ok) { essa.mostrar('erro', 'Não consegui ler o texto. ' + ((lido && lido.erro) || '')); return }
     const daLista = lido.itens.map(item => ({ id: item.id, texto: item.tipo === 'riscado' ? `Riscado: "${item.texto}"` : item.texto, detalhe: item.detalhe, desligado: item.desligado }))
     const baloes = lido.balao ? ' Os comentários saem do SEI só quando você clicar em Salvar.' : ''
@@ -66,11 +80,18 @@
       aoIr: id => pedir('ir', id),
       aoConfirmar: async ids => {
         ocupado = true
-        const resposta = await pedir('remover', ids)
-        ocupado = false
+        let resposta
+        try {
+          resposta = await pedir('remover', ids)
+        } catch (erro) {
+          resposta = { ok: false, erro: erro.message }
+        } finally {
+          ocupado = false
+        }
         if (!resposta || !resposta.ok) { painel.mostrar('erro', 'Não consegui remover. ' + ((resposta && resposta.erro) || '') + ' Nada foi salvo.'); return }
         painel.fechar()
         essa.feito = true
+        restante = total(resposta)
         essa.mostrar('ok', 'Pronto: ' + resumoDoFeito(resposta.feito) + '. ' + DESFAZER)
       }
     })

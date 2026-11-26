@@ -19,10 +19,11 @@
   }
 
   const ehTexto = no => no.is('$text') || no.is('$textProxy')
-  const celulaComFundo = bloco => {
-    const celula = bloco.findAncestor && bloco.findAncestor('tableCell')
-    return Boolean(celula && [...celula.getAttributeKeys()].some(chave => /background/i.test(chave)))
-  }
+  // Fundo na célula, na linha ou na tabela inteira.
+  const celulaComFundo = bloco => ['tableCell', 'tableRow', 'table'].some(nome => {
+    const parte = bloco.findAncestor && bloco.findAncestor(nome)
+    return Boolean(parte && [...parte.getAttributeKeys()].some(chave => /background/i.test(chave)))
+  })
 
   // Blocos de texto (parágrafos, títulos, células) das partes que a pessoa pode editar, na ordem do documento.
   function blocos (ed) {
@@ -54,9 +55,11 @@
   function riscadosDoBloco (p) {
     const trechos = []
     for (const pedaco of p) {
-      if (!pedaco.ehTexto || !pedaco.no.hasAttribute('strikethrough')) continue
+      // Uma quebra de linha riscada no meio do trecho sai junto.
+      if (!pedaco.no.hasAttribute('strikethrough')) continue
       const ultimo = trechos[trechos.length - 1]
       if (ultimo && ultimo.fim === pedaco.inicio) ultimo.fim = pedaco.fim
+      else if (!pedaco.ehTexto) continue
       else trechos.push({ inicio: pedaco.inicio, fim: pedaco.fim })
     }
     return trechos
@@ -102,7 +105,7 @@
       const registro = { bloco, riscados: [], brancos: [], word: [] }
       for (const trecho of riscadosDoBloco(p)) {
         const id = 'r' + (++n)
-        const item = { tipo: 'riscado', bloco, ...trecho, assinatura: texto.slice(trecho.inicio, trecho.fim), antes: texto.slice(0, trecho.inicio), depois: texto.slice(trecho.fim) }
+        const item = { tipo: 'riscado', bloco, ...trecho, assinatura: texto.slice(trecho.inicio, trecho.fim), textoDoBloco: texto, antes: texto.slice(0, trecho.inicio), depois: texto.slice(trecho.fim) }
         mapa.itens.set(id, item)
         registro.riscados.push(id)
       }
@@ -143,7 +146,7 @@
       if (!ed.__extensaoIftoAgu) {
         ed.__extensaoIftoAgu = true
         let espera = null
-        ed.model.document.on('change', () => {
+        ed.model.document.on('change:data', () => {
           clearTimeout(espera)
           espera = setTimeout(() => { try { avisar(contar(mapear(ed))) } catch (erro) { console.warn('extensao-ifto: formatação da AGU', erro) } }, 1500)
         })
@@ -206,8 +209,8 @@
       if (GRUPOS.includes(id)) return true
       const a = antiga.itens.get(id)
       const b = nova.itens.get(id)
-      return Boolean(a && b && a.tipo === b.tipo && a.assinatura === b.assinatura && a.bloco === b.bloco)
-    })
+      return Boolean(a && b && a.tipo === b.tipo && a.assinatura === b.assinatura && a.bloco === b.bloco && a.textoDoBloco === b.textoDoBloco)
+    }) && GRUPOS.every(grupo => !ids.includes(grupo) || antiga.grupos[grupo].length === nova.grupos[grupo].length)
   }
 
   const textoDoBloco = bloco => pedacos(bloco).map(pedaco => pedaco.texto).join('')
@@ -245,33 +248,43 @@
       const escolhidos = new Set(ids || [])
       const nova = mapear(ed)
       if (!mesmaLista(lista, nova, [...escolhidos])) return { ok: false, erro: 'O texto mudou depois que a lista abriu. Feche a lista e clique de novo em "Remover Formatação da AGU".' }
+      let mexeu = false
       const feito = { riscados: 0, justificativas: 0, paragrafos: 0, cores: 0, brancos: 0, marcas: 0, word: 0, baloes: 0 }
-      ed.model.change(escritor => {
-        // 1. Atributos (não mudam as posições): cores, marcação e ligação do Word.
-        if (escolhidos.has('cores')) {
-          for (const { bloco, pedaco } of nova.grupos.cores) { tirarAtributo(escritor, bloco, pedaco, ['fontColor']); feito.cores += 1 }
-          for (const { bloco, pedaco } of nova.grupos.pretas) tirarAtributo(escritor, bloco, pedaco, ['fontColor'])
-        }
-        if (escolhidos.has('marcas')) for (const { bloco, pedaco } of nova.grupos.marcas) { tirarAtributo(escritor, bloco, pedaco, ['fontBackgroundColor', 'htmlMark']); feito.marcas += 1 }
-        if (escolhidos.has('word')) for (const { bloco, trecho } of nova.grupos.word) { tirarAtributo(escritor, bloco, trecho, ['linkHref']); feito.word += 1 }
-        // 2. Trechos (riscado, branco, marca do Word sem texto) e parágrafos que ficaram vazios (D4).
-        for (const registro of nova.blocos) {
-          const trechos = []
-          for (const id of registro.riscados) if (escolhidos.has(id)) { const item = nova.itens.get(id); trechos.push({ inicio: item.inicio, fim: item.fim, riscado: true }); feito.riscados += 1 }
-          if (escolhidos.has('brancos')) for (const pedaco of registro.brancos) { trechos.push({ inicio: pedaco.inicio, fim: pedaco.fim }); feito.brancos += 1 }
-          if (escolhidos.has('word')) for (const trecho of registro.word) if (regras().textoDoLinkSai(trecho.texto)) trechos.push({ inicio: trecho.inicio, fim: trecho.fim })
-          if (!trechos.length) continue
-          tirarTrechos(escritor, ed, registro.bloco, sobrepostos(trechos))
-          const tinhaRiscado = trechos.some(trecho => trecho.riscado)
-          if (tinhaRiscado && regras().ficouSemTexto(textoDoBloco(registro.bloco))) { escritor.remove(registro.bloco); feito.paragrafos += 1 }
-        }
-        // 3. Parágrafos "Justificativa…" (D6 a) e balões (D6 b; o comando do próprio SEI, sai no Salvar).
-        for (const [id, item] of nova.itens) {
-          if (!escolhidos.has(id)) continue
-          if (item.tipo === 'justificativa' && item.bloco.root && item.bloco.root.rootName) { escritor.remove(item.bloco); feito.justificativas += 1 }
-          if (item.tipo === 'balao' && item.podeApagar && ed.model.markers.has(item.marcador.name)) { ed.execute('removerComentario', { id: item.id }); feito.baloes += 1 }
-        }
-      })
+      try {
+        ed.model.change(escritor => {
+          mexeu = true
+          // 1. Atributos (não mudam as posições): cores, marcação e ligação do Word.
+          if (escolhidos.has('cores')) {
+            for (const { bloco, pedaco } of nova.grupos.cores) { tirarAtributo(escritor, bloco, pedaco, ['fontColor']); feito.cores += 1 }
+            for (const { bloco, pedaco } of nova.grupos.pretas) tirarAtributo(escritor, bloco, pedaco, ['fontColor'])
+          }
+          if (escolhidos.has('marcas')) for (const { bloco, pedaco } of nova.grupos.marcas) { tirarAtributo(escritor, bloco, pedaco, ['fontBackgroundColor', 'htmlMark']); feito.marcas += 1 }
+          if (escolhidos.has('word')) for (const { bloco, trecho } of nova.grupos.word) { tirarAtributo(escritor, bloco, trecho, ['linkHref']); feito.word += 1 }
+          // 2. Trechos (riscado, branco, marca do Word sem texto) e parágrafos que ficaram vazios (D4).
+          for (const registro of nova.blocos) {
+            const trechos = []
+            for (const id of registro.riscados) if (escolhidos.has(id)) { const item = nova.itens.get(id); trechos.push({ inicio: item.inicio, fim: item.fim, riscado: true }); feito.riscados += 1 }
+            if (escolhidos.has('brancos')) for (const pedaco of registro.brancos) { trechos.push({ inicio: pedaco.inicio, fim: pedaco.fim }); feito.brancos += 1 }
+            if (escolhidos.has('word')) for (const trecho of registro.word) if (regras().textoDoLinkSai(trecho.texto)) trechos.push({ inicio: trecho.inicio, fim: trecho.fim })
+            if (!trechos.length) continue
+            tirarTrechos(escritor, ed, registro.bloco, sobrepostos(trechos))
+            const tinhaRiscado = trechos.some(trecho => trecho.riscado)
+            if (tinhaRiscado && regras().ficouSemTexto(textoDoBloco(registro.bloco))) { escritor.remove(registro.bloco); feito.paragrafos += 1 }
+          }
+          // 3. Parágrafos "Justificativa…" (D6 a) e balões (D6 b; o comando do próprio SEI, sai no Salvar).
+          for (const [id, item] of nova.itens) {
+            if (!escolhidos.has(id)) continue
+            if (item.tipo === 'justificativa' && item.bloco.root && item.bloco.root.rootName) { escritor.remove(item.bloco); feito.justificativas += 1 }
+            const comando = ed.commands.get('removerComentario')
+            if (item.tipo === 'balao' && item.podeApagar && comando && comando.isEnabled && ed.model.markers.has(item.marcador.name)) { ed.execute('removerComentario', { id: item.id }); feito.baloes += 1 }
+          }
+        })
+      } catch (erro) {
+        lista = null
+        // A mudança pode ter ficado pela metade: o texto não está como antes nem como a lista mostrava.
+        if (mexeu) return { ok: false, erro: erro.message + ' Parte do texto pode ter mudado: aperte Ctrl+Z uma vez (ou feche o editor sem salvar) e tente de novo.' }
+        throw erro
+      }
       lista = null
       return { ok: true, erro: '', feito, ...contar(mapear(ed)) }
     } catch (erro) {
@@ -279,13 +292,13 @@
     }
   }
 
-  // Um trecho branco dentro de um riscado (ou o contrário) sai uma vez só.
+  // Um trecho branco dentro de um riscado ou encostado nele (ou o contrário) sai uma vez só, com a regra do espaço.
   function sobrepostos (trechos) {
     const ordem = [...trechos].sort((a, b) => a.inicio - b.inicio || b.fim - a.fim)
     const juntos = []
     for (const trecho of ordem) {
       const ultimo = juntos[juntos.length - 1]
-      if (ultimo && trecho.inicio < ultimo.fim) { ultimo.fim = Math.max(ultimo.fim, trecho.fim); ultimo.riscado = ultimo.riscado || trecho.riscado } else juntos.push({ ...trecho })
+      if (ultimo && trecho.inicio <= ultimo.fim) { ultimo.fim = Math.max(ultimo.fim, trecho.fim); ultimo.riscado = ultimo.riscado || trecho.riscado } else juntos.push({ ...trecho })
     }
     return juntos
   }

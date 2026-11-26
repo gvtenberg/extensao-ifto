@@ -7,7 +7,7 @@
 
   // Sem acento, minúsculas, espaços (inclusive o "&nbsp;") juntos num só.
   function normalizar (texto) {
-    return String(texto || '').normalize('NFD').replace(/[̀-ͯ]/g, '').replace(/[\s ]+/g, ' ').trim().toLowerCase()
+    return String(texto || '').normalize('NFD').replace(/[̀-ͯ]/g, '').replace(/[\s\u00a0]+/g, ' ').trim().toLowerCase()
   }
 
   // D6 (a): parágrafo cujo texto inteiro é "Justificativa Modificação Item(ns)" (espaços, maiúsculas e acentos
@@ -23,7 +23,7 @@
 
   // Texto dentro da ligação do Word que também sai: só espaços ou a marca do comentário ("[A1]", "[GPO1]").
   function textoDoLinkSai (texto) {
-    return /^[\s ]*(\[[^\]]{0,12}\])?[\s ]*$/.test(String(texto || ''))
+    return /^[\s\u00a0]*(\[[^\]]{0,12}\])?[\s\u00a0]*$/.test(String(texto || ''))
   }
 
   const NOMES_PRETOS = ['black', 'windowtext', 'windowframe', 'buttontext', 'canvastext', 'initial', 'unset', 'inherit', 'auto', 'currentcolor', 'revert']
@@ -67,7 +67,7 @@
   // caractere antes do trecho, depois = primeiro depois ('' no começo ou no fim do parágrafo).
   // inserir: põe um espaço; tirar: dois espaços ficaram juntos, tira o primeiro depois do trecho.
   function espacoAoJuntar (antes, depois) {
-    const espaco = c => /[\s ]/.test(c)
+    const espaco = c => /[\s\u00a0]/.test(c)
     if (!antes || !depois || antes === OBJETO || depois === OBJETO) return { inserir: false, tirar: false }
     if (espaco(antes) && espaco(depois)) return { inserir: false, tirar: true }
     if (espaco(antes) || espaco(depois)) return { inserir: false, tirar: false }
@@ -78,12 +78,12 @@
 
   // D4: o parágrafo ficou sem texto depois de tirar o riscado (espaços não contam; imagem ou outro objeto conta).
   function ficouSemTexto (texto) {
-    return !String(texto || '').replace(/[\s ]+/g, '')
+    return !String(texto || '').replace(/[\s\u00a0]+/g, '')
   }
 
   // Linha da lista de revisão: o trecho riscado com algumas palavras de cada lado.
   function trechoComVolta (antes, trecho, depois, palavras = 5) {
-    const limpo = t => String(t || '').split(OBJETO).join(' ').replace(/[\s ]+/g, ' ')
+    const limpo = t => String(t || '').split(OBJETO).join(' ').replace(/[\s\u00a0]+/g, ' ')
     const textoAntes = limpo(antes)
     const textoDepois = limpo(depois)
     const ladoAntes = textoAntes.trim().split(' ').filter(Boolean)
