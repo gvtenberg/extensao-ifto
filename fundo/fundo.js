@@ -253,8 +253,10 @@ navegador.tabs.onRemoved.addListener(async idDaAba => {
 // v0.29.3 (T173): a Área de Trabalho é uma página que troca de endereço sem recarregar; a troca de endereço
 // também conta (só para ela), e a aba é tratada uma vez só até sair da Área de Trabalho.
 const areaEmAndamento = new Set()
+// v0.37.0: quando cada aba saiu da Área de Trabalho (para reconhecer a página de entrada do SICAF).
+const saiuDaArea = new Map()
 navegador.tabs.onUpdated.addListener(async (idDaAba, mudanca, aba) => {
-  if (mudanca.url && regras.paginaDoCompras(mudanca.url) !== 'areaDeTrabalho') areaEmAndamento.delete(idDaAba)
+  if (mudanca.url && regras.paginaDoCompras(mudanca.url) !== 'areaDeTrabalho' && areaEmAndamento.delete(idDaAba)) saiuDaArea.set(idDaAba, Date.now())
   if (!aba.url) return
   if (mudanca.status !== 'complete' && !(mudanca.url && regras.paginaDoCompras(mudanca.url) === 'areaDeTrabalho')) return
   if (simples.ehSiteDoSimples(aba.url)) {
@@ -281,6 +283,12 @@ navegador.tabs.onUpdated.addListener(async (idDaAba, mudanca, aba) => {
   // v0.17.3: sem login, vai à entrada do Compras e clica em "Entrar com Gov.br" (uma vez). Depois do login,
   // abre o SICAF pelo menu da Área de Trabalho (o endereço direto dá "Sessão expirada"). Cada passo tem
   // limite de vezes, para não ficar dando voltas; aí o aviso pede o passo à pessoa.
+  // v0.37.0 (T299): até 60 segundos depois do clique no menu da Área de Trabalho, uma página pública do SICAF
+  // pode ser a de entrada (ainda preparando a sessão): espera nela em vez de voltar ao login.
+  if (pagina === 'sicafPublico' && Date.now() - (saiuDaArea.get(idDaAba) || 0) < 60000) {
+    await injetar(idDaAba, ['comum/sei.js', 'comum/sicaf.js', 'sites/sicaf/consulta.js'])
+    return
+  }
   if (pagina === 'acessoNegado' || pagina === 'sicafPublico') {
     if (!tarefa.foiAoLogin) {
       tarefa.foiAoLogin = true
@@ -314,15 +322,14 @@ navegador.tabs.onUpdated.addListener(async (idDaAba, mudanca, aba) => {
     // de entrar antes de ir ao SICAF, e tenta direto duas vezes antes do menu.
     // v0.29.3 (T173, 3º pedido): a própria página abre o endereço do SICAF (como um clique nela) só depois de
     // o login terminar (aparece o botão com o nome da pessoa); antes ia por fora, com tempo fixo de 3 segundos.
-    // v0.37.0 (T299, pedido do usuário, 26/11/2026): a Área de Trabalho aberta = login feito; quando ela termina de carregar, abre na mesma aba o mesmo endereço da
-    // consulta do SICAF que a busca abriu no começo (o menu não rolava a lista até o "SICAF"). Se o SICAF
-    // recusar, volta aqui no máximo duas vezes (acima); o menu fica só de reserva, se a página não sair daqui.
+    // v0.37.0 (T299, decidido com o usuário em 26/11/2026): o SICAF só aceita a entrada pelo menu da Área de
+    // Trabalho: o botão "SICAF" pede ao Compras um endereço de entrada de uso único e o abre numa aba nova. A
+    // extensão clica nesse botão (a própria página faz os pedidos; a extensão não mexe no login) e o endereço
+    // abre na mesma aba. Ir direto ao endereço do SICAF dava "Sessão expirada".
     if (areaEmAndamento.has(idDaAba)) return
     areaEmAndamento.add(idDaAba)
     // Página ainda carregando e o navegador recusou: tenta de novo quando ela terminar de abrir.
-    // A cada volta (o SICAF recusou), a página espera mais antes de ir ao SICAF.
-    const vez = (tarefa.idasAreaDeTrabalho || 0) + 1
-    if (!(await injetar(idDaAba, ['sites/compras/aviso.js'], { modo: 'areaDeTrabalho', direto: regras.URL_CONSULTA_SICAF, vez }))) areaEmAndamento.delete(idDaAba)
+    if (!(await injetar(idDaAba, ['sites/compras/aviso.js'], { modo: 'areaDeTrabalho' }))) areaEmAndamento.delete(idDaAba)
   } else {
     await injetar(idDaAba, ['comum/sei.js', 'comum/sicaf.js', 'sites/sicaf/consulta.js'])
   }
@@ -345,7 +352,8 @@ async function injetar (idDaAba, arquivos, dados) {
 async function qualCnpj (aba) {
   const tarefa = await lerTarefa()
   if (!tarefa || !aba || aba.id !== tarefa.idAbaSicaf || tarefa.posicao >= tarefa.faltam.length) return { fim: true }
-  return { cnpj: tarefa.faltam[tarefa.posicao], pesquisado: tarefa.pesquisado, posicao: tarefa.posicao, total: tarefa.faltam.length }
+  // v0.37.0: espera na página de entrada do SICAF: 3 segundos, mais 3 a cada "Sessão expirada" anterior.
+  return { cnpj: tarefa.faltam[tarefa.posicao], pesquisado: tarefa.pesquisado, posicao: tarefa.posicao, total: tarefa.faltam.length, esperaEntrada: 3 + 3 * (tarefa.idasAreaDeTrabalho || 0) }
 }
 async function marcarPesquisa (cnpj) {
   const tarefa = await lerTarefa()

@@ -15,6 +15,13 @@
   mostrarAviso(`Extensão IFTO: buscando o SICAF do CNPJ ${regras.formatarCnpj(cnpj)} (${pedido.posicao + 1} de ${pedido.total}). Não feche esta aba.`)
 
   if (regras.paginaDoCompras(location.href) !== 'consulta') {
+    // v0.37.0 (T299, teste do usuário, 26/11/2026): a página de entrada do SICAF (aberta pelo menu da Área de
+    // Trabalho) ainda está preparando a sessão; sair dela na hora dava "Sessão expirada". Espera a página
+    // terminar de carregar e mais uns segundos (3, e mais 3 a cada tentativa que deu "Sessão expirada").
+    if (document.readyState !== 'complete') await new Promise(pronto => window.addEventListener('load', pronto, { once: true }))
+    const segundos = Number(pedido.esperaEntrada) || 3
+    console.info('[extensão IFTO] SICAF: entrada em', location.href.slice(0, 90), '- esperando', segundos, 'segundos')
+    await esperar(segundos * 1000)
     location.href = regras.URL_CONSULTA_SICAF
     return
   }

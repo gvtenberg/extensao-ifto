@@ -104,21 +104,7 @@
     // A página pode avisar mais de uma vez que terminou de abrir: só uma tentativa por página.
     if (!globalThis.extensaoIftoAbrindoSicaf) {
       globalThis.extensaoIftoAbrindoSicaf = true
-      if (!dados.direto) { peloMenu(); return }
-      // v0.37.0 (teste do usuário, 26/11/2026): ir ao SICAF antes de a Área de Trabalho terminar de carregar dá
-      // "Sessão expirada" (ela ainda está preparando a entrada nos outros sistemas). Espera o botão com o nome
-      // (até 20 segundos) e mais um tempo: 5 segundos na 1ª vez, 10 na 2ª e 15 na 3ª, quando o SICAF recusou antes.
-      tentar(() => document.getElementById('avatar-dropdown-trigger'), 40).then(async () => {
-        const vez = Math.max(1, Number(dados.vez) || 1)
-        registrar(`esperando ${vez * 5} segundos a página terminar de carregar`)
-        await esperar(vez * 5000)
-        registrar('abrindo a consulta do SICAF')
-        location.assign(dados.direto)
-        // Ainda aqui depois de 25 segundos (o SICAF não respondeu): para de esperar e tenta pelo menu.
-        await esperar(25000)
-        window.stop()
-        peloMenu()
-      })
+      peloMenu()
     }
   } else {
     escrever(TEXTOS[dados.modo] ? dados.modo : 'naoAbriu')

@@ -621,7 +621,7 @@ F: Num processo com 2 notas da mesma empresa (mesmo CNPJ), sem Sicaf nem Consult
 E: O botão diz "1 empresa sem SICAF ou Simples (2 notas) – Buscar" e a busca faz um Sicaf e uma Consulta só para essa empresa (e um Anexo por nota).
 ### T307 – Área de Trabalho não fica parada em "Abrindo o SICAF…" (v0.37.0)
 F: Saia do Compras.gov.br, busque o SICAF de uma nota, faça o login e espere na Área de Trabalho, sem clicar em nada.
-E: A Área de Trabalho termina de carregar, a extensão espera uns 5 segundos e o SICAF abre na mesma aba, já com o login (sem "Sessão expirada") e sem abrir o menu do seu nome; a busca continua sozinha. Se o SICAF ainda disser "Sessão expirada", a extensão volta à Área de Trabalho e espera mais (10 e depois 15 segundos). Se não abrir: aperte F12, clique em "Console", copie as linhas "[extensão IFTO] Área de Trabalho: …" e cole aqui; e salve a página com o menu do seu nome aberto (Ctrl+S) na pasta de testes.
+E: A extensão abre o menu do seu nome, rola a lista até "SICAF" e clica; o SICAF abre na mesma aba, espera uns 3 segundos e vai sozinho para "Situação do Fornecedor", sem "Sessão expirada"; a busca continua sozinha. Se falhar: aperte F12, clique em "Console", copie as linhas "[extensão IFTO] …" e cole aqui.
 ### T308 – Nunca duas janelas iguais (v0.37.0)
 F: Comece uma busca de SICAF e Simples Nacional, feche as páginas do SICAF/Simples antes do fim, volte ao processo no SEI e comece a busca de novo, até o fim.
 E: Aparece só uma janela de cada (uma para buscar e uma com "Incluir no processo"), nunca duas iguais uma sobre a outra.
