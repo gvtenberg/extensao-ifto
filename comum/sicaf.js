@@ -119,9 +119,10 @@
   // Tipo pelo nome na árvore: nota fiscal (externa, com arquivo), ateste, folha de encaminhamento, sicaf,
   // consulta ou anexo. Exemplos do processo guardado (13/11/2026): "Nota fiscal nº 063 CHC SOLUÇOES EM
   // SERV. E COM. LTDA (3375105)", "Ateste Fatura Materiais 3375107", "Folha de Encaminhamento 269 (3376800)".
+  // v0.37.0 (usuário, 26/11/2026): Fatura também precisa de SICAF e Simples Nacional, igual à nota fiscal.
   function tipoNaArvore (rotulo) {
     const r = normalizar(rotulo)
-    if (/^(NOTA FISCAL|NF-?E?\b|NFS-?E\b|DANFE\b)/.test(r)) return 'nota'
+    if (/^(NOTA FISCAL|NF-?E?\b|NFS-?E\b|DANFE\b|FATURA\b)/.test(r)) return 'nota'
     if (/^ATESTE\b/.test(r)) return 'ateste'
     if (/^FOLHA DE ENCAMINHAMENTO\b/.test(r)) return 'folha'
     if (/^SICAF\b/.test(r)) return 'sicaf'
@@ -226,7 +227,7 @@
       if (!candidatos.length) candidatos = itensDeAteste.filter(item => item.notas.some(outro => mesmoNumero(outro, numero)))
       const ateste = candidatos.find(item => nomesParecidos(item.empresa, fornecedor)) || candidatos[0] || null
       const anexoFeito = anexosComArquivo.some(anexo => {
-        const achado = /\bN\s*[º°O]?\.?\s*([\d.]+)/.exec(normalizar(anexo.rotulo).replace(/^ANEXO\s+/, '').replace(/^.*?\bNF\b/, 'NF'))
+        const achado = /\bN\s*[º°O]?\.?\s*([\d.]+)/.exec(normalizar(anexo.rotulo).replace(/^ANEXO\s+/, '').replace(/^.*?\b(NF|FATURA)\b/, 'NF'))
         return achado && mesmoNumero(achado[1], numero)
       })
       return { id: doc.id, rotulo: doc.rotulo, link: doc.link, sei, numero, fornecedor, ateste, cnpj: ateste ? ateste.cnpj : null, anexoFeito }
@@ -235,6 +236,7 @@
     const raizesComConsulta = new Set(consultasComArquivo.flatMap(doc => (cnpjsDasConsultas[doc.id] || []).map(raizDoCnpj)))
     for (const nota of notas) {
       const cnpjs = [nota.cnpj, (cnpjsDasNotas[nota.id] || [])[0]].filter(Boolean)
+      nota.cnpjNota = (cnpjsDasNotas[nota.id] || [])[0] || null
       nota.temSicaf = cnpjs.some(cnpj => cnpjsComSicaf.has(cnpj))
       nota.temConsulta = cnpjs.some(cnpj => raizesComConsulta.has(raizDoCnpj(cnpj)))
     }
@@ -413,7 +415,8 @@
   // Decisão D3: "Sicaf <razão social do SICAF>" (sem o ponto final de "LTDA.").
   const nomeDoSicaf = nome => nomeNaArvore(String(nome || '').replace(/\.\s*$/, ''))
   // Decisão D7: "Anexo Instrumento de Cobrança NF nº 63 CHC SOLUÇOES EM SERV. E COM. LTDA".
-  const nomeDoAnexo = (numero, fornecedor) => nomeNaArvore(`Instrumento de Cobrança NF nº ${numero || '?'} ${fornecedor || ''}`)
+  // v0.37.0: Fatura (rótulo da nota começa com "Fatura") → "Instrumento de Cobrança Fatura nº …".
+  const nomeDoAnexo = (numero, fornecedor, rotulo) => nomeNaArvore(`Instrumento de Cobrança ${/^FATURA\b/.test(normalizar(rotulo)) ? 'Fatura' : 'NF'} nº ${numero || '?'} ${fornecedor || ''}`)
 
   // Documentos a incluir, na ordem: por fornecedor Sicaf (com o PDF) e Consulta; por nota um Anexo.
   // Só o Sicaf quando "soSicaf" (outras unidades, etapa 6). Notas com Anexo já feito ficam de fora.
@@ -436,13 +439,13 @@
       if (!ordem) {
         if (sicaf && fornecedor.temPdf) itens.push({ tipo: 'Sicaf', nomeArvore: nomeSicaf, cnpj: fornecedor.cnpj })
         if (simples && fornecedor.temSimples) itens.push({ tipo: 'Consulta', nomeArvore: fornecedor.nomeConsulta || '', cnpj: fornecedor.cnpj })
-        if (anexo) for (const nota of fornecedor.notas || []) if (!nota.anexoFeito) itens.push({ tipo: 'Anexo', nomeArvore: nomeDoAnexo(nota.numero, nota.fornecedor), cnpj: fornecedor.cnpj, nota: nota.numero })
+        if (anexo) for (const nota of fornecedor.notas || []) if (!nota.anexoFeito) itens.push({ tipo: 'Anexo', nomeArvore: nomeDoAnexo(nota.numero, nota.fornecedor, nota.rotulo), cnpj: fornecedor.cnpj, nota: nota.numero })
         continue
       }
       const temSicaf = fornecedor.temPdf || fornecedor.jaTemSicaf || fornecedor.sicafSemPdf
       const temConsulta = fornecedor.temSimples || fornecedor.jaTemConsulta || fornecedor.consultaSemPdf
       const anexos = (fornecedor.jaTemSicaf || fornecedor.temPdf || fornecedor.jaTemConsulta || fornecedor.temSimples)
-        ? (fornecedor.notas || []).filter(nota => !nota.anexoFeito).map(nota => ({ tipo: 'Anexo', nomeArvore: nomeDoAnexo(nota.numero, nota.fornecedor), cnpj: fornecedor.cnpj, nota: nota.numero }))
+        ? (fornecedor.notas || []).filter(nota => !nota.anexoFeito).map(nota => ({ tipo: 'Anexo', nomeArvore: nomeDoAnexo(nota.numero, nota.fornecedor, nota.rotulo), cnpj: fornecedor.cnpj, nota: nota.numero }))
         : []
       let consulta = null
       if (fornecedor.temSimples) consulta = { tipo: 'Consulta', nomeArvore: fornecedor.nomeConsulta || '', cnpj: fornecedor.cnpj }
@@ -596,9 +599,15 @@
   }
 
   // "1 nota sem SICAF" / "2 notas sem SICAF"
-  function textoDoAviso (quantidade) {
+  // v0.37.0 (usuário, 26/11/2026): a busca é uma por empresa; com a lista de notas, o texto conta as empresas
+  // (CNPJ do ateste ou da nota; sem CNPJ, o nome) e diz quantas notas, quando são mais que as empresas.
+  function textoDoAviso (notas) {
     // v0.17.6: o botão busca SICAF e Simples Nacional juntos.
-    return quantidade === 1 ? '1 nota sem SICAF ou Simples' : `${quantidade} notas sem SICAF ou Simples`
+    if (typeof notas === 'number') return notas === 1 ? '1 nota sem SICAF ou Simples' : `${notas} notas sem SICAF ou Simples`
+    const lista = notas || []
+    const empresas = new Set(lista.map(nota => nota.cnpj || nota.cnpjNota || normalizar(nota.fornecedor) || nota.id)).size
+    const textoEmpresas = empresas === 1 ? '1 empresa sem SICAF ou Simples' : `${empresas} empresas sem SICAF ou Simples`
+    return lista.length > empresas ? `${textoEmpresas} (${lista.length} notas)` : textoEmpresas
   }
 
   const api = {

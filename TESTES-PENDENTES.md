@@ -613,3 +613,12 @@ E: Depois de anexar, abre à direita o documento que recebeu o arquivo (não o �
 ### T304 – Arrastar 4 arquivos: todos entram (v0.37.0)
 F: Arraste para a árvore os 4 PDFs do T275 (NF 10.2026 - IFTO Palmas 03.pdf, RANFS 10.2026 - IFTO – Palmas 03.pdf, NF … 04.pdf, RANFS … 04.pdf) e clique em "Incluir no processo".
 E: Os tipos vêm sozinhos (NF = Nota fiscal, RANFS = Documento) e os 4 documentos entram no processo.
+### T305 – Fatura também pede SICAF e Simples (v0.37.0)
+F: Num processo com uma Fatura (documento externo do tipo Fatura) depois da última Folha de Encaminhamento, sem Sicaf nem Consulta, abra o processo e clique no botão do SICAF na barra.
+E: O botão aparece para a Fatura como para a nota fiscal; a busca inclui Sicaf, Consulta e o Anexo em branco com o nome "Instrumento de Cobrança Fatura nº …".
+### T306 – Uma busca por empresa (v0.37.0)
+F: Num processo com 2 notas da mesma empresa (mesmo CNPJ), sem Sicaf nem Consulta, olhe o botão do SICAF na barra e clique nele.
+E: O botão diz "1 empresa sem SICAF ou Simples (2 notas) – Buscar" e a busca faz um Sicaf e uma Consulta só para essa empresa (e um Anexo por nota).
+### T307 – Área de Trabalho não fica parada em "Abrindo o SICAF…" (v0.37.0)
+F: Saia do Compras.gov.br, busque o SICAF de uma nota, faça o login e espere na Área de Trabalho.
+E: O SICAF abre sozinho. Se o SICAF não responder, em até uns 45 segundos a extensão tenta pelo menu do seu nome e, se nem assim abrir, o aviso muda para "Clique no seu nome… e depois em SICAF" (não fica mais parado em "Abrindo o SICAF…"). Se ainda ficar parado, salve a página com o menu do seu nome aberto (Ctrl+S) na pasta de testes.

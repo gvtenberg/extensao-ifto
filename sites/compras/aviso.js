@@ -5,6 +5,9 @@
 (function () {
   const dados = globalThis.extensaoIftoAviso || {}
   const anterior = document.querySelector('[data-extensao-ifto="aviso-compras"]')
+  // v0.37.0 (T299): a Área de Trabalho avisa de novo que abriu enquanto a tentativa anterior continua; trocar o
+  // aviso deixava o novo parado em "Abrindo o SICAF…" (a tentativa escrevia no aviso já tirado). Fica o mesmo.
+  if (anterior && dados.modo === 'areaDeTrabalho' && globalThis.extensaoIftoAbrindoSicaf) return
   if (anterior) anterior.remove()
 
   const TEXTOS = {
@@ -105,17 +108,27 @@
         tentar(() => document.getElementById('avatar-dropdown-trigger'), 30).then(async () => {
           await esperar(1000)
           location.assign(dados.direto)
+          // v0.37.0 (T299, 4º pedido do usuário, 26/11/2026): o SICAF às vezes não responde e o navegador fica
+          // mostrando esta página com "Abrindo o SICAF…" para sempre. Ainda aqui depois de 25 segundos: para de
+          // esperar e abre pelo menu do usuário; se nem isso abrir, o aviso diz onde clicar.
+          await esperar(25000)
+          window.stop()
+          peloMenu()
         })
         return
       }
-      // v0.21.6: se o SICAF não abrir em 20 segundos, o aviso diz onde clicar (antes ficava parado em "Abrindo…").
-      abrirSicafPeloMenu().then(async abriu => {
-        if (abriu) await esperar(20000)
-        escrever('menuManual')
-      })
+      peloMenu()
     }
   } else {
     escrever(TEXTOS[dados.modo] ? dados.modo : 'naoAbriu')
+  }
+
+  // v0.21.6: se o SICAF não abrir em 20 segundos, o aviso diz onde clicar (antes ficava parado em "Abrindo…").
+  function peloMenu () {
+    abrirSicafPeloMenu().then(async abriu => {
+      if (abriu) await esperar(20000)
+      escrever('menuManual')
+    })
   }
 
   // Menu do usuário (botão com o nome, no alto à direita) › SICAF.

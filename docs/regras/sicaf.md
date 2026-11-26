@@ -21,11 +21,11 @@ Decided on 13/11/2026 (spec `specs/feitas/sicaf-automatico.md`, v0.10.0 to v0.15
 ## Pending invoices
 
 - D10: by position in the tree: everything **after the last "Folha de Encaminhamento"** (or everything, if there is none) still needs documents.
-- Tree names: invoice = external PDF "Nota fiscal nº <n> <supplier>"; ateste = SEI document starting with "Ateste"; one ateste may cover several invoices of the same supplier.
+- Tree names: invoice = external PDF "Nota fiscal nº <n> <supplier>" (v0.37.0, user 26/11/2026: "Fatura …" too; its blank Anexo is "Instrumento de Cobrança Fatura nº …"); ateste = SEI document starting with "Ateste"; one ateste may cover several invoices of the same supplier.
 - Ateste lines read: "Empresa:", "CNPJ:", "Número da nota fiscal: 3.626 ( 3384844 )" (SEI number when given), "Nota de Empenho:" / "Número do empenho:", "Valor da nota fiscal:".
 - Supplier already done: a Sicaf **with a file** after the last Folha whose PDF contains that CNPJ (names differ between invoice and SICAF, so the CNPJ decides), and a Consulta **with a file** whose PDF has a CNPJ with the same first 8 digits (the Simples covers the whole company, head office and branches; v0.18.0). An invoice is pending while its supplier lacks either; each search only asks for what is missing. Invoice Anexo done: an Anexo with a file after the last Folha with its number. Blank documents do not count. (v0.18.2) The invoice's CNPJ is the ateste's **or** the issuer read on the invoice PDF (the one the search uses). This check also runs for the selected CNPJ (before opening the sites) and again right before including, with the current tree: a Sicaf/Consulta already there for that CNPJ is never added again; one that cannot be opened gets a yellow warning. Failed reads are not remembered.
 - (v0.18.5, user 18/11/2026) Two or more invoices in the window: each card has "Consultar esta nota", all checked; an unchecked invoice (e.g. cancelled: the PDF alone does not show it) gets nothing (no Sicaf, Consulta or Anexo) and skips the ateste checks. The choice is not remembered (the bar button keeps counting it).
-- D2: button "N notas sem SICAF ou Simples – Buscar" in the extension bar; nothing opens before the click. No pending invoice: no button.
+- D2: button "N notas sem SICAF ou Simples – Buscar" (v0.37.0: counts companies, one search each: "1 empresa sem SICAF ou Simples (2 notas) – Buscar") in the extension bar; nothing opens before the click. No pending invoice: no button.
 
 ## Invoice × ateste check
 

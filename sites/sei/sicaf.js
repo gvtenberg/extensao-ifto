@@ -463,7 +463,7 @@
     avisarSemPdf(resultado ? resultado.nomeados.filter(achado => achado.antesDaFolha) : [])
     const pendentes = resultado ? resultado.situacao.pendentes : []
     if (!pendentes.length) { barra.mostrar(ID, false); return }
-    escreverNoBotao(regras.textoDoAviso(pendentes.length) + ' – Buscar')
+    escreverNoBotao(regras.textoDoAviso(pendentes) + ' – Buscar')
     botao.title = 'Notas fiscais depois da última Folha de Encaminhamento sem SICAF ou Simples Nacional:\n' +
       pendentes.map(nota => `Nota ${nota.numero || '?'} – ${nota.fornecedor || 'fornecedor não identificado'}`).join('\n')
     barra.mostrar(ID, true)
@@ -548,7 +548,7 @@
     }
     const cartoes = notas.map(nota => cartaoDaNota(nota, resultado, aoMarcar))
     aberta = janela.abrir({
-      titulo: regras.textoDoAviso(notas.length),
+      titulo: regras.textoDoAviso(notas),
       conteudo: [
         criar('p', { className: 'apoio', textContent: 'Notas depois da última Folha de Encaminhamento, conferidas com o ateste. Desmarque a nota que não deve entrar na busca (por exemplo, uma nota cancelada).' }),
         ...cartoes,
