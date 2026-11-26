@@ -13,7 +13,6 @@
 | `comandos.md` | Commands in detail, temporary install |
 | `publicacao.md` | Mozilla signing, installation, Chrome package, saved passwords |
 | `referencias/` | Other extensions; `menu-sei.md`: what the SEI already does (read before suggesting SEI improvements) |
-| `claude-regras/` | Owner's general rules (copy; never change it from a fork) |
 | `../CONTRIBUTING.md` | Setup, pull requests, colleague's fork |
 | `../TESTES-PENDENTES.md` | Manual tests (source of the cards) |
 
