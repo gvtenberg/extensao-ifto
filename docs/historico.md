@@ -4,6 +4,7 @@ Older versions: `historico/v0.20-a-v0.29.md` and `historico/ate-v0.20.0.md` (`gr
 
 One or two lines per version, with the date (dd/mm/yyyy). Number 0.STAGE.FIX.
 
+- v0.38.0 (26/11/2026): "Remover Formatação da AGU" in the editor (spec `remover-formatacao-agu`, CCL by default): review list, then struck text, "Justificativa…" paragraphs, colors, white text, highlights, Word comment links and SEI comment balloons leave the text; never saves. T282 to T288.
 - v0.37.0 (26/11/2026): numbering in documents from old SEI models (spec `numeracao-caixas-ocultas`): "Tirar o texto das caixas" (hidden `<div>` boxes broke the counters, Minuta de Ata 3399532 showed "3.3") and "Revisar e converter" typed numbers into Item_Nivel2/3/4 with a left review panel (shared, reused by the AGU button). T275 to T279. External documents: file names starting with NF, DANFE, NFe, NF-e, NFC-e, NFCe, NFSe, NFS, NFS-e → Nota fiscal; RANFS → Documento (T280).
 - v0.36.3 (25/11/2026): code style only, nothing changes on screen: no nested conditionals, no silent errors (details in the console), repeated code joined. T273, T274.
 - v0.36.2 (25/11/2026): Capa: Interessados on one line separated by "; "; "Abrir o editor para corrigir" with the editor already open checks again; notices window becomes a draggable icon with a count; SICAF/Simples: checks if the sites answer before the search (T267–T271). Spacing: new Despacho, the separator between "Assunto" and the addressee no longer counts as space (T272).

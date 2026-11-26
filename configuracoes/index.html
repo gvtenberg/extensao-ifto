@@ -351,12 +351,21 @@
 
       <!-- v0.19.0: peças do Compras IFTO no SEI (spec compras-ifto-no-sei). -->
       <section class="grupo" id="compras">
-        <h2>Licitação (CCL): peças do Compras IFTO</h2>
+        <h2>Licitação (CCL)</h2>
         <div class="cartao">
+          <h1>Peças do Compras IFTO</h1>
           <p class="apoio">No Compras IFTO, o botão "Enviar ao SEI" de cada fase manda a peça para a extensão. No SEI, com o processo aberto, aparece o botão "N peças do Compras IFTO": escolha a peça, confira o tipo de documento e o nível de acesso e clique em "Criar e salvar". A extensão cria o documento, coloca o texto e salva. Ela nunca assina.</p>
           <label class="opcao"><input type="radio" name="comprasIfto" value="automatica"><span>Automática (só na CCL)</span></label>
           <label class="opcao"><input type="radio" name="comprasIfto" value="sempre"><span>Sempre ligada, em qualquer unidade</span></label>
           <label class="opcao"><input type="radio" name="comprasIfto" value="desligada"><span>Desligada</span></label>
+        </div>
+        <!-- v0.38.0 (spec remover-formatacao-agu). -->
+        <div class="cartao">
+          <h1>Remover Formatação da AGU</h1>
+          <p class="apoio">Quando o Edital, o Termo de Referência ou uma minuta volta da AGU com texto riscado, colorido ou com "Justificativa Modificação Item(ns)", a janela de avisos do editor mostra "Remover Formatação da AGU". O clique abre uma lista do que vai sair, para você conferir e desmarcar o que deve ficar. A extensão nunca salva: confira e clique em Salvar no editor.</p>
+          <label class="opcao"><input type="radio" name="formatacaoAgu" value="automatica"><span>Automática (só na CCL)</span></label>
+          <label class="opcao"><input type="radio" name="formatacaoAgu" value="sempre"><span>Sempre ligada, em qualquer unidade</span></label>
+          <label class="opcao"><input type="radio" name="formatacaoAgu" value="desligada"><span>Desligada</span></label>
         </div>
         <div class="cartao">
           <p class="apoio">Para o botão "Enviar ao SEI" aparecer no Compras IFTO, a extensão precisa funcionar no site dele. O navegador pede essa permissão uma vez; depois, recarregue a página do Compras IFTO (F5).</p>

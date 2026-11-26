@@ -676,3 +676,26 @@ E: Nenhum dos dois avisos novos aparece; "Corrigir a numeração" dos números l
 ### T280 – NF e RANFS no começo do nome do arquivo (v0.37.0)
 F: Num processo de teste, arraste para a árvore três arquivos: "NF 123.pdf", "NFS-e 45.pdf" e "RANFS 7 Empresa.pdf" (não precisa incluir; só veja a lista de conferência).
 E: Os dois primeiros vêm com o tipo Nota Fiscal e Nome na Árvore "123" e "45"; o terceiro vem com o tipo Documento e Nome na Árvore "RANFS 7 Empresa".
+## Remover Formatação da AGU (v0.38.0)
+> Entre no SEI com a extensão na versão 0.38.0, na CCL (ou ligue em Configurações › Licitação (CCL) › Remover Formatação da AGU › Sempre ligada). Use os documentos de teste (Edital 3399512, Minuta de Contrato 3399534, TR 3399829) e não salve, a não ser no T284.
+### T282 – Opção nas configurações (v0.38.0)
+F: Abra as Configurações da extensão e vá até "Licitação (CCL)".
+E: Há o cartão "Remover Formatação da AGU" com Automática (só na CCL), Sempre ligada e Desligada; a Automática vem marcada.
+### T283 – Aviso e lista só com o clique (v0.38.0)
+F: Abra o editor do Edital 3399512 e não clique em nada; depois clique em "Remover Formatação da AGU" na janela de avisos.
+E: O aviso conta os trechos riscados, as "Justificativa Modificação Item(ns)" e os trechos coloridos. A lista à esquerda só abre com o clique, com tudo marcado; clicar numa linha leva o texto até o trecho, com um contorno laranja.
+### T284 – Remover, conferir e salvar (v0.38.0) (Crítico)
+F: Na lista do Edital 3399512, desmarque um trecho riscado e clique em "Remover os marcados". Confira o texto e clique em Salvar; depois gere o PDF.
+E: O riscado sumiu sem juntar palavras ("modalidade PREGÃO ELETRÔNICO"); os parágrafos todo riscados e as "Justificativa…" sumiram; o texto ficou preto (links com a cor deles); o trecho desmarcado continua riscado. O documento salvo e o PDF ficam iguais ao editor.
+### T285 – Ctrl+Z desfaz tudo de uma vez (v0.38.0)
+F: No Edital 3399512, remova tudo e aperte Ctrl+Z uma vez (não salve).
+E: O texto volta inteiro como estava, com riscado, cores e "Justificativa…".
+### T286 – Texto em branco e marcas do Word (v0.38.0)
+F: Abra o editor da Minuta de Contrato 3399534 e clique em "Remover Formatação da AGU".
+E: A lista tem as linhas "trecho em branco (invisível) é apagado" e "marcas de comentário do Word saem". Depois de remover, o "1." escondido em branco não aparece no texto e o fundo amarelo das "Justificativa…" sumiu junto com elas.
+### T287 – Comentários do SEI (v0.38.0)
+F: Num documento de teste, ponha um comentário seu (botão de comentário do editor) num trecho, salve, abra o editor de novo e clique em "Remover Formatação da AGU".
+E: O comentário aparece na lista com seu nome; depois de remover, ele some do painel de comentários e, depois de Salvar e abrir de novo, não volta. Comentário de outra pessoa aparece apagado na lista e fica.
+### T288 – Fora da CCL e documento sem marcas (v0.38.0)
+F: Com a opção em Automática, abra um documento numa unidade que não é a CCL; depois, na CCL, abra um Despacho comum.
+E: Nos dois casos não aparece "Remover Formatação da AGU".

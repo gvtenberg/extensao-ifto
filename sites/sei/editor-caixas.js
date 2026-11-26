@@ -172,24 +172,39 @@
     }
   }
 
-  // Leva o editor até o parágrafo e o destaca por um instante (um contorno por cima, sem mexer no texto).
+  // v0.38.0: também usado pela "Remover Formatação da AGU" (alvo = elemento ou trecho do modelo do editor).
+  // Leva o editor até o alvo e o destaca por um instante (um contorno por cima, sem mexer no texto).
+  async function destacar (ed, alvo) {
+    const ehTrecho = Boolean(alvo && alvo.start && alvo.end)
+    const vivo = ehTrecho ? alvo.root && alvo.root.rootName : alvo && alvo.root && alvo.root.rootName
+    if (!vivo) return { ok: false, erro: 'Esse trecho não está mais no texto.' }
+    let caixa = null
+    if (ehTrecho) {
+      const intervalo = ed.editing.view.domConverter.viewRangeToDom(ed.editing.mapper.toViewRange(alvo))
+      caixa = intervalo && { rolar: () => (intervalo.startContainer.parentElement || intervalo.startContainer).scrollIntoView({ block: 'center' }), lugar: () => intervalo.getBoundingClientRect() }
+    } else {
+      const vista = ed.editing.mapper.toViewElement(alvo)
+      const elemento = vista && ed.editing.view.domConverter.mapViewToDom(vista)
+      caixa = elemento && { rolar: () => elemento.scrollIntoView({ block: 'center' }), lugar: () => elemento.getBoundingClientRect() }
+    }
+    if (!caixa) return { ok: false, erro: 'Não achei esse trecho na tela.' }
+    caixa.rolar()
+    await new Promise(resolve => setTimeout(resolve, 350))
+    const lugar = caixa.lugar()
+    const marca = document.createElement('div')
+    marca.style.cssText = `position:fixed;left:${lugar.left - 4}px;top:${lugar.top - 3}px;width:${lugar.width + 8}px;height:${lugar.height + 6}px;` +
+      'border:3px solid #E8A33D;border-radius:4px;background:rgba(232,163,61,.12);pointer-events:none;z-index:99999;'
+    document.body.append(marca)
+    setTimeout(() => marca.remove(), 2500)
+    return { ok: true, erro: '' }
+  }
+
   async function irPara (id) {
     try {
       const ed = await editor()
       const achado = achados.get(id)
-      if (!ed || !achado || !achado.item.root || !achado.item.root.rootName) return { ok: false, erro: 'Esse parágrafo não está mais no texto.' }
-      const vista = ed.editing.mapper.toViewElement(achado.item)
-      const elemento = vista && ed.editing.view.domConverter.mapViewToDom(vista)
-      if (!elemento) return { ok: false, erro: 'Não achei o parágrafo na tela.' }
-      elemento.scrollIntoView({ block: 'center' })
-      await new Promise(resolve => setTimeout(resolve, 350))
-      const lugar = elemento.getBoundingClientRect()
-      const marca = document.createElement('div')
-      marca.style.cssText = `position:fixed;left:${lugar.left - 4}px;top:${lugar.top - 3}px;width:${lugar.width + 8}px;height:${lugar.height + 6}px;` +
-        'border:3px solid #E8A33D;border-radius:4px;background:rgba(232,163,61,.12);pointer-events:none;z-index:99999;'
-      document.body.append(marca)
-      setTimeout(() => marca.remove(), 2500)
-      return { ok: true, erro: '' }
+      if (!ed || !achado) return { ok: false, erro: 'Esse parágrafo não está mais no texto.' }
+      return await destacar(ed, achado.item)
     } catch (erro) {
       return { ok: false, erro: erro.message }
     }
@@ -223,5 +238,5 @@
     }
   }
 
-  raiz.ExtensaoIFTO = Object.assign(raiz.ExtensaoIFTO || {}, { editorCaixas: { preparar, tirar, listar, irPara, converter } })
+  raiz.ExtensaoIFTO = Object.assign(raiz.ExtensaoIFTO || {}, { editorCaixas: { preparar, tirar, listar, irPara, converter, raizesEditaveis, textoDoParagrafo, destacar } })
 })(globalThis)

@@ -2,9 +2,9 @@
 
 **Sections**: 1. Goal · 2. Out of scope · 3. Decisions to confirm · 4. Decided rules · 5. What changes · 6. Stages · 7. Manual tests
 
-- **Status:** ready to code (after `feitas/numeracao-caixas-ocultas.md` (v0.37.0), which creates the shared review panel)
+- **Status:** done, v0.38.0 (26/11/2026), waiting for tests T282–T288
 - **Requested on:** 26/11/2026 · **Deadline or priority:** second, after the numbering fix (user, 26/11/2026)
-- **Planned version:** next middle number at stage 1
+- **Version:** v0.38.0
 
 ## 1. Goal (what for)
 
@@ -33,6 +33,9 @@ None open (all answered on 26/11/2026, see 4).
 - **D7 – Balloons deleted at once (user):** if the SEI deletes a balloon on the server right away (it has its own "excluir" address) instead of on Salvar, the balloons have their own part in the list with a red note "os comentários são apagados do SEI na hora, sem desfazer" and an extra confirmation. If they only go on Salvar, no extra warning. To check in stage 3.
 - **D8 – Review before removing (user, 26/11/2026):** the panel is an extension window, so it **never opens by itself** (user, 26/11/2026): only the click on "Remover Formatação da AGU" in the notice window opens the shared left side panel (from `feitas/numeracao-caixas-ocultas.md`) with everything that will be removed, all ticked: each struck excerpt (with a few words around), each "Justificativa…" paragraph, each balloon; colors as one line "N trechos coloridos ficarão pretos" (and highlights as one line). Clicking a line scrolls the editor to it and highlights it; untick to keep. Button "Remover os marcados", then a short summary. Never saves; Ctrl+Z or closing without saving undoes (except D7).
 
+- **D7 checked (26/11/2026):** the SEI editor has no own address to delete a comment (only `editor_salvar_conteudo`; `Comentario.getData()` goes with the text), so balloons leave only on Salvar: no extra warning. Only comments the person can edit (`remove` capability) are deleted; others are listed greyed out. Comments do not come along when a document is used as a model (TR 3399829, user 26/11/2026): only the "Justificativa…" text stays.
+- **D9 – White text (user, 26/11/2026):** text in white (invisible, e.g. a typed "1." hidden in Contrato 3399534) is deleted, as its own line in the list ("trechos em branco (invisíveis)"), which can be unticked. White text in a table cell with a background or on a colored background is visible there: it stays white.
+
 ## 5. What changes
 
 - Sites and pages: SEI editor window (`acao=editor_montar`), any document type, units per D2.
@@ -42,10 +45,10 @@ None open (all answered on 26/11/2026, see 4).
 
 ## 6. Stages
 
-- [ ] Stage 1 – Pure rules + Node tests (struck text with space rule, empty paragraph, colors except links, highlights, "Justificativa" paragraphs, `#_msocom` links); local script in `ferramentas-de-teste/` comparing the result on the 4 samples with the finals (not in git).
-- [ ] Stage 2 – Setting, notice window section, review panel and removal in the editor model (struck text, paragraphs, colors, highlights, "Justificativa"). Test: Edital 3399512 and Contrato 3399534 in the editor, untick one item, remove, check before Salvar.
-- [ ] Stage 3 – SEI comment balloons: ask the user to save the editor page of a document that has balloons (the TR samples had none saved); check whether deleting is immediate (D7); list and delete. Test (critical if deletion is immediate).
-- [ ] Stage 4 – README (Portuguese), rules to `docs/regras/sei-editor.md`, spec to `specs/feitas/`.
+- [x] Stage 1 – Pure rules + Node tests (struck text with space rule, empty paragraph, colors except links, highlights, "Justificativa" paragraphs, `#_msocom` links); local script in `ferramentas-de-teste/` comparing the result on the 4 samples with the finals (not in git).
+- [x] Stage 2 – Setting, notice window section, review panel and removal in the editor model (struck text, paragraphs, colors, highlights, "Justificativa"). Test: Edital 3399512 and Contrato 3399534 in the editor, untick one item, remove, check before Salvar.
+- [x] Stage 3 – SEI comment balloons: ask the user to save the editor page of a document that has balloons (the TR samples had none saved); check whether deleting is immediate (D7); list and delete. Test (critical if deletion is immediate).
+- [x] Stage 4 – README (Portuguese), rules to `docs/regras/sei-editor.md`, spec to `specs/feitas/`.
 
 ## 7. Manual tests
 

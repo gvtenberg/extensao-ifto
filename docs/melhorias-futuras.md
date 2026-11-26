@@ -6,7 +6,7 @@
 
 Summary to resume work (on another machine or by another person) without reading everything. Update at the end of each stage or round.
 
-- **Ready to code (26/11/2026):** "Remover Formatação da AGU", `specs/remover-formatacao-agu.md` (4 stages; reuses the review panel of v0.37.0; stage 3 needs a saved editor page with SEI comment balloons). No open decisions.
+- **Done, waiting for tests (v0.38.0, 26/11/2026):** "Remover Formatação da AGU" (`specs/feitas/remover-formatacao-agu.md`, rules in `regras/sei-editor.md`), on top of v0.37.0 (pull request #358). Tests T282–T288 (T284 critical: changes the document text).
 - **Done, waiting for tests (v0.37.0, 26/11/2026):** numbering broken by hidden boxes and typed numbers (`specs/feitas/numeracao-caixas-ocultas.md`, rules in `regras/sei-editor.md`). Tests T275–T279 (T277 critical: the saved document and the PDF). Same version: NF/RANFS abbreviations in external document names (no spec; rule in `regras/sei-documentos.md`), T280.
 - **Done, waiting for tests (v0.36.3, 25/11/2026):** code style, nothing changes on screen (no spec). Tests T273–T274.
 - **Done, waiting for tests (v0.36.2, 25/11/2026):** Capa interessados, editor already open, notices icon, sites down before the search, spacing after "Assunto" in a new Despacho (no spec). Tests T267–T272 (T267 critical).

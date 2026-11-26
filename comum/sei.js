@@ -190,6 +190,8 @@
 
   // v0.22.0: Direção-geral (Gabinete) em um lugar só: lista de assinaturas e marca MINUTA dos editais.
   const UNIDADE_DIRECAO_GERAL = 'PAL/REI/IFTO'
+  // v0.38.0: equipe de licitação (CCL): "Remover Formatação da AGU" (o Compras IFTO tem a mesma sigla em comum/compras-ifto.js).
+  const UNIDADE_CCL = 'CCL/GAC/DAP/PAL/REI/IFTO'
 
   // v0.23.0: tipo do documento pelo título da janela do editor ("SEI/IFTO - 3163788 - Ofício"): a parte
   // depois do número. Usado pela marca MINUTA (Edital) e pela data de hoje (Ofício, Portaria).
@@ -198,7 +200,7 @@
     return (partes.find(parte => !/^\d+$/.test(parte.trim())) || '').trim()
   }
 
-  const api = { linkDaArvoreComDocumento, primeiroIncluido, tipoDoDocumento, versaoDoSei, VERSAO_SEI_TESTADA, seiTestado, estadoNoSei, estadoAtualNoSei, ligadaNoSei, gravarEscolhaNoSei, atributosDoCampoDeSenha, lerArvore, ligadaNaUnidade, nomeNaArvore, numeroDaUnidade, UNIDADE_DIRECAO_GERAL, unidadeAberta }
+  const api = { linkDaArvoreComDocumento, primeiroIncluido, tipoDoDocumento, versaoDoSei, VERSAO_SEI_TESTADA, seiTestado, estadoNoSei, estadoAtualNoSei, ligadaNoSei, gravarEscolhaNoSei, atributosDoCampoDeSenha, lerArvore, ligadaNaUnidade, nomeNaArvore, numeroDaUnidade, UNIDADE_DIRECAO_GERAL, UNIDADE_CCL, unidadeAberta }
   if (typeof module !== 'undefined' && module.exports) module.exports = api
   else raiz.ExtensaoIFTO = Object.assign(raiz.ExtensaoIFTO || {}, { sei: api })
 })(globalThis)

@@ -78,6 +78,8 @@ function tratarRecado (recado, remetente) {
     case 'numeracaoPreparar': return numeracaoNoEditor(remetente, false)
     case 'numeracaoCorrigir': return numeracaoNoEditor(remetente, true)
     case 'caixasNoEditor': return caixasNoEditor(remetente, recado.acao, recado.dado)
+    // v0.38.0 (spec remover-formatacao-agu).
+    case 'aguNoEditor': return aguNoEditor(remetente, recado.acao, recado.dado)
     // v0.26.11 (spec conferir-documento, etapa 7): espaço entre as partes do documento.
     case 'estilosPreparar': return estilosNoEditor(remetente, recado.aprendidos)
     // v0.29.2 (R7): opção desligada: o documento já tem o bloco dos estilos extras?
@@ -607,6 +609,30 @@ async function caixasNoEditor (remetente, acao, dado) {
     const caixas = globalThis.ExtensaoIFTO && globalThis.ExtensaoIFTO.editorCaixas
     if (!caixas) return { ok: false, erro: 'A extensão ainda não estava pronta no editor. Feche o editor e abra de novo.' }
     const mapa = { preparar: () => caixas.preparar(), tirar: () => caixas.tirar(), listar: () => caixas.listar(), ir: () => caixas.irPara(valor), converter: () => caixas.converter(valor) }
+    return mapa[qual]()
+  }, [acao, dado === undefined ? null : dado])
+}
+
+// v0.38.0 (spec remover-formatacao-agu): põe na página do editor (world MAIN) as regras e o código das marcas
+// da AGU (reusa acharEditor da numeração e o destaque e as partes editáveis das caixas escondidas, sem carregar de
+// novo o que já está lá). "preparar" procura e fica de olho nas mudanças; "listar", "ir" e "remover" só com o
+// clique da pessoa. Nunca salva.
+async function aguNoEditor (remetente, acao, dado) {
+  const alvo = { tabId: remetente.tab.id, frameIds: [remetente.frameId || 0] }
+  if (acao === 'preparar') {
+    const [ja] = await navegador.scripting.executeScript({ target: alvo, world: 'MAIN', func: () => { const e = globalThis.ExtensaoIFTO || {}; return { numeracao: Boolean(e.editorNumeracao), caixas: Boolean(e.editorCaixas && e.editorCaixas.destacar) } } })
+    const tem = (ja && ja.result) || {}
+    const arquivos = ['comum/formatacao-agu.js', 'sites/sei/editor-agu.js']
+    if (!tem.caixas) arquivos.unshift('comum/numeracao-digitada.js', 'sites/sei/editor-caixas.js')
+    if (!tem.numeracao) arquivos.unshift('sites/sei/editor-numeracao.js')
+    await navegador.scripting.executeScript({ target: alvo, world: 'MAIN', files: arquivos })
+  }
+  const acoes = ['preparar', 'listar', 'ir', 'remover']
+  if (!acoes.includes(acao)) return { ok: false, erro: 'Pedido desconhecido.' }
+  return rodarNoEditor(remetente)((qual, valor) => {
+    const agu = globalThis.ExtensaoIFTO && globalThis.ExtensaoIFTO.editorAgu
+    if (!agu) return { ok: false, erro: 'A extensão ainda não estava pronta no editor. Feche o editor e abra de novo.' }
+    const mapa = { preparar: () => agu.preparar(), listar: () => agu.listar(), ir: () => agu.irPara(valor), remover: () => agu.remover(valor) }
     return mapa[qual]()
   }, [acao, dado === undefined ? null : dado])
 }
