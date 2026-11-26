@@ -620,8 +620,8 @@ E: O botão aparece para a Fatura como para a nota fiscal; a busca inclui Sicaf,
 F: Num processo com 2 notas da mesma empresa (mesmo CNPJ), sem Sicaf nem Consulta, olhe o botão do SICAF na barra e clique nele.
 E: O botão diz "1 empresa sem SICAF ou Simples (2 notas) – Buscar" e a busca faz um Sicaf e uma Consulta só para essa empresa (e um Anexo por nota).
 ### T307 – Área de Trabalho não fica parada em "Abrindo o SICAF…" (v0.37.0)
-F: Saia do Compras.gov.br, busque o SICAF de uma nota, faça o login e espere na Área de Trabalho.
-E: O SICAF abre sozinho. Se o SICAF não responder, em até uns 45 segundos a extensão tenta pelo menu do seu nome e, se nem assim abrir, o aviso muda para "Clique no seu nome… e depois em SICAF" (não fica mais parado em "Abrindo o SICAF…"). Se ainda ficar parado, salve a página com o menu do seu nome aberto (Ctrl+S) na pasta de testes.
+F: Saia do Compras.gov.br, busque o SICAF de uma nota, faça o login e espere na Área de Trabalho, sem clicar em nada.
+E: Em poucos segundos a extensão abre o menu do seu nome, clica em "SICAF" e o SICAF abre na mesma aba; a busca continua sozinha. Se não abrir: aperte F12, clique em "Console", copie as linhas "[extensão IFTO] Área de Trabalho: …" e cole aqui; e salve a página com o menu do seu nome aberto (Ctrl+S) na pasta de testes.
 ### T308 – Nunca duas janelas iguais (v0.37.0)
 F: Comece uma busca de SICAF e Simples Nacional, feche as páginas do SICAF/Simples antes do fim, volte ao processo no SEI e comece a busca de novo, até o fim.
 E: Aparece só uma janela de cada (uma para buscar e uma com "Incluir no processo"), nunca duas iguais uma sobre a outra.

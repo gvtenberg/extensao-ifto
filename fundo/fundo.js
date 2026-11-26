@@ -314,15 +314,12 @@ navegador.tabs.onUpdated.addListener(async (idDaAba, mudanca, aba) => {
     // de entrar antes de ir ao SICAF, e tenta direto duas vezes antes do menu.
     // v0.29.3 (T173, 3º pedido): a própria página abre o endereço do SICAF (como um clique nela) só depois de
     // o login terminar (aparece o botão com o nome da pessoa); antes ia por fora, com tempo fixo de 3 segundos.
+    // v0.37.0 (T299, 5º pedido do usuário, 26/11/2026): nunca mais direto ao endereço do SICAF. O menu da Área de
+    // Trabalho pede ao Compras um endereço do SICAF com uma senha de uma vez só e abre esse endereço numa janela
+    // nova; sem ela o SICAF fica carregando ou dá "Sessão expirada". Sempre pelo menu (a página abre na mesma aba).
     if (areaEmAndamento.has(idDaAba)) return
     areaEmAndamento.add(idDaAba)
-    if ((tarefa.idasDiretoAoSicaf || 0) < 2) {
-      tarefa.idasDiretoAoSicaf = (tarefa.idasDiretoAoSicaf || 0) + 1
-      await gravarTarefa(tarefa)
-      await injetar(idDaAba, ['sites/compras/aviso.js'], { modo: 'areaDeTrabalho', direto: regras.URL_INICIO_SICAF })
-    } else {
-      await injetar(idDaAba, ['sites/compras/aviso.js'], { modo: 'areaDeTrabalho' })
-    }
+    await injetar(idDaAba, ['sites/compras/aviso.js'], { modo: 'areaDeTrabalho' })
   } else {
     await injetar(idDaAba, ['comum/sei.js', 'comum/sicaf.js', 'sites/sicaf/consulta.js'])
   }
