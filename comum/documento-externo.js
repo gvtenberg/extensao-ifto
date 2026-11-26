@@ -123,7 +123,10 @@
   // árvore fica o nome inteiro ("Documento" sozinho não diz o que é).
   const SIGLAS = Object.freeze([
     { siglas: ['NF', 'DANFE', 'NFe', 'NF-e', 'NFC-e', 'NFCe', 'NFSe', 'NFS', 'NFS-e'], tipo: 'Nota fiscal', manterNome: false },
-    { siglas: ['RANFS'], tipo: 'Documento', manterNome: true }
+    { siglas: ['RANFS'], tipo: 'Documento', manterNome: true },
+    // v0.37.0 (T259): o PDF que o SICAF dá ("consultarSituacaoFornecedor_07783734000133_2026-11-26.pdf") → Sicaf;
+    // nome na árvore: o CNPJ com pontos, barra e hífen (o nome da empresa não está no arquivo).
+    { siglas: ['consultarSituacaoFornecedor'], tipo: 'Sicaf', cnpj: true }
   ])
   // A sigla mais longa que começa o nome (a regra de fim de palavra é a mesma dos tipos: "NFe1" não é "NF").
   function siglaDoComeco (bruto) {
@@ -161,7 +164,9 @@
     const sigla = siglaDoComeco(bruto)
     const tipoDaSigla = sigla && achar(sigla.tipo)
     if (tipoDaSigla) {
-      const resto = sigla.manterNome ? semExtensao : limpar(bruto.slice(sigla.fim)).replace(/^[\s\-–—.,;:]+/, '')
+      const cnpj = sigla.cnpj && (bruto.match(/\d{14}/) || [])[0]
+      const resto = cnpj ? cnpj.replace(/^(\d{2})(\d{3})(\d{3})(\d{4})(\d{2})$/, '$1.$2.$3/$4-$5')
+        : sigla.manterNome ? semExtensao : limpar(bruto.slice(sigla.fim)).replace(/^[\s\-–—.,;:]+/, '')
       return { tipo: tipoDaSigla, origem: 'nome', nomeArvore: nomeNaArvore(resto) }
     }
     const nomeArvore = nomeNaArvore(semExtensao)

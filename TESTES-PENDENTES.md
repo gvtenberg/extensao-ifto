@@ -589,3 +589,27 @@ E: Fica uma linha em branco antes do primeiro nome e outra depois de "Ordenador 
 ### T296 – Timbre corrigido não pede para guardar de novo (v0.37.0)
 F: Numa unidade com timbre já guardado em "Minhas unidades", abra no editor um documento com o timbre diferente e clique em "Corrigir timbre".
 E: O botão "Usar este timbre como padrão da unidade" some junto com o de corrigir. Num outro documento, mude o timbre à mão para ficar igual ao guardado e clique em "Usar este timbre como padrão": a extensão diz que ele já é o padrão e não guarda nada.
+### T297 – CNPJ com máscara e conferido antes de buscar (v0.37.0)
+F: No SEI, abra a busca do SICAF por CNPJ e digite 07783734000133; depois apague e digite um CNPJ com o último número trocado.
+E: Enquanto digita, aparecem os pontos, a barra e o hífen (07.783.734/0001-33). Com o número trocado, a janela avisa que o CNPJ está errado e não busca. Com o certo, o campo CNPJ da página do SICAF fica preenchido e a busca termina.
+### T298 – SICAF sem "falha do sistema" (v0.37.0)
+F: Busque o SICAF de duas ou três notas seguidas.
+E: Todos os PDFs chegam. Se o SICAF mostrar "falha do sistema", a extensão espera e tenta sozinha mais duas vezes antes de avisar.
+### T299 – SICAF abre sozinho pela Área de Trabalho (v0.37.0)
+F: Saia do Compras.gov.br, busque o SICAF de uma nota e faça o login quando pedir.
+E: Na Área de Trabalho a extensão abre o SICAF sozinha, na mesma aba, sem pedir para clicar no seu nome. Se ainda aparecer o aviso para clicar no nome, salve a página com o menu do seu nome aberto (Ctrl+S) na pasta de testes.
+### T300 – Foco não pula para o outro monitor (v0.37.0)
+F: Com dois monitores, comece uma busca do SICAF no segundo e vá digitar num documento ou site no primeiro, até a busca terminar.
+E: O cursor continua onde você está digitando; a aba do SEI fica pronta no segundo monitor, esperando você voltar.
+### T301 – Janelas abaixo dos botões do SEI (v0.37.0)
+F: Num processo com muitos botões na barra do SEI, abra a janela do SICAF e a lista de assinaturas.
+E: As janelas abrem no canto de cima, à esquerda, da área do processo, abaixo da barra de botões, sem cobrir nenhum botão; dá para arrastar como antes.
+### T302 – Arquivo do SICAF reconhecido pelo nome (v0.37.0)
+F: Arraste para a árvore o arquivo consultarSituacaoFornecedor_07783734000133_2026-11-26.pdf.
+E: O tipo vem como Sicaf e o Nome na Árvore como 07.783.734/0001-33.
+### T303 – Anexar em documento em branco abre o documento certo (v0.37.0)
+F: Crie 3 documentos externos em branco, anexe um arquivo no do meio (arrastando o arquivo para a página dele) e depois solte 2 arquivos de uma vez em outro.
+E: Depois de anexar, abre à direita o documento que recebeu o arquivo (não o último da árvore). Com 2 arquivos, aparece a lista para escolher um, com "Enviar" e "Cancelar".
+### T304 – Arrastar 4 arquivos: todos entram (v0.37.0)
+F: Arraste para a árvore os 4 PDFs do T275 (NF 10.2026 - IFTO Palmas 03.pdf, RANFS 10.2026 - IFTO – Palmas 03.pdf, NF … 04.pdf, RANFS … 04.pdf) e clique em "Incluir no processo".
+E: Os tipos vêm sozinhos (NF = Nota fiscal, RANFS = Documento) e os 4 documentos entram no processo.

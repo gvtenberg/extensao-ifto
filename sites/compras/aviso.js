@@ -121,13 +121,26 @@
   // Menu do usuário (botão com o nome, no alto à direita) › SICAF.
   async function abrirSicafPeloMenu () {
     const ehSicaf = elemento => /\bSICAF\b/i.test(elemento.textContent || '') && (elemento.textContent || '').trim().length < 120
-    const itemDoSicaf = () => [...document.querySelectorAll('.systems a, .systems button, .system, .dropdown-menu a, .dropdown-menu button')].find(ehSicaf)
+    // v0.37.0 (T260): qualquer link ou botão do menu aberto com "SICAF" (antes, só algumas classes).
+    const itemDoSicaf = () => [...document.querySelectorAll('.systems a, .systems button, .system, .dropdown-menu a, .dropdown-menu button, [role="menu"] a, [role="menu"] button, [role="menuitem"], a[href*="sicaf" i]')].find(ehSicaf) ||
+      [...document.querySelectorAll('a, button')].find(elemento => ehSicaf(elemento) && elemento.offsetParent)
     const menu = await tentar(() => document.getElementById('avatar-dropdown-trigger'))
     if (!menu) return false
     if (!itemDoSicaf()) menu.click()
-    const item = await tentar(itemDoSicaf, 10)
+    const item = await tentar(itemDoSicaf, 20)
     if (!item) return false
     const clicavel = item.closest('a, button') || item.querySelector('a, button') || item
+    // v0.37.0 (T260): o menu abre o SICAF numa janela nova, e o navegador barra janela aberta pela extensão
+    // (não foi a pessoa que clicou): por isso o SICAF não abria. Com o endereço do link, abre na mesma aba;
+    // no Firefox, a janela nova que a página pedir vira a mesma aba.
+    const endereco = clicavel.getAttribute && clicavel.getAttribute('href')
+    if (endereco && !/^(#|javascript:)/i.test(endereco)) {
+      location.assign(new URL(endereco, location.href).href)
+      return true
+    }
+    if (window.wrappedJSObject && typeof exportFunction === 'function') {
+      window.wrappedJSObject.open = exportFunction(url => { if (url) location.assign(new URL(String(url), location.href).href); return null }, window)
+    }
     clicavel.click()
     return true
   }

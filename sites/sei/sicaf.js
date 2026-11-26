@@ -68,7 +68,8 @@
       aviso.textContent = 'CNPJ ' + regras.formatarCnpj(achado.cnpj) + ' conferido.'
       return achado.cnpj
     }
-    campo.addEventListener('input', conferirCampo)
+    // v0.37.0 (T271): a extensão põe pontos, barra e hífen enquanto a pessoa digita.
+    campo.addEventListener('input', () => { campo.value = regras.mascaraCnpj(campo.value); conferirCampo() })
     const aberta = janela.abrir({
       titulo: TITULOS[quais],
       conteudo: [criar('label', {}, ['CNPJ do fornecedor (digite ou cole)', campo]), aviso],
@@ -618,6 +619,7 @@
         return criar('label', { className: 'escolha' }, [marca, `${regras.formatarCnpj(cnpj)} (${origem})`])
       })
       outro.addEventListener('input', () => {
+        outro.value = regras.mascaraCnpj(outro.value)
         const achado = regras.cnpjDaSelecao(outro.value)
         nota.cnpjEscolhido = achado && achado.valido ? achado.cnpj : null
         for (const marca of opcoes.map(rotulo => rotulo.firstChild)) marca.checked = false

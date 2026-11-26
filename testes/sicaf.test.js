@@ -431,3 +431,14 @@ test('pular antes da busca: o site não abre e cada CNPJ fica com o motivo', () 
   assert.deepEqual(semSimples.simplesFaltam, [])
   assert.deepEqual(Object.keys(semSimples.simplesErros), ['1', '2'])
 })
+
+// v0.37.0 (T271): máscara do CNPJ enquanto a pessoa digita.
+test('máscara do CNPJ ao digitar', () => {
+  const { mascaraCnpj } = require('../comum/sicaf.js')
+  assert.equal(mascaraCnpj('07783734000133'), '07.783.734/0001-33')
+  assert.equal(mascaraCnpj('0778373400'), '07.783.734/00')
+  assert.equal(mascaraCnpj('07.783.734/0001-33'), '07.783.734/0001-33')
+  assert.equal(mascaraCnpj('077'), '07.7')
+  assert.equal(mascaraCnpj('CNPJ: 07.783.734/0001-33'), 'CNPJ: 07.783.734/0001-33')
+  assert.equal(mascaraCnpj(''), '')
+})

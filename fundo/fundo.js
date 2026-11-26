@@ -226,11 +226,12 @@ async function fecharAbaDaBusca (tarefa) {
   try { if (tarefa.idAbaSicaf != null) await navegador.tabs.remove(tarefa.idAbaSicaf) } catch (erro) { /* aba já fechada */ }
   try { await navegador.tabs.update(tarefa.idAbaSei, { active: true }) } catch (erro) { /* aba já fechada */ }
 }
-// Mostra a aba do SEI e a janela dela (a aba pode já ter sido fechada).
+// Mostra a aba do SEI dentro da janela dela (a aba pode já ter sido fechada).
+// v0.37.0 (T260, dois monitores): não traz mais a janela para a frente. Isso tirava o foco de onde a pessoa
+// estava digitando, no outro monitor; a aba fica pronta na janela do SEI, esperando a pessoa voltar.
 async function trazerAbaParaFrente (idDaAba) {
   try {
-    const aba = await navegador.tabs.update(idDaAba, { active: true })
-    if (aba && aba.windowId !== undefined) await navegador.windows.update(aba.windowId, { focused: true })
+    await navegador.tabs.update(idDaAba, { active: true })
   } catch (erro) {
     // Aba ou janela já fechada pela pessoa: nada a fazer.
   }
@@ -522,7 +523,10 @@ async function abrirEditor ({ urlEditor, idDocumento, html }, abaSei) {
   try { endereco = new URL(urlEditor) } catch (erro) { return { erro: 'endereço do editor inválido' } }
   if (endereco.hostname !== 'sei.ifto.edu.br' || endereco.searchParams.get('acao') !== 'editor_montar') return { erro: 'endereço do editor inválido' }
   if (!abaSei || typeof html !== 'string' || !html) return { erro: 'pedido incompleto' }
-  const janela = await navegador.windows.create({ url: endereco.href, type: 'popup', width: 1100, height: 820 })
+  // v0.37.0 (T260): a janela do editor abre sem tirar o foco de onde a pessoa está (navegador que não aceita
+  // "focused: false" abre do jeito de antes).
+  const opcoesDaJanela = { url: endereco.href, type: 'popup', width: 1100, height: 820 }
+  const janela = await navegador.windows.create({ ...opcoesDaJanela, focused: false }).catch(() => navegador.windows.create(opcoesDaJanela))
   const idAba = janela.tabs && janela.tabs[0] ? janela.tabs[0].id : null
   const tarefa = { idAbaSei: abaSei.id, idJanela: janela.id, idAba, idDocumento: String(idDocumento || ''), html, estado: 'abrindo', inicio: Date.now() }
   await navegador.storage.local.set({ [CHAVE_EDITOR]: tarefa })

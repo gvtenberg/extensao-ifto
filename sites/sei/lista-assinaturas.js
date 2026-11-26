@@ -47,6 +47,9 @@
 
   // ---------- Posição: padrão à direita da barra de botões do processo; arrastável ----------
   function posicaoPadrao () {
+    // v0.37.0 (T274): no canto de cima, à esquerda, da área do processo (não cobre os botões do SEI).
+    const lugar = globalThis.ExtensaoIFTO.janela && globalThis.ExtensaoIFTO.janela.lugarDasJanelas()
+    if (lugar) return lugar
     const quadro = document.getElementById('divIframeVisualizacao')
     const barraDoAlto = document.getElementById('navInfraBarraNavegacao')
     let topo = 8
@@ -66,8 +69,9 @@
       const top = Math.min(Math.max(guardada.top, 0), Math.max(window.innerHeight - altura, 0))
       Object.assign(painel.style, { left: left + 'px', top: top + 'px', right: 'auto' })
     } else {
-      const { top, right } = posicaoPadrao()
-      Object.assign(painel.style, { top: top + 'px', right: right + 'px', left: 'auto' })
+      const { top, right, left } = posicaoPadrao()
+      if (left != null) Object.assign(painel.style, { top: top + 'px', left: left + 'px', right: 'auto' })
+      else Object.assign(painel.style, { top: top + 'px', right: right + 'px', left: 'auto' })
     }
   }
   function permitirArrastar (alca) {

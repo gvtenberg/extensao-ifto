@@ -36,7 +36,20 @@
     for (let vez = 0; vez < 30 && !linha && !saindo && !textoDosErros(); vez++) { await esperar(500); linha = linhaDoCnpj() }
     if (saindo) return
     if (!linha) throw new Error(textoDosErros() || 'O SICAF não encontrou este CNPJ.')
-    const bytes = await pegarPdf(linha)
+    // v0.37.0 (T274, SICAF-falha-sistema.html): clicando logo que o resultado aparece, o SICAF às vezes responde
+    // "Não foi possível realizar a operação devido a falha do sistema". Espera como uma pessoa e, com essa falha,
+    // tenta de novo mais duas vezes, cada vez esperando mais.
+    let bytes = null
+    for (const espera of [2500, 6000, 12000]) {
+      await esperar(espera)
+      if (saindo) return
+      try {
+        bytes = await pegarPdf(linhaDoCnpj() || linha)
+        break
+      } catch (falha) {
+        if (!falha.deNovo || espera === 12000) throw falha
+      }
+    }
     await enviar({ tipo: 'sicafPdf', cnpj, nome: linha.nome, arquivo: regras.paraBase64(bytes) })
   } catch (erro) {
     await enviar({ tipo: 'sicafPdf', cnpj, erro: erro.message })
@@ -60,6 +73,10 @@
     return null
   }
 
+  function falhasDoSistema () {
+    return [...document.querySelectorAll('.ui-growl-error, .ui-messages-error')].filter(item => /falha do sistema/i.test(item.textContent)).length
+  }
+
   function textoDosErros () {
     return [...document.querySelectorAll('.ui-messages-error, .ui-message-error')].map(item => item.textContent.replace(/\s+/g, ' ').trim()).filter(Boolean).join(' ')
   }
@@ -71,10 +88,20 @@
     const campo = document.getElementById('form:pesq:cnpjPesquisa')
     const botao = document.getElementById('form:pesq:botoesPesqPessoaId:btnPesquisar')
     if (!campo || !botao) throw new Error('Não achei o campo CNPJ na página do SICAF.')
+    // v0.37.0 (T271): o campo tem máscara do próprio SICAF, que ao receber o foco reescreve o campo um pouco
+    // depois e podia apagar o número ("Campo CNPJ inválido" com o campo vazio). Espera a máscara, escreve e
+    // confere; só pesquisa com o número certo no campo.
     campo.focus()
-    campo.value = regras.formatarCnpj(cnpj)
-    campo.dispatchEvent(new Event('input', { bubbles: true }))
-    campo.dispatchEvent(new Event('change', { bubbles: true }))
+    await esperar(400)
+    for (const valor of [regras.formatarCnpj(cnpj), cnpj]) {
+      campo.value = valor
+      campo.dispatchEvent(new Event('input', { bubbles: true }))
+      campo.dispatchEvent(new Event('keyup', { bubbles: true }))
+      campo.dispatchEvent(new Event('change', { bubbles: true }))
+      await esperar(400)
+      if (regras.soDigitos(campo.value) === cnpj) break
+    }
+    if (regras.soDigitos(campo.value) !== cnpj) throw new Error('O campo CNPJ da página do SICAF não aceitou o número. Tente de novo; se repetir, pesquise à mão.')
     await enviar({ tipo: 'sicafPesquisei', cnpj })
     botao.click()
   }
@@ -84,17 +111,24 @@
   // receber o PDF aqui.
   function pegarPdf (linha) {
     return new Promise((resolver, recusar) => {
+      const falhasAntes = falhasDoSistema()
+      const parar = () => { clearTimeout(tempo); clearInterval(vigia); document.removeEventListener('submit', aoEnviar, true) }
       const tempo = setTimeout(() => {
-        document.removeEventListener('submit', aoEnviar, true)
+        parar()
         recusar(new Error(textoDosErros() || 'O SICAF demorou para gerar o PDF. Tente de novo.'))
       }, 90000)
+      // v0.37.0 (T274): aviso de "falha do sistema" do SICAF depois do clique: dá para tentar de novo.
+      const vigia = setInterval(() => {
+        if (falhasDoSistema() <= falhasAntes) return
+        parar()
+        recusar(Object.assign(new Error('O SICAF respondeu "falha do sistema" várias vezes. Espere um pouco e tente de novo.'), { deNovo: true }))
+      }, 500)
       async function aoEnviar (evento) {
         const botao = evento.submitter
         if (!botao || !/abrirRelatorio$/.test(botao.id || '')) return
         evento.preventDefault()
         evento.stopImmediatePropagation()
-        document.removeEventListener('submit', aoEnviar, true)
-        clearTimeout(tempo)
+        parar()
         try {
           const formulario = evento.target
           const corpo = new URLSearchParams(new FormData(formulario, botao)).toString()

@@ -62,6 +62,28 @@
     a { color: #1E5E33; }
   `
 
+  // v0.37.0 (T274, janelas-extensao-frente-barra-botoes-sei.htm): as janelas da extensão abrem no canto de
+  // cima, à esquerda, da área que mostra o processo e os documentos (#divArvoreConteudoIfr, dentro do quadro
+  // da direita, ifrConteudoVisualizacao), abaixo da barra de botões do SEI, para não cobrir os botões. Sem essa área: null (lugar antigo).
+  function lugarDasJanelas () {
+    try {
+      // A área fica dentro do quadro ifrConteudoVisualizacao da página do processo.
+      const quadro = document.getElementById('ifrConteudoVisualizacao')
+      const area = quadro && quadro.contentDocument && quadro.contentDocument.getElementById('divArvoreConteudoIfr')
+      if (!area) return null
+      const fora = quadro.getBoundingClientRect()
+      const dentro = area.getBoundingClientRect()
+      if (!dentro.width || !dentro.height) return null
+      return { top: Math.round(fora.top + dentro.top + 8), left: Math.round(fora.left + dentro.left + 8) }
+    } catch (erro) {
+      return null
+    }
+  }
+  const noLugar = elemento => {
+    const lugar = lugarDasJanelas()
+    if (lugar) Object.assign(elemento.style, { top: lugar.top + 'px', left: lugar.left + 'px', right: 'auto' })
+  }
+
   // abrir({ titulo, conteudo: [nós], botoes: [{ texto, tipo: 'principal'|'perigo', aoClicar(janela) }] })
   // Devolve { fechar, corpo, botoes } . Esc ou × fecham (aoFechar é chamado).
   function abrir ({ titulo, conteudo = [], botoes = [], aoFechar }) {
@@ -109,6 +131,7 @@
     fechar.addEventListener('click', () => api.fechar())
     recolher.addEventListener('click', () => janela.classList.toggle('recolhida'))
     arrastar(janela, topo)
+    noLugar(janela)
     api.trocarBotoes(botoes)
     return api
   }
@@ -156,10 +179,11 @@
       padding: '10px 14px', borderRadius: '8px', border: '1px solid #B7DCC3', background: '#E7F2EA', color: '#1E5E33',
       font: '600 14px/1.4 system-ui, sans-serif', boxShadow: '0 4px 16px rgba(0,0,0,.2)', overflowWrap: 'anywhere', pointerEvents: 'none'
     })
+    noLugar(caixa)
     raiz.append(caixa)
     document.body.append(hospedeiro)
     setTimeout(() => hospedeiro.remove(), segundos * 1000)
   }
 
-  ExtensaoIFTO.janela = { abrir, criar, mensagemRapida }
+  ExtensaoIFTO.janela = { abrir, criar, mensagemRapida, lugarDasJanelas }
 })()

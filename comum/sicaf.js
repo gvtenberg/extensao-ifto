@@ -38,6 +38,15 @@
     if (n.length !== 14) return String(cnpj || '')
     return `${n.slice(0, 2)}.${n.slice(2, 5)}.${n.slice(5, 8)}/${n.slice(8, 12)}-${n.slice(12)}`
   }
+  // v0.37.0 (T271): máscara enquanto a pessoa digita: "0778373400" → "07.783.734/00". Fica fácil comparar os
+  // grupos de números com os da nota. Texto que não é só número e sinais (ex.: "CNPJ: …" colado) fica como está.
+  function mascaraCnpj (texto) {
+    const bruto = String(texto || '')
+    if (!/^[\d\s./-]*$/.test(bruto)) return bruto
+    const n = soDigitos(bruto).slice(0, 14)
+    return [[0, 2, ''], [2, 5, '.'], [5, 8, '.'], [8, 12, '/'], [12, 14, '-']]
+      .filter(([inicio]) => n.length > inicio).map(([inicio, fim, sinal]) => sinal + n.slice(inicio, fim)).join('')
+  }
   const ehDoIfto = cnpj => soDigitos(cnpj).startsWith(RAIZ_IFTO)
   // v0.17.0 (consulta-simples D7): CNPJ da matriz de uma filial: 8 primeiros números + 0001 + dígitos refeitos.
   function cnpjMatriz (cnpj) {
@@ -595,7 +604,7 @@
   const api = {
     LIMITE_DA_RESPOSTA_MS, siteRespondeu, pularAntes,
     UNIDADE_CGOC, CNPJ_CAMPUS_PALMAS, funcaoLigada, ehCgoc,
-    soDigitos, raizDoCnpj, cnpjValido, formatarCnpj, ehDoIfto, cnpjMatriz, acharCnpjs, cnpjDaSelecao,
+    soDigitos, raizDoCnpj, cnpjValido, formatarCnpj, mascaraCnpj, ehDoIfto, cnpjMatriz, acharCnpjs, cnpjDaSelecao,
     normalizar, mesmoNumero, textoDoHtml, nomesParecidos,
     tipoNaArvore, numeroSei, lerRotuloDaNota, trechoPendente, lerAteste, situacaoDoProcesso, textoDoAviso,
     cnpjsDaNota, notaSemTexto, empenhosDoTexto, nomeNoTexto, conferirNota, agruparPorFornecedor,

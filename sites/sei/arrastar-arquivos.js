@@ -134,8 +134,17 @@
     opcoes = await configuracoes.lerConfiguracoes()
     const titulo = 'Anexar arquivo ao documento'
     const fechar = { texto: 'Fechar', aoClicar: j => j.fechar() }
+    // v0.37.0 (T214, decidido em 26/11/2026): com vários arquivos, a pessoa escolhe qual vai para o documento.
     if (arquivos.length > 1) {
-      aberta = janela.abrir({ titulo, conteudo: [criar('p', { className: 'aviso amarelo', textContent: 'Arraste um arquivo só: o documento em branco recebe um arquivo. Para criar vários documentos de uma vez, arraste os arquivos para a árvore do processo, à esquerda.' })], botoes: [fechar], aoFechar: () => { aberta = null } })
+      const marcas = arquivos.map((arquivo, i) => criar('input', { type: 'radio', name: 'arquivo-do-anexo', value: String(i), checked: i === 0 }))
+      const lista = arquivos.map((arquivo, i) => criar('label', { className: 'escolha' }, [marcas[i], `${arquivo.name} (${regras.tamanhoEmTexto(arquivo.size)})`]))
+      const conteudo = [
+        criar('p', { className: 'aviso amarelo', textContent: 'O documento em branco recebe um arquivo só. Escolha qual. Para criar vários documentos de uma vez, arraste os arquivos para a árvore do processo, à esquerda.' }),
+        criar('p', { textContent: 'Vai para: ' + alvo.rotulo }),
+        ...lista
+      ]
+      const enviar = { texto: 'Enviar', tipo: 'principal', aoClicar: () => { const escolhida = marcas.findIndex(marca => marca.checked); confirmarAnexo([arquivos[escolhida < 0 ? 0 : escolhida]]) } }
+      aberta = janela.abrir({ titulo, conteudo, botoes: [enviar, { texto: 'Cancelar', aoClicar: j => j.fechar() }], aoFechar: () => { aberta = null } })
       return
     }
     const arquivo = arquivos[0]
@@ -174,8 +183,8 @@
         return
       }
       alvoGuardado = undefined
-      seiPedidos.recarregarArvore()
-      try { quadroDocumento.contentWindow.location.reload() } catch (falha) { /* a árvore recarregada já mostra */ }
+      // v0.37.0 (#355): abre o documento que recebeu o arquivo (não o último da árvore).
+      seiPedidos.abrirDepoisDeAnexar(alvo.id)
       j.fechar()
       janela.mensagemRapida(`Pronto: "${pronto.nome}" foi anexado ao documento ${alvo.sei || alvo.rotulo}.`)
     }

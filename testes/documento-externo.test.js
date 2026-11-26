@@ -165,3 +165,9 @@ test('v0.37.0: siglas de nota fiscal no começo do nome viram Nota fiscal; RANFS
   // Sem "Documento" na lista do SEI, RANFS fica sem tipo.
   assert.equal(tipoPeloNome('RANFS 45.pdf', TIPOS).tipo, null)
 })
+
+// v0.37.0 (T259): PDF do SICAF pelo nome que o próprio SICAF dá.
+test('v0.37.0: consultarSituacaoFornecedor vira Sicaf, com o CNPJ formatado como nome', () => {
+  const tipos = [...TIPOS, 'Sicaf', 'Consulta']
+  assert.deepEqual(tipoPeloNome('consultarSituacaoFornecedor_07783734000133_2026-11-26.pdf', tipos), { tipo: 'Sicaf', origem: 'nome', nomeArvore: '07.783.734/0001-33' })
+})
