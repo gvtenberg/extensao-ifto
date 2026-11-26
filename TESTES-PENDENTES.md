@@ -518,9 +518,6 @@ E: Há uma linha de espaço entre "Ordenador de Despesas" e a data.
 ### T261 – Mensagem ao anexar em documento em branco e erro na inclusão (v0.36.1)
 F: Solte um PDF na página de um documento externo em branco e clique em "Anexar"; em outra vez, inclua três arquivos e clique em "Parar" no meio.
 E: Ao anexar, a mensagem some sozinha e o documento abre com o arquivo. Ao parar, a janela continua aberta com o aviso.
-### T266 – Linhas antes e depois de quem assina no Despacho (v0.36.1)
-F: Num Despacho não assinado sem linhas em branco perto do nome, abra o editor, clique em "Adicionar as linhas em branco", salve, feche e abra de novo. Repita com uma das linhas já no documento.
-E: Fica uma linha antes do nome e uma depois do cargo, sem repetir a que já existia. Ao abrir de novo, o aviso das linhas não volta.
 ## Avisos, capa e sites fora do ar (v0.36.2)
 > Entre no SEI com a extensão na versão 0.36.2 e use documentos de teste não assinados da sua unidade.
 ### T271 – Site fora do ar antes da busca (v0.36.2)
@@ -589,3 +586,6 @@ E: Nos dois casos não aparece "Remover Formatação da AGU".
 ### T295 – Linha depois da última pessoa que assina e sem espaço duplo (v0.37.0)
 F: Abra no editor a Solicitação de nota de empenho 3399442 (duas pessoas assinam), clique em "Adicionar as linhas em branco", salve, feche e abra de novo. Repita num Despacho, clicando logo que o aviso aparecer.
 E: Fica uma linha em branco antes do primeiro nome e outra depois de "Ordenador de despesa" (antes do rodapé). Nenhum lugar fica com dois espaços, e ao abrir de novo a extensão não muda nada.
+### T296 – Timbre corrigido não pede para guardar de novo (v0.37.0)
+F: Numa unidade com timbre já guardado em "Minhas unidades", abra no editor um documento com o timbre diferente e clique em "Corrigir timbre".
+E: O botão "Usar este timbre como padrão da unidade" some junto com o de corrigir. Num outro documento, mude o timbre à mão para ficar igual ao guardado e clique em "Usar este timbre como padrão": a extensão diz que ele já é o padrão e não guarda nada.

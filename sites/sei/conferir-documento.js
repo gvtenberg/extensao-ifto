@@ -191,6 +191,7 @@
       return novo
     }
     const faltam = new Set([timbreErrado && 'timbre', rodapeErrado && 'rodape'].filter(Boolean))
+    let botaoDoPadrao = null
     const corrigirParte = (qual, rotulo, pronto) => async elemento => {
       elemento.disabled = true
       elemento.textContent = 'Corrigindo…'
@@ -203,6 +204,8 @@
         return
       }
       elemento.remove()
+      // v0.37.0 (T267): o timbre corrigido é o que já está guardado: o botão de guardá-lo como padrão sai.
+      if (qual === 'timbre' && botaoDoPadrao) botaoDoPadrao.remove()
       faltam.delete(qual)
       if (!faltam.size) caixa.resolver()
       resultadoTexto.className = 'ok'
@@ -212,7 +215,8 @@
     if (rodapeErrado) botao('Corrigir rodapé', corrigirParte('rodape', 'Corrigir rodapé', 'Rodapé corrigido.'))
     // D3: as linhas do setor deste documento passam a ser as da unidade em "Minhas unidades" (com confirmação).
     if (timbreErrado && !(sugestao && sugestao.linhas)) {
-      botao('Usar este timbre como padrão da unidade', async elemento => {
+      botaoDoPadrao = botao('Usar este timbre como padrão da unidade', async elemento => {
+        // No clique lê o documento como está agora (não o da primeira leitura).
         const lido = await caixaEditor.pedirAoFundo('conferirLinhasDoSetor')
         const linhas = (lido && lido.ok && lido.linhas) || []
         if (!linhas.length) {
@@ -220,9 +224,16 @@
           resultadoTexto.textContent = 'Este timbre não tem linhas do setor abaixo de "Campus Palmas".'
           return
         }
-        if (!window.confirm(`Guardar estas linhas como o timbre da unidade ${sigla}?\n\n${linhas.join('\n')}`)) return
         const atuais = await configuracoes.lerConfiguracoes()
         const unidade = regras.acharUnidade(atuais.unidades, sigla) || { sigla }
+        // v0.37.0 (T267): timbre igual ao guardado (a pessoa já o corrigiu): nada a guardar.
+        if (JSON.stringify(unidade.linhas || []) === JSON.stringify(linhas)) {
+          elemento.remove()
+          resultadoTexto.className = 'ok'
+          resultadoTexto.textContent = `Este timbre já é o padrão da unidade ${sigla}.`
+          return
+        }
+        if (!window.confirm(`Guardar estas linhas como o timbre da unidade ${sigla}?\n\n${linhas.join('\n')}`)) return
         atuais.unidades = regras.limparUnidades([...atuais.unidades, { ...unidade, linhas }])
         await configuracoes.gravarConfiguracoes(atuais)
         elemento.remove()
