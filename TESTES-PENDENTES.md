@@ -672,3 +672,7 @@ E: A lista só aparece depois do clique. Fechada no ×, nada muda no texto.
 ### T279 – Documento sem caixas nem números digitados (v0.37.0)
 F: Abra o editor de um Edital ou Despacho comum.
 E: Nenhum dos dois avisos novos aparece; "Corrigir a numeração" dos números longos continua como antes.
+## Tipo do documento externo pela sigla (v0.37.0)
+### T280 – NF e RANFS no começo do nome do arquivo (v0.37.0)
+F: Num processo de teste, arraste para a árvore três arquivos: "NF 123.pdf", "NFS-e 45.pdf" e "RANFS 7 Empresa.pdf" (não precisa incluir; só veja a lista de conferência).
+E: Os dois primeiros vêm com o tipo Nota Fiscal e Nome na Árvore "123" e "45"; o terceiro vem com o tipo Documento e Nome na Árvore "RANFS 7 Empresa".
