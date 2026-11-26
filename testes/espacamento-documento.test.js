@@ -311,3 +311,23 @@ test('linha em branco antes de quem assina, venha o que vier antes', () => {
   dupla.splice(4, 0, bloco(2, 'x', 'IFTO_Assinatura', 'Cargo 1'), bloco(2, 'x', 'IFTO_Assinatura', ''), bloco(2, 'x', 'IFTO_Assinatura', 'BELTRANO'))
   assert.deepEqual(onde(dupla), [['antes', 1]])
 })
+
+// v0.37.0 (Solicitação de nota de empenho 3399442, T249): duas pessoas assinam e o rodapé vem dentro de uma caixa.
+test('linha em branco depois da última pessoa que assina, com o rodapé dentro de uma caixa', () => {
+  posicoes = {}
+  const caixa = { ...bloco(3, 'Rodapé', '', 'Quadra 310 Sul', { tag: 'div' }), classesDentro: ['IFTO_Centralizado_rodape'] }
+  const blocos = [
+    bloco(1, 'Data', 'IFTO_Alin_direita_sem_espaço', 'Palmas, 26 de novembro de 2026.'),
+    bloco(2, 'Nome', 'IFTO_Assinatura', '', { altura: 4.8 }),
+    bloco(2, 'Nome', 'IFTO_Assinatura', 'NOME DO SERVIDOR', { acima: -8 }), bloco(2, 'Nome', 'IFTO_Assinatura', 'Responsável', { acima: -8, abaixo: -8 }),
+    bloco(2, 'Nome', 'IFTO_Assinatura', '', { altura: 4.8 }),
+    bloco(2, 'Nome', 'IFTO_Assinatura', 'NOME DO SERVIDOR', { acima: -8 }), bloco(2, 'Nome', 'IFTO_Assinatura', 'Ordenador de despesa', { acima: -8, abaixo: -8 }),
+    caixa,
+    { ...bloco(4, 'Id Processo', '', '', { tag: 'div' }), outro: true, vazio: false }
+  ]
+  assert.deepEqual(linhasQueFaltam({ blocos }).map(f => [f.onde, f.posicao, f.antes]), [['depois', 6, 'Ordenador de despesa']])
+  // T272: a linha em branco fina (estilo de quem assina, 30%) já conta; o espaço automático não soma outro.
+  const { lacunas } = planejarEspacamento({ blocos, outras: [] })
+  assert.ok(!lacunas.some(l => l.depois === 'NOME DO SERVIDOR'))
+  assert.ok(lacunas.some(l => l.depois === 'Quadra 310 Sul'))
+})

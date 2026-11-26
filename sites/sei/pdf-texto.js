@@ -27,8 +27,9 @@
   // PDF só com imagem (nota escaneada) devolve texto vazio.
   async function textoDoPdf (bytes) {
     if (paginaDoFirefox) {
-      const dados = bytes instanceof Uint8Array ? bytes : new Uint8Array(bytes)
-      const resposta = await navegador.runtime.sendMessage({ tipo: 'lerPdf', bytes: dados })
+      // v0.37.0: vai como texto (base64): os bytes chegavam à parte de fundo presos à página e o pdf.js parava
+      // em "Permission denied to access property constructor" (nenhum PDF do processo abria).
+      const resposta = await navegador.runtime.sendMessage({ tipo: 'lerPdf', base64: ExtensaoIFTO.sicaf.paraBase64(bytes) })
       if (!resposta || typeof resposta.texto !== 'string') throw new Error((resposta && resposta.erro) || 'Sem resposta da extensão.')
       return resposta.texto
     }

@@ -56,6 +56,9 @@
     // v0.22.0: botão "Remover marca MINUTA" no editor dos editais: "automatica" (só na Direção-geral),
     // "sempre" ou "desligada".
     minutaEdital: 'automatica',
+    // v0.37.0: "Remover Formatação da AGU" no editor (riscado, cores, "Justificativa…", comentários):
+    // "automatica" (só na CCL), "sempre" ou "desligada".
+    formatacaoAgu: 'automatica',
     // v0.24.0: no editor do SEI, recortar e colar trecho com tabela sem perder a formatação, e a caixa
     // "Margens" na janela "Propriedades da tabela". Todas as unidades e todos os tipos de documento.
     moverTabelas: true,

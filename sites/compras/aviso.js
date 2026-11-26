@@ -5,6 +5,9 @@
 (function () {
   const dados = globalThis.extensaoIftoAviso || {}
   const anterior = document.querySelector('[data-extensao-ifto="aviso-compras"]')
+  // v0.37.0 (T299): a Área de Trabalho avisa de novo que abriu enquanto a tentativa anterior continua; trocar o
+  // aviso deixava o novo parado em "Abrindo o SICAF…" (a tentativa escrevia no aviso já tirado). Fica o mesmo.
+  if (anterior && dados.modo === 'areaDeTrabalho' && globalThis.extensaoIftoAbrindoSicaf) return
   if (anterior) anterior.remove()
 
   const TEXTOS = {
@@ -45,6 +48,8 @@
   document.documentElement.append(hospedeiro)
 
   const esperar = ms => new Promise(pronto => setTimeout(pronto, ms))
+  // Passos no console (F12), para saber onde parou se o SICAF não abrir.
+  const registrar = passo => console.info('[extensão IFTO] Área de Trabalho:', passo)
   // Tenta várias vezes (as páginas montam os botões aos poucos).
   async function tentar (achar, vezes = 20) {
     for (let vez = 0; vez < vezes; vez++) {
@@ -99,35 +104,61 @@
     // A página pode avisar mais de uma vez que terminou de abrir: só uma tentativa por página.
     if (!globalThis.extensaoIftoAbrindoSicaf) {
       globalThis.extensaoIftoAbrindoSicaf = true
-      // v0.29.3 (T173): vai direto ao endereço do SICAF quando o login termina (o botão com o nome aparece; no
-      // máximo 15 segundos), saindo desta página como um clique, para o SICAF saber de onde a pessoa veio.
-      if (dados.direto) {
-        tentar(() => document.getElementById('avatar-dropdown-trigger'), 30).then(async () => {
-          await esperar(1000)
-          location.assign(dados.direto)
-        })
-        return
-      }
-      // v0.21.6: se o SICAF não abrir em 20 segundos, o aviso diz onde clicar (antes ficava parado em "Abrindo…").
-      abrirSicafPeloMenu().then(async abriu => {
-        if (abriu) await esperar(20000)
-        escrever('menuManual')
-      })
+      peloMenu()
     }
   } else {
     escrever(TEXTOS[dados.modo] ? dados.modo : 'naoAbriu')
   }
 
+  // v0.21.6: se o SICAF não abrir em 20 segundos, o aviso diz onde clicar (antes ficava parado em "Abrindo…").
+  function peloMenu () {
+    abrirSicafPeloMenu().then(async abriu => {
+      if (abriu) await esperar(20000)
+      escrever('menuManual')
+    })
+  }
+
+  // v0.37.0 (T299): o menu pede o endereço do SICAF ao Compras e só depois chama window.open(endereço, '_blank');
+  // como não foi a pessoa que clicou, o navegador barrava essa janela nova. Antes de clicar, a janela nova que a
+  // página pedir vira esta mesma aba (no Firefox, pela função exportada para a página).
+  function janelaNovaNaMesmaAba () {
+    const abrirAqui = url => { if (url) { registrar('abrindo ' + String(url).slice(0, 80)); location.assign(new URL(String(url), location.href).href) } return null }
+    if (window.wrappedJSObject && typeof exportFunction === 'function') window.wrappedJSObject.open = exportFunction(abrirAqui, window)
+    else window.open = abrirAqui
+  }
+
   // Menu do usuário (botão com o nome, no alto à direita) › SICAF.
   async function abrirSicafPeloMenu () {
     const ehSicaf = elemento => /\bSICAF\b/i.test(elemento.textContent || '') && (elemento.textContent || '').trim().length < 120
-    const itemDoSicaf = () => [...document.querySelectorAll('.systems a, .systems button, .system, .dropdown-menu a, .dropdown-menu button')].find(ehSicaf)
-    const menu = await tentar(() => document.getElementById('avatar-dropdown-trigger'))
-    if (!menu) return false
+    // v0.37.0 (T260): qualquer link ou botão do menu aberto com "SICAF" (antes, só algumas classes).
+    const itemDoSicaf = () => [...document.querySelectorAll('.systems a, .systems button, .system, .dropdown-menu a, .dropdown-menu button, [role="menu"] a, [role="menu"] button, [role="menuitem"], a[href*="sicaf" i]')].find(ehSicaf) ||
+      [...document.querySelectorAll('a, button')].find(elemento => ehSicaf(elemento) && elemento.offsetParent)
+    // O botão com o nome só aparece quando o login terminou (até 15 segundos).
+    const menu = await tentar(() => document.getElementById('avatar-dropdown-trigger'), 30)
+    if (!menu) { registrar('botão com o nome não apareceu'); return false }
+    await esperar(1000)
     if (!itemDoSicaf()) menu.click()
-    const item = await tentar(itemDoSicaf, 10)
-    if (!item) return false
-    const clicavel = item.closest('a, button') || item.querySelector('a, button') || item
+    // A lista de sistemas do menu tem rolagem própria: rola aos poucos até o "SICAF" aparecer.
+    const item = await tentar(() => {
+      const achado = itemDoSicaf()
+      const lista = document.querySelector('.systems')
+      if (!achado && lista) lista.scrollTop = lista.scrollTop + lista.clientHeight >= lista.scrollHeight ? 0 : lista.scrollTop + 150
+      if (achado) achado.scrollIntoView({ block: 'nearest' })
+      return achado
+    }, 30)
+    if (!item) { registrar('item SICAF não apareceu no menu'); return false }
+    // O clique vale no próprio item (ou no link/botão em volta dele), não num botão de dentro (ex.: favoritar).
+    const clicavel = item.closest('a, button') || item
+    registrar('clicando em ' + (clicavel.textContent || '').trim().slice(0, 60))
+    // v0.37.0 (T260): o menu abre o SICAF numa janela nova, e o navegador barra janela aberta pela extensão
+    // (não foi a pessoa que clicou): por isso o SICAF não abria. Com o endereço do link, abre na mesma aba;
+    // no Firefox, a janela nova que a página pedir vira a mesma aba.
+    const endereco = clicavel.getAttribute && clicavel.getAttribute('href')
+    if (endereco && !/^(#|javascript:)/i.test(endereco)) {
+      location.assign(new URL(endereco, location.href).href)
+      return true
+    }
+    janelaNovaNaMesmaAba()
     clicavel.click()
     return true
   }

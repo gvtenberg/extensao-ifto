@@ -2,7 +2,7 @@
 
 **Sections**: Setup · Working on a change · Colleague's fork
 
-Project rules: `AGENTS.md`. General programming rules: `docs/claude-regras/regras/programacao.md`.
+Project rules: `AGENTS.md` (they win over your personal rules in this project).
 
 ## Setup
 
@@ -21,11 +21,11 @@ Project rules: `AGENTS.md`. General programming rules: `docs/claude-regras/regra
 Only if `git config user.name` is not `gvtenberg`, or when dealing with the colleague's pull request (18/11/2026).
 
 A colleague works in the fork `dcarvalho89/extensao-ifto` and sends pull requests to `gvtenberg/extensao-ifto`. If it is not you (`git config user.name` is not `gvtenberg`):
-- **General rules:** this repository uses its own copy of the rules (`docs/claude-regras/`, the owner's); do not sync it with your `~/.claude/` (in either direction) and never change `docs/claude-regras/`. Your personal rules stay in your `~/.claude/`; where they differ, `AGENTS.md` and `docs/claude-regras/` win in this project. A rule useful for everyone: write it as a suggestion in the pull request text.
+- **General rules:** your personal rules stay in your `~/.claude/`; where they differ, `AGENTS.md` wins in this project. A rule useful for everyone: write it as a suggestion in the pull request text.
 - **Before opening or updating a pull request** (and again if GitHub says "This branch has conflicts" or "out-of-date"):
   1. `git fetch https://github.com/gvtenberg/extensao-ifto.git master` and `git merge FETCH_HEAD`.
   2. Own new tests renumbered to after the highest `T`/`P` number ever used in master (see the cards too) and moved to the end of `TESTES-PENDENTES.md`; version: one number for the pull request, the next after master's (rule in `AGENTS.md`, "Version and git").
   3. Conflicts: keep both sides' text, then delete every `<<<<<<<`, `=======` and `>>>>>>>` line (`npm test` fails if one is left).
   4. `npm test` and `npm run conferir` must pass; commit and push to the fork.
-- **After pushing:** `gh pr checks <number> --repo gvtenberg/extensao-ifto --watch`. If "assinar" fails: `gh run view <run id> --repo gvtenberg/extensao-ifto --log-failed`, find the "Pull request recusado" lines and explain them to the user in plain words, with the fix (the check `.github/scripts/conferir-pull-request.js` refuses: outdated fork, version out of sequence, reused test number, change to `docs/claude-regras/`).
-- **Owner (gvtenberg):** GitHub blocks the merge until the check is green and the branch is up to date (rule "Merge só com a conferência verde" in Settings > Rules). Do not use "bypass" with a red ✗: ask Claude to fix it. The check lets only the owner's own branches change `docs/claude-regras/`.
+- **After pushing:** `gh pr checks <number> --repo gvtenberg/extensao-ifto --watch`. If "assinar" fails: `gh run view <run id> --repo gvtenberg/extensao-ifto --log-failed`, find the "Pull request recusado" lines and explain them to the user in plain words, with the fix (the check `.github/scripts/conferir-pull-request.js` refuses: outdated fork, version out of sequence, reused test number).
+- **Owner (gvtenberg):** GitHub blocks the merge until the check is green and the branch is up to date (rule "Merge só com a conferência verde" in Settings > Rules). Do not use "bypass" with a red ✗: ask Claude to fix it.

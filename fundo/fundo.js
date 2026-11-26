@@ -77,6 +77,9 @@ function tratarRecado (recado, remetente) {
     // v0.25.0 (spec numeracao-edital): números longos dos itens de edital.
     case 'numeracaoPreparar': return numeracaoNoEditor(remetente, false)
     case 'numeracaoCorrigir': return numeracaoNoEditor(remetente, true)
+    case 'caixasNoEditor': return caixasNoEditor(remetente, recado.acao, recado.dado)
+    // v0.37.0 (spec remover-formatacao-agu).
+    case 'aguNoEditor': return aguNoEditor(remetente, recado.acao, recado.dado)
     // v0.26.11 (spec conferir-documento, etapa 7): espaço entre as partes do documento.
     case 'estilosPreparar': return estilosNoEditor(remetente, recado.aprendidos)
     // v0.29.2 (R7): opção desligada: o documento já tem o bloco dos estilos extras?
@@ -96,7 +99,7 @@ function tratarRecado (recado, remetente) {
     // v0.26.5 (D3): linhas do setor do timbre aberto no editor, para "Usar este timbre como padrão da unidade".
     case 'conferirLinhasDoSetor': return rodarNoEditor(remetente)(globalThis.ExtensaoIFTO.editorLer).then(lido => lido.ok ? { ok: true, linhas: globalThis.ExtensaoIFTO.conferirDocumento.linhasDoSetor(lido.secoes) } : lido)
     // v0.17.5: texto de um PDF pedido pela página do SEI (no Firefox o pdf.js só funciona aqui).
-    case 'lerPdf': return globalThis.ExtensaoIFTO.pdfTexto ? globalThis.ExtensaoIFTO.pdfTexto.textoDoPdf(recado.bytes).then(texto => ({ texto })) : Promise.resolve({ erro: 'Leitura de PDF indisponível.' })
+    case 'lerPdf': return globalThis.ExtensaoIFTO.pdfTexto ? globalThis.ExtensaoIFTO.pdfTexto.textoDoPdf(recado.base64 ? globalThis.ExtensaoIFTO.sicaf.deBase64(recado.base64) : recado.bytes).then(texto => ({ texto })) : Promise.resolve({ erro: 'Leitura de PDF indisponível.' })
   }
 }
 
@@ -223,11 +226,12 @@ async function fecharAbaDaBusca (tarefa) {
   try { if (tarefa.idAbaSicaf != null) await navegador.tabs.remove(tarefa.idAbaSicaf) } catch (erro) { /* aba já fechada */ }
   try { await navegador.tabs.update(tarefa.idAbaSei, { active: true }) } catch (erro) { /* aba já fechada */ }
 }
-// Mostra a aba do SEI e a janela dela (a aba pode já ter sido fechada).
+// Mostra a aba do SEI dentro da janela dela (a aba pode já ter sido fechada).
+// v0.37.0 (T260, dois monitores): não traz mais a janela para a frente. Isso tirava o foco de onde a pessoa
+// estava digitando, no outro monitor; a aba fica pronta na janela do SEI, esperando a pessoa voltar.
 async function trazerAbaParaFrente (idDaAba) {
   try {
-    const aba = await navegador.tabs.update(idDaAba, { active: true })
-    if (aba && aba.windowId !== undefined) await navegador.windows.update(aba.windowId, { focused: true })
+    await navegador.tabs.update(idDaAba, { active: true })
   } catch (erro) {
     // Aba ou janela já fechada pela pessoa: nada a fazer.
   }
@@ -249,8 +253,10 @@ navegador.tabs.onRemoved.addListener(async idDaAba => {
 // v0.29.3 (T173): a Área de Trabalho é uma página que troca de endereço sem recarregar; a troca de endereço
 // também conta (só para ela), e a aba é tratada uma vez só até sair da Área de Trabalho.
 const areaEmAndamento = new Set()
+// v0.37.0: quando cada aba saiu da Área de Trabalho (para reconhecer a página de entrada do SICAF).
+const saiuDaArea = new Map()
 navegador.tabs.onUpdated.addListener(async (idDaAba, mudanca, aba) => {
-  if (mudanca.url && regras.paginaDoCompras(mudanca.url) !== 'areaDeTrabalho') areaEmAndamento.delete(idDaAba)
+  if (mudanca.url && regras.paginaDoCompras(mudanca.url) !== 'areaDeTrabalho' && areaEmAndamento.delete(idDaAba)) saiuDaArea.set(idDaAba, Date.now())
   if (!aba.url) return
   if (mudanca.status !== 'complete' && !(mudanca.url && regras.paginaDoCompras(mudanca.url) === 'areaDeTrabalho')) return
   if (simples.ehSiteDoSimples(aba.url)) {
@@ -277,6 +283,12 @@ navegador.tabs.onUpdated.addListener(async (idDaAba, mudanca, aba) => {
   // v0.17.3: sem login, vai à entrada do Compras e clica em "Entrar com Gov.br" (uma vez). Depois do login,
   // abre o SICAF pelo menu da Área de Trabalho (o endereço direto dá "Sessão expirada"). Cada passo tem
   // limite de vezes, para não ficar dando voltas; aí o aviso pede o passo à pessoa.
+  // v0.37.0 (T299): até 60 segundos depois do clique no menu da Área de Trabalho, uma página pública do SICAF
+  // pode ser a de entrada (ainda preparando a sessão): espera nela em vez de voltar ao login.
+  if (pagina === 'sicafPublico' && Date.now() - (saiuDaArea.get(idDaAba) || 0) < 60000) {
+    await injetar(idDaAba, ['comum/sei.js', 'comum/sicaf.js', 'sites/sicaf/consulta.js'])
+    return
+  }
   if (pagina === 'acessoNegado' || pagina === 'sicafPublico') {
     if (!tarefa.foiAoLogin) {
       tarefa.foiAoLogin = true
@@ -310,15 +322,14 @@ navegador.tabs.onUpdated.addListener(async (idDaAba, mudanca, aba) => {
     // de entrar antes de ir ao SICAF, e tenta direto duas vezes antes do menu.
     // v0.29.3 (T173, 3º pedido): a própria página abre o endereço do SICAF (como um clique nela) só depois de
     // o login terminar (aparece o botão com o nome da pessoa); antes ia por fora, com tempo fixo de 3 segundos.
+    // v0.37.0 (T299, decidido com o usuário em 26/11/2026): o SICAF só aceita a entrada pelo menu da Área de
+    // Trabalho: o botão "SICAF" pede ao Compras um endereço de entrada de uso único e o abre numa aba nova. A
+    // extensão clica nesse botão (a própria página faz os pedidos; a extensão não mexe no login) e o endereço
+    // abre na mesma aba. Ir direto ao endereço do SICAF dava "Sessão expirada".
     if (areaEmAndamento.has(idDaAba)) return
     areaEmAndamento.add(idDaAba)
-    if ((tarefa.idasDiretoAoSicaf || 0) < 2) {
-      tarefa.idasDiretoAoSicaf = (tarefa.idasDiretoAoSicaf || 0) + 1
-      await gravarTarefa(tarefa)
-      await injetar(idDaAba, ['sites/compras/aviso.js'], { modo: 'areaDeTrabalho', direto: regras.URL_INICIO_SICAF })
-    } else {
-      await injetar(idDaAba, ['sites/compras/aviso.js'], { modo: 'areaDeTrabalho' })
-    }
+    // Página ainda carregando e o navegador recusou: tenta de novo quando ela terminar de abrir.
+    if (!(await injetar(idDaAba, ['sites/compras/aviso.js'], { modo: 'areaDeTrabalho' }))) areaEmAndamento.delete(idDaAba)
   } else {
     await injetar(idDaAba, ['comum/sei.js', 'comum/sicaf.js', 'sites/sicaf/consulta.js'])
   }
@@ -329,8 +340,11 @@ async function injetar (idDaAba, arquivos, dados) {
   try {
     if (dados) await navegador.scripting.executeScript({ target: { tabId: idDaAba }, func: valor => { globalThis.extensaoIftoAviso = valor }, args: [dados] })
     await navegador.scripting.executeScript({ target: { tabId: idDaAba }, files: arquivos })
+    return true
   } catch (erro) {
     // Página fechada ou sem permissão: a busca continua quando a aba voltar ao SICAF.
+    console.warn('Extensão IFTO: não consegui pôr o aviso na página', erro && erro.message)
+    return false
   }
 }
 
@@ -338,7 +352,8 @@ async function injetar (idDaAba, arquivos, dados) {
 async function qualCnpj (aba) {
   const tarefa = await lerTarefa()
   if (!tarefa || !aba || aba.id !== tarefa.idAbaSicaf || tarefa.posicao >= tarefa.faltam.length) return { fim: true }
-  return { cnpj: tarefa.faltam[tarefa.posicao], pesquisado: tarefa.pesquisado, posicao: tarefa.posicao, total: tarefa.faltam.length }
+  // v0.37.0: espera na página de entrada do SICAF: 3 segundos, mais 3 a cada "Sessão expirada" anterior.
+  return { cnpj: tarefa.faltam[tarefa.posicao], pesquisado: tarefa.pesquisado, posicao: tarefa.posicao, total: tarefa.faltam.length, esperaEntrada: 3 + 3 * (tarefa.idasAreaDeTrabalho || 0) }
 }
 async function marcarPesquisa (cnpj) {
   const tarefa = await lerTarefa()
@@ -519,7 +534,10 @@ async function abrirEditor ({ urlEditor, idDocumento, html }, abaSei) {
   try { endereco = new URL(urlEditor) } catch (erro) { return { erro: 'endereço do editor inválido' } }
   if (endereco.hostname !== 'sei.ifto.edu.br' || endereco.searchParams.get('acao') !== 'editor_montar') return { erro: 'endereço do editor inválido' }
   if (!abaSei || typeof html !== 'string' || !html) return { erro: 'pedido incompleto' }
-  const janela = await navegador.windows.create({ url: endereco.href, type: 'popup', width: 1100, height: 820 })
+  // v0.37.0 (T260): a janela do editor abre sem tirar o foco de onde a pessoa está (navegador que não aceita
+  // "focused: false" abre do jeito de antes).
+  const opcoesDaJanela = { url: endereco.href, type: 'popup', width: 1100, height: 820 }
+  const janela = await navegador.windows.create({ ...opcoesDaJanela, focused: false }).catch(() => navegador.windows.create(opcoesDaJanela))
   const idAba = janela.tabs && janela.tabs[0] ? janela.tabs[0].id : null
   const tarefa = { idAbaSei: abaSei.id, idJanela: janela.id, idAba, idDocumento: String(idDocumento || ''), html, estado: 'abrindo', inicio: Date.now() }
   await navegador.storage.local.set({ [CHAVE_EDITOR]: tarefa })
@@ -587,6 +605,51 @@ async function numeracaoNoEditor (remetente, corrigir) {
   const alvo = { tabId: remetente.tab.id, frameIds: [remetente.frameId || 0] }
   if (!corrigir) await navegador.scripting.executeScript({ target: alvo, world: 'MAIN', files: ['comum/numeracao-edital.js', 'sites/sei/editor-numeracao.js'] })
   return rodarNoEditor(remetente)(fazer => fazer ? globalThis.ExtensaoIFTO.editorNumeracao.corrigir() : globalThis.ExtensaoIFTO.editorNumeracao.preparar(), [corrigir])
+}
+
+// v0.37.0 (spec numeracao-caixas-ocultas): põe na página do editor (world MAIN) as regras e o código das caixas
+// escondidas e dos números digitados (reusa acharEditor da numeração). "preparar" procura e fica de olho nas
+// mudanças; "tirar", "listar", "ir" e "converter" só com o clique da pessoa. Nunca salva.
+async function caixasNoEditor (remetente, acao, dado) {
+  const alvo = { tabId: remetente.tab.id, frameIds: [remetente.frameId || 0] }
+  if (acao === 'preparar') {
+    const [temNumeracao] = await navegador.scripting.executeScript({ target: alvo, world: 'MAIN', func: () => Boolean(globalThis.ExtensaoIFTO && globalThis.ExtensaoIFTO.editorNumeracao) })
+    const arquivos = ['comum/numeracao-digitada.js', 'sites/sei/editor-caixas.js']
+    if (!(temNumeracao && temNumeracao.result)) arquivos.unshift('sites/sei/editor-numeracao.js')
+    await navegador.scripting.executeScript({ target: alvo, world: 'MAIN', files: arquivos })
+  }
+  const acoes = ['preparar', 'tirar', 'listar', 'ir', 'converter']
+  if (!acoes.includes(acao)) return { ok: false, erro: 'Pedido desconhecido.' }
+  return rodarNoEditor(remetente)((qual, valor) => {
+    const caixas = globalThis.ExtensaoIFTO && globalThis.ExtensaoIFTO.editorCaixas
+    if (!caixas) return { ok: false, erro: 'A extensão ainda não estava pronta no editor. Feche o editor e abra de novo.' }
+    const mapa = { preparar: () => caixas.preparar(), tirar: () => caixas.tirar(), listar: () => caixas.listar(), ir: () => caixas.irPara(valor), converter: () => caixas.converter(valor) }
+    return mapa[qual]()
+  }, [acao, dado === undefined ? null : dado])
+}
+
+// v0.37.0 (spec remover-formatacao-agu): põe na página do editor (world MAIN) as regras e o código das marcas
+// da AGU (reusa acharEditor da numeração e o destaque e as partes editáveis das caixas escondidas, sem carregar de
+// novo o que já está lá). "preparar" procura e fica de olho nas mudanças; "listar", "ir" e "remover" só com o
+// clique da pessoa. Nunca salva.
+async function aguNoEditor (remetente, acao, dado) {
+  const alvo = { tabId: remetente.tab.id, frameIds: [remetente.frameId || 0] }
+  if (acao === 'preparar') {
+    const [ja] = await navegador.scripting.executeScript({ target: alvo, world: 'MAIN', func: () => { const e = globalThis.ExtensaoIFTO || {}; return { numeracao: Boolean(e.editorNumeracao), caixas: Boolean(e.editorCaixas && e.editorCaixas.destacar) } } })
+    const tem = (ja && ja.result) || {}
+    const arquivos = ['comum/formatacao-agu.js', 'sites/sei/editor-agu.js']
+    if (!tem.caixas) arquivos.unshift('comum/numeracao-digitada.js', 'sites/sei/editor-caixas.js')
+    if (!tem.numeracao) arquivos.unshift('sites/sei/editor-numeracao.js')
+    await navegador.scripting.executeScript({ target: alvo, world: 'MAIN', files: arquivos })
+  }
+  const acoes = ['preparar', 'listar', 'ir', 'remover']
+  if (!acoes.includes(acao)) return { ok: false, erro: 'Pedido desconhecido.' }
+  return rodarNoEditor(remetente)((qual, valor) => {
+    const agu = globalThis.ExtensaoIFTO && globalThis.ExtensaoIFTO.editorAgu
+    if (!agu) return { ok: false, erro: 'A extensão ainda não estava pronta no editor. Feche o editor e abra de novo.' }
+    const mapa = { preparar: () => agu.preparar(), listar: () => agu.listar(), ir: () => agu.irPara(valor), remover: () => agu.remover(valor) }
+    return mapa[qual]()
+  }, [acao, dado === undefined ? null : dado])
 }
 
 // v0.29.0 (spec todos-os-estilos): põe na página do editor (world MAIN) as regras e o código dos estilos extras

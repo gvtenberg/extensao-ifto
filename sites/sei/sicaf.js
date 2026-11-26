@@ -68,7 +68,8 @@
       aviso.textContent = 'CNPJ ' + regras.formatarCnpj(achado.cnpj) + ' conferido.'
       return achado.cnpj
     }
-    campo.addEventListener('input', conferirCampo)
+    // v0.37.0 (T271): a extensão põe pontos, barra e hífen enquanto a pessoa digita.
+    campo.addEventListener('input', () => { campo.value = regras.mascaraCnpj(campo.value); conferirCampo() })
     const aberta = janela.abrir({
       titulo: TITULOS[quais],
       conteudo: [criar('label', {}, ['CNPJ do fornecedor (digite ou cole)', campo]), aviso],
@@ -87,7 +88,7 @@
   // v0.18.2: com um processo aberto, confere antes o que já está nele (Sicaf e Consulta deste CNPJ).
   async function buscarCnpj (cnpj, aberta, quais) {
     const grupo = { cnpj, nome: '', notas: [], precisaSicaf: quais !== 'simples', precisaSimples: quais !== 'sicaf' }
-    const lida = quadroArvore ? seiPedidos.arvoreAberta() : null
+    const lida = await arvoreDoTrecho()
     if (lida) {
       aberta.trocarConteudo([criar('p', { textContent: 'Conferindo o que já está no processo…' })])
       const existentes = await jaNoProcesso(lida)
@@ -267,7 +268,7 @@
   // Sicaf (etapa 6). Nada é escrito no SEI antes do clique em "Incluir no processo".
   async function mostrarResultadoDoSicaf (fornecedores, pedido) {
     const quais = (pedido && pedido.quais) || (regras.ehCgoc(unidade) ? 'tudo' : 'sicaf')
-    const lida = quadroArvore ? seiPedidos.arvoreAberta() : null
+    const lida = await arvoreDoTrecho()
     // CNPJ escolhido na CGOC: as notas pendentes desse fornecedor ganham o Anexo.
     if (quais === 'tudo' && lida && !(pedido && pedido.resultado)) {
       try {
@@ -285,6 +286,16 @@
     for (const fornecedor of fornecedores) {
       fornecedor.jaTemSicaf = Boolean(existentes && existentes.cnpjsComSicaf.has(fornecedor.cnpj))
       fornecedor.jaTemConsulta = Boolean(existentes && existentes.raizesComConsulta.has(regras.raizDoCnpj(fornecedor.cnpj)))
+      // v0.37.0: Sicaf/Consulta cujo PDF não abriu, com o nome deste fornecedor na árvore, também conta.
+      if (existentes && existentes.naoLidos.length) {
+        const nomes = [fornecedor.nomeNoSicaf, fornecedor.nomeNoSimples, fornecedor.nome, ...(fornecedor.notas || []).map(nota => nota.fornecedor)].filter(Boolean)
+        const doNome = docs => docs.filter(doc => nomes.some(nome => regras.nomesParecidos(nome, regras.nomeDoDocumento(doc.rotulo))))
+        const sicafs = doNome(existentes.naoLidos.filter(doc => existentes.inicial.sicafs.includes(doc)))
+        const consultas = doNome(existentes.naoLidos.filter(doc => existentes.inicial.consultas.includes(doc)))
+        if (sicafs.length) fornecedor.jaTemSicaf = true
+        if (consultas.length) fornecedor.jaTemConsulta = true
+        for (const doc of [...sicafs, ...consultas]) existentes.peloNome.add(doc.id)
+      }
       fornecedor.temPdf = Boolean(fornecedor.bytes) && !fornecedor.jaTemSicaf
       fornecedor.temSimples = Boolean(fornecedor.simplesBytes) && !fornecedor.jaTemConsulta
       // v0.18.6 (spec sicaf-em-branco): Sicaf/Consulta sem PDF já no processo, deste fornecedor.
@@ -335,7 +346,11 @@
       ])
     })
     // Sicaf ou Consulta do processo que não abriu: não dá para saber de quem é; a pessoa confere.
-    if (naoLidos.length) cartoes.push(criar('p', { className: 'aviso amarelo', textContent: 'Não consegui abrir ' + naoLidos.map(doc => doc.rotulo).join(', ') + ' para ver de qual fornecedor é. Confira na árvore antes de incluir.' }))
+    // v0.37.0: o que foi contado pelo nome ganha um aviso próprio.
+    const contados = naoLidos.filter(doc => existentes.peloNome.has(doc.id))
+    const semDono = naoLidos.filter(doc => !existentes.peloNome.has(doc.id))
+    if (contados.length) cartoes.push(criar('p', { className: 'aviso amarelo', textContent: 'Não consegui abrir ' + contados.map(doc => doc.rotulo).join(', ') + '. Pelo nome na árvore, contei como já incluído para este fornecedor. Confira na árvore.' }))
+    if (semDono.length) cartoes.push(criar('p', { className: 'aviso amarelo', textContent: 'Não consegui abrir ' + semDono.map(doc => doc.rotulo).join(', ') + ' para ver de qual fornecedor é. Confira na árvore antes de incluir.' }))
     const botoesDeFechar = [{ texto: 'Fechar', tipo: 'principal', aoClicar: j => j.fechar() }]
     if (!lida) {
       janela.abrir({ titulo: TITULOS[quais], conteudo: [...cartoes, criar('p', { className: 'apoio', textContent: 'Para incluir no SEI, abra o processo e clique de novo.' })], botoes: botoesDeFechar })
@@ -410,6 +425,21 @@
     return null
   })
 
+  // v0.37.0: processo longo vem em pastas e só a última fica aberta; sem Folha à vista, o trecho pendente pode
+  // começar numa pasta fechada (notas 9852 e 9853 do 23236.017252/2025-76 ficavam de fora). Lê então a árvore
+  // com todas as pastas abertas (só leitura), uma vez por árvore; se o SEI não responder, fica a aberta.
+  let ultimaCompleta = null
+  async function arvoreDoTrecho () {
+    const lida = quadroArvore ? seiPedidos.arvoreAberta() : null
+    if (!lida || !lida.linkAbrirPastas || lida.documentos.some(doc => regras.tipoNaArvore(doc.rotulo) === 'folha')) return lida
+    const chave = lida.idProcesso + ':' + lida.documentos.map(doc => doc.id).join(',')
+    if (!ultimaCompleta || ultimaCompleta.chave !== chave) {
+      ultimaCompleta = { chave, leitura: ExtensaoIFTO.menuDocumento.arvoreCompleta(lida).then(completa => completa.documentos) }
+      ultimaCompleta.leitura.catch(erro => { console.warn('[extensão IFTO] Não consegui abrir as pastas da árvore:', erro && erro.message); ultimaCompleta = null })
+    }
+    try { return { ...lida, documentos: await ultimaCompleta.leitura } } catch (erro) { return lida }
+  }
+
   // v0.18.2: Sicaf e Consulta com arquivo depois da última Folha, com os CNPJs de dentro de cada PDF.
   // Usado no aviso, no clique, no CNPJ selecionado e de novo logo antes de incluir.
   async function jaNoProcesso (lida) {
@@ -419,6 +449,26 @@
     const naoLidos = []
     for (const doc of inicial.sicafs) { const cnpjs = await cnpjsDoDocumento(doc); if (cnpjs) cnpjsDosSicafs[doc.id] = cnpjs; else naoLidos.push(doc) }
     for (const doc of inicial.consultas) { const cnpjs = await cnpjsDoDocumento(doc); if (cnpjs) cnpjsDasConsultas[doc.id] = cnpjs; else naoLidos.push(doc) }
+    // v0.37.0 (decidido em 26/11/2026): PDF que não abriu conta pelo nome na árvore (nota, ateste ou texto da nota).
+    const peloNome = new Set()
+    if (naoLidos.length) {
+      const atestes = {}
+      for (const doc of inicial.atestes) atestes[doc.id] = await lerAteste(doc)
+      const cnpjsDasNotas = {}
+      const textosDasNotas = {}
+      for (const nota of inicial.notas) {
+        textosDasNotas[nota.id] = await textoDoDocumento(nota).catch(() => '')
+        cnpjsDasNotas[nota.id] = regras.cnpjsDaNota(textosDasNotas[nota.id])
+      }
+      const { notas } = regras.situacaoDoProcesso(lida.documentos, { atestes })
+      for (const doc of naoLidos) {
+        const cnpjs = regras.cnpjsPeloNome(doc, notas, { cnpjsDasNotas, textosDasNotas })
+        if (!cnpjs.length) continue
+        peloNome.add(doc.id)
+        if (inicial.sicafs.includes(doc)) cnpjsDosSicafs[doc.id] = cnpjs
+        else cnpjsDasConsultas[doc.id] = cnpjs
+      }
+    }
     // v0.18.6: Sicaf/Consulta sem PDF e com nome, em toda a árvore, com os CNPJs do vizinho que tem PDF.
     const nomeados = regras.semPdfNomeados(lida.documentos)
     const cnpjsDosVizinhos = { ...cnpjsDosSicafs, ...cnpjsDasConsultas }
@@ -430,6 +480,7 @@
       cnpjsDosSicafs,
       cnpjsDasConsultas,
       naoLidos,
+      peloNome,
       cnpjsComSicaf: new Set(Object.values(cnpjsDosSicafs).flat()),
       raizesComConsulta: new Set(Object.values(cnpjsDasConsultas).flat().map(regras.raizDoCnpj))
     }
@@ -437,7 +488,7 @@
 
   // Situação do processo aberto: notas pendentes e o que já existe depois da última Folha.
   async function analisar () {
-    const lida = seiPedidos.arvoreAberta()
+    const lida = await arvoreDoTrecho()
     if (!lida) return null
     const existentes = await jaNoProcesso(lida)
     const { inicial, cnpjsDosSicafs, cnpjsDasConsultas, cnpjsComSicaf, raizesComConsulta, naoLidos, nomeados } = existentes
@@ -462,7 +513,7 @@
     avisarSemPdf(resultado ? resultado.nomeados.filter(achado => achado.antesDaFolha) : [])
     const pendentes = resultado ? resultado.situacao.pendentes : []
     if (!pendentes.length) { barra.mostrar(ID, false); return }
-    escreverNoBotao(regras.textoDoAviso(pendentes.length) + ' – Buscar')
+    escreverNoBotao(regras.textoDoAviso(pendentes) + ' – Buscar')
     botao.title = 'Notas fiscais depois da última Folha de Encaminhamento sem SICAF ou Simples Nacional:\n' +
       pendentes.map(nota => `Nota ${nota.numero || '?'} – ${nota.fornecedor || 'fornecedor não identificado'}`).join('\n')
     barra.mostrar(ID, true)
@@ -532,13 +583,12 @@
   function janelaDasNotas (notas, resultado) {
     // v0.29.3 (T160, T173): a caixa de marcar aparece sempre, até com uma nota só, para ficar claro que dá
     // para tirar uma nota da busca.
-    const escolher = notas.length > 1
     for (const nota of notas) if (nota.marcada === undefined) nota.marcada = true
     const marcadas = () => notas.filter(nota => nota.marcada)
     const alerta = criar('p', { className: 'aviso vermelho', hidden: true, textContent: 'Há diferenças em vermelho. Confira a nota e o ateste antes de continuar.' })
     let confirmouVermelho = false
     let aberta = null
-    const textoDoBotao = () => escolher ? `${BUSCAR.tudo} (${marcadas().length} de ${notas.length})` : BUSCAR.tudo
+    const textoDoBotao = () => marcadas().length ? regras.textoDaBusca(marcadas()) : BUSCAR.tudo
     const aoMarcar = () => {
       confirmouVermelho = false
       alerta.hidden = true
@@ -547,7 +597,7 @@
     }
     const cartoes = notas.map(nota => cartaoDaNota(nota, resultado, aoMarcar))
     aberta = janela.abrir({
-      titulo: regras.textoDoAviso(notas.length),
+      titulo: regras.textoDoAviso(notas),
       conteudo: [
         criar('p', { className: 'apoio', textContent: 'Notas depois da última Folha de Encaminhamento, conferidas com o ateste. Desmarque a nota que não deve entrar na busca (por exemplo, uma nota cancelada).' }),
         ...cartoes,
@@ -618,6 +668,7 @@
         return criar('label', { className: 'escolha' }, [marca, `${regras.formatarCnpj(cnpj)} (${origem})`])
       })
       outro.addEventListener('input', () => {
+        outro.value = regras.mascaraCnpj(outro.value)
         const achado = regras.cnpjDaSelecao(outro.value)
         nota.cnpjEscolhido = achado && achado.valido ? achado.cnpj : null
         for (const marca of opcoes.map(rotulo => rotulo.firstChild)) marca.checked = false

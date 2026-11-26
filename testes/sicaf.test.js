@@ -33,6 +33,8 @@ test('funcaoLigada: automática só na CGOC', () => {
 test('tipo, número SEI e nota pelo nome na árvore', () => {
   assert.equal(sicaf.tipoNaArvore('Nota fiscal nº 063 CHC SOLUÇOES EM SERV. E COM. LTDA (3375105)'), 'nota')
   assert.equal(sicaf.tipoNaArvore('Ateste Fatura Materiais 3375107'), 'ateste')
+  assert.equal(sicaf.tipoNaArvore('Fatura 1234 EMPRESA LTDA (3400001)'), 'nota') // v0.37.0
+  assert.deepEqual(sicaf.lerRotuloDaNota('Fatura nº 1234 EMPRESA LTDA (3400001)'), { numero: '1234', fornecedor: 'EMPRESA LTDA' })
   assert.equal(sicaf.tipoNaArvore('Folha de Encaminhamento 269 (3376800)'), 'folha')
   assert.equal(sicaf.tipoNaArvore('Sicaf CHC SOLUCOES (3376789)'), 'sicaf')
   assert.equal(sicaf.tipoNaArvore('E-mail 3374972'), null)
@@ -88,6 +90,11 @@ test('situação: só depois da última Folha; Sicaf com o CNPJ no PDF; Anexo pe
   assert.deepEqual(situacao.sicafs.map(doc => doc.id), ['9'])
   assert.equal(sicaf.textoDoAviso(1), '1 nota sem SICAF ou Simples')
   assert.equal(sicaf.textoDoAviso(2), '2 notas sem SICAF ou Simples')
+  // v0.37.0: uma busca por empresa
+  assert.equal(sicaf.textoDoAviso([{ cnpj: '1' }, { cnpj: '1' }]), '1 empresa sem SICAF ou Simples (2 notas)')
+  assert.equal(sicaf.textoDoAviso([{ cnpj: '1' }, { cnpjNota: '2' }]), '2 empresas sem SICAF ou Simples')
+  assert.equal(sicaf.textoDaBusca([{ cnpjEscolhido: '07783734000133' }, { cnpjEscolhido: '07783734000133' }]), 'Buscar SICAF e Simples de 1 empresa (2 notas)')
+  assert.equal(sicaf.textoDaBusca([{ cnpjEscolhido: '1' }]), 'Buscar SICAF e Simples de 1 empresa (1 nota)')
   // Sem ateste: a nota fica pendente (o CNPJ vem do PDF da nota, na etapa 3).
   assert.equal(sicaf.situacaoDoProcesso(arvoreExemplo).pendentes.length, 2)
 })
@@ -235,6 +242,7 @@ test('manifest: acesso opcional ao Compras, ao Simples Nacional e ao Compras IFT
 test('nomes na árvore: até 50 letras, sem cortar palavra', () => {
   assert.equal(sicaf.nomeDoSicaf('HM COMERCIO IMPORTACAO E EXPORTACAO LTDA.'), 'HM COMERCIO IMPORTACAO E EXPORTACAO LTDA')
   assert.equal(sicaf.nomeDoAnexo('63', 'CHC Soluções'), 'Instrumento de Cobrança NF nº 63 CHC Soluções')
+  assert.equal(sicaf.nomeDoAnexo('12', 'CHC', 'Fatura nº 12 CHC (3400001)'), 'Instrumento de Cobrança Fatura nº 12 CHC') // v0.37.0
   const longo = sicaf.nomeDoAnexo('63', 'CHC SOLUÇOES EM SERV. E COM. LTDA')
   assert.equal(longo, 'Instrumento de Cobrança NF nº 63 CHC SOLUÇOES EM')
   assert.ok(longo.length <= 50)
@@ -430,4 +438,26 @@ test('pular antes da busca: o site não abre e cada CNPJ fica com o motivo', () 
   assert.equal(semSimples.fase, 'sicaf')
   assert.deepEqual(semSimples.simplesFaltam, [])
   assert.deepEqual(Object.keys(semSimples.simplesErros), ['1', '2'])
+})
+
+// v0.37.0 (T271): máscara do CNPJ enquanto a pessoa digita.
+test('máscara do CNPJ ao digitar', () => {
+  const { mascaraCnpj } = require('../comum/sicaf.js')
+  assert.equal(mascaraCnpj('07783734000133'), '07.783.734/0001-33')
+  assert.equal(mascaraCnpj('0778373400'), '07.783.734/00')
+  assert.equal(mascaraCnpj('07.783.734/0001-33'), '07.783.734/0001-33')
+  assert.equal(mascaraCnpj('077'), '07.7')
+  assert.equal(mascaraCnpj('CNPJ: 07.783.734/0001-33'), 'CNPJ: 07.783.734/0001-33')
+  assert.equal(mascaraCnpj(''), '')
+})
+test('cnpjsPeloNome: PDF que não abriu conta pelo nome da nota, do ateste ou do texto da nota (v0.37.0)', () => {
+  const sicafDoc = { id: '9', rotulo: 'Sicaf RG SEGURANCA E VIGILANCIA LTDA (3400098)' }
+  const nota = { id: '1', fornecedor: '-1238 Outubro/2026', cnpj: null, ateste: null }
+  const textos = { 1: 'PRESTADOR RG SEGURANCA E VIGILANCIA LTDA CNPJ 13.019.295/0002-70' }
+  assert.deepEqual(sicaf.cnpjsPeloNome(sicafDoc, [nota], { cnpjsDasNotas: { 1: ['13019295000270'] }, textosDasNotas: textos }), ['13019295000270'])
+  const comAteste = { ...nota, cnpj: '13019295000270', ateste: { empresa: 'RG SEGURANÇA E VIGILÂNCIA', cnpj: '13019295000270' } }
+  assert.deepEqual(sicaf.cnpjsPeloNome(sicafDoc, [comAteste]), ['13019295000270'])
+  assert.deepEqual(sicaf.cnpjsPeloNome(sicafDoc, [nota], { textosDasNotas: { 1: 'OUTRA EMPRESA QUALQUER' } }), [])
+  assert.deepEqual(sicaf.cnpjsPeloNome({ id: '8', rotulo: 'Sicaf (3400100)' }, [comAteste]), [])
+  assert.equal(sicaf.nomeDoDocumento('Consulta Simples Nacional RG SEGURANCA LTDA (3400099)'), 'RG SEGURANCA LTDA')
 })

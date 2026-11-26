@@ -176,8 +176,8 @@
           </label>
           <label class="opcao">
             <input type="checkbox" id="numeracaoEdital">
-            <span>Números longos nos itens de edital
-              <span class="dica">Botão "Corrigir a numeração" quando o texto de um item vai para a linha de baixo (como "10.10.").</span></span>
+            <span>Numeração dos itens
+              <span class="dica">Botão "Corrigir a numeração" quando o texto de um item vai para a linha de baixo (como "10.10."). Também avisa quando o texto está em caixas escondidas do modelo antigo (a numeração sai "3.3" em vez de "3.1") e quando o número foi digitado à mão.</span></span>
           </label>
           <label class="opcao">
             <input type="checkbox" id="todosOsEstilos">
@@ -299,7 +299,7 @@
           </div>
           <label class="opcao"><input type="checkbox" id="direcaoAtribuir"><span>Atribuir o processo a quem está assinando
             <span class="dica">Desligada no início. Ligada, a extensão muda a atribuição do processo no SEI assim que você adiciona um documento dele à lista; esse clique é a confirmação. Se o processo estiver com outra pessoa, ela pergunta antes. Só funciona para a chefia de gabinete registrada acima (quem substitui a chefia registra a própria matrícula no seu navegador); para as outras pessoas, a opção não faz nada. Para isso, a extensão lê a tela "Atribuir Processo" do SEI e guarda só quem estava com o processo, para poder devolver. Desligada, a lista funciona do mesmo jeito e você atribui pelo SEI.</span></span></label>
-          <label class="opcao"><input type="checkbox" id="direcaoApagar"><span>Apagar sozinha as listas enviadas antigas
+          <label class="opcao"><input type="checkbox" id="direcaoApagar"><span>Apagar automaticamente as listas enviadas antigas
             <span class="dica">Desligada, as listas enviadas ficam guardadas. Se você usa as listas no relatório do mês, escolha um prazo que passe do dia 10 do mês seguinte.</span></span></label>
           <label class="campo">Apagar depois de quantos dias<input type="number" min="1" step="1" data-config="direcaoApagarDias"></label>
         </div>
@@ -317,46 +317,55 @@
         <h2>SICAF e Simples Nacional</h2>
         <div class="cartao">
           <!-- v0.26.10 (pedido de 19/11/2026, T62): texto mais claro; cada opção diz para quem é. -->
-          <label class="opcao"><input type="radio" name="incluirSicaf" value="automatica"><span><strong>Automática</strong> – para a CGOC (pagamento de notas fiscais). Na CGOC, com um processo aberto, aparece o botão "2 notas sem SICAF ou Simples – Buscar" quando há notas fiscais sem SICAF: ele busca o SICAF e o Simples Nacional de cada empresa e, depois que você confirma, inclui os documentos no processo. Ao selecionar um CNPJ, aparece "Incluir SICAF, Simples e Anexo". Nas outras unidades, nada aparece.</span></label>
-          <label class="opcao"><input type="radio" name="incluirSicaf" value="sempre"><span><strong>Sempre ligada</strong> – para as outras unidades (por exemplo, a licitação), sem precisar de nota fiscal. Em qualquer unidade, com um processo aberto, aparece no alto o botão "Incluir SICAF": cole o CNPJ da empresa e ele inclui o SICAF no processo. Ao selecionar um CNPJ numa página do SEI, aparece o botão "Incluir SICAF".</span></label>
-          <label class="opcao"><input type="radio" name="incluirSicaf" value="desligada"><span><strong>Desligada</strong> – nenhum botão do SICAF aparece.</span></label>
+          <label class="opcao"><input type="radio" name="incluirSicaf" value="automatica"><span><strong>Automática</strong> – indicada para a CGOC (pagamento de notas fiscais e faturas). Com um processo aberto, o botão "1 empresa sem SICAF ou Simples – Buscar" aparece quando há notas ou faturas sem esses documentos. A busca é feita uma vez por empresa (CNPJ); após a sua confirmação, a extensão inclui no processo o SICAF e a consulta do Simples Nacional de cada empresa e um Instrumento de Cobrança em branco para cada nota ou fatura. Ao selecionar um CNPJ, aparece o botão "Incluir SICAF, Simples e Anexo". Nas demais unidades, a função fica oculta.</span></label>
+          <label class="opcao"><input type="radio" name="incluirSicaf" value="sempre"><span><strong>Sempre ligada</strong> – indicada para as demais unidades (por exemplo, a licitação), sem depender de nota fiscal. Com um processo aberto, o botão "Incluir SICAF" aparece no alto da página: informe o CNPJ da empresa e a extensão inclui o SICAF no processo. O mesmo botão aparece ao selecionar um CNPJ em uma página do SEI.</span></label>
+          <label class="opcao"><input type="radio" name="incluirSicaf" value="desligada"><span><strong>Desligada</strong> – nenhum botão do SICAF é exibido.</span></label>
         </div>
         <div class="cartao">
           <!-- v0.18.2: cópia de cada PDF na pasta Downloads, uma opção por documento. -->
           <h1>Cópia na pasta Downloads</h1>
-          <p class="apoio">Os PDFs vão direto para o processo no SEI. Marque se também quer uma cópia no computador:</p>
+          <p class="apoio">Os PDFs são incluídos diretamente no processo do SEI. Marque as opções abaixo se também quiser guardar uma cópia no computador:</p>
           <label class="opcao"><input type="checkbox" id="copiaSicaf"><span>PDF do SICAF</span></label>
           <label class="opcao"><input type="checkbox" id="copiaConsulta"><span>PDF da consulta do Simples Nacional</span></label>
         </div>
         <div class="cartao">
           <!-- v0.13.0: acesso ao Compras.gov.br e a Downloads, pedido só a quem usa o SICAF. v0.17.2: e ao Simples Nacional. -->
-          <h1>Permissão</h1>
-          <p class="apoio">Para buscar no SICAF e consultar o Simples Nacional, a extensão precisa abrir o Compras.gov.br e o site do Simples Nacional e poder salvar as cópias na pasta Downloads. O navegador pede essa permissão uma vez.</p>
+          <h1>Permissão de acesso</h1>
+          <p class="apoio">Para consultar o SICAF e o Simples Nacional, a extensão precisa acessar o Compras.gov.br e o site do Simples Nacional, e salvar as cópias na pasta Downloads. O navegador solicita essa permissão uma única vez.</p>
           <p><button type="button" class="botao principal" id="permitirSicaf">Permitir acesso ao Compras.gov.br e ao Simples Nacional</button></p>
           <div class="aviso sucesso" id="sicafPermitido" hidden>Acesso ao Compras.gov.br e ao Simples Nacional permitido.</div>
         </div>
         <div class="cartao">
-          <!-- v0.21.3: entrada no Gov.br com SerproID, desligada por padrão; acesso à página de login pedido só ao ligar. -->
-          <h1>Entrar no Gov.br com o certificado SerproID (opcional, desligada no início)</h1>
-          <p class="apoio">Quando a busca do SICAF encontra você sem login, a extensão já abre a entrada do Compras.gov.br e clica em "Entrar com Gov.br". Com esta opção ligada, ela também clica em "SerproID" na página de entrada do Gov.br, e a página do Serpro abre direto (sem você clicar em "Seu certificado digital em nuvem" e depois em "SerproID").</p>
+          <!-- v0.21.3: entrada no Gov.br com SerproID, desligada por padrão; acesso à página de login pedido só ao ligar. v0.37.0: textos revistos (pedido do usuário). -->
+          <h1>Acesso ao Gov.br com o certificado SerproID</h1>
+          <p class="apoio">Opcional e desligado no início. Quando a consulta ao SICAF exige login, a extensão abre a página de acesso do Compras.gov.br e seleciona "Entrar com Gov.br". Com esta opção ligada, ela também seleciona o certificado SerproID na página do Gov.br, o que dispensa os cliques em "Seu certificado digital em nuvem" e em "SerproID".</p>
           <ul class="apoio">
-            <li><strong>O que a extensão acessa:</strong> só a página de entrada do Gov.br (sso.acesso.gov.br), e só quando ela mesma levou você até lá durante a busca do SICAF. Lá, ela apenas clica no botão "SerproID".</li>
-            <li><strong>O que ela não faz:</strong> não lê nem guarda seu CPF, senha, certificado, QR code ou código de verificação; ler o QR code e digitar o código continuam sendo com você. Se o Gov.br pedir uma verificação de imagens, você também a resolve.</li>
-            <li><strong>Ao ligar:</strong> o navegador pede sua permissão para a extensão acessar a página de entrada do Gov.br. Se você permitir, ganha o clique automático em "SerproID".</li>
-            <li><strong>Se não permitir ou desligar:</strong> a opção fica desligada e o acesso é retirado. Você perde só esse clique automático: a busca do SICAF continua funcionando, e na página do Gov.br você clica em "Seu certificado digital em nuvem" e depois em "SerproID".</li>
+            <li><strong>Acesso:</strong> somente à página de login do Gov.br (sso.acesso.gov.br), e apenas quando a própria extensão abriu essa página durante a consulta ao SICAF.</li>
+            <li><strong>Privacidade:</strong> a extensão não lê nem armazena CPF, senha, certificado, QR code ou código de verificação. A leitura do QR code, a digitação do código e eventuais verificações de imagem continuam sendo feitas por você.</li>
+            <li><strong>Ao ligar:</strong> o navegador solicita a permissão de acesso à página do Gov.br. Sem essa permissão, a opção permanece desligada.</li>
+            <li><strong>Desligada:</strong> a consulta ao SICAF funciona normalmente; na página do Gov.br, selecione "Seu certificado digital em nuvem" e depois "SerproID".</li>
           </ul>
-          <label class="opcao"><input type="checkbox" id="entrarComSerproId"><span>Clicar sozinha em "SerproID" na entrada do Gov.br durante a busca do SICAF</span></label>
+          <label class="opcao"><input type="checkbox" id="entrarComSerproId"><span>Selecionar automaticamente o certificado SerproID no login do Gov.br</span></label>
         </div>
       </section>
 
       <!-- v0.19.0: peças do Compras IFTO no SEI (spec compras-ifto-no-sei). -->
       <section class="grupo" id="compras">
-        <h2>Licitação (CCL): peças do Compras IFTO</h2>
+        <h2>Licitação (CCL)</h2>
         <div class="cartao">
+          <h1>Peças do Compras IFTO</h1>
           <p class="apoio">No Compras IFTO, o botão "Enviar ao SEI" de cada fase manda a peça para a extensão. No SEI, com o processo aberto, aparece o botão "N peças do Compras IFTO": escolha a peça, confira o tipo de documento e o nível de acesso e clique em "Criar e salvar". A extensão cria o documento, coloca o texto e salva. Ela nunca assina.</p>
           <label class="opcao"><input type="radio" name="comprasIfto" value="automatica"><span>Automática (só na CCL)</span></label>
           <label class="opcao"><input type="radio" name="comprasIfto" value="sempre"><span>Sempre ligada, em qualquer unidade</span></label>
           <label class="opcao"><input type="radio" name="comprasIfto" value="desligada"><span>Desligada</span></label>
+        </div>
+        <!-- v0.37.0 (spec remover-formatacao-agu). -->
+        <div class="cartao">
+          <h1>Remover Formatação da AGU</h1>
+          <p class="apoio">Quando o Edital, o Termo de Referência ou uma minuta volta da AGU com texto riscado, colorido ou com "Justificativa Modificação Item(ns)", a janela de avisos do editor mostra "Remover Formatação da AGU". O clique abre uma lista do que vai sair, para você conferir e desmarcar o que deve ficar. A extensão nunca salva: confira e clique em Salvar no editor.</p>
+          <label class="opcao"><input type="radio" name="formatacaoAgu" value="automatica"><span>Automática (só na CCL)</span></label>
+          <label class="opcao"><input type="radio" name="formatacaoAgu" value="sempre"><span>Sempre ligada, em qualquer unidade</span></label>
+          <label class="opcao"><input type="radio" name="formatacaoAgu" value="desligada"><span>Desligada</span></label>
         </div>
         <div class="cartao">
           <p class="apoio">Para o botão "Enviar ao SEI" aparecer no Compras IFTO, a extensão precisa funcionar no site dele. O navegador pede essa permissão uma vez; depois, recarregue a página do Compras IFTO (F5).</p>

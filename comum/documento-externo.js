@@ -118,6 +118,28 @@
     return /^\p{L}/u.test(nome.slice(fim)) && !junto ? 0 : fim
   }
 
+  // v0.37.0 (usuário, 26/11/2026): siglas no começo do nome do arquivo. Nota fiscal: NF, DANFE, NFe, NF-e, NFC-e,
+  // NFCe, NFSe, NFS e NFS-e ("NF 123.pdf" → Nota fiscal, nome na árvore "123"). RANFS → Documento, e o nome na
+  // árvore fica o nome inteiro ("Documento" sozinho não diz o que é).
+  const SIGLAS = Object.freeze([
+    { siglas: ['NF', 'DANFE', 'NFe', 'NF-e', 'NFC-e', 'NFCe', 'NFSe', 'NFS', 'NFS-e'], tipo: 'Nota fiscal', manterNome: false },
+    { siglas: ['RANFS'], tipo: 'Documento', manterNome: true },
+    // v0.37.0 (T259): o PDF que o SICAF dá ("consultarSituacaoFornecedor_07783734000133_2026-11-26.pdf") → Sicaf;
+    // nome na árvore: o CNPJ com pontos, barra e hífen (o nome da empresa não está no arquivo).
+    { siglas: ['consultarSituacaoFornecedor'], tipo: 'Sicaf', cnpj: true }
+  ])
+  // A sigla mais longa que começa o nome (a regra de fim de palavra é a mesma dos tipos: "NFe1" não é "NF").
+  function siglaDoComeco (bruto) {
+    let melhor = null
+    for (const grupo of SIGLAS) {
+      for (const sigla of grupo.siglas) {
+        const fim = fimDoComeco(bruto, sigla)
+        if (fim && (!melhor || fim > melhor.fim)) melhor = { ...grupo, fim }
+      }
+    }
+    return melhor
+  }
+
   // D14: tipo do documento pelo nome do arquivo. Ordem: 1º o nome de tipo do SEI MAIS LONGO que começa o
   // nome do arquivo ("Nota Fiscal 123.pdf" → "Nota fiscal", não "Nota"); 2º as regras da pessoa; 3º o tipo
   // padrão. tipos: nomes da lista "Tipo do Documento" do SEI. Devolve { tipo, origem, nomeArvore } (tipo
@@ -138,6 +160,14 @@
     if (melhor) {
       const resto = limpar(bruto.slice(fimDoMelhor)).replace(/^[\s\-–—.,;:]+/, '')
       return { tipo: melhor, origem: 'nome', nomeArvore: nomeNaArvore(resto) }
+    }
+    const sigla = siglaDoComeco(bruto)
+    const tipoDaSigla = sigla && achar(sigla.tipo)
+    if (tipoDaSigla) {
+      const cnpj = sigla.cnpj && (bruto.match(/\d{14}/) || [])[0]
+      const resto = cnpj ? cnpj.replace(/^(\d{2})(\d{3})(\d{3})(\d{4})(\d{2})$/, '$1.$2.$3/$4-$5')
+        : sigla.manterNome ? semExtensao : limpar(bruto.slice(sigla.fim)).replace(/^[\s\-–—.,;:]+/, '')
+      return { tipo: tipoDaSigla, origem: 'nome', nomeArvore: nomeNaArvore(resto) }
     }
     const nomeArvore = nomeNaArvore(semExtensao)
     for (const regra of regras || []) {

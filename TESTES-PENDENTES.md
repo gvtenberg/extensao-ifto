@@ -416,10 +416,6 @@ E: Pede confirmação, põe o texto copiado (com formatação e comentários) e 
 ### T199 – Cópia desligada (v0.31.0)
 F: Com as duas opções desligadas nas configurações, abra um documento no editor.
 E: Não aparece nada da extensão ao lado do botão Salvar.
-### T200 – Correções da extensão voltam ao restaurar (v0.31.1)
-F: Num Edital, use "Corrigir a numeração", um estilo com ★, a correção de espaço entre as partes e as margens de uma tabela; espere 30 segundos, feche sem salvar, abra de novo e clique em "Restaurar esta versão".
-E: Aparece "Conferido…" e tudo volta igual: números dos itens no lugar, estilo com ★, espaço entre as partes e margens da tabela.
-
 ## Dados da extensão
 ### T201 – Voltar às configurações padrão (v0.31.1)
 F: Em Configurações > Geral, mude alguma opção e clique em "Voltar às configurações padrão"; confirme.
@@ -450,67 +446,23 @@ E: O texto é curto e pequeno (ex.: "Salvo neste computador hoje às…"); a fra
 ### T212 – Erro de conexão explicado (v0.31.3)
 F: Com um documento aberto no editor e o salvamento automático ligado, recarregue a extensão (ou atualize-a) e espere 30 segundos.
 E: Ao lado do Salvar aparece "⚠ Salvamento automático com erro (clique para ver)"; ao clicar, a mensagem diz para fechar e abrir o editor de novo, sem texto em inglês.
-### T213 – Soltar arquivo num documento externo em branco (v0.32.0) (Crítico)
-F: Num processo de teste, inclua pelo SEI um documento externo em branco (escolha tipo, data e acesso, sem arquivo), clique nele na árvore e arraste um PDF do computador para a página dele, à direita; confira a janela e clique em "Anexar".
-E: Ao arrastar aparece "Solte aqui para anexar…"; a janela mostra o arquivo e o documento; depois de "Anexar", aparece "Pronto" e o documento abre com o PDF, com o mesmo tipo, data, acesso e nome de antes.
 ### T214 – Vários arquivos num documento em branco (v0.32.0)
 F: Abra um documento externo em branco e solte dois arquivos de uma vez na página dele.
 E: Aparece a mensagem "Arraste um arquivo só…" e nada é enviado ao SEI.
-### T215 – Documento que já tem conteúdo não recebe arquivo (v0.32.0)
-F: Abra um documento externo que já tem arquivo (ou um documento feito no SEI) e arraste um arquivo para a página dele.
-E: Não aparece "Solte aqui para anexar…" nem a janela da extensão.
-### T216 – Dica "PDF no Firefox como no Chrome" (v0.32.0)
-F: Abra as configurações da extensão e clique em Dicas.
-E: Aparece a dica "PDF no Firefox como no Chrome" com 4 passos numerados; a dica da senha do SEI também aparece em passos numerados.
-
 ## Processo e Capa de Processo (v0.33.0)
 > Recarregue a extensão (versão 0.33.0) e entre no SEI.
-### T217 – Processo novo já vem Público (v0.33.0)
-F: Clique em "Iniciar Processo" (ou "Iniciar Processo Relacionado"), escolha o tipo e veja o nível de acesso.
-E: "Público" já vem marcado e aparece o aviso para conferir antes de salvar.
-### T218 – Dados do processo na tela do processo (v0.33.0)
-F: Abra um processo e clique no número dele, no alto da árvore.
-E: Na área da direita, abaixo de "Processo aberto…", aparecem Tipo do Processo, Especificação e Interessados, com a mesma letra do SEI.
-### T219 – Desligar os dados do processo (v0.33.0)
-F: Nas configurações, desmarque "Mostrar os dados do processo" e clique de novo no número do processo.
-E: A área da direita fica como o SEI mostra, sem os dados.
-### T220 – Capa de Processo com dados de outro processo (v0.33.0) (Crítico)
-F: Clique no número do processo (para a extensão ler os dados) e abra no editor uma Capa de Processo copiada de outro processo, sem assinar; clique em "Corrigir o número do processo" e em "Corrigir a capa".
-E: Aparecem os avisos do número e de cada dado diferente (data de autuação, tipo, especificação, interessados); depois das correções, a capa mostra os dados do processo aberto. Só fica guardado se você clicar em Salvar.
-### T221 – Timbre com letra minúscula e linha em branco (v0.33.0)
-F: No editor de um documento de teste não assinado, troque no timbre "Orçamentária" por "orçamentária", aperte Shift+Enter no início de uma linha do timbre, salve, feche e abra o editor de novo; clique em "Corrigir timbre".
-E: O aviso mostra a linha que deve começar com maiúscula e a linha em branco a mais; depois de "Corrigir timbre", o timbre fica sem linhas vazias e com "Gestão Orçamentária".
-### T222 – Espaço depois do timbre e antes do destinatário (v0.33.0) (Crítico)
-F: Abra no editor um Despacho ainda não assinado (também um que já tinha o espaço da extensão), clique em Salvar e gere o PDF.
-E: No PDF há uma linha de espaço entre a última linha do timbre e "DESPACHO Nº…", e entre a linha "Assunto" e "Ao Senhor…"; o resto continua como antes.
-### T223 – Espaço entre o timbre e "Processo:" na Capa (v0.33.0)
-F: Abra no editor uma Capa de Processo ainda não assinada, clique em Salvar e veja o documento na árvore.
-E: Há uma linha de espaço entre a última linha do timbre e "Processo:".
 ### T224 – SEI lento na tela do processo (v0.33.0)
 F: Com a internet lenta ou o SEI demorando, clique no número do processo.
 E: Depois de até 20 segundos aparece, em cinza, "Não consegui ler os dados do processo agora…"; a página do SEI continua funcionando.
-### T225 – Botão Blocos Internos (v0.34.0)
-F: Abra a tela inicial do SEI (Controle de Processos) e clique no novo ícone logo depois de "Controle de Prazos".
-E: O ícone tem o mesmo tamanho e espaço dos outros e abre a página de Blocos Internos (a mesma do menu Blocos > Internos).
-### T226 – Mesmo tamanho de letra na tela do processo (v0.34.1)
-F: Clique no número de um processo no SEI.
-E: "Tipo do Processo", "Especificação" e "Interessados" têm o mesmo tamanho de letra de "Processo aberto somente na unidade…".
 ### T227 – Espaço depois do timbre e do número (v0.34.2)
 F: Abra no editor a Notificação 3394735 (ou outro documento não assinado), confira a caixa do espaço, clique em Salvar, veja o documento e abra o editor de novo.
 E: Há uma linha e meia entre o timbre e o número e uma linha entre o número e "Assunto:"; os outros espaços continuam; na segunda vez a caixa do espaço não aparece.
 ### T228 – Data que já passou em qualquer documento (v0.34.2)
 F: Abra no editor a Notificação 3394735, com "Palmas, 10 de novembro de 2026." no fim, e clique em "Corrigir para …".
 E: A caixa diz que a data já passou e o botão troca só essa data pela de hoje; as outras datas do texto não mudam.
-### T229 – Possíveis divergências antes de assinar (v0.34.2)
-F: Num documento ainda não assinado com a data de outro dia, clique em "Assinar Documento"; depois separe esse documento na lista de assinaturas.
-E: A janela diz "possíveis divergências" (sem a palavra "errado") e lista cada uma, por exemplo "Data: o texto diz 10 de novembro de 2026, mas hoje é…".
 ### T230 – Documento já assinado não é conferido (v0.34.2)
 F: Na árvore, na lista de assinaturas e no Bloco de assinatura, vá assinar um documento que outra pessoa já assinou e que tem outra data ou outro número de processo.
 E: A janela "Assinar mesmo assim?" não aparece e nenhuma correção é sugerida.
-### T231 – Reitoria no timbre (v0.34.2)
-F: Abra no editor um documento não assinado com "Reitoria" entre "Instituto Federal…" e "Campus Palmas".
-E: A extensão não avisa sobre "Reitoria"; se houver outra divergência, "Corrigir timbre" mantém essa linha.
-
 ## Lista para a direção (v0.35.0)
 > Entre no SEI pela unidade PAL/REI/IFTO.
 ### T232 – Adicionar um documento à lista da direção (v0.35.0)
@@ -550,11 +502,6 @@ E: O documento entra na lista e a atribuição no SEI não muda.
 F: Em Configurações > Direção-geral, desmarque "Usar a lista para a direção" e recarregue o SEI; marque de novo. Troque também para outra unidade.
 E: Desligada ou em outra unidade, o botão e as opções do menu somem; ligada de novo, a lista continua guardada.
 
-## Avisos da página do documento
-### T244 – Avisos fecham ao abrir o editor (v0.35.1)
-F: Na árvore, abra um documento não assinado que mostre "Avisos da extensão" e abra o editor pelo botão do aviso; repita com "Editar Conteúdo" do SEI.
-E: Nos dois casos, os avisos da página do documento fecham e ficam só os do editor.
-
 ## Cargo da diretora-geral e Campus em itálico (v0.35.2)
 ### T245 – Cargo da diretora-geral no editor (v0.35.2)
 F: Na unidade PAL/REI/IFTO, num documento de teste não assinado com "Diretora-Geral Pro Tempore" abaixo do nome da diretora-geral, abra o documento e depois o editor; clique em "Corrigir para…". Repita só com "Diretora-Geral" e sem cargo abaixo do nome.
@@ -562,96 +509,21 @@ E: O aviso aparece na página do documento e no editor; o botão deixa "Diretora
 ### T246 – Cargo da diretora-geral antes de assinar (v0.35.2)
 F: Na PAL/REI/IFTO, com o cargo errado, clique em Assinar na árvore, no editor, na lista de assinaturas e no Bloco de assinatura; responda "Não, corrigir antes".
 E: Aparece "Assinar mesmo assim?" com o cargo errado. Só a falta de itálico em outras partes do texto não pergunta.
-### T247 – Campus e Campi em itálico (v0.35.2)
-F: Em qualquer unidade, num documento não assinado, escreva "Campus" e "campi" sem itálico (texto e tabela) e "CAMPUS" em maiúsculas, salve e abra o documento; no editor, clique em "Colocar em itálico" e depois Ctrl+Z.
-E: O aviso diz quantos estão sem itálico (o timbre também conta; maiúsculas não); o botão corrige todos e o Ctrl+Z desfaz. Documento assinado não mostra aviso.
-### T248 – Corrigir timbre com Campus em itálico (v0.35.2)
-F: Num documento não assinado com o timbre errado, clique em "Corrigir timbre" no editor.
-E: O timbre fica certo e "Campus" fica em itálico.
-
 ## Espaço, linhas em branco e padrão da unidade (v0.35.3)
 ### T249 – Espaço antes da data na Solicitação de nota de empenho (v0.35.3)
 F: Na DAP/PAL/REI/IFTO, abra no editor uma Solicitação de nota de empenho não assinada, clique em Salvar e veja o documento na árvore.
 E: Há uma linha de espaço entre "Ordenador de Despesas" e a data.
-### T250 – Linha em branco antes e depois de quem assina (v0.35.3)
-F: Num documento não assinado, apague a linha em branco entre a data e o nome e entre o cargo e o rodapé, salve e abra o editor de novo; clique em "Adicionar as linhas em branco" e em Salvar.
-E: O aviso mostra os dois lugares e só muda o texto com o clique. Onde já há linha em branco, nada é oferecido.
-### T251 – Guardar o timbre e o rodapé da unidade (v0.35.3)
-F: Numa unidade do Campus Palmas sem cadastro em "Minhas unidades", abra o editor; com o aviso aberto, mude o timbre ou o telefone do rodapé (63 3236-40xx) e clique em "Guardar como padrão da unidade".
-E: A confirmação mostra o texto já mudado. Com "Agora não", nada é guardado e o aviso volta na próxima vez.
-### T252 – Padrão separado para cada unidade (v0.35.3)
-F: Guarde o padrão em duas unidades (o segundo com a página de configurações aberta) e veja "Minhas unidades" nas configurações.
-E: Cada unidade tem os seus dados; guardar uma não muda nem apaga a outra.
-## Duplicar documento (v0.36.0)
-> Entre no SEI com a extensão na versão 0.36.0 e abra um processo de teste da sua unidade.
-### T253 – Duplicar documento e salvar (v0.36.0) (Crítico)
-F: Num processo de teste, clique no ícone de um Despacho assinado na árvore e em "Duplicar documento"; confira e clique em Salvar. Repita com um Despacho não assinado.
-E: O formulário abre à direita, com o mesmo tipo e o número do original em "Documento Modelo". Depois de Salvar, o documento novo fica selecionado na árvore, o editor abre com o mesmo texto, e o número e a assinatura do original não são copiados.
-### T254 – Dados copiados no documento duplicado (v0.36.0)
-F: Duplique um documento com Descrição, Interessados, Destinatários e Assuntos, e outro sem Interessados e sem Assuntos; salve o primeiro e abra "Consultar/Alterar Documento".
-E: Os dados são iguais aos do original, sem repetidos; no segundo, as listas ficam vazias. "Número" e "Nome na Árvore" não são copiados.
-### T255 – Nível de acesso no documento duplicado (v0.36.0)
-F: Duplique um documento Público e um Restrito e espere uns segundos no formulário (não precisa salvar).
-E: O nível é o do original; no Restrito, a Hipótese Legal também. Dá para mudar antes de salvar.
-### T256 – Duplicar documento de outra unidade (v0.36.0)
-F: Duplique um documento feito por outra unidade, num processo aberto na sua.
-E: O formulário abre com o tipo e o modelo. Se o cadastro não puder ser lido, aparece um aviso e o nível de acesso fica sem marcar. Se o tipo não estiver na lista de "Incluir Documento" da sua unidade, só aparece o aviso e nada é aberto.
-### T257 – Opção só onde deve aparecer e chave nas configurações (v0.36.0)
-F: Clique no ícone de um documento externo e no de um feito no SEI (na PAL/REI/IFTO, veja também as opções da lista da direção); depois desligue "Duplicar documento" nas configurações (Documentos do SEI) e abra o menu de outro documento.
-E: A opção não aparece no externo; no feito no SEI ela vem antes das opções da lista da direção, que continuam funcionando. Desligada, não aparece.
-### T258 – Incluir Documento comum continua igual (v0.36.0)
-F: Duplique um documento, não salve, e depois use o "Incluir Documento" do SEI com o mesmo tipo.
-E: O formulário vem como antes: sem modelo, com o nível Público marcado pela extensão (se essa opção estiver ligada).
 ## Documentos externos e linhas de quem assina (v0.36.1)
 > Entre no SEI com a extensão na versão 0.36.1 e abra um processo de teste da sua unidade.
-### T259 – Abrir o primeiro documento incluído (v0.36.1) (Crítico)
-F: Arraste um PDF para a árvore e inclua; depois arraste três de uma vez e inclua.
-E: A janela fecha sozinha e uma mensagem verde some em uns 6 segundos. O documento incluído (dos três, o primeiro na árvore) abre à direita e fica marcado na árvore.
-### T260 – Documentos do SICAF também abrem (v0.36.1)
-F: Inclua o SICAF de um CNPJ num processo de teste.
-E: Só aparece a mensagem que some sozinha e o primeiro documento incluído abre.
 ### T261 – Mensagem ao anexar em documento em branco e erro na inclusão (v0.36.1)
 F: Solte um PDF na página de um documento externo em branco e clique em "Anexar"; em outra vez, inclua três arquivos e clique em "Parar" no meio.
 E: Ao anexar, a mensagem some sozinha e o documento abre com o arquivo. Ao parar, a janela continua aberta com o aviso.
-### T262 – Tipo pelo nome com maiúsculas, sinais e acento estragado (v0.36.1)
-F: Arraste para a árvore arquivos como "RELATÓRIO.pdf", "Relatorio_-_obra.pdf" e "RelatÃ³rio.pdf" (não precisa incluir).
-E: O tipo "Relatório" já vem escolhido em todos.
-### T263 – Nome que serve a vários tipos (v0.36.1)
-F: Arraste "portaria_12.pdf" para a árvore; depois escolha o mesmo arquivo em "Incluir Documento › Externo".
-E: Na lista, as portarias vêm primeiro, em "Combinam com o nome". Na tela do SEI, um aviso amarelo mostra as portarias. Nada é escolhido sozinho (se você não tiver regra nem tipo padrão nas configurações).
-### T264 – Área de soltar some sozinha e tem botão de fechar (v0.36.1)
-F: Em "Incluir Documento › Externo", arraste um arquivo passando por cima da árvore e solte no botão "Anexar Arquivo..."; repita passando pela árvore e saindo da janela, e apertando Esc.
-E: A área verde aparece só com o arquivo em cima da árvore e some em até 1 segundo. O arquivo é anexado no formulário do SEI. A área tem o botão "× Fechar". O mesmo na página de um documento externo em branco.
-### T265 – Formulário do SEI com documento em branco escolhido (v0.36.1)
-F: Clique num documento externo em branco na árvore, depois em "Consultar/Alterar Documento Externo", e solte um arquivo no "Anexar Arquivo..." do SEI.
-E: O arquivo vai para o campo do SEI; a área verde da extensão não aparece no formulário.
-### T266 – Linhas antes e depois de quem assina no Despacho (v0.36.1)
-F: Num Despacho não assinado sem linhas em branco perto do nome, abra o editor, clique em "Adicionar as linhas em branco", salve, feche e abra de novo. Repita com uma das linhas já no documento.
-E: Fica uma linha antes do nome e uma depois do cargo, sem repetir a que já existia. Ao abrir de novo, o aviso das linhas não volta.
 ## Avisos, capa e sites fora do ar (v0.36.2)
 > Entre no SEI com a extensão na versão 0.36.2 e use documentos de teste não assinados da sua unidade.
-### T267 – Interessados da capa numa linha só (v0.36.2) (Crítico)
-F: Num processo com três interessados, clique no número do processo, abra a Capa de Processo no editor com um interessado faltando e clique em "Corrigir a capa". Salve.
-E: Os interessados ficam na mesma linha, separados por "; ", sem ";" no final. Ao abrir de novo, não há aviso da capa. Uma capa certa com um interessado por linha também não dá aviso.
-### T268 – Corrigir com o editor já aberto (v0.36.2)
-F: Abra no editor um documento com "Campus" sem itálico e deixe o editor aberto. Volte ao processo, clique no documento e em "Abrir o editor para corrigir". Corrija, não salve, e repita.
-E: O editor vem para a frente com o aviso e o botão "Colocar em itálico". Na segunda vez, aparece "Nada a corrigir…" lembrando de clicar em Salvar.
-### T269 – Ícone dos avisos no documento e no editor (v0.36.2)
-F: No documento e depois no editor, feche a janela de avisos no ×, arraste o ícone, clique nele e feche de novo. Feche também um aviso só e clique em "Mostrar 1 fechado".
-E: A janela vira um ícone verde no mesmo lugar, com o número do que há a corrigir. Arrastar não abre; o clique abre a janela com os avisos.
-### T270 – Ícone sem erro e fechar o ícone (v0.36.2)
-F: No editor, com só o aviso do espaço ("Desfazer"), feche a janela, clique no ícone, feche de novo e clique no × do ícone. Feche e abra o editor.
-E: O ícone aparece sem número e o "Desfazer" continua na janela. O × tira o ícone sem abrir a janela. Ao abrir o editor de novo, os avisos voltam se ainda houver algo a avisar.
 ### T271 – Site fora do ar antes da busca (v0.36.2)
 F: Clique para buscar SICAF e Simples com um dos sites fora do ar. Se os dois estiverem no ar, só confira se a busca começa normalmente.
 E: Em até 10 segundos aparece qual site não está respondendo, com "Cancelar", "Pular" e "Tentar assim mesmo". Pular segue com o outro site. Com os dois no ar, a busca abre sozinha.
-### T272 – Espaço entre "Assunto" e o destinatário no Despacho novo (v0.36.2)
-F: Crie um Despacho, abra o editor pela primeira vez, espere o aviso do espaço, clique em Salvar e veja o documento, sem abrir o editor de novo.
-E: Há uma linha de espaço entre "Assunto" e o destinatário, e as outras partes continuam com o espaço certo.
 ## Nada mudou na tela (v0.36.3)
-### T273 – Lista de assinaturas igual a antes (v0.36.3)
-F: Na lista de assinaturas, passe por itens de assinar, de ciência, de intervalo e já feitos.
-E: Os botões e os textos são os de sempre ("Assinar e próximo", "Dar ciência e próximo", "Conferir de novo", "Desmarcar feito").
 ### T274 – SICAF e Simples iguais a antes (v0.36.3)
 F: Busque SICAF e Simples de um fornecedor e veja a janela "Incluir no processo" (não precisa incluir).
 E: Aparecem os PDFs obtidos, os avisos e a lista "Será incluído" como antes.
@@ -659,3 +531,112 @@ E: Aparecem os PDFs obtidos, os avisos e a lista "Será incluído" como antes.
 ### T275 – Arrastar vários arquivos: motivo quando o SEI não salva (v0.36.4)
 F: Arraste para a árvore os 4 PDFs de antes (nota fiscal, documento, nota fiscal, documento), escolha os tipos e clique em "Incluir no processo".
 E: Ou os 4 entram, ou a mensagem diz o motivo (por exemplo, que o tipo exige o "Número"), e não só "O SEI não salvou o documento".
+
+## Enter na janela de arrastar arquivos (v0.37.0)
+> Entre no SEI com a extensão na versão 0.37.0 e abra um processo de teste da sua unidade.
+### T281 – Enter no Nome na Árvore inclui o documento (v0.37.0)
+F: Arraste um arquivo para a árvore, clique no campo "Nome na Árvore" e aperte Enter (com um arquivo sem tipo, aperte Enter antes de escolher o tipo).
+E: Com o tipo escolhido, o Enter faz o mesmo que "Incluir no processo"; sem tipo, nada acontece e o aviso pede para escolher o tipo.
+## Numeração em documentos de modelo antigo (v0.37.0)
+> Use uma cópia da Minuta de Ata 3399532 (ou outro documento de modelo antigo) e só clique em Salvar quando o teste pedir.
+### T282 – Aviso das caixas escondidas (v0.37.0)
+F: Abra o editor da cópia da Minuta de Ata e espere a janela de avisos da extensão.
+E: Aparece "Parte do texto está dentro de … caixas escondidas…" com o botão "Tirar o texto das caixas". Num documento novo, feito com o modelo atual, esse aviso não aparece.
+### T283 – Tirar o texto das caixas (v0.37.0)
+F: Clique em "Tirar o texto das caixas". Depois mude o parágrafo "3.1. O órgão gerenciador…" para o estilo "Item_Nivel2" (apague o "3.1." digitado).
+E: O aviso diz "Pronto…". O parágrafo mostra 3.1 (não 3.3) e o texto não mudou de lugar nem de formatação. Ctrl+Z desfaz.
+### T284 – Converter os números digitados e salvar (v0.37.0) (Crítico)
+F: Clique em "Revisar e converter". Na lista à esquerda, clique numa linha laranja, desmarque um item, clique em "Converter os marcados" e depois em Salvar. Veja o documento e gere o PDF.
+E: A linha clicada leva o texto até o parágrafo, com um contorno laranja. Os marcados perderam o número digitado e mostram a numeração automática (4.2 digitado passa a 4.1); o desmarcado ficou igual. No documento salvo e no PDF os números são os mesmos do editor.
+### T285 – A lista não abre sozinha e fecha sem mudar nada (v0.37.0)
+F: Abra o editor e não clique em nada. Depois clique em "Revisar e converter" e feche a lista no ×.
+E: A lista só aparece depois do clique. Fechada no ×, nada muda no texto.
+### T286 – Documento sem caixas nem números digitados (v0.37.0)
+F: Abra o editor de um Edital ou Despacho comum.
+E: Nenhum dos dois avisos novos aparece; "Corrigir a numeração" dos números longos continua como antes.
+## Tipo do documento externo pela sigla (v0.37.0)
+### T287 – NF e RANFS no começo do nome do arquivo (v0.37.0)
+F: Num processo de teste, arraste para a árvore três arquivos: "NF 123.pdf", "NFS-e 45.pdf" e "RANFS 7 Empresa.pdf" (não precisa incluir; só veja a lista de conferência).
+E: Os dois primeiros vêm com o tipo Nota Fiscal e Nome na Árvore "123" e "45"; o terceiro vem com o tipo Documento e Nome na Árvore "RANFS 7 Empresa".
+## Remover Formatação da AGU (v0.37.0)
+> Entre no SEI com a extensão na versão 0.37.0, na CCL (ou ligue em Configurações › Licitação (CCL) › Remover Formatação da AGU › Sempre ligada). Use os documentos de teste (Edital 3399512, Minuta de Contrato 3399534, TR 3399829) e não salve, a não ser no T290.
+### T288 – Opção nas configurações (v0.37.0)
+F: Abra as Configurações da extensão e vá até "Licitação (CCL)".
+E: Há o cartão "Remover Formatação da AGU" com Automática (só na CCL), Sempre ligada e Desligada; a Automática vem marcada.
+### T289 – Aviso e lista só com o clique (v0.37.0)
+F: Abra o editor do Edital 3399512 e não clique em nada; depois clique em "Remover Formatação da AGU" na janela de avisos.
+E: O aviso conta os trechos riscados, as "Justificativa Modificação Item(ns)" e os trechos coloridos. A lista à esquerda só abre com o clique, com tudo marcado; clicar numa linha leva o texto até o trecho, com um contorno laranja.
+### T290 – Remover, conferir e salvar (v0.37.0) (Crítico)
+F: Na lista do Edital 3399512, desmarque um trecho riscado e clique em "Remover os marcados". Confira o texto e clique em Salvar; depois gere o PDF.
+E: O riscado sumiu sem juntar palavras ("modalidade PREGÃO ELETRÔNICO"); os parágrafos todo riscados e as "Justificativa…" sumiram; o texto ficou preto (links com a cor deles); o trecho desmarcado continua riscado. O documento salvo e o PDF ficam iguais ao editor.
+### T291 – Ctrl+Z desfaz tudo de uma vez (v0.37.0)
+F: No Edital 3399512, remova tudo e aperte Ctrl+Z uma vez (não salve).
+E: O texto volta inteiro como estava, com riscado, cores e "Justificativa…".
+### T292 – Texto em branco e marcas do Word (v0.37.0)
+F: Abra o editor da Minuta de Contrato 3399534 e clique em "Remover Formatação da AGU".
+E: A lista tem as linhas "trecho em branco (invisível) é apagado" e "marcas de comentário do Word saem". Depois de remover, o "1." escondido em branco não aparece no texto e o fundo amarelo das "Justificativa…" sumiu junto com elas.
+### T293 – Comentários do SEI (v0.37.0)
+F: Num documento de teste, ponha um comentário seu (botão de comentário do editor) num trecho, salve, abra o editor de novo e clique em "Remover Formatação da AGU".
+E: O comentário aparece na lista com seu nome; depois de remover, ele some do painel de comentários e, depois de Salvar e abrir de novo, não volta. Comentário de outra pessoa aparece apagado na lista e fica.
+### T294 – Fora da CCL e documento sem marcas (v0.37.0)
+F: Com a opção em Automática, abra um documento numa unidade que não é a CCL; depois, na CCL, abra um Despacho comum.
+E: Nos dois casos não aparece "Remover Formatação da AGU".
+## Correções da rodada de testes de 26/11 (v0.37.0)
+> Entre no SEI com a extensão na versão 0.37.0 e use documentos de teste não assinados da sua unidade.
+### T295 – Linha depois da última pessoa que assina e sem espaço duplo (v0.37.0)
+F: Abra no editor a Solicitação de nota de empenho 3399442 (duas pessoas assinam), clique em "Adicionar as linhas em branco", salve, feche e abra de novo. Repita num Despacho, clicando logo que o aviso aparecer.
+E: Fica uma linha em branco antes do primeiro nome e outra depois de "Ordenador de despesa" (antes do rodapé). Nenhum lugar fica com dois espaços, e ao abrir de novo a extensão não muda nada.
+### T296 – Timbre corrigido não pede para guardar de novo (v0.37.0)
+F: Numa unidade com timbre já guardado em "Minhas unidades", abra no editor um documento com o timbre diferente e clique em "Corrigir timbre".
+E: O botão "Usar este timbre como padrão da unidade" some junto com o de corrigir. Num outro documento, mude o timbre à mão para ficar igual ao guardado e clique em "Usar este timbre como padrão": a extensão diz que ele já é o padrão e não guarda nada.
+### T297 – CNPJ com máscara e conferido antes de buscar (v0.37.0)
+F: No SEI, abra a busca do SICAF por CNPJ e digite 07783734000133; depois apague e digite um CNPJ com o último número trocado.
+E: Enquanto digita, aparecem os pontos, a barra e o hífen (07.783.734/0001-33). Com o número trocado, a janela avisa que o CNPJ está errado e não busca. Com o certo, o campo CNPJ da página do SICAF fica preenchido e a busca termina.
+### T298 – SICAF sem "falha do sistema" (v0.37.0)
+F: Busque o SICAF de duas ou três notas seguidas.
+E: Todos os PDFs chegam. Se o SICAF mostrar "falha do sistema", a extensão espera e tenta sozinha mais duas vezes antes de avisar.
+### T299 – SICAF abre sozinho pela Área de Trabalho (v0.37.0)
+F: Saia do Compras.gov.br, busque o SICAF de uma nota e faça o login quando pedir.
+E: Na Área de Trabalho a extensão abre o SICAF sozinha, na mesma aba, sem pedir para clicar no seu nome. Se ainda aparecer o aviso para clicar no nome, salve a página com o menu do seu nome aberto (Ctrl+S) na pasta de testes.
+### T300 – Foco não pula para o outro monitor (v0.37.0)
+F: Com dois monitores, comece uma busca do SICAF no segundo e vá digitar num documento ou site no primeiro, até a busca terminar.
+E: O cursor continua onde você está digitando; a aba do SEI fica pronta no segundo monitor, esperando você voltar.
+### T301 – Janelas abaixo dos botões do SEI (v0.37.0)
+F: Num processo com muitos botões na barra do SEI, abra a janela do SICAF e a lista de assinaturas.
+E: As janelas abrem no canto de cima, à esquerda, da área do processo, abaixo da barra de botões, sem cobrir nenhum botão; dá para arrastar como antes.
+### T302 – Arquivo do SICAF reconhecido pelo nome (v0.37.0)
+F: Arraste para a árvore o arquivo consultarSituacaoFornecedor_07783734000133_2026-11-26.pdf.
+E: O tipo vem como Sicaf e o Nome na Árvore como 07.783.734/0001-33.
+### T303 – Anexar em documento em branco abre o documento certo (v0.37.0)
+F: Crie 3 documentos externos em branco, anexe um arquivo no do meio (arrastando o arquivo para a página dele) e depois solte 2 arquivos de uma vez em outro.
+E: Depois de anexar, abre à direita o documento que recebeu o arquivo (não o último da árvore). Com 2 arquivos, aparece a lista para escolher um, com "Enviar" e "Cancelar".
+### T304 – Arrastar 4 arquivos: todos entram (v0.37.0)
+F: Arraste para a árvore os 4 PDFs do T275 (NF 10.2026 - IFTO Palmas 03.pdf, RANFS 10.2026 - IFTO – Palmas 03.pdf, NF … 04.pdf, RANFS … 04.pdf) e clique em "Incluir no processo".
+E: Os tipos vêm sozinhos (NF = Nota fiscal, RANFS = Documento) e os 4 documentos entram no processo.
+### T305 – Fatura também pede SICAF e Simples (v0.37.0)
+F: Num processo com uma Fatura (documento externo do tipo Fatura) depois da última Folha de Encaminhamento, sem Sicaf nem Consulta, abra o processo e clique no botão do SICAF na barra.
+E: O botão aparece para a Fatura como para a nota fiscal; a busca inclui Sicaf, Consulta e o Anexo em branco com o nome "Instrumento de Cobrança Fatura nº …".
+### T306 – Uma busca por empresa (v0.37.0)
+F: Num processo com 2 notas da mesma empresa (mesmo CNPJ), sem Sicaf nem Consulta, olhe o botão do SICAF na barra e clique nele.
+E: O botão diz "1 empresa sem SICAF ou Simples (2 notas) – Buscar" e a busca faz um Sicaf e uma Consulta só para essa empresa (e um Anexo por nota).
+### T307 – Área de Trabalho não fica parada em "Abrindo o SICAF…" (v0.37.0)
+F: Saia do Compras.gov.br, busque o SICAF de uma nota, faça o login e espere na Área de Trabalho, sem clicar em nada.
+E: A extensão abre o menu do seu nome, rola a lista até "SICAF" e clica; o SICAF abre na mesma aba, espera uns 3 segundos e vai sozinho para "Situação do Fornecedor", espera mais 1 segundo e só então preenche o CNPJ, sem "Sessão expirada" nem erro; a busca continua sozinha. Se falhar: aperte F12, clique em "Console", copie as linhas "[extensão IFTO] …" e cole aqui.
+### T308 – Nunca duas janelas iguais (v0.37.0)
+F: Comece uma busca de SICAF e Simples Nacional, feche as páginas do SICAF/Simples antes do fim, volte ao processo no SEI e comece a busca de novo, até o fim.
+E: Aparece só uma janela de cada (uma para buscar e uma com "Incluir no processo"), nunca duas iguais uma sobre a outra.
+### T309 – Botão da busca conta empresas (v0.37.0)
+F: Abra o processo da página processo-duas-faturas-extensao-2-sicafs (2 faturas da mesma empresa, mesmo CNPJ) e clique no botão do SICAF na barra.
+E: O botão verde diz "Buscar SICAF e Simples de 1 empresa (2 notas)"; a busca faz 1 Sicaf e 1 Consulta, e na hora de incluir aparecem 2 Anexos (um Instrumento de Cobrança por fatura).
+### T310 – Textos do SICAF nas configurações (v0.37.0)
+F: Abra as configurações da extensão e leia a parte "SICAF e Simples Nacional".
+E: Os textos estão claros e formais; a opção do Gov.br diz "Selecionar automaticamente o certificado SerproID no login do Gov.br". Comente aqui qualquer frase que ainda pareça estranha.
+### T311 – PDFs do processo abrem no Firefox (v0.37.0)
+F: Abra o processo 23236.010039/2022-91 (nota da RG Segurança e Vigilância, com Sicaf 3400098 e Consulta 3400099 depois da última Folha) e clique no botão do SICAF na barra.
+E: A barra não pede Sicaf nem Consulta para essa nota; na janela das notas aparece "Este fornecedor já tem Sicaf neste trecho do processo." e o mesmo para a Consulta. No console (F12 > Console) não aparece "Permission denied". Se falhar: copie as linhas "Extensão IFTO: …" e cole aqui.
+### T312 – Sicaf ou Consulta que não abre conta pelo nome (v0.37.0)
+F: Só se o T311 ainda mostrar "Não consegui abrir…": faça a busca do SICAF dessa nota até a janela de incluir no SEI.
+E: A janela diz "Não consegui abrir … Pelo nome na árvore, contei como já incluído para este fornecedor. Confira na árvore." e não oferece incluir Sicaf nem Consulta de novo.
+### T313 – Notas em pasta fechada da árvore (v0.37.0)
+F: Abra o processo 23236.017252/2025-76 (sem mexer nas pastas da árvore) e olhe o botão do SICAF na barra; depois faça o mesmo no 23236.001586/2022-85.
+E: No 23236.017252/2025-76 aparecem as 3 notas (9852 e 9853 da K.S. Artigos Esportivos, 4492 da G A da Costa Esportes), 2 empresas; no 23236.001586/2022-85 aparecem as notas 9583 e 9584. Se faltar alguma: copie as linhas "[extensão IFTO] …" do console (F12 > Console) e cole aqui.

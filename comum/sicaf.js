@@ -38,6 +38,15 @@
     if (n.length !== 14) return String(cnpj || '')
     return `${n.slice(0, 2)}.${n.slice(2, 5)}.${n.slice(5, 8)}/${n.slice(8, 12)}-${n.slice(12)}`
   }
+  // v0.37.0 (T271): máscara enquanto a pessoa digita: "0778373400" → "07.783.734/00". Fica fácil comparar os
+  // grupos de números com os da nota. Texto que não é só número e sinais (ex.: "CNPJ: …" colado) fica como está.
+  function mascaraCnpj (texto) {
+    const bruto = String(texto || '')
+    if (!/^[\d\s./-]*$/.test(bruto)) return bruto
+    const n = soDigitos(bruto).slice(0, 14)
+    return [[0, 2, ''], [2, 5, '.'], [5, 8, '.'], [8, 12, '/'], [12, 14, '-']]
+      .filter(([inicio]) => n.length > inicio).map(([inicio, fim, sinal]) => sinal + n.slice(inicio, fim)).join('')
+  }
   const ehDoIfto = cnpj => soDigitos(cnpj).startsWith(RAIZ_IFTO)
   // v0.17.0 (consulta-simples D7): CNPJ da matriz de uma filial: 8 primeiros números + 0001 + dígitos refeitos.
   function cnpjMatriz (cnpj) {
@@ -110,9 +119,10 @@
   // Tipo pelo nome na árvore: nota fiscal (externa, com arquivo), ateste, folha de encaminhamento, sicaf,
   // consulta ou anexo. Exemplos do processo guardado (13/11/2026): "Nota fiscal nº 063 CHC SOLUÇOES EM
   // SERV. E COM. LTDA (3375105)", "Ateste Fatura Materiais 3375107", "Folha de Encaminhamento 269 (3376800)".
+  // v0.37.0 (usuário, 26/11/2026): Fatura também precisa de SICAF e Simples Nacional, igual à nota fiscal.
   function tipoNaArvore (rotulo) {
     const r = normalizar(rotulo)
-    if (/^(NOTA FISCAL|NF-?E?\b|NFS-?E\b|DANFE\b)/.test(r)) return 'nota'
+    if (/^(NOTA FISCAL|NF-?E?\b|NFS-?E\b|DANFE\b|FATURA\b)/.test(r)) return 'nota'
     if (/^ATESTE\b/.test(r)) return 'ateste'
     if (/^FOLHA DE ENCAMINHAMENTO\b/.test(r)) return 'folha'
     if (/^SICAF\b/.test(r)) return 'sicaf'
@@ -217,7 +227,7 @@
       if (!candidatos.length) candidatos = itensDeAteste.filter(item => item.notas.some(outro => mesmoNumero(outro, numero)))
       const ateste = candidatos.find(item => nomesParecidos(item.empresa, fornecedor)) || candidatos[0] || null
       const anexoFeito = anexosComArquivo.some(anexo => {
-        const achado = /\bN\s*[º°O]?\.?\s*([\d.]+)/.exec(normalizar(anexo.rotulo).replace(/^ANEXO\s+/, '').replace(/^.*?\bNF\b/, 'NF'))
+        const achado = /\bN\s*[º°O]?\.?\s*([\d.]+)/.exec(normalizar(anexo.rotulo).replace(/^ANEXO\s+/, '').replace(/^.*?\b(NF|FATURA)\b/, 'NF'))
         return achado && mesmoNumero(achado[1], numero)
       })
       return { id: doc.id, rotulo: doc.rotulo, link: doc.link, sei, numero, fornecedor, ateste, cnpj: ateste ? ateste.cnpj : null, anexoFeito }
@@ -226,6 +236,7 @@
     const raizesComConsulta = new Set(consultasComArquivo.flatMap(doc => (cnpjsDasConsultas[doc.id] || []).map(raizDoCnpj)))
     for (const nota of notas) {
       const cnpjs = [nota.cnpj, (cnpjsDasNotas[nota.id] || [])[0]].filter(Boolean)
+      nota.cnpjNota = (cnpjsDasNotas[nota.id] || [])[0] || null
       nota.temSicaf = cnpjs.some(cnpj => cnpjsComSicaf.has(cnpj))
       nota.temConsulta = cnpjs.some(cnpj => raizesComConsulta.has(raizDoCnpj(cnpj)))
     }
@@ -404,7 +415,8 @@
   // Decisão D3: "Sicaf <razão social do SICAF>" (sem o ponto final de "LTDA.").
   const nomeDoSicaf = nome => nomeNaArvore(String(nome || '').replace(/\.\s*$/, ''))
   // Decisão D7: "Anexo Instrumento de Cobrança NF nº 63 CHC SOLUÇOES EM SERV. E COM. LTDA".
-  const nomeDoAnexo = (numero, fornecedor) => nomeNaArvore(`Instrumento de Cobrança NF nº ${numero || '?'} ${fornecedor || ''}`)
+  // v0.37.0: Fatura (rótulo da nota começa com "Fatura") → "Instrumento de Cobrança Fatura nº …".
+  const nomeDoAnexo = (numero, fornecedor, rotulo) => nomeNaArvore(`Instrumento de Cobrança ${/^FATURA\b/.test(normalizar(rotulo)) ? 'Fatura' : 'NF'} nº ${numero || '?'} ${fornecedor || ''}`)
 
   // Documentos a incluir, na ordem: por fornecedor Sicaf (com o PDF) e Consulta; por nota um Anexo.
   // Só o Sicaf quando "soSicaf" (outras unidades, etapa 6). Notas com Anexo já feito ficam de fora.
@@ -427,13 +439,13 @@
       if (!ordem) {
         if (sicaf && fornecedor.temPdf) itens.push({ tipo: 'Sicaf', nomeArvore: nomeSicaf, cnpj: fornecedor.cnpj })
         if (simples && fornecedor.temSimples) itens.push({ tipo: 'Consulta', nomeArvore: fornecedor.nomeConsulta || '', cnpj: fornecedor.cnpj })
-        if (anexo) for (const nota of fornecedor.notas || []) if (!nota.anexoFeito) itens.push({ tipo: 'Anexo', nomeArvore: nomeDoAnexo(nota.numero, nota.fornecedor), cnpj: fornecedor.cnpj, nota: nota.numero })
+        if (anexo) for (const nota of fornecedor.notas || []) if (!nota.anexoFeito) itens.push({ tipo: 'Anexo', nomeArvore: nomeDoAnexo(nota.numero, nota.fornecedor, nota.rotulo), cnpj: fornecedor.cnpj, nota: nota.numero })
         continue
       }
       const temSicaf = fornecedor.temPdf || fornecedor.jaTemSicaf || fornecedor.sicafSemPdf
       const temConsulta = fornecedor.temSimples || fornecedor.jaTemConsulta || fornecedor.consultaSemPdf
       const anexos = (fornecedor.jaTemSicaf || fornecedor.temPdf || fornecedor.jaTemConsulta || fornecedor.temSimples)
-        ? (fornecedor.notas || []).filter(nota => !nota.anexoFeito).map(nota => ({ tipo: 'Anexo', nomeArvore: nomeDoAnexo(nota.numero, nota.fornecedor), cnpj: fornecedor.cnpj, nota: nota.numero }))
+        ? (fornecedor.notas || []).filter(nota => !nota.anexoFeito).map(nota => ({ tipo: 'Anexo', nomeArvore: nomeDoAnexo(nota.numero, nota.fornecedor, nota.rotulo), cnpj: fornecedor.cnpj, nota: nota.numero }))
         : []
       let consulta = null
       if (fornecedor.temSimples) consulta = { tipo: 'Consulta', nomeArvore: fornecedor.nomeConsulta || '', cnpj: fornecedor.cnpj }
@@ -460,10 +472,24 @@
       if ((tipo !== 'sicaf' && tipo !== 'consulta') || doc.temArquivo || doc.feitoNoSei || SEM_NOME.test(String(doc.rotulo || '').trim())) return
       const outro = tipo === 'sicaf' ? lista[posicao + 1] : lista[posicao - 1]
       const vizinho = outro && outro.temArquivo && tipoNaArvore(outro.rotulo) === (tipo === 'sicaf' ? 'consulta' : 'sicaf') ? outro : null
-      const nome = String(doc.rotulo).replace(/\s*\(?\d{6,}\)?\s*$/, '').replace(/^(Sicaf|Consulta)\s+(Simples Nacional\s+)?/i, '').trim()
+      const nome = nomeDoDocumento(doc.rotulo)
       achados.push({ tipo, doc, vizinho, nome, antesDaFolha: posicao < ultimaFolha, outraUnidade: !doc.linkAlterar })
     })
     return achados
+  }
+  // Nome da empresa no rótulo da árvore: "Sicaf RG SEGURANCA LTDA (3400098)" → "RG SEGURANCA LTDA".
+  const nomeDoDocumento = rotulo => String(rotulo || '').replace(/\s*\(?\d{6,}\)?\s*$/, '').replace(/^(Sicaf|Consulta)\s+(Simples Nacional\s+)?/i, '').trim()
+  // v0.37.0 (decidido em 26/11/2026): Sicaf ou Consulta com PDF que não abriu conta pelo nome na árvore.
+  // Vale a nota do trecho cujo rótulo, ateste ou texto do PDF tem esse nome (o rótulo da nota muitas vezes
+  // não traz a empresa: "Nota fiscal nº 2026-1238 Outubro/2026"). Devolve os CNPJs dessas notas (ateste e
+  // emitente); sem nome ou sem nota: []. notas: situacaoDoProcesso().notas (com atestes).
+  function cnpjsPeloNome (doc, notas, { cnpjsDasNotas = {}, textosDasNotas = {} } = {}) {
+    const nome = nomeDoDocumento(doc && doc.rotulo)
+    if (!palavras(nome).length || SEM_NOME.test(String(doc.rotulo || '').trim())) return []
+    const parecidas = (notas || []).filter(nota => (nota.fornecedor && nomesParecidos(nota.fornecedor, nome)) ||
+      (nota.ateste && nota.ateste.empresa && nomesParecidos(nota.ateste.empresa, nome)) ||
+      (textosDasNotas[nota.id] && nomeNoTexto(nome, textosDasNotas[nota.id])))
+    return [...new Set(parecidas.flatMap(nota => [nota.cnpj, (cnpjsDasNotas[nota.id] || [])[0]]).filter(Boolean))]
   }
   // O Sicaf ou a Consulta sem PDF de um fornecedor: pelo CNPJ do vizinho (raiz, a Consulta vale para a
   // empresa toda) ou, sem ele, pelo nome. cnpjsDosVizinhos: { idDoVizinho: [CNPJs do PDF] }.
@@ -587,20 +613,35 @@
   }
 
   // "1 nota sem SICAF" / "2 notas sem SICAF"
-  function textoDoAviso (quantidade) {
+  // v0.37.0 (usuário, 26/11/2026, 2º pedido): botão da janela das notas: SICAF e Simples são por empresa (CNPJ),
+  // o Instrumento de Cobrança é por nota. "Buscar SICAF e Simples de 1 empresa (2 notas)".
+  function textoDaBusca (marcadas) {
+    const lista = marcadas || []
+    const empresas = new Set(lista.map(nota => soDigitos(nota.cnpjEscolhido || nota.cnpj || '') || normalizar(nota.fornecedor) || nota.id)).size
+    const deEmpresas = empresas === 1 ? 'de 1 empresa' : `de ${empresas} empresas`
+    const notas = lista.length === 1 ? '1 nota' : `${lista.length} notas`
+    return `Buscar SICAF e Simples ${deEmpresas} (${notas})`
+  }
+  // v0.37.0 (usuário, 26/11/2026): a busca é uma por empresa; com a lista de notas, o texto conta as empresas
+  // (CNPJ do ateste ou da nota; sem CNPJ, o nome) e diz quantas notas, quando são mais que as empresas.
+  function textoDoAviso (notas) {
     // v0.17.6: o botão busca SICAF e Simples Nacional juntos.
-    return quantidade === 1 ? '1 nota sem SICAF ou Simples' : `${quantidade} notas sem SICAF ou Simples`
+    if (typeof notas === 'number') return notas === 1 ? '1 nota sem SICAF ou Simples' : `${notas} notas sem SICAF ou Simples`
+    const lista = notas || []
+    const empresas = new Set(lista.map(nota => nota.cnpj || nota.cnpjNota || normalizar(nota.fornecedor) || nota.id)).size
+    const textoEmpresas = empresas === 1 ? '1 empresa sem SICAF ou Simples' : `${empresas} empresas sem SICAF ou Simples`
+    return lista.length > empresas ? `${textoEmpresas} (${lista.length} notas)` : textoEmpresas
   }
 
   const api = {
     LIMITE_DA_RESPOSTA_MS, siteRespondeu, pularAntes,
     UNIDADE_CGOC, CNPJ_CAMPUS_PALMAS, funcaoLigada, ehCgoc,
-    soDigitos, raizDoCnpj, cnpjValido, formatarCnpj, ehDoIfto, cnpjMatriz, acharCnpjs, cnpjDaSelecao,
+    soDigitos, raizDoCnpj, cnpjValido, formatarCnpj, mascaraCnpj, ehDoIfto, cnpjMatriz, acharCnpjs, cnpjDaSelecao,
     normalizar, mesmoNumero, textoDoHtml, nomesParecidos,
-    tipoNaArvore, numeroSei, lerRotuloDaNota, trechoPendente, lerAteste, situacaoDoProcesso, textoDoAviso,
+    tipoNaArvore, numeroSei, lerRotuloDaNota, trechoPendente, lerAteste, situacaoDoProcesso, textoDoAviso, textoDaBusca,
     cnpjsDaNota, notaSemTexto, empenhosDoTexto, nomeNoTexto, conferirNota, agruparPorFornecedor,
     URL_CONSULTA_SICAF, URL_INICIO_SICAF, URL_LOGIN_COMPRAS, URL_AREA_DE_TRABALHO, ORIGENS_COMPRAS, ORIGENS_GOVBR, paginaDoCompras, nomeDoArquivo, lerLinhaDoResultado, lerPdfDoSicaf, paraBase64, deBase64,
-    nomeNaArvore, nomeDoSicaf, nomeDoAnexo, documentosParaIncluir, semPdfNomeados, doFornecedor, aproveitarEmBranco, lerRespostaDoUpload, enderecoDoUpload, lerUsuarioDoUpload, formatarTamanho, linhaDoAnexo,
+    nomeNaArvore, nomeDoSicaf, nomeDoAnexo, documentosParaIncluir, semPdfNomeados, nomeDoDocumento, cnpjsPeloNome, doFornecedor, aproveitarEmBranco, lerRespostaDoUpload, enderecoDoUpload, lerUsuarioDoUpload, formatarTamanho, linhaDoAnexo,
     SEM_RESPOSTA_MS, andamentoDaBusca, pularFase, buscaComErro
   }
   if (typeof module !== 'undefined' && module.exports) module.exports = api

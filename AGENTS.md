@@ -2,7 +2,7 @@
 
 **Sections**: Language · Economical reading · Documentation · How we work · Who the user is · Reply after changing code · Tests · Version and git · Commands · How it works · Conventions
 
-Rules for any AI or person who works here (`CLAUDE.md` only imports this file). Programming: read `docs/claude-regras/regras/programacao.md` once at the start of the session (general rules: pull requests, review, engineering, security). Where they differ, this file wins.
+Rules for any AI or person who works here (`CLAUDE.md` only imports this file). Programming, on the owner's computer: read `~/.claude/regras/programacao.md` once at the start of the session (general rules: pull requests, review, engineering, security; colleagues follow `CONTRIBUTING.md`). Where they differ, this file wins.
 
 Extension for **Firefox** and Chrome (free package, v0.5.0) that goes with the campus Budget Management System: it improves the IFTO SEI and, with login, reads the system data from the Google Spreadsheet to fill documents and capture data on other sites (SEI, SUAP, SIAFI, SICAF, Simples Nacional, Comprasnet). Version in `manifest.json`. The main system lives in `../sistema-orcamento-ifto` (another repository): business rules and the spreadsheet are there; **do not copy**, read only the needed part.
 
@@ -13,7 +13,7 @@ Extension for **Firefox** and Chrome (free package, v0.5.0) that goes with the c
 
 ## Economical reading
 
-- **First command of the session, only on the owner's computers** (`git config user.name` is `gvtenberg`; anyone else skips it, see `CONTRIBUTING.md`): `diff -q ~/.claude/CLAUDE.md docs/claude-regras/CLAUDE.md; diff -rq ~/.claude/regras docs/claude-regras/regras` (the user's general rules, identical on every computer). If they differ or the computer files are missing, follow "Same rules on every computer" in `programacao.md`.
+- **First command of the session, only on the owner's computers** (`git config user.name` is `gvtenberg`; anyone else skips it, see `CONTRIBUTING.md`): `git -C ~/regras-claude pull -q --ff-only` (the user's general rules, in the private repository `gvtenberg/regras-claude`; since 26/11/2026 this project keeps no copy). If it fails, say so in one line and go on.
 - At the start **do not read** `docs/` or `TESTES-PENDENTES.md`. Read only what the task needs, only the needed part, and do not re-read what was already read in the session.
 - Files with several sections have the "**Sections**" index on line 3: read the first 5 lines and search for the title. `docs/historico.md`: search for the version. `TESTES-PENDENTES.md`: `### T12`, never the whole file. To resume work: only "Status" in `docs/melhorias-futuras.md`.
 - Where things are: `docs/README.md` (index). File map: `grep -rn "name" docs/arquitetura/`. Rules: `docs/regras/LEIA-ME.md`.
@@ -62,13 +62,14 @@ Extension for **Firefox** and Chrome (free package, v0.5.0) that goes with the c
 
 ## Version and git
 
-- Not the owner (`git config user.name` is not `gvtenberg`, e.g. the fork `dcarvalho89/extensao-ifto`): read `CONTRIBUTING.md` first; never sync or change `docs/claude-regras/`.
+- Not the owner (`git config user.name` is not `gvtenberg`, e.g. the fork `dcarvalho89/extensao-ifto`): read `CONTRIBUTING.md` first.
 - **Version number (same rule for everyone: owner and colleagues), format `0.MIDDLE.LAST`:**
   - The next number after the last one in **master's** `docs/historico.md`; never skip, never reuse. Only `manifest.json` holds it, plus one or two lines in `docs/historico.md` with the date (dd/mm/yyyy).
   - **Middle +1** (last back to 0) only at the **first stage of a new improvement** (a new spec, or an old spec resumed with new features: one middle number per spec, 18/11/2026). Its other stages, fixes and small changes: **last +1**. Example: master at 0.21.1 → new improvement 0.22.0 → its stage 2 0.22.1 → a fix 0.22.2.
   - Changes not merged into master yet share the open number (same line in `historico.md`); after the merge, a new number, otherwise Mozilla does not sign and the extension does not update. Each version is signed only once by Mozilla.
   - **Pull request from a fork:** one number for the whole pull request (stages inside the fork do not bump), taken only when updating the fork with master (`CONTRIBUTING.md`). The pull request check refuses any other number.
 - **Never commit on `master`** nor push to it (25/11/2026, user): branch + pull request, flow in `programacao.md`, "Pull requests" (its `main` is `master` here). **A merge with a new version makes Mozilla sign and update everybody's extension:** say so when asking for the merge; the user tests before it with `npm run rodar-sei`.
+- **One round = one pull request = one version = one signing** (26/11/2026, user): Mozilla takes long to sign and more changes always follow, so the work of a round (stages, test fixes, small changes) piles up on one branch `rodada/vX.Y.Z` with **one version number** (middle +1 if the round has a new improvement, else last +1). Pull requests already open are merged into it (their versions and test numbers renumbered) and closed pointing to it. Only the end of the round goes to master, after the user tests with `npm run rodar-sei`. An urgent fix may go alone.
 - **No version, no signing:** what does not go into the extension: docs (`.md`, `docs/`, `.claude/`), `.github/`, `testes/`, `package.json` and `package-lock.json` (commit "docs: …", "ci: …", "test: …" or "chore: …").
 - **Always commit after the changes** (25/11/2026, user; wins over "Batch changes" in the general rules): every finished change is committed on its branch in the same reply, with its docs and tests, without waiting for the user to test. Also commit pending changes before each stage or round.
 - Commit format **"vX.Y.Z: type: short summary"** (e.g. "v0.1.3: feat: procurar atualização na janela"); types in `programacao.md`. Check in `git status` that nothing from `ferramentas-de-teste/`, keys or `.xpi` got in.

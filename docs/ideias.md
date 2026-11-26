@@ -8,6 +8,8 @@ One line each. Status of what is done or pending: `melhorias-futuras.md`.
 
 One line per idea. When an idea is planned, it gets a spec in `docs/specs/` and the line points to it. When finished, the line leaves here and goes to `docs/historico.md`.
 
+- **Copy bidding documents to Compras.gov** (26/11/2026, user: "em breve"): the extension copies some documents (e.g. Termo de Referência, after "Remover Formatação da AGU") to Compras.gov automatically.
+
 - **Check "Interessado" and "Assunto"** (18/11/2026): like the process number, warn when they do not match the process (after `specs/feitas/conferir-documento.md`).
 - **Settings page smaller and clearer** (18/11/2026): today it is long with little information spread out; first round was stage 1 of `specs/feitas/conferir-documento.md`; later rounds as needed.
 - **Differences inside the document** (19/11/2026, T195): auto-save "Ver diferenças" shown in the text itself (green and struck-through red), instead of the side panel.
@@ -83,3 +85,14 @@ Marks: **[spec]** already has a spec.
 - **"What's new" between published versions** (19/11/2026, user): for each version published on GitHub (Releases), a list of the features added or removed compared with the previous published version (not commit by commit), in plain Portuguese for users, e.g. "adicionada opção para remover MINUTA de edital".
 - When the extension leaves development: decide whether the "Procurar atualização" button leaves the icon window (12/11/2026).
 - Mozilla "unlisted" signing via GitHub, with automatic updates: prepared in v0.1.1 and v0.1.2 (`publicacao.md`); the user still has to create the keys. Later, maybe, for campus colleagues. Colleagues currently use SEI Pro.
+- **To plan (tests round 26/11/2026, user; run `/planejar` for each):**
+  - Settings pages clearer, with folded explanations, and a new title for "Lista para a direção" on every page (T243).
+  - Yellow warnings: new colour palette (T258).
+  - Notices that close by themselves: a bar on top that starts full and shrinks until the notice closes; pauses with the mouse over it; "×" closes now; only for success notices (errors and questions stay) (T259, T267).
+  - Simpler GitHub test cards: only version, commit and where (T262).
+  - Screen in the settings to see and edit the unit data the extension saved (timbre, footer, signature) (T267).
+  - #355: tooltip with the full name of a tree document (SEI and external); "R$ por extenso" keeps the bold of the value; "Duplicar documento" for external documents (without the attached file); new blank lines keep the formatting of the line above; style list opens scrolled to and showing the current style; signature data per unit in the settings.
+- Fatura and Nota fiscal: also add the "Folha de Encaminhamento" (and a real Instrumento de Cobrança, see `specs/instrumento-cobranca.md`), not only the blank Anexo (26/11/2026, user: later).
+- SEI background colour option (26/11/2026, user).
+- Make the project follow the LGPD (Brazil's data protection law) (#355, 26/11/2026).
+

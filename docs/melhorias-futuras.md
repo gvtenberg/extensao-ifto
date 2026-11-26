@@ -6,7 +6,11 @@
 
 Summary to resume work (on another machine or by another person) without reading everything. Update at the end of each stage or round.
 
+- **Round v0.37.0 (26/11/2026, branch `rodada/v0.37.0`, PR #363, one signing):** test round of 26/11 fixed (passed tests deleted, bugs fixed; tests T295–T304). Items to plan later: `ideias.md`, "To plan (tests round 26/11/2026)". Next: the user tests with `npm run rodar-sei`, then the merge.
+- **Done, waiting for tests (v0.37.0, 26/11/2026):** numbering broken by hidden boxes and typed numbers (`specs/feitas/numeracao-caixas-ocultas.md`, rules in `regras/sei-editor.md`). Tests T282–T286 (T284 critical: the saved document and the PDF). Same version: NF/RANFS abbreviations in external document names (no spec; rule in `regras/sei-documentos.md`), T287.
+- **Done, waiting for tests (v0.37.0, 26/11/2026, same round):** "Remover Formatação da AGU" (`specs/feitas/remover-formatacao-agu.md`, rules in `regras/sei-editor.md`). Tests T288–T294 (T290 critical: changes the document text).
 - **Done, waiting for tests (v0.36.3, 25/11/2026):** code style, nothing changes on screen (no spec). Tests T273–T274.
+- **Done, waiting for tests (v0.37.0, 26/11/2026, same round):** Enter in "Nome na Árvore" of the dragged-files window = "Incluir no processo" (no spec). Test T281.
 - **Done, waiting for tests (v0.36.2, 25/11/2026):** Capa interessados, editor already open, notices icon, sites down before the search, spacing after "Assunto" in a new Despacho (no spec). Tests T267–T272 (T267 critical).
 - **Done, waiting for tests (v0.36.1, 25/11/2026):** external documents (open the first, message, type by name, drop area) and blank lines around the signer (no spec; rules in `regras/sei-documentos.md` and `regras/conferir-documento.md`). Tests T259–T266 (T259 critical). Still open: why the editor sometimes asked again for the blank lines (T266).
 - **Done, waiting for tests (v0.36.0, 24/11/2026):** "Duplicar documento" (`specs/feitas/duplicar-documento.md`, rules in `regras/sei-processo.md`). Tests T253–T258 (T253 critical: saves a document in the SEI).
@@ -44,6 +48,7 @@ Summary to resume work (on another machine or by another person) without reading
 - **Pending, to plan (19/11/2026, user):** the "Salvo no SEI hoje às hh:mm" text next to Salvar (auto-save, `sites/sei/salvamento-automatico.js`) makes the editor's first toolbar row very tall and hides "A versão deste computador foi apagada". Options: (a) only a small mark next to Salvar, full text in the button's tooltip (suggested: little code, nothing over the editor); (b) small floating window, movable, with close button and an on/off setting, fixed while the page scrolls, never over the editor icons, saying the document is also saved on this computer and can be restored if the SEI fails to save. Decide in `/planejar`.
 - **Planning (23/11/2026):** Instrumento de Cobrança in Contratos.gov.br, `specs/instrumento-cobranca.md`; D1–D8, D14–D17 answered, D9–D13, D18–D21 open (site was down: waiting for the user to describe the 6 tabs and copy `formulario.html`, `lista.html`, `ver.html`).
 - **Planning (24/11/2026):** `specs/empenho-substitutivo.md` (after the IC); **remind the user of the pages listed in its section 5**.
+- **Pending, to plan (26/11/2026, user gave up for now):** open the SICAF by itself after the Gov.br login. On the Compras.gov.br Área de Trabalho the extension stays on "Abrindo o SICAF…" and then asks the user to click their name and "SICAF" (T307 failed again in v0.37.0, after several tries: direct link, menu click, waits). Before coding again: console lines "[extensão IFTO] …" and the saved Área de Trabalho page (`ferramentas-de-teste/`).
 - **Planned (with spec):** lines marked **[spec]** below. **Not planned:** the other lines (ideas).
 
 Ideas for later, one line each: `ideias.md`.

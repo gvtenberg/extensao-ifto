@@ -14,6 +14,13 @@ Search by file name (`grep`). Index: `../arquitetura.md`.
 | `sites/sei/tabelas.js` | (v0.24.0) Editor window: asks the background (`tabelasPreparar`) to prepare the tables if the settings are on |
 | `sites/sei/editor-numeracao.js` | (v0.25.0) Inside the editor page (world MAIN): finds items whose text went to the next line, watches changes (`postMessage` to the box), puts the style block (`corrigir`); v0.26.11: `porBloco` and `acharEditor` shared with the spacing |
 | `sites/sei/numeracao-edital.js` | (v0.25.0) Editor window: box "Corrigir a numeração" shown only while there are broken items |
+| `comum/numeracao-digitada.js` | (v0.37.0) Pure rules: hidden box that disturbs the numbering, typed number at the start, new style, numbers the counters will show |
+| `sites/sei/editor-caixas.js` | (v0.37.0) Inside the editor page (world MAIN, with `editor-numeracao.js` for `acharEditor`): finds hidden boxes and typed numbers, unwraps, lists, scrolls to a paragraph, converts (CKEditor model) |
+| `sites/sei/numeracao-caixas.js` | (v0.37.0) Editor window: notices "Tirar o texto das caixas" and "Revisar e converter" |
+| `sites/sei/painel-revisao.js` | (v0.37.0) Shared left review panel (ticked list, click to go, confirm button); opens only on click |
+| `comum/formatacao-agu.js` | (v0.37.0) Pure rules of "Remover Formatação da AGU": "Justificativa…" text, Word comment link, color type (black/white/colored), space when joining, line text |
+| `sites/sei/editor-agu.js` | (v0.37.0) Inside the editor page (world MAIN, with `editor-numeracao.js` and `editor-caixas.js`): finds and removes struck text, colors, white text, highlights, "Justificativa…", Word links and SEI comment balloons (CKEditor model) |
+| `sites/sei/formatacao-agu.js` | (v0.37.0) Editor window: "Remover Formatação da AGU" notice and review panel |
 | `sites/sei/editor-estilos.js` | (v0.29.0) Inside the editor page (world MAIN): adds the extras to the `EstiloEditing` plugin and their CSS, ★ and note in the list, keeps the style block up to date |
 | `sites/sei/todos-os-estilos.js` | (v0.29.0) Editor window: starts the extras and saves learned styles; switch off + block in the text: box "Ligar de novo" |
 | `sites/sei/editor-salvamento.js` | (v0.31.0) Inside the editor page (world MAIN): reads text (`getFullData`, editable roots) + comments, watches Salvar (events `extensao-ifto-salvando` / `extensao-ifto-salvou`, SEI version changed), reloads the editor with a copy (destroy + `montar`, falls back to the previous text) |

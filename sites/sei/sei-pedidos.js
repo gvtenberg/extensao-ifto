@@ -135,7 +135,6 @@
     const sicaf = ExtensaoIFTO.sicaf
     // Só é pedido se algum item for novo (v0.16.0: os em branco são alterados).
     let pagina = null
-    let paginaEmBranco = null
 
     for (let posicao = 0; posicao < itens.length; posicao++) {
       if (deveParar()) return
@@ -147,7 +146,9 @@
         incluidos.push(tipo)
         continue
       }
-      if (!paginaEmBranco) paginaEmBranco = await abrirExternoNovo(lida)
+      // v0.37.0 (T275, 4 arquivos arrastados, só o 1º entrava): um formulário novo do SEI para cada documento;
+      // o mesmo formulário, usado de novo depois de salvar, o SEI não aceitava.
+      const paginaEmBranco = await abrirExternoNovo(lida)
       // 1º: escolher o tipo (trocarSerie() do SEI), sempre a partir do formulário em branco.
       const emBranco = formularioDoExterno(paginaEmBranco)
       const lista = emBranco.querySelector('#selSerie')
@@ -259,6 +260,11 @@
     const primeiro = ExtensaoIFTO.sei.primeiroIncluido(conhecidos, antes, [])
     if (primeiro && primeiro.link) quadro.contentWindow.location.href = new URL(primeiro.link, location.href).href
     else recarregarArvore()
+    await abrirNaArvoreNova(quadro, velha, lida.idProcesso, nova => primeiro || ExtensaoIFTO.sei.primeiroIncluido([], antes, nova.documentos.map(doc => doc.id)))
+  }
+
+  // Espera a árvore nova (até 20 s) e abre à direita o documento que acharAlvo(árvore nova) indicar.
+  async function abrirNaArvoreNova (quadro, velha, idProcesso, acharAlvo, sempreClicar = false) {
     const fim = Date.now() + 20000
     while (Date.now() < fim) {
       await esperar(400)
@@ -266,16 +272,28 @@
       try { arvore = quadro.contentDocument } catch (erro) { continue }
       const nova = arvore && arvore !== velha && arvore.readyState === 'complete' ? arvoreAberta() : null
       if (!nova) continue
-      if (nova.idProcesso !== lida.idProcesso) return
-      const alvo = primeiro || ExtensaoIFTO.sei.primeiroIncluido([], antes, nova.documentos.map(doc => doc.id))
+      if (nova.idProcesso !== idProcesso) return
+      const alvo = acharAlvo(nova)
       if (!alvo) return
       await esperar(1000)
       const direita = document.getElementById('ifrConteudoVisualizacao')
-      try { if (new URL(direita.contentWindow.location.href).searchParams.get('id_documento') === alvo.id) return } catch (erro) { /* clica */ }
+      // sempreClicar: a direita pode ainda mostrar o documento antes de o SEI trocar pelo último da árvore.
+      try { if (!sempreClicar && new URL(direita.contentWindow.location.href).searchParams.get('id_documento') === alvo.id) return } catch (erro) { /* clica */ }
       const link = quadro.contentDocument && quadro.contentDocument.getElementById('anchor' + alvo.id)
       if (link) { link.scrollIntoView({ block: 'nearest' }); link.click() }
       return
     }
+  }
+
+  // v0.37.0 (#355): depois de anexar o arquivo a um documento em branco, recarrega a árvore e abre esse mesmo
+  // documento (o SEI, sozinho, abria o último da árvore, que nem sempre é o que recebeu o arquivo).
+  async function abrirDepoisDeAnexar (idDocumento) {
+    const quadro = document.getElementById('ifrArvore')
+    let velha = null
+    try { velha = quadro.contentDocument } catch (erro) { /* só compara */ }
+    const lida = arvoreAberta()
+    recarregarArvore()
+    if (lida) await abrirNaArvoreNova(quadro, velha, lida.idProcesso, () => ({ id: String(idDocumento) }), true)
   }
 
   // v0.15.0 (saiu de sicaf.js na v0.27.1 para servir também aos arquivos arrastados): inclui os itens com a
@@ -316,5 +334,5 @@
     aberta.trocarBotoes([{ texto: 'Fechar', tipo: 'principal', aoClicar: j => j.fechar() }])
   }
 
-  ExtensaoIFTO.seiPedidos = { pedir, baixar, baixarPdf, lerHtml, camposDoFormulario, enviar, incluirExternos, anexarAoExterno, tiposDoExterno, abrirIncluir, formularioDoTipo, incluirNaJanela, arvoreAberta, recarregarArvore }
+  ExtensaoIFTO.seiPedidos = { pedir, baixar, baixarPdf, lerHtml, camposDoFormulario, enviar, incluirExternos, anexarAoExterno, tiposDoExterno, abrirIncluir, formularioDoTipo, incluirNaJanela, arvoreAberta, recarregarArvore, abrirDepoisDeAnexar }
 })()
