@@ -86,9 +86,22 @@
 
   // abrir({ titulo, conteudo: [nós], botoes: [{ texto, tipo: 'principal'|'perigo', aoClicar(janela) }] })
   // Devolve { fechar, corpo, botoes } . Esc ou × fecham (aoFechar é chamado).
+  // v0.37.0 (pedido do usuário, 26/11/2026: busca travada, páginas fechadas e busca de novo mostravam duas
+  // janelas iguais): nunca duas janelas com o mesmo título na mesma página. A anterior é fechada antes (também
+  // a aberta por outra cópia do script da extensão na página, pelo evento que ela escuta).
+  function fecharRepetidas (titulo) {
+    for (const outra of document.querySelectorAll('[data-extensao-ifto="janela"]')) {
+      if (outra.dataset.titulo !== String(titulo)) continue
+      outra.dispatchEvent(new CustomEvent('extensao-ifto-fechar'))
+      outra.remove()
+    }
+  }
+
   function abrir ({ titulo, conteudo = [], botoes = [], aoFechar }) {
+    fecharRepetidas(titulo)
     const hospedeiro = document.createElement('div')
     hospedeiro.dataset.extensaoIfto = 'janela'
+    hospedeiro.dataset.titulo = String(titulo)
     const raiz = hospedeiro.attachShadow({ mode: 'open' })
     const estilo = document.createElement('style')
     estilo.textContent = ESTILO
@@ -129,6 +142,7 @@
     const teclas = evento => { if (evento.key === 'Escape' && evento.composedPath().includes(hospedeiro)) { evento.stopPropagation(); api.fechar() } }
     document.addEventListener('keydown', teclas, true)
     fechar.addEventListener('click', () => api.fechar())
+    hospedeiro.addEventListener('extensao-ifto-fechar', () => api.fechar())
     recolher.addEventListener('click', () => janela.classList.toggle('recolhida'))
     arrastar(janela, topo)
     noLugar(janela)
@@ -168,9 +182,12 @@
   let ultimaMensagem = null
   function mensagemRapida (texto, segundos = 6) {
     if (ultimaMensagem) ultimaMensagem.remove()
+    // v0.37.0: também a mensagem igual posta por outra cópia do script.
+    for (const outra of document.querySelectorAll('[data-extensao-ifto="mensagem"]')) if (outra.dataset.texto === String(texto)) outra.remove()
     const hospedeiro = document.createElement('div')
     ultimaMensagem = hospedeiro
     hospedeiro.dataset.extensaoIfto = 'mensagem'
+    hospedeiro.dataset.texto = String(texto)
     hospedeiro.setAttribute('role', 'status')
     const raiz = hospedeiro.attachShadow({ mode: 'open' })
     const caixa = criar('div', { textContent: texto })

@@ -13,6 +13,8 @@ Follows the system's pattern (`../sistema-orcamento-ifto/docs/padrao-visual.md`)
 
 ## What the extension adds to pages (SEI and other sites)
 
+- Never two windows for the same item on one page (user, 26/11/2026): `janela.abrir` (`sites/sei/sicaf-janela.js`) closes any open window with the same title first; quick messages with the same text too.
+
 - **Discreet and in the site's style**, not the system's: what is added should look like part of the page.
 - Everything the extension adds is identifiable (e.g. a small extension icon), so the user knows what belongs to the site and what to the extension.
 - Do not change what the site already shows unless the user turns the feature on in the settings. Exception (v0.3.0): features of the open SEI unit's profile may come on ("Automática"), like the signature list in the Director-General's office; the user can turn them off.
