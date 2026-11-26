@@ -34,7 +34,7 @@ jobs:
     timeout-minutes: 90 # v0.9.4: espera da aprovação (até 30 min) + download da versão já assinada (até 30 min) + folga
     steps:
       - name: Baixar o código
-        uses: actions/checkout@v5
+        uses: actions/checkout@v7
         with:
           fetch-depth: ${{ github.event_name == 'pull_request' && '0' || '1' }} # pull request: história toda, para a conferência abaixo
 
