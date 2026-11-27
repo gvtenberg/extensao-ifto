@@ -57,6 +57,7 @@ Extension for **Firefox** and Chrome (free package, v0.5.0) that goes with the c
 
 - Format, cards and repeated numbers: `docs/testes.md` (read before writing or reading manual tests).
 - `TESTES-PENDENTES.md` (Portuguese) is the source of the GitHub cards, created when master receives the file (merge). New number at the end, never reused; never delete a test without "Passou" on the card (or the user's request). An uncommented test = it worked.
+- **Close cards early** (27/11/2026, user): when reading the cards, a passed test with no comment is closed at once; a card with a comment is closed as soon as its fix is committed (or when nothing is needed). Each early close gets a short comment "corrigido em vX.Y.Z (commit …), entra no próximo merge" and the label `aguardando merge`, removed at the merge. A fix that fails in the next test: reopen the same card (no new card). Open cards = work not done yet.
 - Automated tests at every stage; the user tests the whole improvement at the end. Only stop earlier for a **critical** test (writes to an official system – SEI, spreadsheet – or decides the direction of the next stage), marked "(Crítico)".
 - Minimum check: `npm test` and `npm run conferir`. **Never test with screenshots** (nor open the browser to see the screen) without the user's explicit request.
 

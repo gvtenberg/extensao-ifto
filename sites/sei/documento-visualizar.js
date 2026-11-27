@@ -83,7 +83,7 @@
   const sigla = regras.siglaDaUnidade(await caixaEditor.unidadeAberta())
   if (!regras.ehUnidadePalmas(sigla)) return
   // v0.35.2: cargo da diretora-geral (só na Direção-geral).
-  const cargo = configuracoes.conferirCargo ? regras.conferirCargo(secoes, sigla) : null
+  const cargo = configuracoes.conferirCargo ? regras.conferirCargo(secoes, sigla, configuracoes.cargosPorUnidade) : null
   if (cargo && !cargo.certo && !editorAberto) avisoDaPagina('conferir-cargo', 'Confira o cargo da diretora-geral:', cargo.problemas)
   const unidade = regras.acharUnidade(configuracoes.unidades, sigla)
   const timbre = configuracoes.conferirTimbre ? regras.conferirTimbre(secoes, unidade, sigla) : null

@@ -40,7 +40,24 @@
     return cadastro.nivel === '1' ? 'restrito' : ''
   }
 
-  const api = { podeDuplicar, acharTipo, lerLista, listaEmTexto, semRepetidos, nivelACopiar, numeroDoDocumento }
+  // v0.38.0 (#355): documento externo (vazio ou com arquivo), da própria unidade (só ela tem o "Alterar").
+  function podeDuplicarExterno (lida, documento) {
+    return Boolean(lida && lida.linkIncluir && documento && !documento.feitoNoSei && documento.linkAlterar)
+  }
+
+  // Campos do "Alterar Documento Externo" do original que vão para a cópia ([[nome, valor]] → objeto). O
+  // arquivo (hdnAnexos) e os números do original (documento, processo) ficam de fora.
+  const DO_EXTERNO = ['hdnIdSerie', 'txtDataElaboracao', 'txtNumero', 'txtNomeArvore', 'txtDinValor', 'txtDescricao', 'rdoFormato',
+    'selTipoConferencia', 'hdnIdTipoConferencia', 'txtRemetente', 'hdnIdRemetente', 'hdnInteressados', 'hdnDestinatarios', 'hdnAssuntos',
+    'txaObservacoes', 'rdoNivelAcesso', 'selGrauSigilo', 'selHipoteseLegal', 'hdnStaNivelAcessoLocal', 'hdnIdHipoteseLegal', 'hdnStaGrauSigilo']
+  function camposDoExterno (campos) {
+    const copia = {}
+    for (const [nome, valor] of campos || []) if (DO_EXTERNO.includes(nome)) copia[nome] = valor
+    for (const [nome, valor] of campos || []) if (nome === 'selSerie' && !copia.hdnIdSerie && valor && valor !== 'null') copia.hdnIdSerie = valor
+    return copia
+  }
+
+  const api = { podeDuplicar, podeDuplicarExterno, camposDoExterno, acharTipo, lerLista, listaEmTexto, semRepetidos, nivelACopiar, numeroDoDocumento }
   if (no) module.exports = api
   else raiz.ExtensaoIFTO = Object.assign(raiz.ExtensaoIFTO || {}, { duplicarDocumento: api })
 })(globalThis)

@@ -125,7 +125,7 @@
     }
     const { cargo, italico } = verificado
     if (cargo && !cargo.certo) {
-      avisoComBotao('conferir-cargo', 'Confira o cargo da diretora-geral:', cargo.problemas, `Corrigir para "${regras.CARGO_DA_DIRETORA}"`, 'cargo', 'Cargo corrigido.', cargo.editavel)
+      avisoComBotao('conferir-cargo', 'Confira o cargo abaixo do nome:', cargo.problemas, `Corrigir para "${cargo.esperado}"`, 'cargo', 'Cargo corrigido.', cargo.editavel)
     }
     if (italico && !italico.certo) {
       const trechos = italico.quantos > italico.trechos.length ? [...italico.trechos, '…'] : italico.trechos

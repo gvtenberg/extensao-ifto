@@ -126,6 +126,8 @@
     if (/^ATESTE\b/.test(r)) return 'ateste'
     if (/^FOLHA DE ENCAMINHAMENTO\b/.test(r)) return 'folha'
     if (/^SICAF\b/.test(r)) return 'sicaf'
+    // v0.38.0 (usuário, 27/11/2026): "Consulta Consolidada TCU <empresa>" não é a Consulta do Simples Nacional.
+    if (/^CONSULTA\s+CONSOLIDADA\b/.test(r)) return 'tcu'
     if (/^CONSULTA\b/.test(r)) return 'consulta'
     if (/^ANEXO\b/.test(r)) return 'anexo'
     return null
@@ -418,6 +420,9 @@
   // v0.37.0: Fatura (rótulo da nota começa com "Fatura") → "Instrumento de Cobrança Fatura nº …".
   const nomeDoAnexo = (numero, fornecedor, rotulo) => nomeNaArvore(`Instrumento de Cobrança ${/^FATURA\b/.test(normalizar(rotulo)) ? 'Fatura' : 'NF'} nº ${numero || '?'} ${fornecedor || ''}`)
 
+  // v0.38.0 (usuário, 27/11/2026): "Consulta Consolidada TCU <razão social>" (tipo Consulta do SEI).
+  const nomeDoTcu = nome => nomeNaArvore('Consolidada TCU ' + String(nome || '').replace(/\.\s*$/, ''))
+
   // Documentos a incluir, na ordem: por fornecedor Sicaf (com o PDF) e Consulta; por nota um Anexo.
   // Só o Sicaf quando "soSicaf" (outras unidades, etapa 6). Notas com Anexo já feito ficam de fora.
   // v0.17.6 (pedido de 13/11/2026, um botão só): o que incluir depende do pedido. CGOC (notas): Sicaf com o
@@ -430,30 +435,37 @@
   // sem PDF) ocupa o lugar: não cria outro. Empresa com Sicaf/Consulta sem PDF de outra unidade: nada (R8).
   // Campos do fornecedor: temPdf/temSimples (PDF obtido agora), jaTemSicaf/jaTemConsulta (com PDF no
   // processo), sicafSemPdf/consultaSemPdf (sem PDF no processo), outraUnidade.
-  function documentosParaIncluir (fornecedores, { sicaf = true, simples = true, anexo = true } = {}) {
-    const ordem = sicaf && simples && anexo
+  // v0.38.0 (usuário, 27/11/2026): janela das notas com 4 caixas (SICAF, Simples, Consulta consolidada do
+  // TCU, Instrumento de Cobrança); "ordem" liga a regra acima para o que foi marcado. A Consulta do TCU ainda
+  // não é buscada: entra sempre em branco (semPdf), uma por empresa, depois da do Simples (fornecedor.jaTemTcu:
+  // já no processo). A regra R2 vale só quando SICAF ou Simples foi marcado.
+  function documentosParaIncluir (fornecedores, { sicaf = true, simples = true, tcu = false, anexo = true, ordem = sicaf && simples && anexo } = {}) {
     const itens = []
     for (const fornecedor of fornecedores || []) {
       const nomeSicaf = nomeDoSicaf(fornecedor.nomeNoSicaf || fornecedor.nomeNoSimples || fornecedor.nome)
       if (fornecedor.outraUnidade) continue
+      const anexosDe = () => (fornecedor.notas || []).filter(nota => !nota.anexoFeito).map(nota => ({ tipo: 'Anexo', nomeArvore: nomeDoAnexo(nota.numero, nota.fornecedor, nota.rotulo), cnpj: fornecedor.cnpj, nota: nota.numero }))
+      const tcuDe = () => ({ tipo: 'Consulta', tcu: true, nomeArvore: nomeDoTcu(fornecedor.nomeNoSicaf || fornecedor.nomeNoSimples || fornecedor.nome), cnpj: fornecedor.cnpj, semPdf: true })
       if (!ordem) {
         if (sicaf && fornecedor.temPdf) itens.push({ tipo: 'Sicaf', nomeArvore: nomeSicaf, cnpj: fornecedor.cnpj })
         if (simples && fornecedor.temSimples) itens.push({ tipo: 'Consulta', nomeArvore: fornecedor.nomeConsulta || '', cnpj: fornecedor.cnpj })
-        if (anexo) for (const nota of fornecedor.notas || []) if (!nota.anexoFeito) itens.push({ tipo: 'Anexo', nomeArvore: nomeDoAnexo(nota.numero, nota.fornecedor, nota.rotulo), cnpj: fornecedor.cnpj, nota: nota.numero })
+        if (tcu && !fornecedor.jaTemTcu) itens.push(tcuDe())
+        if (anexo) itens.push(...anexosDe())
         continue
       }
       const temSicaf = fornecedor.temPdf || fornecedor.jaTemSicaf || fornecedor.sicafSemPdf
       const temConsulta = fornecedor.temSimples || fornecedor.jaTemConsulta || fornecedor.consultaSemPdf
-      const anexos = (fornecedor.jaTemSicaf || fornecedor.temPdf || fornecedor.jaTemConsulta || fornecedor.temSimples)
-        ? (fornecedor.notas || []).filter(nota => !nota.anexoFeito).map(nota => ({ tipo: 'Anexo', nomeArvore: nomeDoAnexo(nota.numero, nota.fornecedor, nota.rotulo), cnpj: fornecedor.cnpj, nota: nota.numero }))
-        : []
+      const base = (!sicaf && !simples) || fornecedor.jaTemSicaf || fornecedor.temPdf || fornecedor.jaTemConsulta || fornecedor.temSimples
+      const anexos = anexo && base ? anexosDe() : []
+      const tcuItem = tcu && base && !fornecedor.jaTemTcu ? tcuDe() : null
+      const depois = Boolean(tcuItem || anexos.length)
       let consulta = null
-      if (fornecedor.temSimples) consulta = { tipo: 'Consulta', nomeArvore: fornecedor.nomeConsulta || '', cnpj: fornecedor.cnpj }
-      else if (!temConsulta && anexos.length) consulta = { tipo: 'Consulta', nomeArvore: fornecedor.nomeConsulta || '', cnpj: fornecedor.cnpj, semPdf: true }
+      if (simples && fornecedor.temSimples) consulta = { tipo: 'Consulta', nomeArvore: fornecedor.nomeConsulta || '', cnpj: fornecedor.cnpj }
+      else if (simples && !temConsulta && depois) consulta = { tipo: 'Consulta', nomeArvore: fornecedor.nomeConsulta || '', cnpj: fornecedor.cnpj, semPdf: true }
       let sicafItem = null
-      if (fornecedor.temPdf) sicafItem = { tipo: 'Sicaf', nomeArvore: nomeSicaf, cnpj: fornecedor.cnpj }
-      else if (!temSicaf && (consulta || anexos.length)) sicafItem = { tipo: 'Sicaf', nomeArvore: nomeSicaf, cnpj: fornecedor.cnpj, semPdf: true }
-      itens.push(...[sicafItem, consulta].filter(Boolean), ...anexos)
+      if (sicaf && fornecedor.temPdf) sicafItem = { tipo: 'Sicaf', nomeArvore: nomeSicaf, cnpj: fornecedor.cnpj }
+      else if (sicaf && !temSicaf && (consulta || depois)) sicafItem = { tipo: 'Sicaf', nomeArvore: nomeSicaf, cnpj: fornecedor.cnpj, semPdf: true }
+      itens.push(...[sicafItem, consulta, tcuItem].filter(Boolean), ...anexos)
     }
     return itens
   }
@@ -478,7 +490,7 @@
     return achados
   }
   // Nome da empresa no rótulo da árvore: "Sicaf RG SEGURANCA LTDA (3400098)" → "RG SEGURANCA LTDA".
-  const nomeDoDocumento = rotulo => String(rotulo || '').replace(/\s*\(?\d{6,}\)?\s*$/, '').replace(/^(Sicaf|Consulta)\s+(Simples Nacional\s+)?/i, '').trim()
+  const nomeDoDocumento = rotulo => String(rotulo || '').replace(/\s*\(?\d{6,}\)?\s*$/, '').replace(/^(Sicaf|Consulta)\s+(Simples Nacional\s+|Consolidada TCU\s+)?/i, '').trim()
   // v0.37.0 (decidido em 26/11/2026): Sicaf ou Consulta com PDF que não abriu conta pelo nome na árvore.
   // Vale a nota do trecho cujo rótulo, ateste ou texto do PDF tem esse nome (o rótulo da nota muitas vezes
   // não traz a empresa: "Nota fiscal nº 2026-1238 Outubro/2026"). Devolve os CNPJs dessas notas (ateste e
@@ -615,12 +627,18 @@
   // "1 nota sem SICAF" / "2 notas sem SICAF"
   // v0.37.0 (usuário, 26/11/2026, 2º pedido): botão da janela das notas: SICAF e Simples são por empresa (CNPJ),
   // o Instrumento de Cobrança é por nota. "Buscar SICAF e Simples de 1 empresa (2 notas)".
-  function textoDaBusca (marcadas) {
+  // v0.38.0 (27/11/2026): com as caixas da janela, o texto diz o que foi marcado ("oQue"); sem SICAF nem
+  // Simples marcados, não há busca: "Incluir TCU e Instrumento de Cobrança de 1 empresa (2 notas)".
+  function textoDaBusca (marcadas, oQue = { sicaf: true, simples: true }) {
     const lista = marcadas || []
     const empresas = new Set(lista.map(nota => soDigitos(nota.cnpjEscolhido || nota.cnpj || '') || normalizar(nota.fornecedor) || nota.id)).size
     const deEmpresas = empresas === 1 ? 'de 1 empresa' : `de ${empresas} empresas`
     const notas = lista.length === 1 ? '1 nota' : `${lista.length} notas`
-    return `Buscar SICAF e Simples ${deEmpresas} (${notas})`
+    const juntar = nomes => nomes.length > 1 ? nomes.slice(0, -1).join(', ') + ' e ' + nomes[nomes.length - 1] : nomes[0]
+    const sites = [oQue.sicaf && 'SICAF', oQue.simples && 'Simples'].filter(Boolean)
+    const outros = [oQue.tcu && 'TCU', oQue.anexo && 'Instrumento de Cobrança'].filter(Boolean)
+    if (!sites.length && !outros.length) return 'Marque o que incluir'
+    return `${sites.length ? 'Buscar ' + juntar(sites) : 'Incluir ' + juntar(outros)} ${deEmpresas} (${notas})`
   }
   // v0.37.0 (usuário, 26/11/2026): a busca é uma por empresa; com a lista de notas, o texto conta as empresas
   // (CNPJ do ateste ou da nota; sem CNPJ, o nome) e diz quantas notas, quando são mais que as empresas.
@@ -634,6 +652,7 @@
   }
 
   const api = {
+    nomeDoTcu,
     LIMITE_DA_RESPOSTA_MS, siteRespondeu, pularAntes,
     UNIDADE_CGOC, CNPJ_CAMPUS_PALMAS, funcaoLigada, ehCgoc,
     soDigitos, raizDoCnpj, cnpjValido, formatarCnpj, mascaraCnpj, ehDoIfto, cnpjMatriz, acharCnpjs, cnpjDaSelecao,

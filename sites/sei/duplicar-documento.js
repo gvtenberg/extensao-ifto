@@ -1,7 +1,8 @@
 // v0.36.0 (spec duplicar-documento): "Duplicar documento" no menu do ícone do documento na árvore. Abre, no
 // quadro do documento, o formulário de documento novo do SEI com o mesmo tipo, o original como "Documento
-// Modelo" e os dados do cadastro dele. Nada é gravado: Salvar é sempre o clique da pessoa. Os dados passam
-// direto da página principal para o formulário (nada fica guardado no navegador).
+// Modelo" e os dados do cadastro dele. Os dados passam direto da página principal para o formulário (nada
+// fica guardado no navegador). v0.38.0 (#355): com tudo copiado, salva sozinho e o SEI abre o editor; o
+// documento externo é duplicado sem o arquivo (o clique em "Duplicar documento" é a confirmação).
 (async function () {
   if (!(await globalThis.ExtensaoIFTO.sei.ligadaNoSei())) return
   if (window.top !== window) return
@@ -22,8 +23,24 @@
     nome: 'duplicar-documento',
     primeira: true,
     ligada: () => opcoes.duplicarDocumento,
-    opcoes: (lida, documento) => regras.podeDuplicar(lida, documento) ? [{ texto: TITULO, aoClicar: () => duplicar(lida, documento) }] : []
+    opcoes: (lida, documento) => {
+      if (regras.podeDuplicar(lida, documento)) return [{ texto: TITULO, aoClicar: () => duplicar(lida, documento) }]
+      return regras.podeDuplicarExterno(lida, documento) ? [{ texto: TITULO, aoClicar: () => duplicarExterno(lida, documento) }] : []
+    }
   })
+
+  // v0.38.0 (#355): documento externo: cria a cópia sem o arquivo e abre na árvore.
+  async function duplicarExterno (lida, documento) {
+    const aberta = janela.abrir({ titulo: TITULO, conteudo: [criar('p', { textContent: `Criando a cópia de ${documento.rotulo} (sem o arquivo)…` })], botoes: [] })
+    try {
+      await seiPedidos.duplicarExterno(lida, documento)
+      aberta.fechar()
+      janela.mensagemRapida(`Cópia de ${documento.rotulo} criada, sem o arquivo.`)
+    } catch (erro) {
+      aberta.trocarConteudo([criar('p', { className: 'aviso vermelho', textContent: erro.message })])
+      aberta.trocarBotoes([{ texto: 'Fechar', tipo: 'principal', aoClicar: j => j.fechar() }])
+    }
+  }
 
   // ---------- Cadastro do original (só leitura) ----------
   // null se não deu para ler (D8): de outra unidade sem o link, SEI lento ou página diferente.
@@ -159,6 +176,14 @@
       }
     }
     if (!formulario.isConnected) return
+    // v0.38.0 (#355, usuário, 27/11/2026): com tudo copiado, a extensão clica no Salvar do próprio SEI, que
+    // confere os campos, cria o documento e abre o editor (como no documento novo feito à mão). Se algo não
+    // pôde ser copiado, o formulário fica aberto para a pessoa conferir.
+    const salvar = campo('btnSalvar')
+    if (!avisos.length && salvar) {
+      salvar.click()
+      return
+    }
     for (const texto of avisos) documentoExterno.avisarNoFormulario(pagina, texto, 'dica', 'duplicar-documento')
     documentoExterno.avisarNoFormulario(pagina, `Cópia de ${documento.rotulo}, preenchida pela extensão: confira e clique em Salvar.`, 'feito', 'duplicar-documento')
   }

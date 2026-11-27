@@ -461,3 +461,27 @@ test('cnpjsPeloNome: PDF que não abriu conta pelo nome da nota, do ateste ou do
   assert.deepEqual(sicaf.cnpjsPeloNome({ id: '8', rotulo: 'Sicaf (3400100)' }, [comAteste]), [])
   assert.equal(sicaf.nomeDoDocumento('Consulta Simples Nacional RG SEGURANCA LTDA (3400099)'), 'RG SEGURANCA LTDA')
 })
+
+// v0.38.0 (27/11/2026): caixas da janela das notas (SICAF, Simples, TCU, Instrumento de Cobrança).
+test('caixas: TCU em branco depois do Simples, um por empresa; só o marcado entra', () => {
+  const f = { cnpj: 'A', nomeNoSicaf: 'CHC LTDA.', temPdf: true, temSimples: true, nomeConsulta: 'Simples Nacional CHC LTDA', notas: [{ numero: '63' }, { numero: '64' }] }
+  const tudo = { sicaf: true, simples: true, tcu: true, anexo: true, ordem: true }
+  assert.deepEqual(sicaf.documentosParaIncluir([f], tudo).map(d => d.tipo + ' ' + d.nomeArvore + (d.semPdf ? ' -' : '')), [
+    'Sicaf CHC LTDA', 'Consulta Simples Nacional CHC LTDA', 'Consulta Consolidada TCU CHC LTDA -',
+    'Anexo Instrumento de Cobrança NF nº 63', 'Anexo Instrumento de Cobrança NF nº 64'
+  ])
+  assert.deepEqual(sicaf.documentosParaIncluir([{ ...f, jaTemTcu: true }], tudo).map(d => d.tipo), ['Sicaf', 'Consulta', 'Anexo', 'Anexo'])
+  assert.deepEqual(sicaf.documentosParaIncluir([f], { ...tudo, sicaf: false, simples: false }).map(d => d.tipo + (d.tcu ? '-tcu' : '')), ['Consulta-tcu', 'Anexo', 'Anexo'])
+  assert.deepEqual(sicaf.documentosParaIncluir([f], { ...tudo, simples: false, tcu: false, anexo: false }).map(d => d.tipo), ['Sicaf'])
+  // SICAF e Simples marcados e os dois pulados: nada da empresa (R2), nem TCU.
+  assert.deepEqual(sicaf.documentosParaIncluir([{ ...f, temPdf: false, temSimples: false }], tudo), [])
+})
+test('caixas: nomes na árvore e texto do botão', () => {
+  assert.equal(sicaf.tipoNaArvore('Consulta Consolidada TCU CHC LTDA (3400100)'), 'tcu')
+  assert.equal(sicaf.tipoNaArvore('Consulta Simples Nacional CHC LTDA (3400100)'), 'consulta')
+  assert.equal(sicaf.nomeDoDocumento('Consulta Consolidada TCU CHC LTDA (3400100)'), 'CHC LTDA')
+  const notas = [{ cnpjEscolhido: '1' }, { cnpjEscolhido: '1' }]
+  assert.equal(sicaf.textoDaBusca(notas, { sicaf: true, simples: false, tcu: true, anexo: true }), 'Buscar SICAF de 1 empresa (2 notas)')
+  assert.equal(sicaf.textoDaBusca(notas, { tcu: true, anexo: true }), 'Incluir TCU e Instrumento de Cobrança de 1 empresa (2 notas)')
+  assert.equal(sicaf.textoDaBusca(notas, {}), 'Marque o que incluir')
+})
