@@ -75,7 +75,7 @@
     conferirData: true,
     // v0.35.2: cargo da diretora-geral abaixo do nome (só na PAL/REI/IFTO) e "Campus"/"Campi" em itálico (toda unidade).
     conferirCargo: true,
-    // v0.37.0 (#355): pessoas que assinam e o cargo certo abaixo do nome, por unidade ({ unidade, nome, cargo }).
+    // v0.38.0 (#355): pessoas que assinam e o cargo certo abaixo do nome, por unidade ({ unidade, nome, cargo }).
     cargosPorUnidade: Object.freeze([Object.freeze({ unidade: 'PAL/REI/IFTO', nome: 'Noemi Barreto Sales Zukowski', cargo: 'Diretora-Geral do Campus Palmas' })]),
     conferirItalico: true,
     espacamentoDocumento: true,

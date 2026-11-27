@@ -1,4 +1,4 @@
-// v0.37.0 (#355, usuário): a árvore do processo é estreita e corta nomes compridos. Com o mouse sobre o nome
+// v0.38.0 (#355, usuário): a árvore do processo é estreita e corta nomes compridos. Com o mouse sobre o nome
 // de um documento (do SEI ou externo), aparece o nome inteiro. As pastas do processo chegam depois (o SEI
 // monta aos poucos): por isso a extensão olha a árvore de novo quando ela muda.
 (async function () {

@@ -1,6 +1,6 @@
 # IFTO SEI: editor
 
-**Sections**: Tables in the editor (v0.24.0) · Long numbers in edital items (v0.25.0) · MINUTA mark in editais (v0.22.0) · Automatic save in the editor (v0.31.0) · Hidden boxes and typed numbers (v0.37.0) · AGU formatting (v0.37.0) · Typing fixes (v0.37.0)
+**Sections**: Tables in the editor (v0.24.0) · Long numbers in edital items (v0.25.0) · MINUTA mark in editais (v0.22.0) · Automatic save in the editor (v0.31.0) · Hidden boxes and typed numbers (v0.38.0) · AGU formatting (v0.38.0) · Typing fixes (v0.38.0)
 
 ## Tables in the editor (v0.24.0)
 
@@ -46,7 +46,7 @@
 - The review list is checked again on the click: if the text changed after the list opened (same id, other text or paragraph), nothing changes and the person reopens the list.
 - Local check (not in git): `node ferramentas-de-teste/agu/comparar.js` applies the rules to the 4 `*-formatacao-agu.html` samples and compares each paragraph with `*-final.html` (26/11/2026: Edital 458 of 468 equal, the rest are hand edits such as dates and punctuation).
 
-## Typing fixes (v0.37.0)
+## Typing fixes (v0.38.0)
 
 #355, user 26/11/2026; every unit, no switch; `sites/sei/digitacao.js` asks the background part to put `sites/sei/editor-digitacao.js` in the page (MAIN world). Never saves.
 - **"R$" (valor por extenso):** the text formatting of the selected value (bold, italic…) read before the SEI command runs goes to all text the command inserts (value and words). Command found by name (`/extenso/i`); not found: console line only.

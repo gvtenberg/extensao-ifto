@@ -511,7 +511,7 @@
   }
 
   // ---- v0.35.2: cargo da diretora-geral abaixo do nome (só na Direção-geral, PAL/REI/IFTO) ----
-  // v0.37.0 (#355, usuário): a lista vem das configurações ("cargosPorUnidade": { unidade, nome, cargo }), uma
+  // v0.38.0 (#355, usuário): a lista vem das configurações ("cargosPorUnidade": { unidade, nome, cargo }), uma
   // linha por pessoa; a de Palmas é o padrão. "Campus" e "Campi" do cargo ficam em itálico sozinhos.
   const CARGOS_PADRAO = Object.freeze([Object.freeze({ unidade: 'PAL/REI/IFTO', nome: 'Noemi Barreto Sales Zukowski', cargo: 'Diretora-Geral do Campus Palmas' })])
   const CARGO_DA_DIRETORA = CARGOS_PADRAO[0].cargo

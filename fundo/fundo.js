@@ -653,7 +653,7 @@ async function aguNoEditor (remetente, acao, dado) {
   }, [acao, dado === undefined ? null : dado])
 }
 
-// v0.37.0 (#355): ajustes de digitação no editor (valor por extenso, linha em branco, lista de estilos).
+// v0.38.0 (#355): ajustes de digitação no editor (valor por extenso, linha em branco, lista de estilos).
 async function digitacaoNoEditor (remetente) {
   const alvo = { tabId: remetente.tab.id, frameIds: [remetente.frameId || 0] }
   const [temNumeracao] = await navegador.scripting.executeScript({ target: alvo, world: 'MAIN', func: () => Boolean(globalThis.ExtensaoIFTO && globalThis.ExtensaoIFTO.editorNumeracao) })

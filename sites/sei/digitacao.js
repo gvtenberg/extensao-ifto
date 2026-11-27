@@ -1,4 +1,4 @@
-// v0.37.0 (#355, usuário): três ajustes na digitação do editor do SEI 5, feitos dentro da página
+// v0.38.0 (#355, usuário): três ajustes na digitação do editor do SEI 5, feitos dentro da página
 // (sites/sei/editor-digitacao.js): o "R$" (valor por extenso) mantém a formatação do valor (negrito etc.);
 // linha nova depois de uma linha em branco mantém a formatação da linha de cima; a lista de estilos abre
 // rolada e marcada no estilo em uso. Nunca salva.

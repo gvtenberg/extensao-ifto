@@ -1,4 +1,4 @@
-// v0.37.0 (#355): roda DENTRO da página do editor do SEI 5 (a parte de fundo o coloca com executeScript,
+// v0.38.0 (#355): roda DENTRO da página do editor do SEI 5 (a parte de fundo o coloca com executeScript,
 // world MAIN, junto com sites/sei/editor-numeracao.js, de onde vem acharEditor). Nunca salva.
 (function (raiz) {
   if (raiz.ExtensaoIFTO && raiz.ExtensaoIFTO.editorDigitacao) return

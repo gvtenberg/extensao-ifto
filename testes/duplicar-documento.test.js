@@ -54,7 +54,7 @@ Nos[1].acoes = '<a href="controlador.php?acao=documento_alterar_recebido&amp;id_
   assert.equal(documentos[1].linkCadastro, '')
 })
 
-test('v0.37.0: duplicar documento externo, sem o arquivo', () => {
+test('v0.38.0: duplicar documento externo, sem o arquivo', () => {
   const lida = { linkIncluir: 'x' }
   assert.equal(d.podeDuplicarExterno(lida, { feitoNoSei: false, linkAlterar: 'a' }), true)
   assert.equal(d.podeDuplicarExterno(lida, { feitoNoSei: false, linkAlterar: '' }), false)

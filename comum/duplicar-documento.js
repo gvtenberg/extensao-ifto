@@ -40,7 +40,7 @@
     return cadastro.nivel === '1' ? 'restrito' : ''
   }
 
-  // v0.37.0 (#355): documento externo (vazio ou com arquivo), da própria unidade (só ela tem o "Alterar").
+  // v0.38.0 (#355): documento externo (vazio ou com arquivo), da própria unidade (só ela tem o "Alterar").
   function podeDuplicarExterno (lida, documento) {
     return Boolean(lida && lida.linkIncluir && documento && !documento.feitoNoSei && documento.linkAlterar)
   }

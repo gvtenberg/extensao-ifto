@@ -296,7 +296,7 @@
     if (lida) await abrirNaArvoreNova(quadro, velha, lida.idProcesso, () => ({ id: String(idDocumento) }), true)
   }
 
-  // v0.37.0 (#355, usuário, 27/11/2026): "Duplicar documento" de um documento externo: lê o "Alterar Documento
+  // v0.38.0 (#355, usuário, 27/11/2026): "Duplicar documento" de um documento externo: lê o "Alterar Documento
   // Externo" do original e salva um externo novo do mesmo tipo, com os mesmos dados (nome na árvore, data,
   // número, formato, remetente, interessados, classificação, observações, nível de acesso), sem o arquivo.
   // Depois abre o novo na árvore.

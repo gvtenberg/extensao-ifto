@@ -58,7 +58,7 @@ Decided in `specs/feitas/conferir-documento.md` (v0.26.0 to v0.26.9 and stage 7,
 
 Decided by the user on 24/11/2026 (v0.35.2).
 
-- Title: the line below the name (alone on its line) of a person in the settings list "Pessoas e cargos" (`cargosPorUnidade`, one line "unidade = nome = cargo", #355, v0.37.0; default: PAL/REI/IFTO, Noemi Barreto Sales Zukowski, "Diretora-Geral do Campus Palmas") must be exactly that cargo, only in that unit; "Campus"/"Campi" of the cargo go in italics by themselves. Missing, "Pro Tempore" or only "Diretora-Geral" are warned. A line counts as the title if short and it speaks of direction or starts like the right cargo. A line that does not speak of direction is never replaced (the title is inserted after the name).
+- Title: the line below the name (alone on its line) of a person in the settings list "Pessoas e cargos" (`cargosPorUnidade`, one line "unidade = nome = cargo", #355, v0.38.0; default: PAL/REI/IFTO, Noemi Barreto Sales Zukowski, "Diretora-Geral do Campus Palmas") must be exactly that cargo, only in that unit; "Campus"/"Campi" of the cargo go in italics by themselves. Missing, "Pro Tempore" or only "Diretora-Geral" are warned. A line counts as the title if short and it speaks of direction or starts like the right cargo. A line that does not speak of direction is never replaced (the title is inserted after the name).
 - Italics (every unit): each "Campus"/"Campi" (any case) outside italics, timbre and event names ("Campus Party") included. Not flagged: text in capitals (typed or by style), e-mails and web addresses. Notice only, never stops signing.
 - Corrected only by click in the editor; "Corrigir timbre" also writes Campus in italics.
 

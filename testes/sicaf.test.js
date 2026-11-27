@@ -462,7 +462,7 @@ test('cnpjsPeloNome: PDF que não abriu conta pelo nome da nota, do ateste ou do
   assert.equal(sicaf.nomeDoDocumento('Consulta Simples Nacional RG SEGURANCA LTDA (3400099)'), 'RG SEGURANCA LTDA')
 })
 
-// v0.37.0 (27/11/2026): caixas da janela das notas (SICAF, Simples, TCU, Instrumento de Cobrança).
+// v0.38.0 (27/11/2026): caixas da janela das notas (SICAF, Simples, TCU, Instrumento de Cobrança).
 test('caixas: TCU em branco depois do Simples, um por empresa; só o marcado entra', () => {
   const f = { cnpj: 'A', nomeNoSicaf: 'CHC LTDA.', temPdf: true, temSimples: true, nomeConsulta: 'Simples Nacional CHC LTDA', notas: [{ numero: '63' }, { numero: '64' }] }
   const tudo = { sicaf: true, simples: true, tcu: true, anexo: true, ordem: true }

@@ -290,7 +290,7 @@ test('v0.35.3: sugere guardar o timbre e o rodapé da unidade sem cadastro, só 
   assert.deepEqual(c.acharUnidade(unidades, 'DAP/PAL/REI/IFTO').linhas, tudo.linhas)
 })
 
-test('v0.37.0: cargo abaixo do nome por unidade (lista das configurações)', () => {
+test('v0.38.0: cargo abaixo do nome por unidade (lista das configurações)', () => {
   const s = html => [{ nome: 'corpo', html }]
   const lista = c.lerCargos('CGOC/PAL/REI/IFTO = Fulana de Tal = Coordenadora de Orçamento do Campus Palmas\nlinha errada')
   assert.deepEqual(lista, [{ unidade: 'CGOC/PAL/REI/IFTO', nome: 'Fulana de Tal', cargo: 'Coordenadora de Orçamento do Campus Palmas' }])

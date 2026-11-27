@@ -1,7 +1,7 @@
 // v0.36.0 (spec duplicar-documento): "Duplicar documento" no menu do ícone do documento na árvore. Abre, no
 // quadro do documento, o formulário de documento novo do SEI com o mesmo tipo, o original como "Documento
 // Modelo" e os dados do cadastro dele. Os dados passam direto da página principal para o formulário (nada
-// fica guardado no navegador). v0.37.0 (#355): com tudo copiado, salva sozinho e o SEI abre o editor; o
+// fica guardado no navegador). v0.38.0 (#355): com tudo copiado, salva sozinho e o SEI abre o editor; o
 // documento externo é duplicado sem o arquivo (o clique em "Duplicar documento" é a confirmação).
 (async function () {
   if (!(await globalThis.ExtensaoIFTO.sei.ligadaNoSei())) return
@@ -29,7 +29,7 @@
     }
   })
 
-  // v0.37.0 (#355): documento externo: cria a cópia sem o arquivo e abre na árvore.
+  // v0.38.0 (#355): documento externo: cria a cópia sem o arquivo e abre na árvore.
   async function duplicarExterno (lida, documento) {
     const aberta = janela.abrir({ titulo: TITULO, conteudo: [criar('p', { textContent: `Criando a cópia de ${documento.rotulo} (sem o arquivo)…` })], botoes: [] })
     try {
@@ -176,7 +176,7 @@
       }
     }
     if (!formulario.isConnected) return
-    // v0.37.0 (#355, usuário, 27/11/2026): com tudo copiado, a extensão clica no Salvar do próprio SEI, que
+    // v0.38.0 (#355, usuário, 27/11/2026): com tudo copiado, a extensão clica no Salvar do próprio SEI, que
     // confere os campos, cria o documento e abre o editor (como no documento novo feito à mão). Se algo não
     // pôde ser copiado, o formulário fica aberto para a pessoa conferir.
     const salvar = campo('btnSalvar')

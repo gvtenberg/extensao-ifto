@@ -144,7 +144,7 @@
   const { lerRegras, regrasEmTexto } = globalThis.ExtensaoIFTO.documentoExterno
   for (const campo of document.querySelectorAll('[data-config]')) {
     const chave = campo.dataset.config
-    // v0.37.0 (#355): "cargosPorUnidade" também é lista ({ unidade, nome, cargo }), uma pessoa por linha.
+    // v0.38.0 (#355): "cargosPorUnidade" também é lista ({ unidade, nome, cargo }), uma pessoa por linha.
     const listas = {
       externoRegras: [regrasEmTexto, lerRegras],
       cargosPorUnidade: [globalThis.ExtensaoIFTO.conferirDocumento.cargosEmTexto, globalThis.ExtensaoIFTO.conferirDocumento.lerCargos]

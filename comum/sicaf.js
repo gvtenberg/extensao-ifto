@@ -126,7 +126,7 @@
     if (/^ATESTE\b/.test(r)) return 'ateste'
     if (/^FOLHA DE ENCAMINHAMENTO\b/.test(r)) return 'folha'
     if (/^SICAF\b/.test(r)) return 'sicaf'
-    // v0.37.0 (usuário, 27/11/2026): "Consulta Consolidada TCU <empresa>" não é a Consulta do Simples Nacional.
+    // v0.38.0 (usuário, 27/11/2026): "Consulta Consolidada TCU <empresa>" não é a Consulta do Simples Nacional.
     if (/^CONSULTA\s+CONSOLIDADA\b/.test(r)) return 'tcu'
     if (/^CONSULTA\b/.test(r)) return 'consulta'
     if (/^ANEXO\b/.test(r)) return 'anexo'
@@ -420,7 +420,7 @@
   // v0.37.0: Fatura (rótulo da nota começa com "Fatura") → "Instrumento de Cobrança Fatura nº …".
   const nomeDoAnexo = (numero, fornecedor, rotulo) => nomeNaArvore(`Instrumento de Cobrança ${/^FATURA\b/.test(normalizar(rotulo)) ? 'Fatura' : 'NF'} nº ${numero || '?'} ${fornecedor || ''}`)
 
-  // v0.37.0 (usuário, 27/11/2026): "Consulta Consolidada TCU <razão social>" (tipo Consulta do SEI).
+  // v0.38.0 (usuário, 27/11/2026): "Consulta Consolidada TCU <razão social>" (tipo Consulta do SEI).
   const nomeDoTcu = nome => nomeNaArvore('Consolidada TCU ' + String(nome || '').replace(/\.\s*$/, ''))
 
   // Documentos a incluir, na ordem: por fornecedor Sicaf (com o PDF) e Consulta; por nota um Anexo.
@@ -435,7 +435,7 @@
   // sem PDF) ocupa o lugar: não cria outro. Empresa com Sicaf/Consulta sem PDF de outra unidade: nada (R8).
   // Campos do fornecedor: temPdf/temSimples (PDF obtido agora), jaTemSicaf/jaTemConsulta (com PDF no
   // processo), sicafSemPdf/consultaSemPdf (sem PDF no processo), outraUnidade.
-  // v0.37.0 (usuário, 27/11/2026): janela das notas com 4 caixas (SICAF, Simples, Consulta consolidada do
+  // v0.38.0 (usuário, 27/11/2026): janela das notas com 4 caixas (SICAF, Simples, Consulta consolidada do
   // TCU, Instrumento de Cobrança); "ordem" liga a regra acima para o que foi marcado. A Consulta do TCU ainda
   // não é buscada: entra sempre em branco (semPdf), uma por empresa, depois da do Simples (fornecedor.jaTemTcu:
   // já no processo). A regra R2 vale só quando SICAF ou Simples foi marcado.
@@ -627,7 +627,7 @@
   // "1 nota sem SICAF" / "2 notas sem SICAF"
   // v0.37.0 (usuário, 26/11/2026, 2º pedido): botão da janela das notas: SICAF e Simples são por empresa (CNPJ),
   // o Instrumento de Cobrança é por nota. "Buscar SICAF e Simples de 1 empresa (2 notas)".
-  // v0.37.0 (27/11/2026): com as caixas da janela, o texto diz o que foi marcado ("oQue"); sem SICAF nem
+  // v0.38.0 (27/11/2026): com as caixas da janela, o texto diz o que foi marcado ("oQue"); sem SICAF nem
   // Simples marcados, não há busca: "Incluir TCU e Instrumento de Cobrança de 1 empresa (2 notas)".
   function textoDaBusca (marcadas, oQue = { sicaf: true, simples: true }) {
     const lista = marcadas || []

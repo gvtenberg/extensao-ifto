@@ -640,30 +640,30 @@ E: A janela diz "Não consegui abrir … Pelo nome na árvore, contei como já i
 ### T313 – Notas em pasta fechada da árvore (v0.37.0)
 F: Abra o processo 23236.017252/2025-76 (sem mexer nas pastas da árvore) e olhe o botão do SICAF na barra; depois faça o mesmo no 23236.001586/2022-85.
 E: No 23236.017252/2025-76 aparecem as 3 notas (9852 e 9853 da K.S. Artigos Esportivos, 4492 da G A da Costa Esportes), 2 empresas; no 23236.001586/2022-85 aparecem as notas 9583 e 9584. Se faltar alguma: copie as linhas "[extensão IFTO] …" do console (F12 > Console) e cole aqui.
-### T314 – Nome inteiro do documento na árvore (v0.37.0)
+### T314 – Nome inteiro do documento na árvore (v0.38.0)
 F: Abra um processo com documentos de nome comprido (do SEI e externos) e pare o mouse sobre o nome de um deles na árvore; abra também uma pasta fechada da árvore e faça o mesmo.
 E: Aparece o nome inteiro do documento numa caixinha, nos documentos do SEI e nos externos, também nos da pasta aberta depois.
-### T315 – Duplicar documento do SEI abre o editor (v0.37.0) (Crítico)
+### T315 – Duplicar documento do SEI abre o editor (v0.38.0) (Crítico)
 F: Num processo de teste, clique no ícone de um documento feito no SEI, na árvore, e em "Duplicar documento".
 E: A extensão cria o documento novo sozinha (mesmo tipo, com o original como modelo, mesma descrição, interessados, assuntos e nível de acesso) e o SEI abre o editor dele, como num documento novo feito à mão. Se algum dado não pôde ser copiado, o formulário fica aberto com o aviso, esperando você clicar em Salvar.
-### T316 – Duplicar documento externo, vazio (v0.37.0) (Crítico)
+### T316 – Duplicar documento externo, vazio (v0.38.0) (Crítico)
 F: Num processo de teste, clique no ícone de um documento externo com arquivo (por exemplo, uma Nota Fiscal) e em "Duplicar documento"; depois faça o mesmo com um documento externo vazio.
 E: Aparece "Cópia de … criada, sem o arquivo." e o documento novo entra no fim da árvore, vazio, com o mesmo tipo, nome na árvore, data, número, remetente, interessados, classificação, observações e nível de acesso do original, e já aberto à direita. Solte um PDF na página dele: o arquivo é anexado.
-### T317 – "R$" mantém o negrito do valor (v0.37.0)
+### T317 – "R$" mantém o negrito do valor (v0.38.0)
 F: No editor de um documento de teste, escreva um valor em negrito (por exemplo, 1.234,56), selecione-o e clique no botão "R$" (valor por extenso). Faça o mesmo com um valor sem negrito.
 E: No primeiro caso, o valor e o texto por extenso ficam em negrito; no segundo, sem negrito. Não salve.
-### T318 – Linha em branco mantém a formatação (v0.37.0)
+### T318 – Linha em branco mantém a formatação (v0.38.0)
 F: No editor, num parágrafo com estilo (por exemplo, "Item_Nivel1" ou texto em negrito), aperte Enter duas vezes seguidas; repita dentro de uma célula de tabela.
 E: As duas linhas novas ficam com a mesma formatação da linha de cima (antes, a segunda ficava sem formatação). Não salve.
-### T319 – Lista de estilos abre no estilo em uso (v0.37.0)
+### T319 – Lista de estilos abre no estilo em uso (v0.38.0)
 F: No editor de um Edital, ponha o cursor num parágrafo com um estilo do fim da lista (por exemplo, "Edital nível 1") e abra a lista de estilos.
 E: A lista abre já rolada até esse estilo, com ele marcado.
-### T320 – Pessoas e cargos por unidade nas configurações (v0.37.0)
+### T320 – Pessoas e cargos por unidade nas configurações (v0.38.0)
 F: Abra as configurações › Documentos do SEI e veja "Pessoas e cargos". Acrescente uma linha com a sua unidade, o seu nome e um cargo (por exemplo, "CGOC/GAC/DAP/PAL/REI/IFTO = Seu Nome = Coordenador de Gestão Orçamentária do Campus Palmas"). Num documento de teste dessa unidade, ponha o seu nome sozinho numa linha e outro cargo embaixo.
 E: A linha da direção-geral já vem escrita. O documento mostra o aviso do cargo e, no editor, o botão "Corrigir para …" põe o cargo certo, com "Campus" em itálico. Não salve.
-### T321 – Caixas do que incluir na janela das notas (v0.37.0)
+### T321 – Caixas do que incluir na janela das notas (v0.38.0)
 F: Num processo de pagamento com notas sem SICAF, clique no botão das notas na barra.
 E: No alto da janela aparecem 4 caixas: SICAF, Simples Nacional e Instrumento de Cobrança marcadas; Consulta consolidada do TCU desmarcada. Ao desmarcar SICAF e Simples, o botão muda para "Incluir … de N empresas (M notas)"; sem nenhuma caixa marcada, o botão fica cinza.
-### T322 – Consulta Consolidada TCU em branco (v0.37.0) (Crítico)
+### T322 – Consulta Consolidada TCU em branco (v0.38.0) (Crítico)
 F: Num processo de teste com nota sem SICAF, marque também "Consulta consolidada do TCU" e faça a busca até a janela de incluir; confira a lista e clique em "Incluir no processo".
 E: A lista mostra, por empresa, Sicaf, Consulta Simples Nacional, "Consulta Consolidada TCU <empresa> – em branco" e, por nota, o Anexo. Na árvore entram nessa ordem; a do TCU vazia. Clicando de novo no botão, a do TCU não é pedida outra vez.
