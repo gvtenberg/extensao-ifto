@@ -82,6 +82,7 @@ function tratarRecado (recado, remetente) {
     case 'aguNoEditor': return aguNoEditor(remetente, recado.acao, recado.dado)
     // v0.26.11 (spec conferir-documento, etapa 7): espaço entre as partes do documento.
     case 'estilosPreparar': return estilosNoEditor(remetente, recado.aprendidos)
+    case 'digitacaoPreparar': return digitacaoNoEditor(remetente)
     // v0.29.2 (R7): opção desligada: o documento já tem o bloco dos estilos extras?
     // v0.31.0 (spec copia-editor-sei): salvamento automático e Copiar/Colar conteúdo no editor.
     case 'salvamentoPreparar': return salvamentoNoEditor(remetente, 'preparar')
@@ -652,6 +653,16 @@ async function aguNoEditor (remetente, acao, dado) {
   }, [acao, dado === undefined ? null : dado])
 }
 
+// v0.37.0 (#355): ajustes de digitação no editor (valor por extenso, linha em branco, lista de estilos).
+async function digitacaoNoEditor (remetente) {
+  const alvo = { tabId: remetente.tab.id, frameIds: [remetente.frameId || 0] }
+  const [temNumeracao] = await navegador.scripting.executeScript({ target: alvo, world: 'MAIN', func: () => Boolean(globalThis.ExtensaoIFTO && globalThis.ExtensaoIFTO.editorNumeracao) })
+  const arquivos = ['sites/sei/editor-digitacao.js']
+  if (!(temNumeracao && temNumeracao.result)) arquivos.unshift('sites/sei/editor-numeracao.js')
+  await navegador.scripting.executeScript({ target: alvo, world: 'MAIN', files: arquivos })
+  return rodarNoEditor(remetente)(() => globalThis.ExtensaoIFTO.editorDigitacao.preparar(), [])
+}
+
 // v0.29.0 (spec todos-os-estilos): põe na página do editor (world MAIN) as regras e o código dos estilos extras
 // (reusa acharEditor da numeração) e junta os estilos que faltam ao tipo de documento.
 async function estilosNoEditor (remetente, aprendidos) {
@@ -743,7 +754,7 @@ async function conferirNoEditor (remetente, recado) {
     // v0.35.3: o que dá para guardar em "Minhas unidades" (unidade sem timbre ou sem rodapé guardado).
     sugestao: palmas ? regras.sugerirUnidade(secoes, unidade, { timbre: opcoes.conferirTimbre, rodape: opcoes.conferirRodape }) : null,
     // v0.35.2: cargo da diretora-geral (só PAL/REI/IFTO) e "Campus"/"Campi" em itálico (toda unidade).
-    cargo: opcoes.conferirCargo ? regras.conferirCargo(secoes, sigla) : null,
+    cargo: opcoes.conferirCargo ? regras.conferirCargo(secoes, sigla, opcoes.cargosPorUnidade) : null,
     italico: opcoes.conferirItalico ? regras.conferirItalico(secoes) : null
   })
   const lido = await rodar(globalThis.ExtensaoIFTO.editorLer)

@@ -150,7 +150,7 @@
     const datas = regrasDaData()
     const data = opcoes.conferirData && datas ? datas.conferirData(secoes, hoje) : null
     if (data && data.errada) problemas.push(datas.fraseAntesDeAssinar(data))
-    const cargo = opcoes.conferirCargo ? conferirCargo(secoes, sigla) : null
+    const cargo = opcoes.conferirCargo ? conferirCargo(secoes, sigla, opcoes.cargosPorUnidade) : null
     if (cargo && !cargo.certo) problemas.push(fraseDoCargo(cargo))
     return problemas
   }
@@ -511,11 +511,18 @@
   }
 
   // ---- v0.35.2: cargo da diretora-geral abaixo do nome (só na Direção-geral, PAL/REI/IFTO) ----
-  const UNIDADE_DA_DIRECAO = 'PAL/REI/IFTO'
-  const NOME_DA_DIRETORA = 'noemi barreto sales zukowski'
-  const CARGO_DA_DIRETORA = 'Diretora-Geral do Campus Palmas'
-  const CARGO_EM_HTML = 'Diretora-Geral do <i>Campus</i> Palmas'
-  const soNome = html => textoDoHtml(html).toLowerCase().replace(/[.,]$/, '') === NOME_DA_DIRETORA
+  // v0.37.0 (#355, usuário): a lista vem das configurações ("cargosPorUnidade": { unidade, nome, cargo }), uma
+  // linha por pessoa; a de Palmas é o padrão. "Campus" e "Campi" do cargo ficam em itálico sozinhos.
+  const CARGOS_PADRAO = Object.freeze([Object.freeze({ unidade: 'PAL/REI/IFTO', nome: 'Noemi Barreto Sales Zukowski', cargo: 'Diretora-Geral do Campus Palmas' })])
+  const CARGO_DA_DIRETORA = CARGOS_PADRAO[0].cargo
+  const minusculo = texto => textoDoHtml(texto).toLowerCase().replace(/[.,]$/, '').replace(/\s+/g, ' ').trim()
+  const cargoEmHtml = cargo => String(cargo || '').replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/\b(Campus|Campi)\b/g, '<i>$1</i>')
+  // Texto "unidade = nome = cargo" (um por linha) ↔ lista.
+  function lerCargos (texto) {
+    return String(texto || '').split('\n').map(linha => linha.split('=').map(parte => parte.trim())).filter(partes => partes.length >= 3 && partes.every(Boolean))
+      .map(([unidade, nome, ...cargo]) => ({ unidade: siglaDaUnidade(unidade), nome, cargo: cargo.join(' = ') }))
+  }
+  const cargosEmTexto = lista => (lista || []).map(item => `${item.unidade} = ${item.nome} = ${item.cargo}`).join('\n')
   const QUEBRA = /<br\b[^>]*>/i
 
   // Linhas do documento, na ordem: cada parágrafo dividido nas quebras de linha.
@@ -536,45 +543,51 @@
     return linhas
   }
 
-  // null se não há o nome sozinho numa linha ou se a unidade não é a Direção-geral.
-  function conferirCargo (secoes, sigla) {
-    if (siglaDaUnidade(sigla) !== UNIDADE_DA_DIRECAO) return null
+  // null se não há o nome sozinho numa linha ou se a unidade não está na lista.
+  function conferirCargo (secoes, sigla, cargos = CARGOS_PADRAO) {
+    const daUnidade = (cargos || []).filter(item => item && item.nome && item.cargo && siglaDaUnidade(item.unidade) === siglaDaUnidade(sigla))
+    if (!daUnidade.length) return null
     let achado = null
     for (const secao of secoes || []) {
       const linhas = linhasDaSecao(secao.html)
       linhas.forEach((linha, i) => {
-        if (!soNome(linha.html)) return
+        const pessoa = daUnidade.find(item => minusculo(linha.html) === minusculo(item.nome))
+        if (!pessoa) return
+        const esperado = pessoa.cargo
         const abaixo = linhas.slice(i + 1).find(outra => outra.texto)
-        // Só é cargo se for curto e falar em direção: outra frase abaixo do nome não é trocada.
-        const cargo = abaixo && abaixo.texto.length <= 100 && /diretora?\b|pro tempore/i.test(abaixo.texto) ? abaixo : null
+        // Só é cargo se for curto e falar em direção (ou começar como o cargo certo): outra frase abaixo do nome não é trocada.
+        const primeira = minusculo(esperado).split(' ')[0]
+        const pareceCargo = texto => /diretora?\b|pro tempore/i.test(texto) || minusculo(texto).startsWith(primeira)
+        const cargo = abaixo && abaixo.texto.length <= 100 && pareceCargo(abaixo.texto) ? abaixo : null
         const problemas = []
-        if (!cargo) problemas.push(`Falta "${CARGO_DA_DIRETORA}" abaixo do nome.`)
-        else if (cargo.texto !== CARGO_DA_DIRETORA) problemas.push(`Está "${cargo.texto}"; o certo é "${CARGO_DA_DIRETORA}".`)
-        else if (porItalico(cargo.comItalico) !== cargo.comItalico) problemas.push('A palavra "Campus" deve ficar em itálico.')
+        if (!cargo) problemas.push(`Falta "${esperado}" abaixo do nome.`)
+        else if (cargo.texto !== esperado) problemas.push(`Está "${cargo.texto}"; o certo é "${esperado}".`)
+        else if (/\b(Campus|Campi)\b/.test(esperado) && porItalico(cargo.comItalico) !== cargo.comItalico) problemas.push('A palavra "Campus" deve ficar em itálico.')
         // Com o nome em mais de um lugar, o errado vem primeiro.
-        if (!achado || (achado.certo && problemas.length)) achado = { certo: !problemas.length, problemas, secao: secao.nome, editavel: secao.editavel !== false, nome: { fim: linha.fim }, cargo: cargo && { inicio: cargo.inicio, fim: cargo.fim, html: cargo.html } }
+        if (!achado || (achado.certo && problemas.length)) achado = { certo: !problemas.length, problemas, esperado, secao: secao.nome, editavel: secao.editavel !== false, nome: { fim: linha.fim }, cargo: cargo && { inicio: cargo.inicio, fim: cargo.fim, html: cargo.html } }
       })
     }
     return achado
   }
-  const fraseDoCargo = conferido => 'Cargo da diretora-geral: ' + conferido.problemas.join(' ')
+  const fraseDoCargo = conferido => 'Cargo abaixo do nome: ' + conferido.problemas.join(' ')
 
   // Troca só a linha do cargo (ou põe uma, se não há). As marcas (negrito…) que começam ou acabam na linha ficam,
   // menos o itálico, para só "Campus" ficar em itálico.
   function corrigirCargo (html, conferido) {
     const { cargo, nome } = conferido
-    if (!cargo) return html.slice(0, nome.fim) + '<br>' + CARGO_EM_HTML + html.slice(nome.fim)
+    const emHtml = cargoEmHtml(conferido.esperado || CARGO_DA_DIRETORA)
+    if (!cargo) return html.slice(0, nome.fim) + '<br>' + emHtml + html.slice(nome.fim)
     let posto = false
     let nova = cargo.html.replace(/<[^>]+>|[^<]+/g, pedaco => {
       if (pedaco[0] === '<') return pedaco
       if (posto || !textoDoHtml(pedaco)) return ''
       posto = true
-      return CARGO_EM_HTML
+      return emHtml
     })
     // Itálico inteiro dentro da linha sai; o de "Campus" volta.
     const aberturas = (cargo.html.match(/<(i|em)\b[^>]*>/gi) || []).length
     const fechos = (cargo.html.match(/<\/(i|em)>/gi) || []).length
-    if (aberturas === fechos) nova = nova.replace(/<\/?(i|em)\b[^>]*>/gi, '').replace('Campus', '<i>Campus</i>')
+    if (aberturas === fechos) nova = nova.replace(/<\/?(i|em)\b[^>]*>/gi, '').replace(/\b(Campus|Campi)\b/g, '<i>$1</i>')
     nova = nova.replace(/<(span|strong|b|u)\b[^>]*><\/\1>/gi, '')
     return html.slice(0, cargo.inicio) + nova + html.slice(cargo.fim)
   }
@@ -582,7 +595,7 @@
   // Documento já assinado: a página do documento mostra "Documento assinado eletronicamente por".
   const estaAssinado = html => /assinado\s+eletronicamente\s+por/i.test(textoDoHtml(html))
 
-  const api = { siglaDaUnidade, ehUnidadePalmas, limparUnidade, limparUnidades, acharUnidade, textoDoHtml, formatarProcesso, mesmoProcesso, processoDaReferencia, linhaDoProcesso, conferirProcesso, avisoDoProcesso, perguntaAntesDeAssinar, fraseDoProcesso, problemasParaAssinar, corrigirProcesso, estaAssinado, confereAoAssinar, conferirItalico, avisoDoItalico, corrigirItalico, conferirCargo, fraseDoCargo, corrigirCargo, CARGO_DA_DIRETORA, numeroSeiDoDocumento, aceitar, foiAceito, documentosDoBloco, idDoItemDoBloco, TIMBRE_FIXO, comMaiusculas, linhasVaziasDoTimbre, linhasDoTimbre, timbreEsperado, conferirTimbre, avisosDoTimbre, corrigirTimbre, secaoCom, ehDoTimbre, ehDoRodape, formatarTelefone, conferirRodape, rodapeEsperado, corrigirRodape, linhasDoSetor, sugerirUnidade, linhasDaSugestao }
+  const api = { siglaDaUnidade, ehUnidadePalmas, limparUnidade, limparUnidades, acharUnidade, textoDoHtml, formatarProcesso, mesmoProcesso, processoDaReferencia, linhaDoProcesso, conferirProcesso, avisoDoProcesso, perguntaAntesDeAssinar, fraseDoProcesso, problemasParaAssinar, corrigirProcesso, estaAssinado, confereAoAssinar, conferirItalico, avisoDoItalico, corrigirItalico, conferirCargo, fraseDoCargo, corrigirCargo, CARGO_DA_DIRETORA, CARGOS_PADRAO, lerCargos, cargosEmTexto, numeroSeiDoDocumento, aceitar, foiAceito, documentosDoBloco, idDoItemDoBloco, TIMBRE_FIXO, comMaiusculas, linhasVaziasDoTimbre, linhasDoTimbre, timbreEsperado, conferirTimbre, avisosDoTimbre, corrigirTimbre, secaoCom, ehDoTimbre, ehDoRodape, formatarTelefone, conferirRodape, rodapeEsperado, corrigirRodape, linhasDoSetor, sugerirUnidade, linhasDaSugestao }
   if (typeof module !== 'undefined' && module.exports) module.exports = api
   else raiz.ExtensaoIFTO = Object.assign(raiz.ExtensaoIFTO || {}, { conferirDocumento: api })
 })(globalThis)

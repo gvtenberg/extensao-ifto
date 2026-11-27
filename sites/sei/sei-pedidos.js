@@ -296,6 +296,30 @@
     if (lida) await abrirNaArvoreNova(quadro, velha, lida.idProcesso, () => ({ id: String(idDocumento) }), true)
   }
 
+  // v0.37.0 (#355, usuário, 27/11/2026): "Duplicar documento" de um documento externo: lê o "Alterar Documento
+  // Externo" do original e salva um externo novo do mesmo tipo, com os mesmos dados (nome na árvore, data,
+  // número, formato, remetente, interessados, classificação, observações, nível de acesso), sem o arquivo.
+  // Depois abre o novo na árvore.
+  async function duplicarExterno (lida, documento) {
+    const regras = ExtensaoIFTO.duplicarDocumento
+    const original = await pedir(new URL(documento.linkAlterar, location.href).href)
+    const doOriginal = formularioDoExterno(original)
+    if (!doOriginal) throw new Error(`O SEI não abriu o cadastro de ${documento.rotulo}.`)
+    const copiar = regras.camposDoExterno(camposDoFormulario(doOriginal))
+    if (!copiar.hdnIdSerie) throw new Error(`Não consegui ler o tipo de ${documento.rotulo}.`)
+    const paginaEmBranco = await abrirExternoNovo(lida)
+    const emBranco = formularioDoExterno(paginaEmBranco)
+    const lista = emBranco.querySelector('#selSerie')
+    if (!lista || ![...lista.options].some(opcao => opcao.getAttribute('value') === copiar.hdnIdSerie)) throw new Error(`O tipo de ${documento.rotulo} não aparece em "Incluir Documento › Externo" nesta unidade. Nada foi criado.`)
+    const pagina = await enviar(emBranco, paginaEmBranco.endereco, { hdnIdSerie: copiar.hdnIdSerie, selSerie: copiar.hdnIdSerie })
+    const doTipo = formularioDoExterno(pagina)
+    if (!doTipo) throw new Error('O SEI não abriu o formulário do documento externo.')
+    const resposta = await enviar(doTipo, pagina.endereco, { ...copiar, selSerie: copiar.hdnIdSerie, hdnAnexos: '', hdnFlagDocumentoCadastro: '2' })
+    const regrasPagamento = ExtensaoIFTO.documentosPagamento
+    if (formularioDoExterno(resposta)) throw new Error(regrasPagamento.mensagemDoSei(resposta.html) || regrasPagamento.alertaNovo(resposta.html, pagina.html) || 'O SEI não salvou a cópia.')
+    await abrirIncluido(lida, [ExtensaoIFTO.sei.linkDaArvoreComDocumento(resposta.html)])
+  }
+
   // v0.15.0 (saiu de sicaf.js na v0.27.1 para servir também aos arquivos arrastados): inclui os itens com a
   // janela da extensão aberta: andamento, botão Parar, árvore recarregada e o resumo no fim.
   async function incluirNaJanela (itens, aberta, nomeDoItem) {
@@ -334,5 +358,5 @@
     aberta.trocarBotoes([{ texto: 'Fechar', tipo: 'principal', aoClicar: j => j.fechar() }])
   }
 
-  ExtensaoIFTO.seiPedidos = { pedir, baixar, baixarPdf, lerHtml, camposDoFormulario, enviar, incluirExternos, anexarAoExterno, tiposDoExterno, abrirIncluir, formularioDoTipo, incluirNaJanela, arvoreAberta, recarregarArvore, abrirDepoisDeAnexar }
+  ExtensaoIFTO.seiPedidos = { pedir, baixar, baixarPdf, lerHtml, camposDoFormulario, enviar, incluirExternos, anexarAoExterno, tiposDoExterno, abrirIncluir, formularioDoTipo, incluirNaJanela, arvoreAberta, recarregarArvore, abrirDepoisDeAnexar, duplicarExterno }
 })()

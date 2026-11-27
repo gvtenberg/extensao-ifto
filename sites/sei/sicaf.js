@@ -146,7 +146,7 @@
     })
   }
 
-  async function buscarNoSicaf (grupos, resultado, aberta, quais, voltar) {
+  async function buscarNoSicaf (grupos, resultado, aberta, quais, voltar, oQue = null) {
     const permissao = await pedirAoFundo({ tipo: 'sicafPermissao' })
     if (!permissao || !permissao.permitido) {
       aberta.trocarConteudo([
@@ -156,13 +156,13 @@
       aberta.trocarBotoes([
         { texto: 'Cancelar', aoClicar: j => j.fechar() },
         { texto: 'Abrir configurações', aoClicar: () => pedirAoFundo({ tipo: 'abrirConfiguracoes' }) },
-        { texto: BUSCAR[quais], tipo: 'principal', aoClicar: j => buscarNoSicaf(grupos, resultado, j, quais, voltar) }
+        { texto: BUSCAR[quais], tipo: 'principal', aoClicar: j => buscarNoSicaf(grupos, resultado, j, quais, voltar, oQue) }
       ])
       return
     }
     const pular = await conferirSites(grupos, aberta, voltar)
     if (!pular) return
-    pedidoAtual = { grupos, resultado, quais, voltar }
+    pedidoAtual = { grupos, resultado, quais, voltar, oQue }
     janelaDaBusca = aberta
     const sites = { sicaf: 'O SICAF abre', simples: 'O Simples Nacional abre' }[quais] || 'O SICAF e o Simples Nacional abrem'
     const titulo = { sicaf: 'Buscando no SICAF:', simples: 'Consultando no Simples Nacional:' }[quais] || 'Buscando no SICAF e no Simples Nacional:'
@@ -254,6 +254,10 @@
       if (!fornecedor.nomeConsulta) fornecedor.nomeConsulta = simplesNacional.nomeDaConsulta(fornecedor.nomeNoSicaf || grupo.nome)
       fornecedores.push(fornecedor)
     }
+    // v0.37.0: com as caixas, a empresa que não precisou de SICAF nem Simples ainda pode ganhar TCU e Anexo.
+    for (const grupo of (pedido && pedido.oQue && pedido.grupos) || []) {
+      if (!fornecedores.some(outro => outro.cnpj === grupo.cnpj)) fornecedores.push({ ...grupo, nomeNoSicaf: '', avisos: [], pediuSicaf: false, pediuSimples: false })
+    }
     mostrarResultadoDoSicaf(fornecedores, pedido)
   }
 
@@ -302,10 +306,14 @@
       fornecedor.sicafSemPdf = existentes ? regras.doFornecedor(existentes.nomeados, 'sicaf', fornecedor, existentes.cnpjsDosVizinhos) : null
       fornecedor.consultaSemPdf = existentes ? regras.doFornecedor(existentes.nomeados, 'consulta', fornecedor, existentes.cnpjsDosVizinhos) : null
       fornecedor.outraUnidade = [fornecedor.sicafSemPdf, fornecedor.consultaSemPdf].some(achado => achado && achado.outraUnidade)
+      // v0.37.0: Consulta Consolidada TCU deste fornecedor já no trecho do processo (pelo nome na árvore).
+      const nomesDele = [fornecedor.nomeNoSicaf, fornecedor.nomeNoSimples, fornecedor.nome, ...(fornecedor.notas || []).map(nota => nota.fornecedor)].filter(Boolean)
+      fornecedor.jaTemTcu = Boolean(lida) && regras.trechoPendente(lida.documentos).some(doc => regras.tipoNaArvore(doc.rotulo) === 'tcu' && nomesDele.some(nome => regras.nomesParecidos(nome, regras.nomeDoDocumento(doc.rotulo))))
     }
     const naoLidos = existentes ? existentes.naoLidos : []
     // v0.16.0: Sicaf, Consulta e Anexo em branco depois da última Folha são preenchidos em vez de criar outros.
-    const oQue = { sicaf: quais !== 'simples', simples: quais !== 'sicaf', anexo: quais === 'tudo' }
+    // v0.37.0: janela das notas: o que a pessoa marcou nas caixas.
+    const oQue = (pedido && pedido.oQue) ? { ...pedido.oQue, ordem: true } : { sicaf: quais !== 'simples', simples: quais !== 'sicaf', anexo: quais === 'tudo' }
     const paraIncluir = regras.documentosParaIncluir(fornecedores, oQue)
     for (const item of paraIncluir) {
       const fornecedor = fornecedores.find(outro => outro.cnpj === item.cnpj)
@@ -330,7 +338,7 @@
       return item.nomeArvore || item.arquivo ? ` – no ${item.tipo} em branco ${item.emBranco.sei}` : ` – já existe em branco (${item.emBranco.sei})`
     }
     const textoDoItem = item => nomeDoItem(item) + (item.arquivo ? ' (com o PDF)' : '') +
-      (item.semPdf ? ' – sem PDF (complete depois, para manter a ordem)' : '') + doEmBranco(item)
+      (item.tcu ? ' – em branco (a consulta do TCU ainda não é feita pela extensão)' : item.semPdf ? ' – sem PDF (complete depois, para manter a ordem)' : '') + doEmBranco(item)
     const cartoes = fornecedores.map(fornecedor => {
       const doFornecedor = itens.filter(item => item.cnpj === fornecedor.cnpj)
       return criar('div', { className: 'cartao' }, [
@@ -588,17 +596,37 @@
     const alerta = criar('p', { className: 'aviso vermelho', hidden: true, textContent: 'Há diferenças em vermelho. Confira a nota e o ateste antes de continuar.' })
     let confirmouVermelho = false
     let aberta = null
-    const textoDoBotao = () => marcadas().length ? regras.textoDaBusca(marcadas()) : BUSCAR.tudo
+    // v0.37.0 (usuário, 27/11/2026): o que incluir. SICAF, Simples e Instrumento de Cobrança vêm marcados
+    // (servem a quase todo processo); a escolha fica ao voltar para esta janela.
+    if (!notas.escolhas) notas.escolhas = { sicaf: true, simples: true, tcu: false, anexo: true }
+    const escolhas = notas.escolhas
+    const algumaEscolha = () => Object.values(escolhas).some(Boolean)
+    const textoDoBotao = () => marcadas().length ? regras.textoDaBusca(marcadas(), escolhas) : BUSCAR.tudo
     const aoMarcar = () => {
       confirmouVermelho = false
       alerta.hidden = true
       const botao = aberta && aberta.botoes[1]
-      if (botao) { botao.textContent = textoDoBotao(); botao.className = 'acao principal'; botao.disabled = !marcadas().length }
+      if (botao) { botao.textContent = textoDoBotao(); botao.className = 'acao principal'; botao.disabled = !marcadas().length || !algumaEscolha() }
     }
+    const OPCOES = [
+      ['sicaf', 'SICAF', '1 documento por empresa'],
+      ['simples', 'Simples Nacional', '1 documento por empresa'],
+      ['tcu', 'Consulta consolidada do TCU', '1 documento por empresa; por enquanto, só o documento em branco'],
+      ['anexo', 'Instrumento de Cobrança', '1 documento por nota; por enquanto, só o documento em branco']
+    ]
+    const caixas = criar('div', { className: 'cartao' }, [
+      criar('p', { className: 'apoio', textContent: 'O que incluir no processo:' }),
+      ...OPCOES.map(([chave, nome, dica]) => {
+        const caixa = criar('input', { type: 'checkbox', checked: escolhas[chave] })
+        caixa.addEventListener('change', () => { escolhas[chave] = caixa.checked; aoMarcar() })
+        return criar('label', { className: 'escolha' }, [caixa, ` ${nome} `, criar('span', { className: 'apoio', textContent: `(${dica})` })])
+      })
+    ])
     const cartoes = notas.map(nota => cartaoDaNota(nota, resultado, aoMarcar))
     aberta = janela.abrir({
       titulo: regras.textoDoAviso(notas),
       conteudo: [
+        caixas,
         criar('p', { className: 'apoio', textContent: 'Notas depois da última Folha de Encaminhamento, conferidas com o ateste. Desmarque a nota que não deve entrar na busca (por exemplo, uma nota cancelada).' }),
         ...cartoes,
         alerta
@@ -610,7 +638,7 @@
           tipo: 'principal',
           aoClicar: j => {
             const escolhidas = marcadas()
-            if (!escolhidas.length) return
+            if (!escolhidas.length || !algumaEscolha()) return
             const semCnpj = escolhidas.filter(nota => !regras.cnpjValido(nota.cnpjEscolhido))
             if (semCnpj.length) {
               alerta.hidden = false
@@ -626,7 +654,7 @@
               return
             }
             const grupos = regras.agruparPorFornecedor(escolhidas.map(nota => ({ ...nota, cnpj: nota.cnpjEscolhido })))
-            buscarFornecedores(grupos, resultado, j, () => janelaDasNotas(notas, resultado))
+            buscarFornecedores(grupos, resultado, j, () => janelaDasNotas(notas, resultado), { ...escolhas })
           }
         }
       ]
@@ -698,19 +726,24 @@
 
   // v0.13.0: fornecedores conferidos vão para o SICAF (os que já têm Sicaf neste trecho ficam de fora).
   // v0.18.0: e para o Simples Nacional (os que já têm a Consulta com o PDF ficam de fora).
-  function buscarFornecedores (grupos, resultado, aberta, voltar) {
+  // v0.37.0: oQue = caixas marcadas na janela das notas ({ sicaf, simples, tcu, anexo }).
+  function buscarFornecedores (grupos, resultado, aberta, voltar, oQue) {
     const marcados = grupos.map(grupo => ({
       ...grupo,
-      precisaSicaf: !resultado.cnpjsComSicaf.has(grupo.cnpj),
-      precisaSimples: !resultado.raizesComConsulta.has(regras.raizDoCnpj(grupo.cnpj))
+      precisaSicaf: oQue.sicaf && !resultado.cnpjsComSicaf.has(grupo.cnpj),
+      precisaSimples: oQue.simples && !resultado.raizesComConsulta.has(regras.raizDoCnpj(grupo.cnpj))
     }))
     const faltam = marcados.filter(grupo => grupo.precisaSicaf || grupo.precisaSimples)
-    if (!faltam.length) {
-      aberta.trocarConteudo([criar('p', { textContent: 'Todos esses fornecedores já têm Sicaf e Consulta do Simples Nacional neste trecho do processo.' })])
-      aberta.trocarBotoes([{ texto: 'Voltar', aoClicar: j => { j.fechar(); voltar() } }, { texto: 'Fechar', tipo: 'principal', aoClicar: j => j.fechar() }])
+    const quais = oQue.sicaf && oQue.simples ? 'tudo' : oQue.sicaf ? 'sicaf' : 'simples'
+    if (faltam.length) { buscarNoSicaf(marcados, resultado, aberta, quais, voltar, oQue); return }
+    // Nada a buscar nos sites: segue direto para a lista do que incluir (TCU e Instrumento de Cobrança).
+    if (oQue.tcu || oQue.anexo) {
+      aberta.fechar()
+      mostrarResultadoDoSicaf(marcados.map(grupo => ({ ...grupo, nomeNoSicaf: '', avisos: [], pediuSicaf: false, pediuSimples: false })), { grupos: marcados, resultado, quais: 'tudo', voltar, oQue })
       return
     }
-    buscarNoSicaf(faltam, resultado, aberta, 'tudo', voltar)
+    aberta.trocarConteudo([criar('p', { textContent: 'Todos esses fornecedores já têm Sicaf e Consulta do Simples Nacional neste trecho do processo.' })])
+    aberta.trocarBotoes([{ texto: 'Voltar', aoClicar: j => { j.fechar(); voltar() } }, { texto: 'Fechar', tipo: 'principal', aoClicar: j => j.fechar() }])
   }
 
   navegador.storage.onChanged.addListener(async (mudancas, area) => {

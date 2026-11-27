@@ -53,3 +53,12 @@ Nos[1].acoes = '<a href="controlador.php?acao=documento_alterar_recebido&amp;id_
   assert.equal(documentos[0].linkCadastro, 'controlador.php?acao=documento_alterar&id_documento=5')
   assert.equal(documentos[1].linkCadastro, '')
 })
+
+test('v0.37.0: duplicar documento externo, sem o arquivo', () => {
+  const lida = { linkIncluir: 'x' }
+  assert.equal(d.podeDuplicarExterno(lida, { feitoNoSei: false, linkAlterar: 'a' }), true)
+  assert.equal(d.podeDuplicarExterno(lida, { feitoNoSei: false, linkAlterar: '' }), false)
+  assert.equal(d.podeDuplicarExterno(lida, { feitoNoSei: true, linkAlterar: 'a' }), false)
+  const copia = d.camposDoExterno([['selSerie', '12'], ['txtNomeArvore', 'NF 63'], ['hdnAnexos', 'arq'], ['hdnIdDocumento', '99'], ['rdoNivelAcesso', '1'], ['selHipoteseLegal', '3']])
+  assert.deepEqual(copia, { hdnIdSerie: '12', txtNomeArvore: 'NF 63', rdoNivelAcesso: '1', selHipoteseLegal: '3' })
+})
