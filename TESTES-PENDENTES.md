@@ -667,6 +667,6 @@ E: No alto da janela aparecem 4 caixas: SICAF, Simples Nacional e Instrumento de
 ### T322 – Consulta Consolidada TCU em branco (v0.38.0) (Crítico)
 F: Num processo de teste com nota sem SICAF, marque também "Consulta consolidada do TCU" e faça a busca até a janela de incluir; confira a lista e clique em "Incluir no processo".
 E: A lista mostra, por empresa, Sicaf, Consulta Simples Nacional, "Consulta Consolidada TCU <empresa> – em branco" e, por nota, o Anexo. Na árvore entram nessa ordem; a do TCU vazia. Clicando de novo no botão, a do TCU não é pedida outra vez.
-### T323 – SICAF, Simples e editor depois da divisão do fundo (v0.38.0)
+### T323 – SICAF, Simples e editor depois da divisão do fundo (v0.38.1)
 F: Faça uma busca de SICAF e Simples numa nota (até a janela de incluir, sem incluir); depois abra um documento no editor e use um botão da extensão (por exemplo, "Corrigir timbre").
 E: Tudo funciona como antes (a parte de trás da extensão foi dividida em arquivos menores; nada muda na tela). Se algo parar, copie as linhas "[extensão IFTO]" do console (F12 > Console) e cole aqui.
