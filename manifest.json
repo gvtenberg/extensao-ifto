@@ -2,7 +2,7 @@
   "manifest_version": 3,
   "name": "Extensão IFTO Palmas",
   "short_name": "IFTO Palmas",
-  "version": "0.38.0",
+  "version": "0.38.1",
   "description": "Melhorias no SEI e apoio ao Sistema de Gestão Orçamentária do IFTO Campus Palmas.",
   "icons": { "48": "icones/icone.svg", "96": "icones/icone.svg" },
   "permissions": ["storage", "contextMenus", "scripting"],
@@ -10,7 +10,7 @@
   "host_permissions": ["*://sei.ifto.edu.br/*controlador.php?acao=*", "*://sei.ifto.edu.br/*login.php*"],
   "optional_host_permissions": ["*://www3.comprasnet.gov.br/*", "*://comprasnet.gov.br/*", "*://www.comprasnet.gov.br/*", "*://cnetmobile.estaleiro.serpro.gov.br/*", "*://consopt.www8.receita.fazenda.gov.br/*", "https://compras-ifto-teste-v1-mbro.onrender.com/*", "https://sso.acesso.gov.br/*"],
   "background": {
-    "scripts": ["comum/sei.js", "comum/minuta-edital.js", "comum/conferir-documento.js", "comum/dados-processo.js", "comum/data-documento.js", "comum/configuracoes.js", "comum/todos-os-estilos.js", "comum/sicaf.js", "comum/simples-nacional.js", "comum/compras-ifto.js", "sites/sei/pdf-texto.js", "sites/sei/editor-preencher.js", "sites/sei/editor-minuta.js", "fundo/fundo.js"]
+    "scripts": ["comum/sei.js", "comum/minuta-edital.js", "comum/conferir-documento.js", "comum/dados-processo.js", "comum/data-documento.js", "comum/configuracoes.js", "comum/todos-os-estilos.js", "comum/sicaf.js", "comum/simples-nacional.js", "comum/compras-ifto.js", "sites/sei/pdf-texto.js", "sites/sei/editor-preencher.js", "sites/sei/editor-minuta.js", "fundo/base.js", "fundo/busca-sicaf.js", "fundo/busca-simples.js", "fundo/copia-downloads.js", "fundo/compras-ifto.js", "fundo/editor.js", "fundo/fundo.js"]
   },
   "action": {
     "default_icon": "icones/icone.svg",
